@@ -1,0 +1,83 @@
+        <h3>Search Subscribers</h3>
+        <div class="p1">
+          <form action="/subscriber/search" method="post">
+            <input type="text" id="search_subscriber" name="search_string" value="[% search_string %]" />
+            <input type="submit" value="Search &#187;" class="but" />
+          </form>
+        </div>
+
+        [% IF subscriber_list %]
+
+          <h3>Subscribers</h3>
+
+          <div class="p1">
+            <table>
+              <tr><td>SIP URI</td><td class="tdcenter">Account ID</td></tr>
+
+            [% FOREACH subscriber = subscriber_list %]
+
+              <tr>
+                <td>
+                [% IF subscriber.subscriber_id %]
+                  <a href="/subscriber/detail?subscriber_id=[% subscriber.subscriber_id %]">
+                    [% subscriber.username %]@[% subscriber.domain %]</a>
+                [% ELSE %]
+                  [% subscriber.username %]@[% subscriber.domain %]
+                [% END %]
+                </td>
+                <td class="tdcenter">
+                  <a href="/account/detail?account_id=[% subscriber.account_id %]">
+                    [% subscriber.account_id %]</a>
+                </td>
+              </tr>
+
+            [% END %]
+            </table>
+
+            [% IF pagination %]
+            <div class="pagination">
+              <ul>
+                [% IF offset == 0 %]
+                  <li class="disablepage">&#171; prev</li>
+                [% ELSE %]
+                  <li class="nextpage">
+                    <a href="/subscriber/search?search_string=[% search_string %]&amp;offset=[% offset - 1 %]">&#171; prev</a>
+                  </li>
+                [% END %]
+                [% FOREACH pagine = pagination %]
+                  [% IF pagine.offset == offset %]
+                    <li class="currentpage">
+                      [% pagine.offset + 1 %]
+                    </li>
+                  [% ELSIF pagine.offset == -1 %]
+                     ...
+                  [% ELSE %]
+                    <li>
+                      <a href="/subscriber/search?search_string=[% search_string
+                               %]&amp;offset=[% pagine.offset %]">[% pagine.offset + 1 %]</a>
+                    </li>
+                  [% END %]
+                [% END %]
+                [% IF offset >= max_offset %]
+                  <li class="disablepage">
+                    next &#187;
+                  </li>
+                [% ELSE %]
+                  <li class="nextpage">
+                    <a href="/subscriber/search?search_string=[% search_string %]&amp;offset=[% offset + 1 %]">next &#187;</a>
+                  </li>
+                [% END %]
+              </ul>
+            </div>
+            [% END %]
+
+          </div>
+
+        [% ELSIF searched %]
+
+          <div class="p1">
+            No matching subscribers found.
+          </div>
+
+        [% END %]
+

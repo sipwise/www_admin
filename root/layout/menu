@@ -1,0 +1,35 @@
+      <div id="contentmenu">
+
+        <h3 id="first">Authentication</h3>
+        <ul>
+        [% IF Catalyst.user_exists %]
+          <li>Logged in as <b>[% Catalyst.user.login %]</b></li>
+          <li><a href="/logout">&#187; Logout</a></li>
+        [% ELSE %]
+          <li>&nbsp;</li>
+          <li>Not logged in</li>
+        [% END %]
+        </ul>
+
+      [% IF Catalyst.session.admin %]
+        <h3>User Administration</h3>
+        <ul>
+          [% IF Catalyst.config.billing_features %]
+          <li><a href="/customer">Customers</a></li>
+          [% END %]
+          <li><a href="/account">Accounts</a></li>
+          <li><a href="/subscriber">Subscribers</a></li>
+[%#          <li><a href="/registration">Devices</a></li> %]
+[%#          <li><a href="/registration">Registrations</a></li> %]
+        </ul>
+
+        <h3>System Administration</h3>
+        <ul>
+          <li><a href="/domain">Domains</a></li>
+          <li><a href="/admin">Administrators</a></li>
+[%#          <li><a href="/gwgroup">Gateway Settings</a></li> %]
+[%#          <li><a href="/sipserver">SIP Server Settings</a></li> %]
+        </ul>
+      [% END %]
+
+      </div>

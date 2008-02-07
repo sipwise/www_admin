@@ -1,0 +1,6 @@
+<!-- BEGIN layout/footer -->
+    <div id="footer">
+      Copyright 2007 Sipwise, Austria.<br />
+      <a href="http://sipwise.com/">http://sipwise.com</a>
+    </div>
+<!-- END layout/footer -->

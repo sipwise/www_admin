@@ -1,0 +1,52 @@
+        <h3>Get by ID</h3>
+        <div class="p1">
+          <form action="/account/getbyid" method="GET">
+            <input type="text" id="account_id" name="account_id" value="[% account_id %]" />
+            <input type="submit" value="Get &#187;" class="but" />
+          </form>
+          [% IF messages.accsearcherr %]<div class="errormsg">[% messages.accsearcherr %]</div>[% END %]
+        </div>
+
+        <h3>Search by subscriber</h3>
+        <div class="p1">
+          <form action="/subscriber/search" method="post">
+            <input type="text" id="search_subscriber" name="search_string" value="[% search_string %]" />
+            <input type="submit" value="Search &#187;" class="but" />
+          </form>
+        </div>
+
+        <h3>Create new account</h3>
+        <div class="p1">
+          <form action="/account/create_account" method="post">
+            <input type="submit" value="Create &#187;" class="but" />
+          </form>
+        </div>
+
+        [% IF subscriber_list %]
+
+          <h3>Subscribers</h3>
+
+          <div class="p1">
+            <table>
+              <tr><td>SIP URI</td><td class="tdcenter">Subscriber ID</td><td class="tdcenter">Account ID</td></tr>
+
+            [% FOREACH subscriber = subscriber_list %]
+
+              <tr>
+                <td><a href="/subscriber/detail?subscriber_id=[% subscriber.id %]">
+                      [% subscriber.username %]@[% subscriber.domain %]
+                    </a></td>
+                <td class="tdcenter"><a href="/subscriber/detail?subscriber_id=[% subscriber.id %]">
+                                       [% subscriber.id %]
+                                     </a></td>
+                <td class="tdcenter"><a href="/account/detail?account_id=[% subscriber.account_id %]">
+                                       [% subscriber.account_id %]
+                                     </a></td>
+              </tr>
+
+            [% END %]
+
+            </table>
+          </div>
+
+        [% END %]

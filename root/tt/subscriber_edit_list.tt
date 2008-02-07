@@ -1,0 +1,69 @@
+        <h3>Edit [% list_name %] for
+          <a class="noarrow" href="detail?subscriber_id=[% subscriber_id %]">
+            [% subscriber.username %]@[% subscriber.domain %]</a>
+        </h3>
+
+        <div class="actions">
+          <a href="detail?subscriber_id=[% subscriber_id %]" class="aaction">back</a>
+        </div>
+        <div class="p1">
+          [% IF messages.nummsg %]<div class="goodmsg">[% messages.nummsg %]</div>[% END %]
+          [% IF messages.numerr %]<div class="errormsg">[% messages.numerr %]</div>[% END %]
+
+          <table>
+            [% FOREACH blockentry = list_data %]
+              <tr class="[% blockentry.background %]">
+                <td > [% blockentry.number %] </td>
+                <form action="do_edit_list" method="post">
+                  <td >
+                    <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                    <input type="hidden" name="list_name" value="[% list_name %]" />
+                    <input type="hidden" name="block_del" value="[% blockentry.number %]" />
+                    <input type="hidden" name="block_stat" value="[% blockentry.active %]" />
+                    <div class="postlink">
+                      <label for="listdel[% blockentry.id %]">delete</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="listdel[% blockentry.id %]" />
+                    </div>
+                  </td>
+                </form>
+                <form action="do_edit_list" method="post">
+                  <td>
+                    <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                    <input type="hidden" name="list_name" value="[% list_name %]" />
+                    [% IF    blockentry.active  == 1 %]
+                      <input type="hidden" name="block_act" value="[% blockentry.number %]" />
+                      <input type="hidden" name="block_stat" value="1" />
+                      <div class="postlink">
+                        <label for="blockact[% blockentry.id %]">deactivate</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockact[% blockentry.id %]" />
+                      </div>
+                    [% ELSIF blockentry.active  == 0 %]
+                      <input type="hidden" name="block_act" value="[% blockentry.number %]" />
+                      <input type="hidden" name="block_stat" value="0" />
+                      <div class="postlink">
+                        <label for="blockact[% blockentry.id %]">activate</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockact[% blockentry.id %]" />
+                      </div>
+                    [% END %]
+                  </td>
+                </form>
+              </tr>
+            [% END %]
+          </table>
+
+          <br />
+
+          <form action="/subscriber/do_edit_list" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+            <input type="hidden" name="list_name" value="[% list_name %]" />
+            <label for="blockaddtxt">New entry:</label><br />
+            <div class="postlink">
+              <input type="text" size="20" name="block_add" id="blockaddtxt" value="[% blockaddtxt %]" /> &nbsp;
+              <label for="blockadd">Add entry</label>
+              <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockadd" />
+              [% IF messages.msgadd %]<div class="errormsg">[% messages.msgadd %]</div>[% END %]
+            </div><br clear="all" />
+          </form>
+
+        </div>
+

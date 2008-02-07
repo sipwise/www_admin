@@ -1,0 +1,119 @@
+        <h3>Manage Administrator Accounts</h3>
+
+        <div class="p1">
+          [% IF messages.eadmmsg %]<div class="goodmsg">[% messages.eadmmsg %]</div>[% END %]
+          [% IF messages.eadmerr %]<div class="errormsg">[% messages.eadmerr %]</div>[% END %]
+
+          <table>
+            <tr class="table_header">
+              <td>login</td>
+              <td>password</td>
+              <td>master</td>
+              <td>active</td>
+              <td />
+              <td />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH admin = admins %]
+              <tr>
+                <td>[% admin.login %]</td>
+                [% IF admin.login == edit_admin %]
+                  <form action="/admin/do_edit_admin" method="post">
+                    <input type="hidden" name="admin" value="[% admin.login %]" />
+                    <td><input type="password" name="password" value="" /></td>
+                    <td class="tdcenter">
+                      <input type="checkbox" class="checkbox" name="is_master"
+                             [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
+                             [% IF erefill.is_master or !erefill && admin.is_master %]checked="checked" [% END %] />
+                    </td>
+                    <td class="tdcenter">
+                      <input type="checkbox" class="checkbox" name="is_active"
+                             [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
+                             [% IF erefill.is_active or !erefill && admin.is_active %]checked="checked" [% END %] />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="admsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="admsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/admin" class="aaction">cancel</a></td>
+                [% ELSE %]
+                  <td>********</td>
+                  <td class="tdcenter"><input type="checkbox" class="checkbox" disabled="disabled"[% IF admin.is_master %] checked="checked"[% END %] /></td>
+                  <td class="tdcenter"><input type="checkbox" class="checkbox" disabled="disabled"[% IF admin.is_active %] checked="checked"[% END %] /></td>
+                  <td><a href="/admin?edit_admin=[% admin.login %]" class="aaction">edit</a></td>
+                  [% IF admin.login != Catalyst.session.admin.login %]
+                    <form action="/admin/do_delete_admin" method="post">
+                      <td>
+                        <input type="hidden" name="admin" value="[% admin.login %]" />
+                        <div class="postlink">
+                          <label for="admdel[% id %]">delete</label>
+                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="admdel[% id %]" />
+                        </div>
+                      </td>
+                    </form>
+                  [% ELSE %]
+                    <td />
+                  [% END %]
+                [% END %]
+              </tr>
+              [% IF admin.login == edit_admin %]
+                [% IF messages.epass %]
+                  <tr><td colspan="5">
+                    <div class="errormsg">
+                      [% messages.epass %]
+                    </div>
+                  </td></tr>
+                [% END %]
+              [% END %]
+            [% id = id + 1 %]
+            [% END %]
+          </table>
+        </div>
+
+      [% IF Catalyst.session.admin.is_master || Catalyst.session.admin.is_superuser %]
+        <h3>Create Administrator Account</h3>
+
+        <div class="p1">
+          [% IF messages.cadmmsg %]<div class="goodmsg">[% messages.cadmmsg %]</div>[% END %]
+          [% IF messages.cadmerr %]<div class="errormsg">[% messages.cadmerr %]</div>[% END %]
+
+          <table>
+            <tr class="table_header">
+              <td>login</td>
+              <td>password</td>
+              <td>master</td>
+              <td>active</td>
+              <td />
+              <td />
+            </tr>
+            <form action="/admin/do_create_admin" method="post">
+              <tr>
+                <td><input type="text" size="20" name="admin" id="adminaddtxt" value="[% arefill.admin %]" /></td>
+                <td><input type="password" name="password" value="" /></td>
+                <td class="tdcenter"><input type="checkbox" class="checkbox" name="is_master"[% IF arefill.is_master %] checked="checked"[% END %] /></td>
+                <td class="tdcenter"><input type="checkbox" class="checkbox" name="is_active"[% IF arefill.is_active %] checked="checked"[% END %] /></td>
+                <td>
+                  <div class="postlink">
+                    <label for="adminadd">Add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="adminadd" />
+                  </div>
+                </td>
+                <td />
+              </tr>
+              [% IF messages.alogin || messages.apass %]
+                <tr><td colspan="5">
+                  <div class="errormsg">
+                    [% messages.alogin %]
+                    [% IF messages.alogin && messages.apass %]<br />[% END %]
+                    [% messages.apass %]
+                  </div>
+                </td></tr>
+              [% END %]
+            </form>
+          </table>
+        </div>
+      [% END %]
+

@@ -1,0 +1,104 @@
+        <h3>Edit Domains</h3>
+
+        <div class="p1">
+          [% IF messages.edommsg %]<div class="goodmsg">[% messages.edommsg %]</div>[% END %]
+          [% IF messages.edomerr %]<div class="errormsg">[% messages.edomerr %]</div>[% END %]
+
+          <table>
+            <tr class="table_header">
+              <td>domain</td>
+              <td>country code</td>
+              <td>timezone</td>
+              <td />
+              <td />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH domain = domains %]
+              <tr>
+                <td>[% domain.domain %]</td>
+                [% IF domain.domain == edit_domain %]
+                  <form action="/domain/do_edit_domain" method="post">
+                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <td class="tdcenter"><input class="ishort" name="cc" value="[% domain.cc %]" /></td>
+                    <td><input name="timezone" value="[% domain.timezone %]" /></td>
+                    <td>
+                      <div class="postlink">
+                        <label for="domsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="domsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/domain" class="aaction">cancel</a></td>
+                [% ELSE %]
+                <td class="tdcenter">[% domain.cc %]</td>
+                <td>[% domain.timezone %]</td>
+                <td><a href="/domain?edit_domain=[% domain.domain %]" class="aaction">edit</a></td>
+                <form action="/domain/do_delete_domain" method="post">
+                  <input type="hidden" name="domain" value="[% domain.domain %]" />
+                  <td>
+                    <div class="postlink">
+                      <label for="domdel[% id %]">delete</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="domdel[% id %]" />
+                    </div>
+                  </td>
+                </form>
+                [% END %]
+              </tr>
+              [% IF domain.domain == edit_domain %]
+                [% IF messages.ecc || messages.etimezone %]
+                  <tr><td colspan="5">
+                    <div class="errormsg">
+                      [% messages.ecc %]
+                      [% IF messages.ecc && messages.etimezone %]<br />[% END %]
+                      [% messages.etimezone %]
+                    </div>
+                  </td></tr>
+                [% END %]
+              [% END %]
+            [% id = id + 1 %]
+            [% END %]
+          </table>
+        </div>
+
+        <h3>Create domain</h3>
+
+        <div class="p1">
+          [% IF messages.cdommsg %]<div class="goodmsg">[% messages.cdommsg %]</div>[% END %]
+          [% IF messages.cdomerr %]<div class="errormsg">[% messages.cdomerr %]</div>[% END %]
+
+          <table>
+            <tr class="table_header">
+              <td>domain</td>
+              <td>country code</td>
+              <td>timezone</td>
+              <td />
+              <td />
+            </tr>
+            <form action="/domain/do_create_domain" method="post">
+              <tr>
+                <td><input type="text" size="20" name="domain" id="domainaddtxt" value="[% arefill.domain %]" /></td>
+                <td class="tdcenter"><input class="ishort" name="cc" value="[% arefill.cc %]" /></td>
+                <td><input name="timezone" value="[% arefill.timezone %]" /></td>
+                <td>
+                  <div class="postlink">
+                    <label for="domainadd">Add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="domainadd" />
+                  </div>
+                </td>
+                <td />
+              </tr>
+              [% IF messages.acc || messages.atimezone %]
+                <tr><td colspan="5">
+                  <div class="errormsg">
+                    [% messages.acc %]
+                    [% IF messages.acc && messages.atimezone %]<br />[% END %]
+                    [% messages.atimezone %]
+                  </div>
+                </td></tr>
+              [% END %]
+            </form>
+
+          </table>
+
+        </div>
+

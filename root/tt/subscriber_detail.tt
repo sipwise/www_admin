@@ -1,0 +1,333 @@
+        [% IF subscriber.subscriber_id %]
+        <h3> Subscriber
+          <a class="noarrow" href="detail?subscriber_id=[% subscriber.subscriber_id %]">
+            [% subscriber.username %]@[% subscriber.domain %]</a>
+        </h3>
+
+        <div class="actions">
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_subscriber=1" class="aaction">edit</a>
+        [% ELSE %]
+        <h3>New subscriber</h3>
+
+        <div class="actions">
+        [% END %]
+        [% IF edit_subscriber %]
+          [% IF subscriber.subscriber_id %]
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]" class="aaction">cancel</a>
+          [% ELSE %]
+          <a href="/account/detail?account_id=[% account_id %]" class="aaction">cancel</a>
+          [% END %]
+        [% ELSE %]
+          <script language="JavaScript" src="/js/openclose.js" type="text/javascript"></script>
+          <a href="javascript:;" class="aaction" onclick="javascript:openclose();" onkeypress="javascript:openclose();">lock</a>
+          <span id="lock_menu" class="floating" onmouseout="javascript:openclose();">
+            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=none" class="aaction">unlock</a><br />
+            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=foreign" class="aaction">foreign</a><br />
+            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=outgoing" class="aaction">all outgoing</a><br />
+            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=incoming" class="aaction">incoming and outgoing</a><br />
+            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=global" class="aaction">global</a><br />
+          </span>
+          <a href="terminate?subscriber_id=[% subscriber.subscriber_id %]" class="aaction">terminate</a>
+        [% END %]
+        </div>
+        <div class="p1">
+        [% IF subscriber.is_locked %]
+          <div class="alert">[% subscriber.is_locked %]</div>
+        [% END %]
+          [% IF messages.submsg %]<div class="goodmsg">[% messages.submsg %]</div>[% END %]
+          [% IF messages.suberr %]<div class="errormsg">[% messages.suberr %]</div>[% END %]
+          <form action="update_subscriber" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
+            <input type="hidden" name="account_id" value="[% account_id %]" />
+            <table class="table">
+              <tr><td class="tdkey">ID:</td><td>[% subscriber.subscriber_id %]</td></tr>
+              <tr>
+                <td class="tdkey">account ID:</td>
+                <td>
+                  <a href="/account/detail?account_id=[% subscriber.account_id || account_id %]">
+                    [% subscriber.account_id || account_id %]</a>
+                </td>
+              </tr>
+              <tr><td class="tdkey">user:</td><td>[% subscriber.webusername %]</td></tr>
+              [% IF subscriber.subscriber_id %]
+              <tr><td class="tdkey">SIP URI:</td><td>[% subscriber.username %]@[% subscriber.domain %]</td></tr>
+              [% ELSE %]
+              <tr>
+                <td class="tdkey">SIP URI:</td>
+                <td>
+                  <input type="text" name="username" value="[% subscriber.username %]" />
+                  @
+                  <select size="1" name="domain">
+                  [% FOREACH sdom = domains %]
+                    <option>[% sdom.domain %]</option>
+                  [% END %]
+                  </select>
+                </td>
+              </tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">E.164 number:</td>
+                <td>
+                [% IF edit_subscriber %]
+                  <input type="text" name="cc" class="ishort" value="[% subscriber.cc %]" />
+                  <input type="text" name="ac" class="ishort" value="[% subscriber.ac %]" />
+                  <input type="text" name="sn" value="[% subscriber.sn %]" />
+                [% ELSE %]
+                  <input type="text" class="disabled" disabled="disabled"
+                  [% IF subscriber.sn %]
+                    value="+[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %]" />
+                  [% ELSE %]
+                    value="" />
+                  [% END %]
+                [% END %]
+                </td>
+              </tr>
+              [% IF messages.number %]<tr><td /><td><div class="errormsg">[% messages.number %]</div></td></tr>[% END %]
+              [% IF messages.number_cc %]<tr><td /><td><div class="errormsg">[% messages.number_cc %]</div></td></tr>[% END %]
+              [% IF messages.number_ac %]<tr><td /><td><div class="errormsg">[% messages.number_ac %]</div></td></tr>[% END %]
+              [% IF messages.number_sn %]<tr><td /><td><div class="errormsg">[% messages.number_sn %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">web password:</td>
+                <td>
+                [% IF edit_subscriber %]
+                  <input type="text" name="webpassword" id="edit_webpass" value="[% subscriber.edit_webpass %]" />
+                [% ELSE %]
+                  <input type="text" id="edit_webpass" class="disabled" disabled="disabled"
+                  [% IF show_webpass %]
+                    value="[% subscriber.webpassword %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
+                  [% ELSE %]
+                    [% IF subscriber.webpassword %]
+                      value="********" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_webpass=1" class="apass">Show</a>
+                    [% ELSE %]
+                      value="" />
+                    [% END %]
+                  [% END %]
+                [% END %]
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">SIP password:</td>
+                <td>
+                [% IF edit_subscriber %]
+                  <input type="text" name="password" id="edit_pass" value="[% subscriber.edit_pass %]" />
+                [% ELSE %]
+                  <input type="text" id="edit_pass" class="disabled" disabled="disabled"
+                  [% IF show_pass %]
+                    value="[% subscriber.password %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
+                  [% ELSE %]
+                    [% IF subscriber.password %]
+                      value="********" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_pass=1" class="apass">Show</a>
+                    [% ELSE %]
+                      value="" />
+                    [% END %]
+                  [% END %]
+                [% END %]
+                </td>
+              </tr>
+              [% IF messages.password %]<tr><td /><td><div class="errormsg">[% messages.password %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">administrative:</td>
+                <td>
+                  <input type="checkbox" name="admin" class="checkbox" [% IF ! edit_subscriber %]disabled="disabled"[% END %]
+                  [% IF subscriber.admin %]checked="checked"[% END %] />
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">timezone:</td>
+                <td>
+                  <input type="text" name="timezone" [% IF ! edit_subscriber %]class="disabled" disabled="disabled"[% END %]
+                    value="[% subscriber.timezone %]" />
+                </td>
+              </tr>
+              [% IF messages.timezone %]<tr><td /><td><div class="errormsg">[% messages.timezone %]</div></td></tr>[% END %]
+              <tr><td class="tdkey">UUID:</td><td>[% subscriber.uuid %]</td></tr>
+              <tr><td class="tdkey">created:</td><td>[% subscriber.create_timestamp %]</td></tr>
+              <tr><td class="tdkey">modified:</td><td>[% subscriber.modify_timestamp %]</td></tr>
+            </table>
+
+          [% IF edit_subscriber %]
+            <input type="submit" class="but" value="Save &#187;" />
+          [% END %]
+          </form>
+        </div>
+
+        <h3 id="userprefs">User Preferences</h3>
+
+        <div class="actions">
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_preferences=1#userprefs" class="aaction">edit</a>
+          [% IF edit_preferences %]
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]#userprefs" class="aaction">cancel</a>
+          [% END %]
+        </div>
+        <div class="p1">
+          [% IF messages.prefmsg %]<div class="goodmsg">[% messages.prefmsg %]</div>[% END %]
+          [% IF messages.preferr %]<div class="errormsg">[% messages.preferr %]</div>[% END %]
+          <form action="update_preferences" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
+            <table>
+            [% FOREACH preference = subscriber.preferences_array %]
+              [% IF preference.max_occur == 1 %]
+                [% IF preference.key == "block_in_mode" || preference.key == "block_out_mode" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <select size="1" name="[% preference.key %]"
+                      [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
+                      <option [% IF ! preference.value %]selected="selected"[% END %]>blacklist</option>
+                      <option [% IF preference.value %]selected="selected"[% END %]>whitelist</option>
+                    </select>
+                  </td>
+                </tr>
+                [% ELSIF preference.key == "block_in_clir"
+                      || preference.key == "clir"
+                      || preference.key == "cfu"
+                      || preference.key == "cfb"
+                      || preference.key == "cft"
+                      || preference.key == "cfna" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <input type="checkbox" name="[% preference.key %]" class="checkbox"
+                      [% IF ! edit_preferences %]disabled="disabled"[% END %]
+                      [% IF preference.value %]checked="checked"[% END %] />
+                  </td>
+                </tr>
+                [% ELSIF preference.key == "prepaid"
+                      || preference.key == "has_extension" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <input type="checkbox" name="[% preference.key %]" class="checkbox"
+                      disabled="disabled" [% IF preference.value %]checked="checked"[% END %] />
+                  </td>
+                </tr>
+                [% ELSIF preference.key == "cftarget" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                  [% IF edit_preferences %]
+                    <label for="cfvoicebox">
+                      <input type="radio" id="cfvoicebox" value="voicebox" name="fw_target" class="radio"
+                        [% IF ! preference.value.sipuri %]checked="checked"[% END %] />
+                      Voicebox
+                    </label>
+                    <br clear="all" />
+                    <label for="cfsipuri">
+                      <input type="radio" id="cfsipuri" value="sipuri" name="fw_target" class="radio"
+                        [% IF preference.value.sipuri %]checked="checked"[% END %] />
+                        number or SIP-URI:
+                    </label>
+                    <input type="text" id="cfsipuritxt" name="fw_sipuri" size="25" value="[% preference.value.sipuri %]"
+                      [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] />
+                  [% ELSE %]
+                    [% IF preference.value.sipuri %]
+                      <input type="text" size="25" value="[% preference.value.sipuri %]"
+                             class="disabled" disabled="disabled" />
+                    [% ELSE %]
+                      Voicebox
+                    [% END %]
+                  [% END %]
+                  </td>
+                </tr>
+                [% IF messages.target %]<tr><td /><td><div class="errormsg">[% messages.target %]</div></td></tr>[% END %]
+                [% ELSIF preference.key == "base_cli"
+                      || preference.key == "extension"
+                      || preference.key == "lock"
+                      || preference.key == "base_user" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <input type="text" name="[% preference.key %]"
+                      class="disabled txtpreference" disabled="disabled"
+                      value="[% preference.value %]" />
+                  </td>
+                </tr>
+                [% ELSE %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <input type="text" name="[% preference.key %]" [% IF ! edit_preferences %]
+                      class="disabled txtpreference" disabled="disabled"
+                      [% ELSE %]
+                      class="txtpreference"
+                      [% END %]
+                      value="[% preference.value %]" />
+                  </td>
+                </tr>
+                [% END %]
+              [% ELSE %]
+              <tr>
+                <td class="tdkey">[% preference.key %]:</td>
+                <td>
+                  [% IF preference.value %]
+                    <select size="1" name="[% preference.key %]">
+                    [% FOREACH pref_entry = preference.value %]
+                      <option>[% pref_entry %]</option>
+                    [% END %]
+                    </select>
+                  [% ELSE %]
+                  <select size="1" name="[% preference.key %]">
+                    <option />
+                  </select>
+                  [% END %]
+                  [% IF ! edit_preferences %]
+                    &nbsp;
+                    <a href="edit_list?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
+                       class="aaction">edit list</a>
+                  [% END %]
+                </td>
+              </tr>
+              [% END %]
+              [% IF preference.error %]<tr><td /><td><div class="errormsg">[% preference.error %]</div></td></tr>[% END %]
+            [% END %]
+            </table>
+          [% IF edit_preferences %]
+            <input type="submit" class="but" value="Save &#187;" />
+          [% END %]
+          </form>
+        </div>
+
+        <h3 id="vboxprefs">Voicebox Preferences</h3>
+
+        <div class="actions">
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_voicebox=1#vboxprefs" class="aaction">edit</a>
+          [% IF edit_voicebox %]
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]#vboxprefs" class="aaction">cancel</a>
+          [% END %]
+        </div>
+        <div class="p1">
+          [% IF messages.vboxmsg %]<div class="goodmsg">[% messages.vboxmsg %]</div>[% END %]
+          [% IF messages.vboxerr %]<div class="errormsg">[% messages.vboxerr %]</div>[% END %]
+          <form action="update_voicebox" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
+            <table>
+              <tr>
+                <td class="tdkey">PIN:</td>
+                <td>
+                  <input type="text" name="password" [% IF ! edit_voicebox %]class="disabled" disabled="disabled"[% END %]
+                    value="[% subscriber.voicebox_preferences.password %]" />
+                </td>
+              </tr>
+              [% IF messages.vpin %]<tr><td /><td><div class="errormsg">[% messages.vpin %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">E-Mail:</td>
+                <td>
+                  <input type="text" name="email" [% IF ! edit_voicebox %]class="disabled" disabled="disabled"[% END %]
+                    value="[% subscriber.voicebox_preferences.email %]" />
+                </td>
+              </tr>
+              [% IF messages.vemail %]<tr><td /><td><div class="errormsg">[% messages.vemail %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">Attach WAV:</td>
+                <td>
+                  <input type="checkbox" name="attach" class="checkbox" [% IF ! edit_voicebox %]disabled="disabled"[% END %]
+                    [% IF subscriber.voicebox_preferences.attach %]checked="checked"[% END %] />
+                </td>
+              </tr>
+            </table>
+          [% IF edit_voicebox %]
+            <input type="submit" class="but" value="Save &#187;" />
+          [% END %]
+          </form>
+        </div>
+

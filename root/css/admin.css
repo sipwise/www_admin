@@ -1,0 +1,260 @@
+/*
+ * Relative size definitions like "large" ,"0.8em", etc.
+ * don't work very well 'cross different browsers.
+ * Allthought it is recommended to use them, they don't
+ * give useable results.
+ */
+body {
+	font: 14px Trebuchet MS, Lucida Sans Unicode, Arial, sans-serif !important;
+	/* hover effects for IE6 */
+	behavior:url("/css/csshover.htc");
+}
+h3 {
+	font-size: 18px !important;
+}
+
+#header #sipwise_logo {
+	margin: 3px;
+	width: 200px;
+}
+
+#header #heading {
+	position: absolute;
+	top: 20px;
+	left: 250px;
+	text-align: center;
+	width: 400px;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+#header #client_logo {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	margin: 3px;
+	width: 200px;
+	text-align: right;
+}
+
+
+/* hmm, menu doesn't extend container height ... */
+#container #content {
+	min-height: 570px;
+}
+
+/* contentmenu's width and contentplace' margin-left should match */
+#container #contentmenu {
+	width: 230px;
+}
+#container #contentplace {
+	margin-left: 230px;
+}
+
+/* red error messages */
+.errormsg {
+	width: auto;
+	margin: 0;
+	padding: 5px;
+	font-weight: bold;
+	color: #FF1010;
+}
+/* green success messages */
+.goodmsg {
+	width: auto;
+	margin: 0;
+	padding: 5px;
+	font-weight: bold;
+	color: #10BB40;
+}
+/* highlight text */
+.alert {
+	width: auto;
+	margin: 0;
+	padding: 0;
+	font-weight: bold;
+	color: #FF1010;
+}
+
+/* increase vertical spacing in tables */
+#contentplace td {
+	padding: 3px 5px 3px 5px;
+}
+
+/* some table alignment aliases */
+#contentplace .tdcenter {
+	text-align: center;
+}
+
+#contentplace .tdmiddle {
+	vertical-align: top;
+}
+
+#contentplace .tdkey {
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+#contentplace .table_header {
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+#contentplace .nowrap {
+	white-space: nowrap;
+}
+
+/* format links and images in post div's */
+#contentplace .postlink label {
+	font-weight: bold;
+	cursor: pointer;
+	color: #006600;
+	text-decoration: none;
+}
+#contentplace .postlink label:hover {
+	color: #D60808;
+	text-decoration: underline;
+}
+#contentplace .postlink label:after {
+	content: "\bb";
+	font-weight: bold;
+}
+#contentplace .postlink .hidden {
+	position: absolute;
+	top: -90000px;
+	left: -90000px;
+}
+
+/*
+ * use smaller font for input elements (textfields)
+ * and select boxes
+ */
+#container #contentplace input {
+	font-size: 11px;
+	padding: 2px 2px 2px 3px;
+	border: 1px solid #606060;
+}
+
+/* sigh, no border for checkboxes */
+#contentplace .checkbox {
+	border: none !important;
+}
+
+#contentplace .table input {
+	margin: -2px 0 -2px 0;
+}
+
+#contentplace select {
+	font-size: 11px;
+	border: 1px solid #606060;
+}
+
+/* use smaller font for buttons */
+#contentplace .but {
+	font-size: 11px;
+	text-align: center;
+	border: 1px solid #606060;
+	background-color: #e0e0e0;
+	padding: 2px !important;
+	margin: 3px 0 5px 0;
+}
+
+/* print ">>" after hyper refs */
+#contentplace a:after {
+	content: "\bb";
+	font-weight: bold;
+}
+/* no ">>" in heading */
+#contentplace h3 a:after {
+	content: "";
+}
+
+/* specify position of edit/lock/delete action links */
+#contentplace .actions {
+	margin: 0 0 -17px 23px;
+	position: relative;
+}
+#contentplace .aaction {
+	margin: 0 8px 0 0;
+	font-weight: bold;
+}
+
+/* colors for disabled input fields */
+#contentplace .disabled {
+	color: #808080;
+	background-color: #f4f4f4;
+}
+
+#contentplace .txtpreference {
+	width: 160px;
+}
+
+/* customize login form */
+#login {
+	border: none;
+	margin: 0 0 0 10px;
+}
+#login label {
+	font-weight: bold;
+}
+#login_user, #login_pass {
+	font-size: 11px;
+	margin: 3px 0 5px 0;
+	padding: 3px;
+	width: 120px;
+}
+
+/* decrease input text field for password */
+#edit_pass, #edit_webpass {
+	width: 95px;
+}
+
+/* decrease input text fields for cc/ac */
+.ishort {
+	width: 40px;
+}
+
+/* increase spacing between password and show/hide href */
+#contentplace .apass {
+	vertical-align: middle;
+	margin: 0 0 0 5px;
+}
+
+/* increase spacing between amount and add textfield in
+ * account balance edit
+ */
+#contentplace .account_add {
+	margin: 0 0 0 15px;
+}
+/* decrease input text field for amounts */
+#contentplace .account_add input {
+	width: 50px;
+}
+
+/* floating menu for subscriber lock */
+#contentplace .floating {
+	z-index: 100;
+	display: none;
+	position: absolute;
+	top: 20px;
+	left: 50px;
+	border: 1px solid #006600;
+	background-color: #DDFFDD;
+	padding: 3px 10px 3px 5px;
+}
+#contentplace .menu_foo {
+	z-index: 200;
+	overflow: auto;
+	margin: 0;
+	width: 200px;
+	height: 200px;
+}
+
+/* correct margin for active paginations */
+.pagination li.currentpage, .pagination li.disablepage {
+	margin: 0 5px 0 0;
+}
+/* no ">>" in pagination next / previous */
+#contentplace .pagination li.nextpage a:after {
+	content: "";
+}

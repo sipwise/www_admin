@@ -1,0 +1,167 @@
+        <h3> VoIP Account
+          <a class="noarrow" href="detail?account_id=[% account.id %]">
+          #[% account.id %]</a>
+        </h3>
+
+        [% IF ! account.terminate_timestamp %]
+        <div class="actions">
+        [% IF billing_features %]
+          <a href="detail?account_id=[% account.id %]&amp;edit_account=1" class="aaction">edit</a>
+        [% END %]
+        [% IF edit_account %]
+          <a href="detail?account_id=[% account.id %]" class="aaction">cancel</a>
+        [% ELSE %]
+          [% IF account.is_locked %]
+          <a href="lock?account_id=[% account.id %]&amp;lock=none" class="aaction">unlock</a>
+          [% ELSE %]
+          <a href="lock?account_id=[% account.id %]&amp;lock=global" class="aaction">lock</a>
+          [% END %]
+          <a href="terminate?account_id=[% account.id %]" class="aaction">terminate</a>
+        [% END %]
+        </div>
+        [% END %]
+        <div class="p1">
+        [% IF account.is_locked %]
+          <div class="alert">Account is LOCKED!</div>
+        [% END %]
+          [% IF messages.accmsg %]<div class="goodmsg">[% messages.accmsg %]</div>[% END %]
+          [% IF messages.accerr %]<div class="errormsg">[% messages.accerr %]</div>[% END %]
+          <form action="update_account" method="post">
+            <input type="hidden" name="account_id" value="[% account.id %]" />
+            <table>
+              <tr><td class="tdkey">ID:</td><td>[% account.id %]</td></tr>
+
+            [% IF billing_features %]
+              <tr>
+                <td class="tdkey">customer:</td>
+                <td>
+                  [% IF account.customer_id %]
+                  <a href="/customer/detail?customer_id=[% account.customer_id %]">[% account.customer_id %]</a>
+                  [% END %]
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">product:</td>
+                <td>
+                [% IF edit_account %]
+                  <select size="1" name="product">
+                  [% FOREACH product = products %]
+                    <option[% IF product.name == account.product %] selected="selected"[% END %]>[% product.name %]</option>
+                  [% END %]
+                  </select>
+                [% ELSE %]
+                  [% account.product %]
+                [% END %]
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">billing profile:</td>
+                <td>
+                [% IF edit_account %]
+                  <select size="1" name="billing_profile">
+                  [% FOREACH profile = billing_profiles %]
+                    <option[% IF profile.name == account.billing_profile %] selected="selected"[% END %]>[% profile.name %]</option>
+                  [% END %]
+                  </select>
+                [% ELSE %]
+                  [% account.billing_profile %]
+                [% END %]
+                </td>
+              </tr>
+            [% END %]
+
+              <tr><td class="tdkey">created:</td><td>[% account.create_timestamp %]</td></tr>
+              <tr><td class="tdkey">modified:</td><td>[% account.modify_timestamp %]</td></tr>
+              [% IF account.terminate_timestamp %]
+              <tr><td class="tdkey">terminated:</td><td><div class="alert">[% account.terminate_timestamp %]</div></td></tr>
+              [% END %]
+            </table>
+            [% IF edit_account %]
+              <input type="submit" class="but" value="Save &#187;" />
+            [% END %]
+          </form>
+        </div>
+
+      [% IF billing_features %]
+        <h3>Account Balance</h3>
+
+        [% IF ! account.terminate_timestamp %]
+        <div class="actions">
+          <a href="detail?account_id=[% account.id %]&amp;edit_balance=1" class="aaction">edit</a>
+          [% IF edit_balance %]
+          <a href="detail?account_id=[% account.id %]" class="aaction">cancel</a>
+          [% END %]
+        </div>
+        [% END %]
+        <div class="p1">
+          [% IF messages.balmsg %]<div class="goodmsg">[% messages.balmsg %]</div>[% END %]
+          [% IF messages.balerr %]<div class="errormsg">[% messages.balerr %]</div>[% END %]
+          Current totals
+          <form action="update_balance" method="post">
+            <input type="hidden" name="account_id" value="[% account.id %]" />
+            <table>
+              <tr>
+                <td class="tdkey">cash:</td>
+                <td class="nowrap">&euro; [% account.balance.cash_balance %]</td>
+                <td>
+                [% IF edit_balance %]
+                  <div class="account_add">add <input type="text" name="add_cash" value="[% balanceadd.cash %]" /> Euro</div>
+                [% END %]
+                </td>
+              </tr>
+              [% IF messages.addcash %]<tr><td /><td /><td><div class="errormsg">[% messages.addcash %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">free time:</td>
+                <td class="nowrap">[% account.balance.free_time_balance %] s</td>
+                <td>
+                [% IF edit_balance %]
+                  <div class="account_add">add <input type="text" name="add_time" value="[% balanceadd.free_time %]" /> seconds</div>
+                [% END %]
+                </td>
+              </tr>
+              [% IF messages.addtime %]<tr><td /><td /><td><div class="errormsg">[% messages.addtime %]</div></td></tr>[% END %]
+            </table>
+          [% IF edit_balance %]
+            <input type="submit" class="but" value="Save &#187;" />
+          [% END %]
+          </form>
+        </div>
+        <div class="p1">
+          Spent this billing interval
+          <table>
+            <tr><td class="tdkey">cash:</td><td>&euro; [% account.balance.cash_balance_interval %]</td></tr>
+            <tr><td class="tdkey">free time:</td><td>[% account.balance.free_time_balance_interval %] s</td></tr>
+          </table>
+        </div>
+      [% END %]
+
+        <h3>Subscribers</h3>
+
+        <div class="actions">
+            <a href="/subscriber/detail?account_id=[% account.id %]&amp;new=1" class="aaction">create new</a>
+        </div>
+        <div class="p1">
+        [% IF account.subscribers %]
+          <table>
+          [% FOREACH subscriber = account.subscribers %]
+            <tr>
+              <td>
+              [% IF subscriber.subscriber_id %]
+                <a href="/subscriber/detail?subscriber_id=[% subscriber.subscriber_id %]">
+                  [% subscriber.username %]@[% subscriber.domain %]</a>
+              [% ELSE %]
+                [% subscriber.username %]@[% subscriber.domain %]
+              [% END %]
+              </td>
+              <td>[% IF subscriber.sn %]+[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %][% END %]</td>
+              <td>[% subscriber.uuid %]</td>
+            </tr>
+          [% END %]
+          </table>
+        [% ELSE %]
+          <div>
+            This account does not have any subscribers yet.
+          </div>
+        [% END %]
+        </div>
+

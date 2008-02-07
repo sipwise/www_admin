@@ -1,0 +1,58 @@
+        <h3>Get by ID</h3>
+        <div class="p1">
+          <form action="/customer/getbyid" method="GET">
+            <input type="text" id="customer_id" name="customer_id" value="[% customer_id %]" />
+            <input type="submit" value="Get &#187;" class="but" />
+          </form>
+          [% IF messages.accgeterr %]<div class="errormsg">[% messages.accgeterr %]</div>[% END %]
+        </div>
+
+        <h3>Search by contacts</h3>
+        <div class="p1">
+          <form action="/customer/search" method="post">
+            <input type="text" id="search_string" name="search_string" value="[% search_string %]" />
+            <input type="submit" value="Search &#187;" class="but" />
+          </form>
+          [% IF messages.accsearcherr %]<div class="errormsg">[% messages.accsearcherr %]</div>[% END %]
+        </div>
+<!--
+        <h3>Create new customer</h3>
+        <div class="p1">
+          <form action="/customer/create_customer" method="post">
+            <input type="submit" value="Create &#187;" class="but" />
+          </form>
+        </div>
+-->
+        [% IF customer_list %]
+
+          <h3>Customers</h3>
+
+          <div class="p1">
+            <table>
+              <tr class="table_header"><td>CustomerID</td><td>Name</td><td>Firma</td></tr>
+
+            [% FOREACH customer = customer_list %]
+
+              <tr>
+                <td><a href="/customer/detail?customer_id=[% customer.id %]">
+                      [% customer.id %]
+                    </a></td>
+                <td><a href="/customer/detail?customer_id=[% customer.id %]">
+                      [% customer.contact.firstname %] [% customer.contact.lastname %]
+                    </a></td>
+                [% IF customer.contact.company %]
+                <td><a href="/customer/detail?customer_id=[% customer.id %]">
+                      [% customer.contact.company %]
+                    </a></td>
+                [% ELSE %]
+                <td />
+                [% END %]
+              </tr>
+
+            [% END %]
+
+            </table>
+          </div>
+
+        [% END %]
+
