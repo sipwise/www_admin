@@ -750,7 +750,7 @@ sub do_edit_list : Local {
     # input text field to add new entry to block list
     my $add = $c->request->params->{block_add};
     if(defined $add) {
-        if($add =~ /^\+?[?*0-9\[\]]+$/) {
+        if($add =~ /^\+?[?*0-9\[\]-]+$/) {
             if($add =~ /^[1-9\[]/) {
                 $add =~ s/^/$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}/e;
             } elsif($add =~ /^0[^0]/) {
@@ -787,7 +787,6 @@ sub do_edit_list : Local {
     # activate/deactivate link next to entries in block list
     my $act = $c->request->params->{block_act};
     if(defined $act) {
-        print STDERR "Got request to de/activate $act...\n";
         my $blocklist = $$preferences{$list};
         if(defined $blocklist) {
             $act =~ s/^\+//;
