@@ -258,3 +258,22 @@ h3 {
 #contentplace .pagination li.nextpage a:after {
 	content: "";
 }
+
+/* colorful table rows */
+#contentplace .tr_alt {
+	background-color: #ccffcc;
+}
+
+#contentplace .orders,
+#contentplace .contracts,
+#contentplace .order_payments
+{
+	width: 100%;
+	border-spacing: 0px;
+}
+
+#contentplace .table_name {
+	font-weight: bold;
+	white-space: nowrap;
+	text-align: center;
+}

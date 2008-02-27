@@ -1,4 +1,4 @@
-        <h3> Customer
+        <h3 id="customer"> Customer
           <a class="noarrow" href="detail?customer_id=[% customer.id %]">
           #[% customer.id %]</a>
         </h3>
@@ -16,7 +16,7 @@
           <form action="update_customer" method="post">
             <input type="hidden" name="customer_id" value="[% customer.id %]" />
             <table>
-              <tr><td class="tdkey">ID:</td><td>[% customer.id %]</td></tr>
+              <tr><td class="tdkey">CustomerID:</td><td>[% customer.id %]</td></tr>
               <tr>
                 <td class="tdkey">shopuser:</td>
                 <td>
@@ -298,22 +298,30 @@
           </form>
         </div>
 
-        <h3>Contracts</h3>
+        <h3 id="contract">Contracts</h3>
 
 <!--        <div class="actions">
             <a href="/subscriber/detail?customer_id=[% customer.id %]&amp;new=1" class="aaction">create new</a>
         </div>
 -->        <div class="p1">
         [% IF customer.contracts %]
-          <table>
+          <table class="contracts">
             <tr>
               <td class="table_header">ContractID</td>
+              <td class="table_header">OrderID</td>
               <td class="table_header">Product</td>
               <td class="table_header">status</td>
               <td class="table_header">created</td>
             </tr>
+          [% bgflip = 1 %]
           [% FOREACH contract = customer.contracts %]
+          [% IF bgflip %]
+            [% bgflip = 0 %]
+            <tr class="tr_alt">
+          [% ELSE %]
+            [% bgflip = 1 %]
             <tr>
+          [% END %]
               <td>
               [% IF contract.class == 'voip' %]
                 <a href="/account/detail?account_id=[% contract.id %]">
@@ -323,6 +331,7 @@
                 [% contract.id %]
               [% END %]
               </td>
+              <td>[% contract.order_id %]</td>
               <td>
                 [% IF contract.class == 'voip' %]
                   <a href="/account/detail?account_id=[% contract.id %]">
@@ -344,14 +353,16 @@
         [% END %]
         </div>
 
-        <h3>Orders</h3>
+        <h3 id="order">Orders</h3>
 
-<!--        <div class="actions">
-            <a href="/subscriber/detail?customer_id=[% customer.id %]&amp;new=1" class="aaction">create new</a>
+<!--
+        <div class="actions">
+          <a href="/subscriber/detail?customer_id=[% customer.id %]&amp;new=1" class="aaction">create new</a>
         </div>
--->        <div class="p1">
+-->
+        <div class="p1">
         [% IF customer.orders %]
-          <table>
+          <table class="orders">
             <tr>
               <td class="table_header">OrderID</td>
               <td class="table_header">status</td>
@@ -359,13 +370,55 @@
               <td class="table_header">modified</td>
               <td class="table_header">completed</td>
             </tr>
+          [% bgflip = 1 %]
           [% FOREACH order = customer.orders %]
+          [% IF bgflip %]
+            [% bgflip = 0 %]
+            <tr class="tr_alt">
+          [% ELSE %]
+            [% bgflip = 1 %]
             <tr>
+          [% END %]
               <td>[% order.id %]</td>
-              <td>[% order.status %]</td>
+              <td>[% order.state %]</td>
               <td>[% order.create_timestamp %]</td>
               <td>[% order.modify_timestamp %]</td>
               <td>[% order.complete_timestamp %]</td>
+            </tr>
+          [% UNLESS bgflip %]
+            <tr class="tr_alt">
+          [% ELSE %]
+            <tr>
+          [% END %]
+              <td colspan="5">
+                <table class="order_payments">
+                [% IF order.payments.0 %]
+                  <tr>
+                    <td class="table_name">Payments:</td>
+                    <td class="table_header">TID</td>
+                    <td class="table_header">MpayTID</td>
+                    <td class="table_header">Type</td>
+                    <td class="table_header">State</td>
+                    <td class="table_header">Mpay24 State</td>
+                  </tr>
+                  [% FOREACH payment = order.payments %]
+                    <tr>
+                      <td />
+                      <td>[% payment.id %]</td>
+                      <td>[% payment.mpaytid %]</td>
+                      <td>[% payment.type %]</td>
+                      <td>[% payment.state %]</td>
+                      <td>[% payment.status %]</td>
+                    </tr>
+                  [% END %]
+                [% ELSE %]
+                  <tr>
+                    <td class="table_name">Payments:</td>
+                    <td> No payments recorded.</td>
+                  </tr>
+                [% END %]
+                </table>
+              </td>
             </tr>
           [% END %]
           </table>
