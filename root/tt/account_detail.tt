@@ -4,36 +4,43 @@
         </h3>
 
         [% IF ! account.terminate_timestamp %]
-        <div class="actions">
-        [% IF billing_features %]
-          <a href="detail?account_id=[% account.id %]&amp;edit_account=1" class="aaction">edit</a>
-        [% END %]
-        [% IF edit_account %]
-          <a href="detail?account_id=[% account.id %]" class="aaction">cancel</a>
-        [% ELSE %]
-          [% IF account.is_locked %]
-          <a href="lock?account_id=[% account.id %]&amp;lock=none" class="aaction">unlock</a>
-          [% ELSE %]
-          <a href="lock?account_id=[% account.id %]&amp;lock=global" class="aaction">lock</a>
+          <div class="actions">
+          [% IF billing_features %]
+            <a href="detail?account_id=[% account.id %]&amp;edit_account=1" class="aaction">edit</a>
           [% END %]
-          <a href="terminate?account_id=[% account.id %]" class="aaction">terminate</a>
-        [% END %]
-        </div>
+          [% IF edit_account %]
+            <a href="detail?account_id=[% account.id %]" class="aaction">cancel</a>
+          [% ELSE %]
+            [% IF account.status == "pending" %]
+              <a href="activate?account_id=[% account.id %]" class="aaction">activate</a>
+            [% ELSE %]
+              [% IF account.is_locked %]
+              <a href="lock?account_id=[% account.id %]&amp;lock=none" class="aaction">unlock</a>
+              [% ELSE %]
+              <a href="lock?account_id=[% account.id %]&amp;lock=global" class="aaction">lock</a>
+              [% END %]
+              <a href="terminate?account_id=[% account.id %]" class="aaction">terminate</a>
+            [% END %]
+          [% END %]
+          </div>
         [% END %]
         <div class="p1">
         [% IF account.is_locked %]
-          <div class="alert">Account is LOCKED!</div>
+          <div class="alert">Account is locked!</div>
+        [% END %]
+        [% IF account.status == "pending" %]
+          <div class="alert">Account is in pending state!</div>
         [% END %]
           [% IF messages.accmsg %]<div class="goodmsg">[% messages.accmsg %]</div>[% END %]
           [% IF messages.accerr %]<div class="errormsg">[% messages.accerr %]</div>[% END %]
           <form action="update_account" method="post">
             <input type="hidden" name="account_id" value="[% account.id %]" />
             <table>
-              <tr><td class="tdkey">ID:</td><td>[% account.id %]</td></tr>
+              <tr><td class="tdkey">ContractID:</td><td>[% account.id %]</td></tr>
 
             [% IF billing_features %]
               <tr>
-                <td class="tdkey">customer:</td>
+                <td class="tdkey">CustomerID:</td>
                 <td>
                   [% IF account.customer_id %]
                   <a href="/customer/detail?customer_id=[% account.customer_id %]">[% account.customer_id %]</a>

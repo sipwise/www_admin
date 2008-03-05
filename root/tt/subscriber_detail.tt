@@ -40,31 +40,36 @@
             <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
             <input type="hidden" name="account_id" value="[% account_id %]" />
             <table class="table">
-              <tr><td class="tdkey">ID:</td><td>[% subscriber.subscriber_id %]</td></tr>
+              <tr><td class="tdkey">SubscriberID:</td><td>[% subscriber.subscriber_id %]</td></tr>
               <tr>
-                <td class="tdkey">account ID:</td>
+                <td class="tdkey">ContractID:</td>
                 <td>
                   <a href="/account/detail?account_id=[% subscriber.account_id || account_id %]">
                     [% subscriber.account_id || account_id %]</a>
                 </td>
               </tr>
-              <tr><td class="tdkey">user:</td><td>[% subscriber.webusername %]</td></tr>
-              [% IF subscriber.subscriber_id %]
-              <tr><td class="tdkey">SIP URI:</td><td>[% subscriber.username %]@[% subscriber.domain %]</td></tr>
-              [% ELSE %]
+
+              <tr><td class="tdkey">web user:</td><td>[% subscriber.webusername %]</td></tr>
               <tr>
-                <td class="tdkey">SIP URI:</td>
+                <td class="tdkey">web password:</td>
                 <td>
-                  <input type="text" name="username" value="[% subscriber.username %]" />
-                  @
-                  <select size="1" name="domain">
-                  [% FOREACH sdom = domains %]
-                    <option>[% sdom.domain %]</option>
+                [% IF edit_subscriber %]
+                  <input type="text" name="webpassword" id="edit_webpass" value="[% subscriber.edit_webpass %]" />
+                [% ELSE %]
+                  <input type="text" id="edit_webpass" class="disabled" disabled="disabled"
+                  [% IF show_webpass %]
+                    value="[% subscriber.webpassword %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
+                  [% ELSE %]
+                    [% IF subscriber.webpassword %]
+                      value="********" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_webpass=1" class="apass">Show</a>
+                    [% ELSE %]
+                      value="" />
+                    [% END %]
                   [% END %]
-                  </select>
+                [% END %]
                 </td>
               </tr>
-              [% END %]
+
               <tr>
                 <td class="tdkey">E.164 number:</td>
                 <td>
@@ -86,25 +91,23 @@
               [% IF messages.number_cc %]<tr><td /><td><div class="errormsg">[% messages.number_cc %]</div></td></tr>[% END %]
               [% IF messages.number_ac %]<tr><td /><td><div class="errormsg">[% messages.number_ac %]</div></td></tr>[% END %]
               [% IF messages.number_sn %]<tr><td /><td><div class="errormsg">[% messages.number_sn %]</div></td></tr>[% END %]
+
+              [% IF subscriber.subscriber_id %]
+              <tr><td class="tdkey">SIP URI:</td><td>[% subscriber.username %]@[% subscriber.domain %]</td></tr>
+              [% ELSE %]
               <tr>
-                <td class="tdkey">web password:</td>
+                <td class="tdkey">SIP URI:</td>
                 <td>
-                [% IF edit_subscriber %]
-                  <input type="text" name="webpassword" id="edit_webpass" value="[% subscriber.edit_webpass %]" />
-                [% ELSE %]
-                  <input type="text" id="edit_webpass" class="disabled" disabled="disabled"
-                  [% IF show_webpass %]
-                    value="[% subscriber.webpassword %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
-                  [% ELSE %]
-                    [% IF subscriber.webpassword %]
-                      value="********" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_webpass=1" class="apass">Show</a>
-                    [% ELSE %]
-                      value="" />
-                    [% END %]
+                  <input type="text" name="username" value="[% subscriber.username %]" />
+                  @
+                  <select size="1" name="domain">
+                  [% FOREACH sdom = domains %]
+                    <option>[% sdom.domain %]</option>
                   [% END %]
-                [% END %]
+                  </select>
                 </td>
               </tr>
+              [% END %]
               <tr>
                 <td class="tdkey">SIP password:</td>
                 <td>

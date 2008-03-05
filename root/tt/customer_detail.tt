@@ -3,13 +3,14 @@
           #[% customer.id %]</a>
         </h3>
 
+<!--
         <div class="actions">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_customer=1" class="aaction">edit</a>
         [% IF edit_customer %]
           <a href="detail?customer_id=[% customer.id %]" class="aaction">cancel</a>
         [% END %]
         </div>
-
+-->
         <div class="p1">
           [% IF messages.custmsg %]<div class="goodmsg">[% messages.custmsg %]</div>[% END %]
           [% IF messages.custerr %]<div class="errormsg">[% messages.custerr %]</div>[% END %]
@@ -18,14 +19,14 @@
             <table>
               <tr><td class="tdkey">CustomerID:</td><td>[% customer.id %]</td></tr>
               <tr>
-                <td class="tdkey">shopuser:</td>
+                <td class="tdkey">shop user:</td>
                 <td>
                 <input type="text" id="shopuser" [% IF ! edit_customer %]class="disabled" disabled="disabled"[% END %]
                        name="shopuser" value="[% customer.shopuser %]" />
                 </td>
               </tr>
               <tr>
-                <td class="tdkey">shoppass:</td>
+                <td class="tdkey">shop password:</td>
                 <td>
                 [% IF edit_customer %]
                   <input type="text" id="shoppass" name="shoppass" value="[% customer.edit_shoppass %]" />
@@ -341,7 +342,7 @@
                   [% contract.product %]
                 [% END %]
               </td>
-              <td>[% contract.status %]</td>
+              <td [% IF contract.status != "active" %]class="alert"[% END %]>[% contract.status %]</td>
               <td>[% contract.create_timestamp %]</td>
             </tr>
           [% END %]

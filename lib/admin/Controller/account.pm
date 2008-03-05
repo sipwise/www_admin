@@ -126,7 +126,7 @@ sub detail : Local {
             or $#{$c->session->{voip_account}{subscribers}} == -1;
 
     $c->stash->{account} = $c->session->{voip_account};
-#    $c->stash->{account}{is_locked} = 1 if $c->session->{voip_account}{status} eq 'locked';
+    $c->stash->{account}{is_locked} = 1 if $c->session->{voip_account}{status} eq 'locked';
 
     return 1;
 }
@@ -221,6 +221,31 @@ sub lock : Local {
     $c->response->redirect("/account/detail?account_id=$account_id");
 }
 
+=head2 activate
+
+Activates an account by calling finish on it.
+
+=cut
+
+sub activate : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $account_id = $c->request->params->{account_id};
+
+    if($c->model('Provisioning')->call_prov( $c, 'billing', 'activate_voip_account',
+                                             { id => $account_id },
+                                             undef))
+    {
+        $messages{topmsg} = 'Web.Account.Activated';
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/account/detail?account_id=$account_id");
+    return;
+}
+
 =head2 terminate
 
 Terminates an account.
@@ -249,7 +274,7 @@ sub terminate : Local {
     return;
 }
 
-=head2 update_account
+=head2 update_balance
 
 Update a VoIP account cash and free time balance.
 

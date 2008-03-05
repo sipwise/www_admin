@@ -131,7 +131,8 @@ sub detail : Local {
     }
 
     $c->stash->{show_pass} = $c->request->params->{show_pass};
-    $c->stash->{edit_customer} = $c->request->params->{edit_customer};
+# there's currently nothing to edit
+#    $c->stash->{edit_customer} = $c->request->params->{edit_customer};
     $c->stash->{edit_contact} = $c->request->params->{edit_contact};
     $c->stash->{edit_commercial} = $c->request->params->{edit_commercial};
     $c->stash->{edit_technical} = $c->request->params->{edit_technical};
