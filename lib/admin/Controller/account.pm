@@ -274,6 +274,34 @@ sub terminate : Local {
     return;
 }
 
+=head2 delete
+
+Deletes an account.
+
+=cut
+
+sub delete : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $account_id = $c->request->params->{account_id};
+
+    if($c->model('Provisioning')->call_prov( $c, 'billing', 'delete_voip_account',
+                                             { id => $account_id },
+                                             undef))
+    {
+        $messages{topmsg} = 'Server.Voip.SubscriberDeleted';
+        $c->session->{messages} = \%messages;
+        $c->response->redirect("/account");
+        return;
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/account/detail?account_id=$account_id");
+    return;
+}
+
 =head2 update_balance
 
 Update a VoIP account cash and free time balance.

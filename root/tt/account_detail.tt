@@ -20,6 +20,7 @@
               <a href="lock?account_id=[% account.id %]&amp;lock=global" class="aaction">lock</a>
               [% END %]
               <a href="terminate?account_id=[% account.id %]" class="aaction">terminate</a>
+              <a href="delete?account_id=[% account.id %]" class="aaction">delete</a>
             [% END %]
           [% END %]
           </div>
