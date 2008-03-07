@@ -3,14 +3,16 @@
           #[% customer.id %]</a>
         </h3>
 
-<!--
         <div class="actions">
+<!--
           <a href="detail?customer_id=[% customer.id %]&amp;edit_customer=1" class="aaction">edit</a>
         [% IF edit_customer %]
           <a href="detail?customer_id=[% customer.id %]" class="aaction">cancel</a>
         [% END %]
-        </div>
 -->
+          <a href="delete?customer_id=[% customer.id %]" class="aaction">delete</a>
+        </div>
+
         <div class="p1">
           [% IF messages.custmsg %]<div class="goodmsg">[% messages.custmsg %]</div>[% END %]
           [% IF messages.custerr %]<div class="errormsg">[% messages.custerr %]</div>[% END %]

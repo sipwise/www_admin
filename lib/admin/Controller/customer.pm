@@ -210,6 +210,58 @@ sub update_customer : Local {
     return;
 }
 
+=head2 terminate
+
+Terminates a customer.
+
+=cut
+
+sub terminate : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my $customer_id = $c->request->params->{customer_id};
+
+    if($c->model('Provisioning')->call_prov( $c, 'billing', 'terminate_customer',
+                                             { id => $customer_id },
+                                             undef))
+    {
+        $messages{topmsg} = 'Server.Voip.SubscriberDeleted';
+        $c->session->{messages} = \%messages;
+        $c->response->redirect("/customer");
+        return;
+    }
+
+    $c->response->redirect("/customer/detail?customer_id=$customer_id");
+    return;
+}
+
+=head2 delete
+
+Deletes a customer.
+
+=cut
+
+sub delete : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my $customer_id = $c->request->params->{customer_id};
+
+    if($c->model('Provisioning')->call_prov( $c, 'billing', 'delete_customer',
+                                             { id => $customer_id },
+                                             undef))
+    {
+        $messages{topmsg} = 'Server.Voip.SubscriberDeleted';
+        $c->session->{messages} = \%messages;
+        $c->response->redirect("/customer");
+        return;
+    }
+
+    $c->response->redirect("/customer/detail?customer_id=$customer_id");
+    return;
+}
+
 =head2 update_contact 
 
 Update details of a customer's contact.
