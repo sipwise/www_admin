@@ -54,11 +54,14 @@
                 [% IF edit_account %]
                   <select size="1" name="product">
                   [% FOREACH product = products %]
-                    <option[% IF product.name == account.product %] selected="selected"[% END %]>[% product.name %]</option>
+                    <option value="[% product.handle %]"
+                          [% IF product.handle == account.product %]
+                            selected="selected"
+                          [% END %]>[% product.name %]</option>
                   [% END %]
                   </select>
                 [% ELSE %]
-                  [% account.product %]
+                  [% account.product_name %]
                 [% END %]
                 </td>
               </tr>

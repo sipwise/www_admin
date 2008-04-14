@@ -114,6 +114,13 @@ sub detail : Local {
                                                               );
 
             $c->stash->{billing_profiles} = $$billing_profiles{result};
+        } else {
+            my $product;
+            return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_product',
+                                                                { product => $c->session->{voip_account}{product} },
+                                                                \$product
+                                                              );
+            $c->session->{voip_account}{product_name} = $$product{name};
         }
 
         $c->stash->{billing_features} = 1;
