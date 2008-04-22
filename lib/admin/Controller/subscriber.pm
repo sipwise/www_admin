@@ -77,6 +77,22 @@ sub search : Local {
     $c->session->{search_filter} = \%filter;
     $c->session->{exact_filter} = \%exact;
 
+    $c->stash->{exact_user} = $exact{username};
+    $c->stash->{exact_e164} = $exact{number};
+    $c->stash->{exact_uuid} = $exact{uuid};
+
+    $c->stash->{search_user} = $filter{username};
+    $c->stash->{search_e164} = $filter{number};
+    $c->stash->{search_uuid} = $filter{uuid};
+    $c->stash->{search_user} =~ s/^\%*(.*?)\%*$/$1/ if defined $c->stash->{search_user};
+    $c->stash->{search_e164} =~ s/^\%*(.*?)\%*$/$1/ if defined $c->stash->{search_e164};
+    $c->stash->{search_uuid} =~ s/^\%*(.*?)\%*$/$1/ if defined $c->stash->{search_uuid};
+
+    unless(keys %filter) {
+        $c->session->{messages}{toperr} = 'Web.MissingSearchString';
+        return;
+    }
+
     my $offset = $c->request->params->{offset} || 0;
     $offset = 0 if $offset !~ /^\d+$/;
 
@@ -89,16 +105,6 @@ sub search : Local {
                                                         },
                                                         \$subscriber_list
                                                       );
-
-    $c->stash->{search_user} = $filter{username};
-    $c->stash->{search_e164} = $filter{number};
-    $c->stash->{search_uuid} = $filter{uuid};
-    $c->stash->{search_user} =~ s/^\%*(.*?)\%*$/$1/ if defined $c->stash->{search_user};
-    $c->stash->{search_e164} =~ s/^\%*(.*?)\%*$/$1/ if defined $c->stash->{search_e164};
-    $c->stash->{search_uuid} =~ s/^\%*(.*?)\%*$/$1/ if defined $c->stash->{search_uuid};
-    $c->stash->{exact_user} = $exact{username};
-    $c->stash->{exact_e164} = $exact{number};
-    $c->stash->{exact_uuid} = $exact{uuid};
 
     $c->stash->{searched} = 1;
     if(ref $$subscriber_list{subscribers} eq 'ARRAY' and @{$$subscriber_list{subscribers}}) {
