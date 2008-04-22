@@ -277,3 +277,13 @@ h3 {
 	white-space: nowrap;
 	text-align: center;
 }
+
+/* align search labels and text fields */
+#contentplace .search_subscriber .search_label {
+	float: left;
+	min-width: 100px;
+	margin-top: 3px;
+}
+#contentplace .search_subscriber input {
+	margin: 3px 0;
+}
