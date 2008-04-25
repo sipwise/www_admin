@@ -76,19 +76,29 @@ sub do_edit_admin : Local {
         delete $settings{password};
     }
 
-    $settings{is_master} = $c->request->params->{is_master} ? 1 : 0;
-    $settings{is_active} = $c->request->params->{is_active} ? 1 : 0;
+    $settings{is_master} = $c->request->params->{is_master} ? 1 : 0
+        unless $admin eq $c->session->{admin}{login};
+    $settings{is_active} = $c->request->params->{is_active} ? 1 : 0
+        unless $admin eq $c->session->{admin}{login};
 
     unless(keys %messages) {
-        if($c->model('Provisioning')->call_prov( $c, 'billing', 'update_admin',
-                                                 { login => $admin,
-                                                   data   => \%settings,
-                                                 },
-                                                 undef
-                                               ))
-        {
-            $messages{eadmmsg} = 'Server.Voip.SavedSettings';
-            $c->session->{messages} = \%messages;
+        if(keys %settings) {
+            if($c->model('Provisioning')->call_prov( $c, 'billing', 'update_admin',
+                                                     { login => $admin,
+                                                       data   => { %settings },
+                                                     },
+                                                     undef
+                                                   ))
+            {
+                $c->session->{admin}{password} = $settings{password}
+                    if exists $settings{password} and $admin eq $c->session->{admin}{login};
+                $messages{eadmmsg} = 'Server.Voip.SavedSettings';
+                $c->session->{messages} = \%messages;
+                $c->response->redirect("/admin");
+                return;
+            }
+        } else {
+            # emit error?
             $c->response->redirect("/admin");
             return;
         }
