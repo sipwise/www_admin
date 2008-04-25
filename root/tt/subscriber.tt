@@ -1,7 +1,22 @@
-        <h3>Search Subscribers</h3>
+        <h3>Search subscribers</h3>
         <div class="p1">
-          <form action="/subscriber/search" method="post">
-            <input type="text" id="search_subscriber" name="search_string" value="[% search_string %]" />
+          <form action="/subscriber/search" method="post" class="search_subscriber">
+
+            <label class="search_label" for="search_by_username">Username:</label>
+            <input type="text" id="search_by_username" name="search_user" value="[% search_user %]" />
+            <input type="checkbox" id="exact_user" name="exact_user" [% IF exact_user %]checked="checked"[% END %] />
+            <label for="exact_user">exact match</label><br />
+
+            <label class="search_label" for="search_by_e164">E.164 number:</label>
+            <input type="text" id="search_by_e164" name="search_e164" value="[% search_e164 %]" />
+            <input type="checkbox" id="exact_e164" name="exact_e164" [% IF exact_e164 %]checked="checked"[% END %] />
+            <label for="exact_e164">exact match</label><br />
+
+            <label class="search_label" for="search_by_uuid">UUID:</label>
+            <input type="text" id="search_by_uuid" name="search_uuid" value="[% search_uuid %]" />
+            <input type="checkbox" id="exact_uuid" name="exact_uuid" [% IF exact_uuid %]checked="checked"[% END %]/>
+            <label for="exact_uuid">exact match</label><br />
+
             <input type="submit" value="Search &#187;" class="but" />
           </form>
         </div>
@@ -41,7 +56,7 @@
                   <li class="disablepage">&#171; prev</li>
                 [% ELSE %]
                   <li class="nextpage">
-                    <a href="/subscriber/search?search_string=[% search_string %]&amp;offset=[% offset - 1 %]">&#171; prev</a>
+                    <a href="/subscriber/search?use_session=1&amp;offset=[% offset - 1 %]">&#171; prev</a>
                   </li>
                 [% END %]
                 [% FOREACH pagine = pagination %]
@@ -53,8 +68,7 @@
                      ...
                   [% ELSE %]
                     <li>
-                      <a href="/subscriber/search?search_string=[% search_string
-                               %]&amp;offset=[% pagine.offset %]">[% pagine.offset + 1 %]</a>
+                      <a href="/subscriber/search?use_session=1&amp;offset=[% pagine.offset %]">[% pagine.offset + 1 %]</a>
                     </li>
                   [% END %]
                 [% END %]
@@ -64,7 +78,7 @@
                   </li>
                 [% ELSE %]
                   <li class="nextpage">
-                    <a href="/subscriber/search?search_string=[% search_string %]&amp;offset=[% offset + 1 %]">next &#187;</a>
+                    <a href="/subscriber/search?use_session=1&amp;offset=[% offset + 1 %]">next &#187;</a>
                   </li>
                 [% END %]
               </ul>
