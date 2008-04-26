@@ -154,6 +154,37 @@
           </form>
         </div>
 
+        <h3 id="userprefs">Active Registrations</h3>
+
+        <div class="p1">
+          [% IF subscriber.registered_contacts.0 %]
+            <table class="registered_contacts">
+              [% bgflip = 1 %]
+              [% FOREACH regcon = subscriber.registered_contacts %]
+                <tr [% IF bgflip %]class="tr_alt"[% END %]>
+                  <td class="tdkey">User Agent:</td><td>[% regcon.user_agent %]</td>
+                </tr>
+                <tr [% IF bgflip %]class="tr_alt"[% END %]>
+                  <td class="tdkey">Contact:</td><td>[% regcon.contact %]</td>
+                </tr>
+                <tr [% IF bgflip %]class="tr_alt"[% END %]>
+                  <td class="tdkey">NAT detected:</td><td>[% IF regcon.nat %]yes[% ELSE %]no[% END %]</td>
+                </tr>
+                <tr [% IF bgflip %]class="tr_alt"[% END %]>
+                  <td class="tdkey">Expires:</td><td>[% regcon.expires %]</td>
+                </tr>
+                [% IF bgflip %]
+                  [% bgflip = 0 %]
+                [% ELSE %]
+                  [% bgflip = 1 %]
+                [% END %]
+              [% END %]
+            </table>
+          [% ELSE %]
+            <b>none</b>
+          [% END %]
+        </div>
+
         <h3 id="userprefs">User Preferences</h3>
 
         <div class="actions">

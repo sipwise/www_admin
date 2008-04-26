@@ -266,7 +266,8 @@ h3 {
 
 #contentplace .orders,
 #contentplace .contracts,
-#contentplace .order_payments
+#contentplace .order_payments,
+#contentplace .registered_contacts
 {
 	width: 100%;
 	border-spacing: 0px;

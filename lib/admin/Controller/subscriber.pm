@@ -168,7 +168,15 @@ sub detail : Local {
                                                             },
                                                             \$c->session->{subscriber}{voicebox_preferences}
                                                           );
+        my $regcon;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_registered_contacts',
+                                                            { username => $c->session->{subscriber}{username},
+                                                              domain   => $c->session->{subscriber}{domain},
+                                                            },
+                                                            \$regcon
+                                                          );
 
+        $c->session->{subscriber}{registered_contacts} = $$regcon{result} if $$regcon{result};
         $c->stash->{subscriber} = $c->session->{subscriber};
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
         $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c->view($c->config->{view})->
