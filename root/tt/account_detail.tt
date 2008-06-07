@@ -3,7 +3,7 @@
           #[% account.id %]</a>
         </h3>
 
-        [% IF ! account.terminate_timestamp %]
+        [% UNLESS account.terminate_timestamp || Catalyst.session.admin.read_only %]
           <div class="actions">
           [% IF billing_features %]
             <a href="detail?account_id=[% account.id %]&amp;edit_account=1" class="aaction">edit</a>
@@ -96,7 +96,7 @@
       [% IF billing_features %]
         <h3>Account Balance</h3>
 
-        [% IF ! account.terminate_timestamp %]
+        [% UNLESS account.terminate_timestamp || Catalyst.session.admin.read_only %]
         <div class="actions">
           <a href="detail?account_id=[% account.id %]&amp;edit_balance=1" class="aaction">edit</a>
           [% IF edit_balance %]
@@ -148,9 +148,11 @@
 
         <h3>Subscribers</h3>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <div class="actions">
             <a href="/subscriber/detail?account_id=[% account.id %]&amp;new=1" class="aaction">create new</a>
         </div>
+      [% END %]
         <div class="p1">
         [% IF account.subscribers %]
           <table>

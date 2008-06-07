@@ -10,17 +10,19 @@
         <h3>Search by subscriber</h3>
         <div class="p1">
           <form action="/subscriber/search" method="post">
-            <input type="text" id="search_subscriber" name="search_string" value="[% search_string %]" />
+            <input type="text" id="search_subscriber" name="search_user" value="[% search_string %]" />
             <input type="submit" value="Search &#187;" class="but" />
           </form>
         </div>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <h3>Create new account</h3>
         <div class="p1">
           <form action="/account/create_account" method="post">
             <input type="submit" value="Create &#187;" class="but" />
           </form>
         </div>
+      [% END %]
 
         [% IF subscriber_list %]
 

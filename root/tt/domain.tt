@@ -32,14 +32,20 @@
                 [% ELSE %]
                 <td class="tdcenter">[% domain.cc %]</td>
                 <td>[% domain.timezone %]</td>
-                <td><a href="/domain?edit_domain=[% domain.domain %]" class="aaction">edit</a></td>
+                <td>
+                [% UNLESS Catalyst.session.admin.read_only %]
+                  <a href="/domain?edit_domain=[% domain.domain %]" class="aaction">edit</a>
+                [% END %]
+                </td>
                 <form action="/domain/do_delete_domain" method="post">
                   <input type="hidden" name="domain" value="[% domain.domain %]" />
                   <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
                     <div class="postlink">
                       <label for="domdel[% id %]">delete</label>
                       <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="domdel[% id %]" />
                     </div>
+                  [% END %]
                   </td>
                 </form>
                 [% END %]
@@ -60,6 +66,7 @@
           </table>
         </div>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <h3>Create domain</h3>
 
         <div class="p1">
@@ -101,4 +108,5 @@
           </table>
 
         </div>
+      [% END %]
 
