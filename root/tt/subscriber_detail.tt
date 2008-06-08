@@ -3,13 +3,14 @@
           <a class="noarrow" href="detail?subscriber_id=[% subscriber.subscriber_id %]">
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
-
-        <div class="actions">
-          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_subscriber=1" class="aaction">edit</a>
         [% ELSE %]
         <h3>New subscriber</h3>
+        [% END %]
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <div class="actions">
+        [% IF subscriber.subscriber_id %]
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_subscriber=1" class="aaction">edit</a>
         [% END %]
         [% IF edit_subscriber %]
           [% IF subscriber.subscriber_id %]
@@ -30,6 +31,8 @@
           <a href="terminate?subscriber_id=[% subscriber.subscriber_id %]" class="aaction">terminate</a>
         [% END %]
         </div>
+      [% END %]
+
         <div class="p1">
         [% IF subscriber.is_locked %]
           <div class="alert">[% subscriber.is_locked %]</div>
@@ -93,11 +96,14 @@
                   <input type="text" name="webpassword" id="edit_webpass" value="[% subscriber.edit_webpass %]" />
                 [% ELSE %]
                   <input type="text" id="edit_webpass" class="disabled" disabled="disabled"
-                  [% IF show_webpass %]
+                  [% IF show_webpass && Catalyst.session.admin.show_passwords %]
                     value="[% subscriber.webpassword %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
                   [% ELSE %]
                     [% IF subscriber.webpassword %]
-                      value="********" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_webpass=1" class="apass">Show</a>
+                      value="********" />
+                      [% IF Catalyst.session.admin.show_passwords %]
+                        <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_webpass=1" class="apass">Show</a>
+                      [% END %]
                     [% ELSE %]
                       value="" />
                     [% END %]
@@ -112,11 +118,14 @@
                   <input type="text" name="password" id="edit_pass" value="[% subscriber.edit_pass %]" />
                 [% ELSE %]
                   <input type="text" id="edit_pass" class="disabled" disabled="disabled"
-                  [% IF show_pass %]
+                  [% IF show_pass && Catalyst.session.admin.show_passwords %]
                     value="[% subscriber.password %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
                   [% ELSE %]
                     [% IF subscriber.password %]
-                      value="********" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_pass=1" class="apass">Show</a>
+                      value="********" />
+                      [% IF Catalyst.session.admin.show_passwords %]
+                        <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_pass=1" class="apass">Show</a>
+                      [% END %]
                     [% ELSE %]
                       value="" />
                     [% END %]
@@ -184,12 +193,14 @@
 
         <h3 id="userprefs">User Preferences</h3>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <div class="actions">
           <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_preferences=1#userprefs" class="aaction">edit</a>
           [% IF edit_preferences %]
           <a href="detail?subscriber_id=[% subscriber.subscriber_id %]#userprefs" class="aaction">cancel</a>
           [% END %]
         </div>
+      [% END %]
         <div class="p1">
           [% IF messages.prefmsg %]<div class="goodmsg">[% messages.prefmsg %]</div>[% END %]
           [% IF messages.preferr %]<div class="errormsg">[% messages.preferr %]</div>[% END %]
@@ -301,7 +312,7 @@
                     <option />
                   </select>
                   [% END %]
-                  [% IF ! edit_preferences %]
+                  [% IF ! edit_preferences && ! Catalyst.session.admin.read_only %]
                     &nbsp;
                     <a href="edit_list?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
                        class="aaction">edit list</a>
@@ -320,12 +331,14 @@
 
         <h3 id="vboxprefs">Voicebox Preferences</h3>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <div class="actions">
           <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_voicebox=1#vboxprefs" class="aaction">edit</a>
           [% IF edit_voicebox %]
           <a href="detail?subscriber_id=[% subscriber.subscriber_id %]#vboxprefs" class="aaction">cancel</a>
           [% END %]
         </div>
+      [% END %]
         <div class="p1">
           [% IF messages.vboxmsg %]<div class="goodmsg">[% messages.vboxmsg %]</div>[% END %]
           [% IF messages.vboxerr %]<div class="errormsg">[% messages.vboxerr %]</div>[% END %]

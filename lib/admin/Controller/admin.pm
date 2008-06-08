@@ -80,6 +80,10 @@ sub do_edit_admin : Local {
         unless $admin eq $c->session->{admin}{login};
     $settings{is_active} = $c->request->params->{is_active} ? 1 : 0
         unless $admin eq $c->session->{admin}{login};
+    $settings{read_only} = $c->request->params->{read_only} ? 1 : 0
+        unless $admin eq $c->session->{admin}{login};
+    $settings{show_passwords} = $c->request->params->{show_passwords} ? 1 : 0
+        unless $admin eq $c->session->{admin}{login};
 
     unless(keys %messages) {
         if(keys %settings) {
@@ -134,6 +138,8 @@ sub do_create_admin : Local {
 
     $settings{is_master} = $c->request->params->{is_master} ? 1 : 0;
     $settings{is_active} = $c->request->params->{is_active} ? 1 : 0;
+    $settings{read_only} = $c->request->params->{read_only} ? 1 : 0;
+    $settings{show_passwords} = $c->request->params->{show_passwords} ? 1 : 0;
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'billing', 'create_admin',

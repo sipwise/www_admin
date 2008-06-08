@@ -80,6 +80,15 @@ sub detail : Local {
                                                             \$c->session->{voip_account}{balance}
                                                           );
 
+        $c->session->{voip_account}{balance}{cash_balance} = 0
+            unless defined $c->session->{voip_account}{balance}{cash_balance};
+        $c->session->{voip_account}{balance}{cash_balance_interval} = 0
+            unless defined $c->session->{voip_account}{balance}{cash_balance_interval};
+        $c->session->{voip_account}{balance}{free_time_balance} = 0
+            unless defined $c->session->{voip_account}{balance}{free_time_balance};
+        $c->session->{voip_account}{balance}{free_time_balance_interval} = 0
+            unless defined $c->session->{voip_account}{balance}{free_time_balance_interval};
+
         $c->session->{voip_account}{balance}{cash_balance} = 
             sprintf "%.2f", $c->session->{voip_account}{balance}{cash_balance} / 100;
         $c->session->{voip_account}{balance}{cash_balance_interval} = 

@@ -3,12 +3,14 @@
           #[% customer.id %]</a>
         </h3>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <div class="actions">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_customer=1" class="aaction">edit</a>
         [% IF edit_customer %]
           <a href="detail?customer_id=[% customer.id %]" class="aaction">cancel</a>
         [% END %]
         </div>
+      [% END %]
 
         <div class="p1">
           [% IF messages.custmsg %]<div class="goodmsg">[% messages.custmsg %]</div>[% END %]
@@ -31,11 +33,14 @@
                   <input type="text" id="shoppass" name="shoppass" value="[% customer.edit_shoppass %]" />
                 [% ELSE %]
                   <input type="text" id="shoppass" name="shoppass" class="disabled" disabled="disabled"
-                  [% IF show_pass %]
+                  [% IF show_pass && Catalyst.session.admin.show_passwords %]
                     value="[% customer.shoppass %]" /> <a href="?customer_id=[% customer.id %]" class="apass">Hide</a>
                   [% ELSE %]
                     [% IF customer.shoppass %]
-                      value="********" /> <a href="?customer_id=[% customer.id %]&amp;show_pass=1" class="apass">Show</a>
+                      value="********" />
+                      [% IF Catalyst.session.admin.show_passwords %]
+                        <a href="?customer_id=[% customer.id %]&amp;show_pass=1" class="apass">Show</a>
+                      [% END %]
                     [% ELSE %]
                       value="" />
                     [% END %]
@@ -54,12 +59,14 @@
 
         <h3 id="contact">Contact</h3>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <div class="actions">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_contact=1#contact" class="aaction">edit</a>
           [% IF edit_contact %]
           <a href="detail?customer_id=[% customer.id %]#contact" class="aaction">cancel</a>
           [% END %]
         </div>
+      [% END %]
 
         <div class="p1">
           [% IF messages.contmsg %]<div class="goodmsg">[% messages.contmsg %]</div>[% END %]
@@ -156,12 +163,14 @@
 
         <h3 id="commercial">Commercial Contact</h3>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <div class="actions">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_commercial=1#commercial" class="aaction">edit</a>
           [% IF edit_commercial %]
           <a href="detail?customer_id=[% customer.id %]#commercial" class="aaction">cancel</a>
           [% END %]
         </div>
+      [% END %]
 
         <div class="p1">
           [% IF messages.commmsg %]<div class="goodmsg">[% messages.commmsg %]</div>[% END %]
@@ -228,12 +237,14 @@
 
         <h3 id="technical">Technical Contact</h3>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
         <div class="actions">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_technical=1#technical" class="aaction">edit</a>
           [% IF edit_technical %]
           <a href="detail?customer_id=[% customer.id %]#technical" class="aaction">cancel</a>
           [% END %]
         </div>
+      [% END %]
 
         <div class="p1">
           [% IF messages.techmsg %]<div class="goodmsg">[% messages.techmsg %]</div>[% END %]
@@ -300,10 +311,7 @@
 
         <h3>Contracts</h3>
 
-<!--        <div class="actions">
-            <a href="/subscriber/detail?customer_id=[% customer.id %]&amp;new=1" class="aaction">create new</a>
-        </div>
--->        <div class="p1">
+        <div class="p1">
         [% IF customer.contracts %]
           <table>
             <tr>
@@ -346,10 +354,7 @@
 
         <h3>Orders</h3>
 
-<!--        <div class="actions">
-            <a href="/subscriber/detail?customer_id=[% customer.id %]&amp;new=1" class="aaction">create new</a>
-        </div>
--->        <div class="p1">
+        <div class="p1">
         [% IF customer.orders %]
           <table>
             <tr>
