@@ -49,6 +49,8 @@ sub index : Private {
     if(ref $c->session->{restore_admadd_input} eq 'HASH') {
         $c->stash->{arefill} = $c->session->{restore_admadd_input};
         delete $c->session->{restore_admadd_input};
+    } else {
+        $c->stash->{arefill} = $c->config->{default_admin_settings};
     }
 
     return 1;
