@@ -4,9 +4,6 @@
         <a href="http://sipwise.com/"><img src="/static/images/sipwise_logo_96.png" alt="Sipwise GmbH, Austria" /></a>
       </div>
       <div id="heading">Sipwise NGCP Administration Interface</div>
-      <div id="client_logo">
-        <a href="[% site_config.company.homepage %]"><img src="/static/images/client_logo.png" alt="" /></a>
-      </div>
     </div>
 
 <!-- END layout/header -->
