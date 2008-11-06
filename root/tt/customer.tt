@@ -15,14 +15,16 @@
           </form>
           [% IF messages.accsearcherr %]<div class="errormsg">[% messages.accsearcherr %]</div>[% END %]
         </div>
-<!--
-        <h3>Create new customer</h3>
-        <div class="p1">
-          <form action="/customer/create_customer" method="post">
-            <input type="submit" value="Create &#187;" class="but" />
-          </form>
-        </div>
--->
+
+        [% UNLESS Catalyst.session.admin.read_only %]
+          <h3>Create new customer</h3>
+          <div class="p1">
+            <form action="/customer/detail?new_customer=1" method="post">
+              <input type="submit" value="Create &#187;" class="but" />
+            </form>
+          </div>
+        [% END %]
+
         [% IF customer_list %]
 
           <h3>Customers</h3>

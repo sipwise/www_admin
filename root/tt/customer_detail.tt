@@ -1,68 +1,83 @@
-        <h3 id="customer"> Customer
-          <a class="noarrow" href="detail?customer_id=[% customer.id %]">
-          #[% customer.id %]</a>
-        </h3>
+        [% IF new_customer %]
+          <h3 id="customer"> New Customer</h3>
+        [% ELSE %]
+          <h3 id="customer"> Customer
+            <a class="noarrow" href="detail?customer_id=[% customer.id %]">
+            #[% customer.id %]</a>
+          </h3>
+        [% END %]
 
-      [% UNLESS Catalyst.session.admin.read_only %]
+      [% IF messages.newmsg %]<div class="goodmsg">[% messages.newmsg %]</div>[% END %]
+      [% IF messages.newerr %]<div class="errmsg">[% messages.newerr %]</div>[% END %]
+
+      [% UNLESS Catalyst.session.admin.read_only || new_customer %]
         <div class="actions">
-<!--
           <a href="detail?customer_id=[% customer.id %]&amp;edit_customer=1" class="aaction">edit</a>
         [% IF edit_customer %]
           <a href="detail?customer_id=[% customer.id %]" class="aaction">cancel</a>
-        [% END %]
--->
+        [% ELSE %]
           <a href="delete?customer_id=[% customer.id %]" class="aaction">delete</a>
+        [% END %]
         </div>
       [% END %]
 
-        <div class="p1">
-          [% IF messages.custmsg %]<div class="goodmsg">[% messages.custmsg %]</div>[% END %]
-          [% IF messages.custerr %]<div class="errormsg">[% messages.custerr %]</div>[% END %]
-          <form action="update_customer" method="post">
-            <input type="hidden" name="customer_id" value="[% customer.id %]" />
-            <table>
-              <tr><td class="tdkey">CustomerID:</td><td>[% customer.id %]</td></tr>
-              <tr>
-                <td class="tdkey">shop user:</td>
-                <td>
-                <input type="text" id="shopuser" [% IF ! edit_customer %]class="disabled" disabled="disabled"[% END %]
-                       name="shopuser" value="[% customer.shopuser %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">shop password:</td>
-                <td>
-                [% IF edit_customer %]
-                  <input type="text" id="shoppass" name="shoppass" value="[% customer.edit_shoppass %]" />
-                [% ELSE %]
-                  <input type="text" id="shoppass" name="shoppass" class="disabled" disabled="disabled"
-                  [% IF show_pass && Catalyst.session.admin.show_passwords %]
-                    value="[% customer.shoppass %]" /> <a href="?customer_id=[% customer.id %]" class="apass">Hide</a>
+      [% IF new_customer %]
+        <form action="create_customer" method="post">
+      [% ELSE %]
+        <form action="update_customer" method="post">
+      [% END %]
+
+          <div class="p1">
+            [% IF messages.custmsg %]<div class="goodmsg">[% messages.custmsg %]</div>[% END %]
+            [% IF messages.custerr %]<div class="errormsg">[% messages.custerr %]</div>[% END %]
+              <input type="hidden" name="customer_id" value="[% customer.id %]" />
+              <table>
+                <tr><td class="tdkey">CustomerID:</td><td>[% customer.id %]</td></tr>
+                <tr>
+                  <td class="tdkey">shop username:</td>
+                  <td>
+                  <input type="text" id="shopuser" [% IF ! edit_customer %]class="disabled" disabled="disabled"[% END %]
+                         name="shopuser" value="[% customer.shopuser %]" />
+                  [% IF messages.username %]<div class="errormsg">[% messages.username %]</div>[% END %]
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">shop password:</td>
+                  <td>
+                  [% IF edit_customer %]
+                    <input type="text" id="shoppass" name="shoppass" value="[% customer.edit_shoppass %]" />
                   [% ELSE %]
-                    [% IF customer.shoppass %]
-                      value="********" />
-                      [% IF Catalyst.session.admin.show_passwords %]
-                        <a href="?customer_id=[% customer.id %]&amp;show_pass=1" class="apass">Show</a>
-                      [% END %]
+                    <input type="text" id="shoppass" name="shoppass" class="disabled" disabled="disabled"
+                    [% IF show_pass && Catalyst.session.admin.show_passwords %]
+                      value="[% customer.shoppass %]" /> <a href="?customer_id=[% customer.id %]" class="apass">Hide</a>
                     [% ELSE %]
-                      value="" />
+                      [% IF customer.shoppass %]
+                        value="********" />
+                        [% IF Catalyst.session.admin.show_passwords %]
+                          <a href="?customer_id=[% customer.id %]&amp;show_pass=1" class="apass">Show</a>
+                        [% END %]
+                      [% ELSE %]
+                        value="" />
+                      [% END %]
                     [% END %]
                   [% END %]
-                [% END %]
-                </td>
-              </tr>
-              <tr><td class="tdkey">created:</td><td>[% customer.create_timestamp %]</td></tr>
-              <tr><td class="tdkey">modified:</td><td>[% customer.modify_timestamp %]</td></tr>
-            </table>
-            [% IF edit_customer %]
-              <input type="submit" class="but" value="Save &#187;" />
-            [% END %]
-          </form>
-        </div>
+                  [% IF messages.password %]<div class="errormsg">[% messages.password %]</div>[% END %]
+                  </td>
+                </tr>
+                <tr><td class="tdkey">created:</td><td>[% customer.create_timestamp %]</td></tr>
+                <tr><td class="tdkey">modified:</td><td>[% customer.modify_timestamp %]</td></tr>
+              </table>
+              [% IF edit_customer && ! new_customer %]
+                <input type="submit" class="but" value="Save &#187;" />
+              [% END %]
+          </div>
+        [% UNLESS new_customer %]
+        </form>
+        [% END %]
 
         <h3 id="contact">Contact</h3>
 
-      [% UNLESS Catalyst.session.admin.read_only %]
+      [% UNLESS Catalyst.session.admin.read_only || new_customer %]
         <div class="actions">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_contact=1#contact" class="aaction">edit</a>
           [% IF edit_contact %]
@@ -71,98 +86,119 @@
         </div>
       [% END %]
 
-        <div class="p1">
-          [% IF messages.contmsg %]<div class="goodmsg">[% messages.contmsg %]</div>[% END %]
-          [% IF messages.conterr %]<div class="errormsg">[% messages.conterr %]</div>[% END %]
-          <form action="update_contact#contact" method="post">
-            <input type="hidden" name="ctype" value="contact" />
-            <input type="hidden" name="customer_id" value="[% customer.id %]" />
-            <table>
-              <tr>
-                <td class="tdkey">name:</td>
-                <td>
-                  <select [% IF ! edit_contact %]class="disabled" disabled="disabled" [% END %] name="gender">
-                    <option value="male"[% IF customer.contact.gender == "male" %] selected="selected"[% END %]>Mr.</option>
-                    <option value="female"[% IF customer.contact.gender == "female" %] selected="selected"[% END %]>Ms./Mrs.</option>
-                  </select>
-                  <input type="text" id="cont_firstname" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="firstname" value="[% customer.contact.firstname %]" />
-                  <input type="text" id="cont_lastname" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="lastname" value="[% customer.contact.lastname %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">comm. register num.:</td>
-                <td>
-                  <input type="text" id="cont_comregnum" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="comregnum" value="[% customer.contact.comregnum %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">company:</td>
-                <td>
-                  <input type="text" id="cont_company" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="company" value="[% customer.contact.company %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">street:</td>
-                <td>
-                  <input type="text" id="cont_street" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="street" value="[% customer.contact.street %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">postcode / city:</td>
-                <td>
-                  <input type="text" id="cont_postcode" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="postcode" value="[% customer.contact.postcode %]" />
-                  <input type="text" id="cont_city" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="city" value="[% customer.contact.city %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">phonenumber:</td>
-                <td>
-                  <input type="text" id="cont_phonenumber" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="phonenumber" value="[% customer.contact.phonenumber %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">mobilenumber:</td>
-                <td>
-                  <input type="text" id="cont_mobilenumber" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="mobilenumber" value="[% customer.contact.mobilenumber %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">email:</td>
-                <td>
-                  <input type="text" id="cont_email" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="email" value="[% customer.contact.email %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">newsletter:</td>
-                <td>
-                  <input type="checkbox" id="cont_newsletter" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
-                         name="newsletter" [% IF customer.contact.newsletter %]checked="checked"[% END %] />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">created:</td>
-                <td> [% customer.contact.create_timestamp %]</td>
-              </tr>
-              <tr>
-                <td class="tdkey">modified:</td>
-                <td> [% customer.contact.modify_timestamp %]</td>
-              </tr>
-            </table>
-          [% IF edit_contact %]
-            <input type="submit" class="but" value="Save &#187;" />
-          [% END %]
-          </form>
-        </div>
+        [% UNLESS new_customer %]
+        <form action="update_contact#contact" method="post">
+        [% END %]
+
+          <div class="p1">
+            [% IF messages.contmsg %]<div class="goodmsg">[% messages.contmsg %]</div>[% END %]
+            [% IF messages.conterr %]<div class="errormsg">[% messages.conterr %]</div>[% END %]
+              <input type="hidden" name="ctype" value="contact" />
+              <input type="hidden" name="customer_id" value="[% customer.id %]" />
+              <table>
+                <tr>
+                  <td class="tdkey">gender:</td>
+                  <td>
+                    <select [% IF ! edit_contact %]class="disabled" disabled="disabled" [% END %] name="gender">
+                      <option value="male"[% IF customer.contact.gender == "male" %] selected="selected"[% END %]>Mr.</option>
+                      <option value="female"[% IF customer.contact.gender == "female" %] selected="selected"[% END %]>Ms./Mrs.</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">firstname:</td>
+                  <td>
+                    <input type="text" id="cont_firstname" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="firstname" value="[% customer.contact.firstname %]" />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">lastname:</td>
+                  <td>
+                    <input type="text" id="cont_lastname" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="lastname" value="[% customer.contact.lastname %]" />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">comm. register num.:</td>
+                  <td>
+                    <input type="text" id="cont_comregnum" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="comregnum" value="[% customer.contact.comregnum %]" />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">company:</td>
+                  <td>
+                    <input type="text" id="cont_company" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="company" value="[% customer.contact.company %]" />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">street:</td>
+                  <td>
+                    <input type="text" id="cont_street" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="street" value="[% customer.contact.street %]" />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">postcode / city:</td>
+                  <td>
+                    <input type="text" id="cont_postcode"
+                           [% IF ! edit_contact %]class="disabled ishort" disabled="disabled"[% ELSE %]class="ishort"[% END %]
+                           name="postcode" value="[% customer.contact.postcode %]" />
+                    <input type="text" id="cont_city" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="city" value="[% customer.contact.city %]" />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">phonenumber:</td>
+                  <td>
+                    <input type="text" id="cont_phonenumber" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="phonenumber" value="[% customer.contact.phonenumber %]" />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">mobilenumber:</td>
+                  <td>
+                    <input type="text" id="cont_mobilenumber" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="mobilenumber" value="[% customer.contact.mobilenumber %]" />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">email:</td>
+                  <td>
+                    <input type="text" id="cont_email" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="email" value="[% customer.contact.email %]" />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">newsletter:</td>
+                  <td>
+                    <input type="checkbox" id="cont_newsletter" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                           name="newsletter" [% IF customer.contact.newsletter %]checked="checked"[% END %] />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tdkey">created:</td>
+                  <td> [% customer.contact.create_timestamp %]</td>
+                </tr>
+                <tr>
+                  <td class="tdkey">modified:</td>
+                  <td> [% customer.contact.modify_timestamp %]</td>
+                </tr>
+              </table>
+            [% IF edit_contact && ! new_customer %]
+              <input type="submit" class="but" value="Save &#187;" />
+            [% END %]
+          </div>
+
+        [% IF new_customer %]
+          <input type="submit" class="but" value="Save &#187;" />
+        [% END %]
+
+        </form>
+
+  [% UNLESS new_customer %]
 
         <h3 id="commercial">Commercial Contact</h3>
 
@@ -183,14 +219,24 @@
             <input type="hidden" name="customer_id" value="[% customer.id %]" />
             <table>
               <tr>
-                <td class="tdkey">name:</td>
+                <td class="tdkey">gender:</td>
                 <td>
                   <select [% IF ! edit_commercial %]class="disabled" disabled="disabled" [% END %] name="gender">
                     <option value="male"[% IF customer.comm_contact.gender == "male" %] selected="selected"[% END %]>Mr.</option>
                     <option value="female"[% IF customer.comm_contact.gender == "female" %] selected="selected"[% END %]>Ms./Mrs.</option>
                   </select>
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">firstname:</td>
+                <td>
                   <input type="text" id="comm_firstname" [% IF ! edit_commercial %]class="disabled" disabled="disabled"[% END %]
                          name="firstname" value="[% customer.comm_contact.firstname %]" />
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">lastname:</td>
+                <td>
                   <input type="text" id="comm_lastname" [% IF ! edit_commercial %]class="disabled" disabled="disabled"[% END %]
                          name="lastname" value="[% customer.comm_contact.lastname %]" />
                 </td>
@@ -257,14 +303,24 @@
             <input type="hidden" name="customer_id" value="[% customer.id %]" />
             <table>
               <tr>
-                <td class="tdkey">name:</td>
+                <td class="tdkey">gender:</td>
                 <td>
                   <select [% IF ! edit_technical %]class="disabled" disabled="disabled" [% END %] name="gender">
                     <option value="male"[% IF customer.tech_contact.gender == "male" %] selected="selected"[% END %]>Mr.</option>
                     <option value="female"[% IF customer.tech_contact.gender == "female" %] selected="selected"[% END %]>Ms./Mrs.</option>
                   </select>
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">firstname:</td>
+                <td>
                   <input type="text" id="tech_firstname" [% IF ! edit_technical %]class="disabled" disabled="disabled"[% END %]
                          name="firstname" value="[% customer.tech_contact.firstname %]" />
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">lastname:</td>
+                <td>
                   <input type="text" id="tech_lastname" [% IF ! edit_technical %]class="disabled" disabled="disabled"[% END %]
                          name="lastname" value="[% customer.tech_contact.lastname %]" />
                 </td>
@@ -434,4 +490,6 @@
           </div>
         [% END %]
         </div>
+
+  [% END %]
 

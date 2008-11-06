@@ -93,6 +93,7 @@ h3 {
 #contentplace .tdkey {
 	font-weight: bold;
 	white-space: nowrap;
+        vertical-align: top;
 }
 
 #contentplace .table_header {
@@ -211,7 +212,7 @@ h3 {
 
 /* decrease input text fields for cc/ac */
 .ishort {
-	width: 40px;
+	width: 50px;
 }
 
 /* increase spacing between password and show/hide href */
