@@ -45,52 +45,33 @@ sub search : Local {
         %filter = %{ $c->session->{search_filter} };
         %exact = %{ $c->session->{exact_filter} };
     } else {
-        if(defined $c->request->params->{search_user} and length $c->request->params->{search_user}) {
-            $filter{username} = $c->request->params->{search_user};
-            unless($c->request->params->{exact_user}) {
-                $filter{username} =~ s/^\%*/\%/;
-                $filter{username} =~ s/\%*$/\%/;
-            } else {
-                $exact{username} = 1;
+        foreach my $sf (qw(username domain number uuid)) {
+            if((    defined $c->request->params->{'search_'.$sf}
+                and length $c->request->params->{'search_'.$sf})
+               or $c->request->params->{'exact_'.$sf})
+            {
+                $filter{$sf} = $c->request->params->{'search_'.$sf} || '';
+                $exact{$sf} = 1 if $c->request->params->{'exact_'.$sf};
             }
         }
-        if(defined $c->request->params->{search_e164} and length $c->request->params->{search_e164}) {
-            $filter{number} = $c->request->params->{search_e164};
-            unless($c->request->params->{exact_e164}) {
-                $filter{number} =~ s/^\%*/\%/;
-                $filter{number} =~ s/\%*$/\%/;
-            } else {
-                $exact{number} = 1;
-            }
-        }
-        if(defined $c->request->params->{search_uuid} and length $c->request->params->{search_uuid}) {
-            $filter{uuid} = $c->request->params->{search_uuid};
-            unless($c->request->params->{exact_uuid}) {
-                $filter{uuid} =~ s/^\%*/\%/;
-                $filter{uuid} =~ s/\%*$/\%/;
-            } else {
-                $exact{uuid} = 1;
-            }
-        }
+        $c->session->{search_filter} = { %filter };
+        $c->session->{exact_filter} = { %exact };
     }
 
-    $c->session->{search_filter} = \%filter;
-    $c->session->{exact_filter} = \%exact;
+    foreach my $sf (qw(username domain number uuid)) {
+        # set values for webform
+        $c->stash->{'exact_'.$sf} = $exact{$sf};
+        $c->stash->{'search_'.$sf} = $filter{$sf};
 
-    $c->stash->{exact_user} = $exact{username};
-    $c->stash->{exact_e164} = $exact{number};
-    $c->stash->{exact_uuid} = $exact{uuid};
+        next unless defined $filter{$sf};
 
-    $c->stash->{search_user} = $filter{username};
-    $c->stash->{search_e164} = $filter{number};
-    $c->stash->{search_uuid} = $filter{uuid};
-    $c->stash->{search_user} =~ s/^\%*(.*?)\%*$/$1/ if defined $c->stash->{search_user};
-    $c->stash->{search_e164} =~ s/^\%*(.*?)\%*$/$1/ if defined $c->stash->{search_e164};
-    $c->stash->{search_uuid} =~ s/^\%*(.*?)\%*$/$1/ if defined $c->stash->{search_uuid};
-
-    unless(keys %filter) {
-        $c->session->{messages}{toperr} = 'Web.MissingSearchString';
-        return;
+        # alter filter for SOAP call
+        $filter{$sf} =~ s/\*/\%/g;
+        $filter{$sf} =~ s/\?/\_/g;
+        unless($exact{$sf}) {
+            $filter{$sf} =~ s/^\%*/\%/;
+            $filter{$sf} =~ s/\%*$/\%/;
+        }
     }
 
     my $offset = $c->request->params->{offset} || 0;
