@@ -3,6 +3,7 @@ package admin::Controller::subscriber;
 use strict;
 use warnings;
 use base 'Catalyst::Controller';
+use admin::Utils;
 
 =head1 NAME
 
@@ -94,24 +95,8 @@ sub search : Local {
         $c->stash->{offset} = $offset;
         if($$subscriber_list{total_count} > @{$$subscriber_list{subscribers}}) {
             # paginate!
-            my @pagination;
-            foreach my $page (0 .. int(($$subscriber_list{total_count} - 1) / $limit)) {
-                push @pagination, { offset => $page };
-            }
-            $c->stash->{max_offset} = $#pagination;
-            if($#pagination > 10) {
-                if($offset <= 5) {
-                    splice @pagination, 9, @pagination - (10), ({offset => -1});
-                } else {
-                    if($offset < @pagination - 6) {
-                        splice @pagination, $offset + 4, @pagination - ($offset + 5), ({offset => -1});
-                        splice @pagination, 1, $offset - 4, ({offset => -1});
-                    } else {
-                        splice @pagination, 1, @pagination - 10, ({offset => -1});
-                    }
-                }
-            }
-            $c->stash->{pagination} = \@pagination;
+            $c->stash->{pagination} = admin::Utils::paginate($c, $subscriber_list, $offset, $limit);
+            $c->stash->{max_offset} = $#{$c->stash->{pagination}};
         }
     }
 

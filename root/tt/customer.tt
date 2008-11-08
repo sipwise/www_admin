@@ -30,7 +30,7 @@
           <h3>Customers</h3>
 
           <div class="p1">
-            <table>
+            <table class="inc_vspace">
               <tr class="table_header"><td>CustomerID</td><td>Name</td><td>Firma</td></tr>
 
             [% FOREACH customer = customer_list %]
@@ -54,6 +54,49 @@
             [% END %]
 
             </table>
+
+            [% IF pagination %]
+            <div class="pagination">
+              <ul>
+                [% IF offset == 0 %]
+                  <li class="disablepage">&#171; prev</li>
+                [% ELSE %]
+                  <li class="nextpage">
+                    <a href="/customer/search?use_session=1&amp;offset=[% offset - 1 %]">&#171; prev</a>
+                  </li>
+                [% END %]
+                [% FOREACH pagine = pagination %]
+                  [% IF pagine.offset == offset %]
+                    <li class="currentpage">
+                      [% pagine.offset + 1 %]
+                    </li>
+                  [% ELSIF pagine.offset == -1 %]
+                     ...
+                  [% ELSE %]
+                    <li>
+                      <a href="/customer/search?use_session=1&amp;offset=[% pagine.offset %]">[% pagine.offset + 1 %]</a>
+                    </li>
+                  [% END %]
+                [% END %]
+                [% IF offset >= max_offset %]
+                  <li class="disablepage">
+                    next &#187;
+                  </li>
+                [% ELSE %]
+                  <li class="nextpage">
+                    <a href="/customer/search?use_session=1&amp;offset=[% offset + 1 %]">next &#187;</a>
+                  </li>
+                [% END %]
+              </ul>
+            </div>
+            [% END %]
+
+          </div>
+
+        [% ELSIF searched %]
+
+          <div class="p1">
+            No matching customers found.
           </div>
 
         [% END %]

@@ -37,16 +37,43 @@ sub search : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/customer.tt';
 
-    my $search_string = $c->request->params->{search_string};
-    
+    my $filter;
+    my $limit = 10;
+    my $offset = $c->request->params->{offset} || 0;
+    $offset = 0 if $offset !~ /^\d+$/;
+
+    if($c->request->params->{use_session}) {
+        $filter = $c->session->{search_filter};
+    } else {
+        $filter = $c->request->params->{search_string} || '';
+        $c->session->{search_filter} = $filter;
+    }
+
+    $c->stash->{search_string} = $filter;
+    $filter =~ s/\*/\%/;
+    $filter =~ s/\?/\_/;
+
     my $customer_list;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'search_customers',
-                                                        { filter => { anything => '%'.$search_string.'%' } },
+                                                        { filter => { anything => '%'.$filter.'%',
+                                                                      limit    => $limit,
+                                                                      offset   => $limit * $offset,
+                                                        }           },
                                                         \$customer_list
                                                       );
 
-    $c->stash->{customer_list} = $$customer_list{customers}
-        if ref $$customer_list{customers} eq 'ARRAY';
+    $c->stash->{searched} = 1;
+    if(ref $$customer_list{customers} eq 'ARRAY' and @{$$customer_list{customers}}) {
+        $c->stash->{customer_list} = $$customer_list{customers};
+        $c->stash->{total_count} = $$customer_list{total_count};
+        $c->stash->{offset} = $offset;
+        if($$customer_list{total_count} > @{$$customer_list{customers}}) {
+            # paginate!
+            $c->stash->{pagination} = admin::Utils::paginate($c, $customer_list, $offset, $limit);
+            $c->stash->{max_offset} = $#{$c->stash->{pagination}};
+        }
+    }
+
 }
 
 =head2 getbyid 
