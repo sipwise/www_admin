@@ -292,3 +292,13 @@ h3 {
 #contentplace .search_subscriber input {
 	margin: 3px 0;
 }
+
+/* increase spacing around list explanation text */
+#contentplace .list_explanation {
+	margin-bottom: 10px;
+}
+
+/* strikeout deactivated entries in list edit */
+#contentplace .listentry_disabled {
+	text-decoration: line-through;
+}

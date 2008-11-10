@@ -746,6 +746,12 @@ sub edit_list : Local {
     $c->stash->{subscriber} = $c->session->{subscriber};
     $c->stash->{subscriber_id} = $subscriber_id;
     $c->stash->{list_name} = $list;
+
+    my $list_mode = $list;
+    $list_mode =~ s/list$/mode/;
+    $c->stash->{list_mode} = $$preferences{$list_mode};
+    $c->stash->{block_in_clir} = $$preferences{$list_mode};
+
     if(defined $c->session->{blockaddtxt}) {
         $c->stash->{blockaddtxt} = $c->session->{blockaddtxt};
         delete $c->session->{blockaddtxt};

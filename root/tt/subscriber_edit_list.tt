@@ -4,16 +4,53 @@
         </h3>
 
         <div class="actions">
-          <a href="detail?subscriber_id=[% subscriber_id %]" class="aaction">back</a>
+          <a href="detail?subscriber_id=[% subscriber_id %]&amp;#userprefs" class="aaction">back</a>
         </div>
         <div class="p1">
           [% IF messages.nummsg %]<div class="goodmsg">[% messages.nummsg %]</div>[% END %]
           [% IF messages.numerr %]<div class="errormsg">[% messages.numerr %]</div>[% END %]
 
+          <div class="list_explanation">
+          [% IF list_name == 'block_in_list' %]
+            [% IF list_mode %]
+              [% IF list_data %]
+                All incoming calls are blocked by default, only the following callers are allowed.<br />
+              [% ELSE %]
+                All incoming calls are currently blocked, exceptions may be added below.<br />
+              [% END %]
+            [% ELSE %]
+              [% IF list_data %]
+                All incoming calls are accepted by default, only the following callers are blocked.<br />
+              [% ELSE %]
+                All incoming calls are currently accepted, exceptions may be added below.<br />
+              [% END %]
+            [% END %]
+            [% IF block_in_clir %]
+              Anonymous calls (CLIR) are currently blocked!<br />
+            [% ELSE %]
+              Anonymous calls (CLIR) are currently accepted!<br />
+            [% END %]
+          [% ELSE %]
+            [% IF list_mode %]
+              [% IF list_data %]
+                All outgoing calls are blocked by default, only the following destinations are allowed.<br />
+              [% ELSE %]
+                All outgoing calls are currently blocked, exceptions may be added below.<br />
+              [% END %]
+            [% ELSE %]
+              [% IF list_data %]
+                All outgoing calls are allowed by default, only the following destinations are blocked.<br />
+              [% ELSE %]
+                All outgoing calls are currently allowed, exceptions may be added below.<br />
+              [% END %]
+            [% END %]
+          [% END %]
+          </div>
+
           <table>
             [% FOREACH blockentry = list_data %]
               <tr class="[% blockentry.background %]">
-                <td > [% blockentry.number %] </td>
+                <td [% IF blockentry.active == 0 %]class="listentry_disabled"[% END %]> [% blockentry.number %] </td>
                 <form action="do_edit_list" method="post">
                   <td >
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
