@@ -847,6 +847,32 @@ sub do_edit_list : Local {
 
 }
 
+sub expire : Local {
+    my ( $self, $c ) = @_;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $contact_id = $c->request->params->{contact_id};
+
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_registered_contact',
+                                             { username => $c->session->{subscriber}{username},
+                                               domain   => $c->session->{subscriber}{domain},
+                                               id       => $contact_id,
+                                             },
+                                             undef
+                                           ))
+    {
+        $c->session->{messages}{contmsg} = 'Server.Voip.RemovedRegisteredContact';
+        $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
+    }
+
+    $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
+}
+
 
 =head1 BUGS AND LIMITATIONS
 

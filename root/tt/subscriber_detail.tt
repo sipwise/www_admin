@@ -163,7 +163,9 @@
           </form>
         </div>
 
-        <h3 id="userprefs">Active Registrations</h3>
+        <h3 id="activeregs">Active Registrations</h3>
+
+        [% IF messages.contmsg %]<div class="goodmsg">[% messages.contmsg %]</div>[% END %]
 
         <div class="p1">
           [% IF subscriber.registered_contacts.0 %]
@@ -180,7 +182,10 @@
                   <td class="tdkey">NAT detected:</td><td>[% IF regcon.nat %]yes[% ELSE %]no[% END %]</td>
                 </tr>
                 <tr [% IF bgflip %]class="tr_alt"[% END %]>
-                  <td class="tdkey">Expires:</td><td>[% regcon.expires %]</td>
+                  <td class="tdkey">Expires:</td>
+                  <td>[% regcon.expires %] &nbsp;
+                      <a href="expire?subscriber_id=[% subscriber.subscriber_id %]&amp;contact_id=[% regcon.id %]">expire now</a>
+                  </td>
                 </tr>
                 [% IF bgflip %]
                   [% bgflip = 0 %]
