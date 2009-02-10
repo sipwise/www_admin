@@ -1,0 +1,14 @@
+Source: www-admin
+Section: admin
+Priority: extra
+Maintainer: Michael Prokop <mika@grml.org>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.8.0
+Homepage: http://sipwise.com/
+
+Package: www-admin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ossbss, libcatalyst-perl
+Description: administration framework to configure the Sipwise NGCP
+ This package provides an administration framework which is used to
+ configure the Sipwise NGCP.
