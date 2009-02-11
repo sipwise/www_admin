@@ -35,16 +35,16 @@ install: build
 	dh_prep  
 	dh_installdirs usr/local/admin usr/local/admin/script/
 
-	# Add here commands to install the package into debian/www-admin.
-	cp -a lib  debian/www-admin/usr/local/admin/
-	cp -a root debian/www-admin/usr/local/admin/
-	install -m 644 admin.yml debian/www-admin/usr/local/admin/
+	# Add here commands to install the package into debian/sipwise-www-admin.
+	cp -a lib  debian/sipwise-www-admin/usr/local/admin/
+	cp -a root debian/sipwise-www-admin/usr/local/admin/
+	install -m 644 admin.yml debian/sipwise-www-admin/usr/local/admin/
 	# we don't need admin_create.pl and admin_test.pl:
-	install -m 755 script/admin_cgi.pl     debian/www-admin/usr/local/admin/script/
-	install -m 755 script/admin_fastcgi.pl debian/www-admin/usr/local/admin/script/
-	install -m 755 script/admin_server.pl  debian/www-admin/usr/local/admin/script/
+	install -m 755 script/admin_cgi.pl     debian/sipwise-www-admin/usr/local/admin/script/
+	install -m 755 script/admin_fastcgi.pl debian/sipwise-www-admin/usr/local/admin/script/
+	install -m 755 script/admin_server.pl  debian/sipwise-www-admin/usr/local/admin/script/
 	# make sure we don't have any svn files inside the .deb:
-	find debian/www-admin -name \.svn -print0 | xargs -0 rm -rf
+	find debian/sipwise-www-admin -name \.svn -print0 | xargs -0 rm -rf
 
 
 # Build architecture-dependent files here.
