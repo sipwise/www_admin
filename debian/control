@@ -1,12 +1,14 @@
-Source: www-admin
+Source: sipwise-www-admin
 Section: admin
 Priority: extra
 Maintainer: Michael Prokop <mika@grml.org>
 Build-Depends: debhelper (>= 5)
 Standards-Version: 3.8.0
 Homepage: http://sipwise.com/
+Vcs-svn: https://dev.sipwise.com/svn/www_admin
+Vcs-Browser: https://dev.sipwise.com/svn/www_admin
 
-Package: www-admin
+Package: sipwise-www-admin
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ossbss, libcatalyst-perl
 Description: administration framework to configure the Sipwise NGCP
