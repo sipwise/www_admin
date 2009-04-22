@@ -1,4 +1,4 @@
-        <h3>Products</h3>
+        <h3 id="product">Products</h3>
 
         [% UNLESS Catalyst.session.admin.read_only %]
           <div class="actions">
@@ -7,6 +7,7 @@
         [% END %]
 
         <div class="p1">
+          [% IF messages.prodmsg %]<div class="goodmsg">[% messages.prodmsg %]</div>[% END %]
           <table>
           [% IF products %]
             <tr class="table_header">
@@ -45,7 +46,7 @@
           </table>
         </div>
 
-        <h3>Billing Profiles</h3>
+        <h3 id="bilprof">Billing Profiles</h3>
 
         [% UNLESS Catalyst.session.admin.read_only %]
           <div class="actions">
@@ -54,8 +55,7 @@
         [% END %]
 
         <div class="p1">
-          [% IF messages.cdommsg %]<div class="goodmsg">[% messages.cdommsg %]</div>[% END %]
-          [% IF messages.cdomerr %]<div class="errormsg">[% messages.cdomerr %]</div>[% END %]
+          [% IF messages.profmsg %]<div class="goodmsg">[% messages.profmsg %]</div>[% END %]
 
           <table>
           [% IF bilprofs %]
@@ -68,7 +68,10 @@
             [% id = 0 %]
             [% FOREACH bilprof = bilprofs %]
               <tr>
-                <td>[% bilprof.data.prepaid %]</td>
+                <td class="tdcenter">
+                  <input type="checkbox" class="checkbox" name="prepaid" disabled="disabled"
+                         [% IF bilprof.data.prepaid %]checked="checked"[% END %] />
+                </td>
                 <td>[% bilprof.data.name %]</td>
                 <td>
                 [% UNLESS Catalyst.session.admin.read_only %]

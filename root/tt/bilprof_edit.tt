@@ -1,0 +1,69 @@
+        [% IF handle %]
+        <h3>Edit Billing Profile</h3>
+        [% ELSE %]
+        <h3>Create New Billing Profile</h3>
+        [% END %]
+
+        <div class="actions">
+          <a href="/billing#bilprof" class="aaction">cancel</a>
+        </div>
+
+        <div class="p1">
+          <form action="do_edit_bilprof" method="post">
+          <input type="hidden" name="bilprof" value="[% handle %]" />
+            <table>
+              <tr>
+                <td class="tdkey">handle:</td>
+                [% IF handle %]
+                <td>[% bilprof.handle %]</td>
+                [% ELSE %]
+                <td><input type="text" name="handle" value="[% bilprof.handle %]" /></td>
+                [% END %]
+              </tr>
+              [% IF messages.handle %]<tr><td /><td><div class="errormsg">[% messages.handle %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">name:</td>
+                <td><input type="text" name="name" value="[% bilprof.data.name %]" /></td>
+              </tr>
+              [% IF messages.name %]<tr><td /><td><div class="errormsg">[% messages.name %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">prepaid:</td>
+                <td><input type="checkbox" class="checkbox" name="prepaid" [% IF bilprof.data.prepaid %]checked="checked"[% END %] /></td>
+              </tr>
+<!--
+              <tr>
+                <td class="tdkey">interval unit:</td>
+                <td>
+                  <select size="1" name="interval_unit">
+                    <option [% IF bilprof.data.interval_unit == "month" %]selected="selected"[% END %]>month</option>
+                    <option [% IF bilprof.data.interval_unit == "week" %]selected="selected"[% END %]>week</option>
+                  </select>
+                </td>
+              </tr>
+              [% IF messages.unit %]<tr><td /><td><div class="errormsg">[% messages.unit %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">interval count:</td>
+                <td><input type="text" name="interval_count" value="[% bilprof.data.interval_count %]" /></td>
+              </tr>
+              [% IF messages.count %]<tr><td /><td><div class="errormsg">[% messages.count %]</div></td></tr>[% END %]
+-->
+              <tr>
+                <td class="tdkey">interval charge:</td>
+                <td><input type="text" name="interval_charge" value="[% bilprof.data.interval_charge %]" /></td>
+              </tr>
+              [% IF messages.charge %]<tr><td /><td><div class="errormsg">[% messages.charge %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">interval free time:</td>
+                <td><input type="text" name="interval_free_time" value="[% bilprof.data.interval_free_time %]" /></td>
+              </tr>
+              [% IF messages.free_time %]<tr><td /><td><div class="errormsg">[% messages.free_time %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">interval free cash:</td>
+                <td><input type="text" name="interval_free_cash" value="[% bilprof.data.interval_free_cash %]" /></td>
+              </tr>
+              [% IF messages.free_cash %]<tr><td /><td><div class="errormsg">[% messages.free_cash %]</div></td></tr>[% END %]
+            </table>
+            <input type="submit" class="but" value="Save &#187;" />
+          </form>
+        </div>
+

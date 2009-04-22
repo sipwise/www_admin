@@ -21,6 +21,7 @@
                 <td><input type="text" name="handle" value="[% product.handle %]" /></td>
                 [% END %]
               </tr>
+              [% IF messages.handle %]<tr><td /><td><div class="errormsg">[% messages.handle %]</div></td></tr>[% END %]
 <!--
               <tr>
                 <td class="tdkey">class:</td>
@@ -32,26 +33,38 @@
                   </select>
                 </td>
               </tr>
+              [% IF messages.class %]<tr><td /><td><div class="errormsg">[% messages.class %]</div></td></tr>[% END %]
 -->
               <tr>
                 <td class="tdkey">name:</td>
                 <td><input type="text" name="name" value="[% product.data.name %]" /></td>
               </tr>
+              [% IF messages.name %]<tr><td /><td><div class="errormsg">[% messages.name %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">on sale:</td>
                 <td><input type="checkbox" class="checkbox" name="on_sale" [% IF product.data.on_sale %]checked="checked"[% END %] /></td>
               </tr>
+              [% IF messages.on_sale %]<tr><td /><td><div class="errormsg">[% messages.on_sale %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">price:</td>
                 <td><input type="text" name="price" value="[% product.data.price %]" /></td>
               </tr>
+              [% IF messages.price %]<tr><td /><td><div class="errormsg">[% messages.price %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">weight:</td>
                 <td><input type="text" name="weight" value="[% product.data.weight %]" /></td>
               </tr>
+              [% IF messages.weight %]<tr><td /><td><div class="errormsg">[% messages.weight %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">billing_profile:</td>
-                <td><input type="text" name="billing_profile" value="[% product.data.billing_profile %]" /></td>
+                <td>
+                  <select size="1" name="billing_profile">
+                    [% FOREACH bilprof = bilprofs %]
+                    <option [% IF bilprof.handle == product.data.billing_profile %]selected="selected"[% END %]
+                            value="[% bilprof.handle %]">[% bilprof.data.name %]</option>
+                    [% END %]
+                  </select>
+                </td>
               </tr>
             </table>
             <input type="submit" class="but" value="Save &#187;" />
