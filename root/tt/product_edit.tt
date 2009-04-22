@@ -1,0 +1,60 @@
+        [% IF handle %]
+        <h3>Edit Product</h3>
+        [% ELSE %]
+        <h3>Create New Product</h3>
+        [% END %]
+
+        <div class="actions">
+          <a href="/billing" class="aaction">cancel</a>
+        </div>
+
+        <div class="p1">
+          <form action="do_edit_product" method="post">
+          <input type="hidden" name="product" value="[% handle %]" />
+          <input type="hidden" name="class" value="voip" />
+            <table>
+              <tr>
+                <td class="tdkey">handle:</td>
+                [% IF handle %]
+                <td>[% product.handle %]</td>
+                [% ELSE %]
+                <td><input type="text" name="handle" value="[% product.handle %]" /></td>
+                [% END %]
+              </tr>
+<!--
+              <tr>
+                <td class="tdkey">class:</td>
+                <td>
+                  <select size="1" name="class">
+                    <option [% IF product.data.class == "voip" %]selected="selected"[% END %]>voip</option>
+                    <option [% IF product.data.class == "hardware" %]selected="selected"[% END %]>hardware</option>
+                    <option [% IF product.data.class == "auxiliary" %]selected="selected"[% END %]>auxiliary</option>
+                  </select>
+                </td>
+              </tr>
+-->
+              <tr>
+                <td class="tdkey">name:</td>
+                <td><input type="text" name="name" value="[% product.data.name %]" /></td>
+              </tr>
+              <tr>
+                <td class="tdkey">on sale:</td>
+                <td><input type="checkbox" class="checkbox" name="on_sale" [% IF product.data.on_sale %]checked="checked"[% END %] /></td>
+              </tr>
+              <tr>
+                <td class="tdkey">price:</td>
+                <td><input type="text" name="price" value="[% product.data.price %]" /></td>
+              </tr>
+              <tr>
+                <td class="tdkey">weight:</td>
+                <td><input type="text" name="weight" value="[% product.data.weight %]" /></td>
+              </tr>
+              <tr>
+                <td class="tdkey">billing_profile:</td>
+                <td><input type="text" name="billing_profile" value="[% product.data.billing_profile %]" /></td>
+              </tr>
+            </table>
+            <input type="submit" class="but" value="Save &#187;" />
+          </form>
+        </div>
+

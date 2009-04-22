@@ -27,6 +27,9 @@
         <ul>
           <li><a href="/domain">Domains</a></li>
           <li><a href="/admin">Administrators</a></li>
+          [% IF Catalyst.config.billing_features %]
+          <li><a href="/billing">Billing</a></li>
+          [% END %]
 [%#          <li><a href="/gwgroup">Gateway Settings</a></li> %]
 [%#          <li><a href="/sipserver">SIP Server Settings</a></li> %]
         </ul>

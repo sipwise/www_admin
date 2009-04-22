@@ -1,0 +1,98 @@
+        <h3>Products</h3>
+
+        [% UNLESS Catalyst.session.admin.read_only %]
+          <div class="actions">
+            <a href="/billing/edit_product" class="aaction">create new product</a>
+          </div>
+        [% END %]
+
+        <div class="p1">
+          <table>
+          [% IF products %]
+            <tr class="table_header">
+              <td>class</td>
+              <td>name</td>
+              <td />
+              <td />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH product = products %]
+              <tr>
+                <td>[% product.data.class %]</td>
+                <td>[% product.data.name %]</td>
+                <td>
+                [% UNLESS Catalyst.session.admin.read_only %]
+                  <a href="/billing/edit_product?product=[% product.handle %]" class="aaction">edit</a>
+                [% END %]
+                </td>
+                <form action="/billing/do_delete_product" method="post">
+                  <input type="hidden" name="product" value="[% product.handle %]" />
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <div class="postlink">
+                      <label for="prodel[% id %]">delete</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="prodel[% id %]" />
+                    </div>
+                  [% END %]
+                  </td>
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+          [% ELSE %]
+            <tr><td colspan="4">No products found in the database.</td></tr>
+          [% END %]
+          </table>
+        </div>
+
+        <h3>Billing Profiles</h3>
+
+        [% UNLESS Catalyst.session.admin.read_only %]
+          <div class="actions">
+            <a href="/billing/edit_bilprof" class="aaction">create new billing profile</a>
+          </div>
+        [% END %]
+
+        <div class="p1">
+          [% IF messages.cdommsg %]<div class="goodmsg">[% messages.cdommsg %]</div>[% END %]
+          [% IF messages.cdomerr %]<div class="errormsg">[% messages.cdomerr %]</div>[% END %]
+
+          <table>
+          [% IF bilprofs %]
+            <tr class="table_header">
+              <td>prepaid</td>
+              <td>name</td>
+              <td />
+              <td />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH bilprof = bilprofs %]
+              <tr>
+                <td>[% bilprof.data.prepaid %]</td>
+                <td>[% bilprof.data.name %]</td>
+                <td>
+                [% UNLESS Catalyst.session.admin.read_only %]
+                  <a href="/billing/edit_bilprof?bilprof=[% bilprof.handle %]" class="aaction">edit</a>
+                [% END %]
+                </td>
+                <form action="/billing/do_delete_bilprof" method="post">
+                  <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <div class="postlink">
+                      <label for="bildel[% id %]">delete</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="bildel[% id %]" />
+                    </div>
+                  [% END %]
+                  </td>
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+          [% ELSE %]
+            <tr><td colspan="4">No billing profiles found in the database.</td></tr>
+          [% END %]
+          </table>
+
+        </div>
+
