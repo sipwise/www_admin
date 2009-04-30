@@ -126,10 +126,10 @@ sub detail : Local {
         } else {
             my $product;
             return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_product',
-                                                                { product => $c->session->{voip_account}{product} },
+                                                                { handle => $c->session->{voip_account}{product} },
                                                                 \$product
                                                               );
-            $c->session->{voip_account}{product_name} = $$product{name};
+            $c->session->{voip_account}{product_name} = $$product{data}{name};
         }
 
         $c->stash->{billing_features} = 1;

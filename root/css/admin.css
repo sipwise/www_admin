@@ -96,12 +96,19 @@ h3 {
 #contentplace .tdkey {
 	font-weight: bold;
 	white-space: nowrap;
-        vertical-align: top;
+	vertical-align: top;
 }
 
 #contentplace .table_header {
 	font-weight: bold;
 	white-space: nowrap;
+}
+.bottom {
+	vertical-align: bottom;
+}
+.header_rate_interval {
+	margin-left: 25px;
+	margin-right: -25px;
 }
 
 #contentplace .nowrap {
@@ -138,6 +145,30 @@ h3 {
 	padding: 2px 2px 2px 3px;
 	border: 1px solid #606060;
 }
+
+/*
+ * input type="file" can't be themed, so we use some magic
+ */
+/*
+#container #contentplace div.fileinputs {
+	position: relative;
+	margin-left: 100px;
+}
+#container #contentplace div.fakefile {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+}
+#container #contentplace input.file {
+	position: relative;
+	text-align: right;
+	-moz-opacity:0 ;
+	filter:alpha(opacity: 0);
+	opacity: 0;
+	z-index: 2;
+}
+*/
 
 /* sigh, no border for checkboxes */
 #contentplace .checkbox {
@@ -271,7 +302,8 @@ h3 {
 #contentplace .orders,
 #contentplace .contracts,
 #contentplace .order_payments,
-#contentplace .registered_contacts
+#contentplace .registered_contacts,
+#contentplace .billing_fees
 {
 	width: 100%;
 	border-spacing: 0px;

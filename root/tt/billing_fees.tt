@@ -1,0 +1,148 @@
+        <h3><a href="/billing#bilprof">[% bilprof.data.name %]</a></h3>
+
+        <h3 id="upload">Upload Billing Fees</h3>
+
+        <div class="p1">
+          <form action="/billing/set_fees" method="post" enctype="multipart/form-data" class="search_subscriber">
+            <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+            <input type="hidden" name="offset" value="[% offset %]" />
+            [% IF messages.feemsg %]<div class="goodmsg">[% messages.feemsg %]</div>[% END %]
+            [% IF messages.feeerr %]
+              <div class="errormsg">[% messages.feeerr %]
+              [% IF feeerr.line %]
+                at line [% feeerr.line %]
+              [% END %]
+              [% IF messages.feeerrdetail %]
+                <br />
+                [% messages.feeerrdetail %]
+                [% IF feeerr.detail %]
+                  [% feeerr.detail %]
+                [% END %]
+              [% END %]
+              </div>
+            [% END %]
+            <label class="search_label" for="upload_fees">Upload file:</label>
+<!--            <div class="fileinputs"> -->
+              <input type="file" class="file" id="upload_fees" name="upload_fees" /> <br />
+<!--              <div class="fakefile">
+                <input type="text" /> <a href="" class="aaction">browse...</a>
+              </div>
+            </div>
+-->
+            [% IF messages.feefileerr %]<div class="errormsg">[% messages.feefileerr %]</div>[% END %]
+            <input type="checkbox" id="purge_existing" name="purge_existing" [% IF purge_existing %]checked="checked"[% END %] />
+            <label for="purge_existing">purge existing fees</label><br />
+            <input type="submit" value="Upload &#187;" class="but" />
+          </form>
+        </div>
+
+        <h3 id="search">Search Billing Fees</h3>
+
+        <div class="p1">
+          <form action="/billing/search_fees" method="post" class="search_subscriber">
+            <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+
+            <label class="search_label" for="search_by_destination">Destination:</label>
+            <input type="text" id="search_by_destination" name="search_destination" value="[% search_destination %]" />
+            <input type="checkbox" id="exact_destination" name="exact_destination" [% IF exact_destination %]checked="checked"[% END %] />
+            <label for="exact_destination">exact match</label><br />
+
+            <label class="search_label" for="search_by_zone">Zone:</label>
+            <input type="text" id="search_by_zone" name="search_zone" value="[% search_zone %]" />
+            <input type="checkbox" id="exact_zone" name="exact_zone" [% IF exact_zone %]checked="checked"[% END %] />
+            <label for="exact_zone">exact match</label><br />
+
+            <label class="search_label" for="search_by_detail">Zone detail:</label>
+            <input type="text" id="search_by_detail" name="search_detail" value="[% search_detail %]" />
+            <input type="checkbox" id="exact_detail" name="exact_detail" [% IF exact_detail %]checked="checked"[% END %] />
+            <label for="exact_detail">exact match</label><br />
+
+            <input type="submit" value="Search &#187;" class="but" />
+          </form>
+        </div>
+
+        <h3 id="stored">Stored Billing Fees</h3>
+
+        [% IF fee_list %]
+
+          <div class="p1">
+            [% IF messages.stfeemsg %]<div class="goodmsg">[% messages.stfeemsg %]</div>[% END %]
+            <table class="billing_fees">
+              <tr class="table_header bottom">
+                <td>destination</td>
+                <td>zone</td>
+                <td>zone detail</td>
+                <td />
+                <td />
+              </tr>
+
+            [% bgflip = 1 %]
+            [% FOREACH fee = fee_list %]
+            [% IF bgflip %]
+              [% bgflip = 0 %]
+              <tr class="tr_alt">
+            [% ELSE %]
+              [% bgflip = 1 %]
+              <tr>
+            [% END %]
+                <td>[% fee.destination %]</td>
+                <td>[% fee.zone %]</td>
+                <td>[% fee.zone_detail %]</td>
+                <td>
+                  <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.destination %]&amp;offset=[% offset %]"
+                     class="aaction">edit</a>
+                </td>
+                <td>
+                  <a href="/billing/do_delete_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.destination %]&amp;offset=[% offset %][% IF last_one %]&amp;last_one=1[% END %]"
+                     class="aaction">delete</a>
+                </td>
+              </tr>
+            [% END %]
+            </table>
+
+            [% IF pagination %]
+            <div class="pagination">
+              <ul>
+                [% IF offset == 0 %]
+                  <li class="disablepage">&#171; prev</li>
+                [% ELSE %]
+                  <li class="nextpage">
+                    <a href="/billing/search_fees?bilprof=[% bilprof.handle %]&amp;use_session=1&amp;offset=[% offset - 1 %]#stored">&#171; prev</a>
+                  </li>
+                [% END %]
+                [% FOREACH pagine = pagination %]
+                  [% IF pagine.offset == offset %]
+                    <li class="currentpage">
+                      [% pagine.offset + 1 %]
+                    </li>
+                  [% ELSIF pagine.offset == -1 %]
+                     ...
+                  [% ELSE %]
+                    <li>
+                      <a href="/billing/search_fees?bilprof=[% bilprof.handle %]&amp;use_session=1&amp;offset=[% pagine.offset %]#stored">[% pagine.offset + 1 %]</a>
+                    </li>
+                  [% END %]
+                [% END %]
+                [% IF offset >= max_offset %]
+                  <li class="disablepage">
+                    next &#187;
+                  </li>
+                [% ELSE %]
+                  <li class="nextpage">
+                    <a href="/billing/search_fees?bilprof=[% bilprof.handle %]&amp;use_session=1&amp;offset=[% offset + 1 %]#stored">next &#187;</a>
+                  </li>
+                [% END %]
+              </ul>
+            </div>
+            [% END %]
+
+          </div>
+
+        [% ELSIF searched %]
+
+          <div class="p1">
+            No matching billing fees found.
+          </div>
+
+        [% END %]
+

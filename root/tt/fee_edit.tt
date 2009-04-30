@@ -1,0 +1,106 @@
+        [% IF destination %]
+        <h3>Edit Billing Fee</h3>
+        [% ELSE %]
+        <h3>Create New Billing Fee</h3>
+        [% END %]
+
+        <div class="actions">
+          <a href="/billing/search_fees?bilprof=[% bilprof %]&amp;use_session=1&amp;offset=[% offset %]" class="aaction">cancel</a>
+        </div>
+
+        <div class="p1">
+          <form action="do_edit_fee" method="post">
+            <input type="hidden" name="bilprof" value="[% bilprof %]" />
+            <input type="hidden" name="destination" value="[% fee.destination %]" />
+            <input type="hidden" name="offset" value="[% offset %]" />
+            <table>
+              <tr>
+                <td class="tdkey">destination:</td>
+                [% IF destination %]
+                <td>[% fee.destination %]</td>
+                [% ELSE %]
+                <td><input type="text" name="new_destination" value="[% fee.destination %]" /></td>
+                [% END %]
+              </tr>
+              [% IF messages.destination %]
+                <tr><td /><td><div class="errormsg">[% messages.destination %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">zone:</td>
+                <td><input type="text" name="zone" value="[% fee.zone %]" /></td>
+              </tr>
+              [% IF messages.zone %]
+                <tr><td /><td><div class="errormsg">[% messages.zone %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">zone detail:</td>
+                <td><input type="text" name="zone_detail" value="[% fee.zone_detail %]" /></td>
+              </tr>
+              [% IF messages.zone_detail %]
+                <tr><td /><td><div class="errormsg">[% messages.zone_detail %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">onpeak init rate:</td>
+                <td><input type="text" name="onpeak_init_rate" value="[% fee.onpeak_init_rate %]" /></td>
+              </tr>
+              [% IF messages.onpeak_init_rate %]
+                <tr><td /><td><div class="errormsg">[% messages.onpeak_init_rate %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">onpeak init interval:</td>
+                <td><input type="text" name="onpeak_init_interval" value="[% fee.onpeak_init_interval %]" /></td>
+              </tr>
+              [% IF messages.onpeak_init_interval %]
+                <tr><td /><td><div class="errormsg">[% messages.onpeak_init_interval %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">onpeak follow rate:</td>
+                <td><input type="text" name="onpeak_follow_rate" value="[% fee.onpeak_follow_rate %]" /></td>
+              </tr>
+              [% IF messages.onpeak_follow_rate %]
+                <tr><td /><td><div class="errormsg">[% messages.onpeak_follow_rate %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">onpeak follow interval:</td>
+                <td><input type="text" name="onpeak_follow_interval" value="[% fee.onpeak_follow_interval %]" /></td>
+              </tr>
+              [% IF messages.onpeak_follow_interval %]
+                <tr><td /><td><div class="errormsg">[% messages.onpeak_follow_interval %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">offpeak init rate:</td>
+                <td><input type="text" name="offpeak_init_rate" value="[% fee.offpeak_init_rate %]" /></td>
+              </tr>
+              [% IF messages.offpeak_init_rate %]
+                <tr><td /><td><div class="errormsg">[% messages.offpeak_init_rate %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">offpeak init interval:</td>
+                <td><input type="text" name="offpeak_init_interval" value="[% fee.offpeak_init_interval %]" /></td>
+              </tr>
+              [% IF messages.offpeak_init_interval %]
+                <tr><td /><td><div class="errormsg">[% messages.offpeak_init_interval %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">offpeak follow rate:</td>
+                <td><input type="text" name="offpeak_follow_rate" value="[% fee.offpeak_follow_rate %]" /></td>
+              </tr>
+              [% IF messages.offpeak_follow_rate %]
+                <tr><td /><td><div class="errormsg">[% messages.offpeak_follow_rate %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">offpeak follow interval:</td>
+                <td><input type="text" name="offpeak_follow_interval" value="[% fee.offpeak_follow_interval %]" /></td>
+              </tr>
+              [% IF messages.offpeak_follow_interval %]
+                <tr><td /><td><div class="errormsg">[% messages.offpeak_follow_interval %]</div></td></tr>
+              [% END %]
+              <tr>
+                <td class="tdkey">use free time:</td>
+                <td><input type="checkbox" name="use_free_time" [% IF fee.use_free_time %]checked="checked"[% END %] /></td>
+              </tr>
+            </table>
+            <input type="submit" class="but" value="Save &#187;" />
+          </form>
+        </div>
+
