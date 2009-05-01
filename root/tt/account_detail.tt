@@ -1,7 +1,11 @@
+        [% IF account.id %]
         <h3> VoIP Account
           <a class="noarrow" href="detail?account_id=[% account.id %]">
           #[% account.id %]</a>
         </h3>
+        [% ELSE %]
+        <h3>New VoIP Account</h3>
+        [% END %]
 
         [% UNLESS account.terminate_timestamp || Catalyst.session.admin.read_only %]
           <div class="actions">
@@ -9,7 +13,15 @@
             <a href="detail?account_id=[% account.id %]&amp;edit_account=1" class="aaction">edit</a>
           [% END %]
           [% IF edit_account %]
+            [% IF account.id %]
             <a href="detail?account_id=[% account.id %]" class="aaction">cancel</a>
+            [% ELSE %]
+              [% IF account.customer_id %]
+                <a href="/customer/detail?customer_id=[% account.customer_id %]#contract" class="aaction">cancel</a>
+              [% ELSE %]
+                <a href="/account" class="aaction">cancel</a>
+              [% END %]
+            [% END %]
           [% ELSE %]
             [% IF account.status == "pending" %]
               <a href="activate?account_id=[% account.id %]" class="aaction">activate</a>
@@ -34,7 +46,7 @@
         [% END %]
           [% IF messages.accmsg %]<div class="goodmsg">[% messages.accmsg %]</div>[% END %]
           [% IF messages.accerr %]<div class="errormsg">[% messages.accerr %]</div>[% END %]
-          <form action="update_account" method="post">
+          <form action="save_account" method="post">
             <input type="hidden" name="account_id" value="[% account.id %]" />
             <table>
               <tr><td class="tdkey">ContractID:</td><td>[% account.id %]</td></tr>
@@ -43,8 +55,12 @@
               <tr>
                 <td class="tdkey">CustomerID:</td>
                 <td>
-                  [% IF account.customer_id %]
-                  <a href="/customer/detail?customer_id=[% account.customer_id %]">[% account.customer_id %]</a>
+                  [% IF edit_account %]
+                    <input type="text" name="customer_id" value="[% account.customer_id %]" />
+                  [% ELSE %]
+                    [% IF account.customer_id %]
+                    <a href="/customer/detail?customer_id=[% account.customer_id %]">[% account.customer_id %]</a>
+                    [% END %]
                   [% END %]
                 </td>
               </tr>
@@ -57,7 +73,7 @@
                     <option value="[% product.handle %]"
                           [% IF product.handle == account.product %]
                             selected="selected"
-                          [% END %]>[% product.name %]</option>
+                          [% END %]>[% product.data.name %]</option>
                   [% END %]
                   </select>
                 [% ELSE %]
@@ -71,11 +87,14 @@
                 [% IF edit_account %]
                   <select size="1" name="billing_profile">
                   [% FOREACH profile = billing_profiles %]
-                    <option[% IF profile.name == account.billing_profile %] selected="selected"[% END %]>[% profile.name %]</option>
+                    <option value="[% profile.handle %]"
+                          [% IF profile.handle == account.billing_profile %]
+                            selected="selected"
+                          [% END %]>[% profile.data.name %]</option>
                   [% END %]
                   </select>
                 [% ELSE %]
-                  [% account.billing_profile %]
+                  [% account.billing_profile_name %]
                 [% END %]
                 </td>
               </tr>

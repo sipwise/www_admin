@@ -69,34 +69,42 @@ sub detail : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/account_detail.tt';
 
-    my $account_id = $c->request->params->{account_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_id',
-                                                        { id => $account_id },
-                                                        \$c->session->{voip_account}
-                                                      );
-    if($c->config->{billing_features}) {
-        return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_balance',
+    my $account_id = $c->request->params->{account_id} || undef;
+    if(defined $account_id) {
+        return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_id',
                                                             { id => $account_id },
-                                                            \$c->session->{voip_account}{balance}
+                                                            \$c->session->{voip_account}
                                                           );
+    } else {
+        delete $c->session->{voip_account};
+        $c->session->{voip_account}{customer_id} = $c->request->params->{customer_id} || undef;
+    }
+    if($c->config->{billing_features}) {
+        if(defined $account_id) {
+            return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_balance',
+                                                                { id => $account_id },
+                                                                \$c->session->{voip_account}{balance}
+                                                              );
 
-        $c->session->{voip_account}{balance}{cash_balance} = 0
-            unless defined $c->session->{voip_account}{balance}{cash_balance};
-        $c->session->{voip_account}{balance}{cash_balance_interval} = 0
-            unless defined $c->session->{voip_account}{balance}{cash_balance_interval};
-        $c->session->{voip_account}{balance}{free_time_balance} = 0
-            unless defined $c->session->{voip_account}{balance}{free_time_balance};
-        $c->session->{voip_account}{balance}{free_time_balance_interval} = 0
-            unless defined $c->session->{voip_account}{balance}{free_time_balance_interval};
+            $c->session->{voip_account}{balance}{cash_balance} = 0
+                unless defined $c->session->{voip_account}{balance}{cash_balance};
+            $c->session->{voip_account}{balance}{cash_balance_interval} = 0
+                unless defined $c->session->{voip_account}{balance}{cash_balance_interval};
+            $c->session->{voip_account}{balance}{free_time_balance} = 0
+                unless defined $c->session->{voip_account}{balance}{free_time_balance};
+            $c->session->{voip_account}{balance}{free_time_balance_interval} = 0
+                unless defined $c->session->{voip_account}{balance}{free_time_balance_interval};
 
-        $c->session->{voip_account}{balance}{cash_balance} = 
-            sprintf "%.2f", $c->session->{voip_account}{balance}{cash_balance} / 100;
-        $c->session->{voip_account}{balance}{cash_balance_interval} = 
-            sprintf "%.2f", $c->session->{voip_account}{balance}{cash_balance_interval} / 100;
+            $c->session->{voip_account}{balance}{cash_balance} = 
+                sprintf "%.2f", $c->session->{voip_account}{balance}{cash_balance} / 100;
+            $c->session->{voip_account}{balance}{cash_balance_interval} = 
+                sprintf "%.2f", $c->session->{voip_account}{balance}{cash_balance_interval} / 100;
+        }
 
         if(ref $c->session->{restore_account_input} eq 'HASH') {
-            $c->stash->{account}{product} = $c->session->{restore_account_input}{product};
-            $c->stash->{account}{billing_profile} = $c->session->{restore_account_input}{billing_profile};
+            $c->session->{voip_account}{product} = $c->session->{restore_account_input}{product};
+            $c->session->{voip_account}{billing_profile} = $c->session->{restore_account_input}{billing_profile};
+            $c->session->{voip_account}{customer_id} = $c->session->{restore_account_input}{customer_id};
             delete $c->session->{restore_account_input};
         }
 
@@ -115,14 +123,18 @@ sub detail : Local {
                                                                 undef,
                                                                 \$products
                                                               );
-            $c->stash->{products} = [ grep { $$_{class} eq 'voip' } @{$$products{result}} ];
+            $c->stash->{products} = [ grep { $$_{data}{class} eq 'voip' }
+                                        sort { $$a{data}{name} cmp $$b{data}{name} }
+                                          @{$$products{result}}
+                                    ];
             my $billing_profiles;
             return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profiles',
                                                                 undef,
                                                                 \$billing_profiles
                                                               );
 
-            $c->stash->{billing_profiles} = $$billing_profiles{result};
+            $c->stash->{billing_profiles} = [ sort { $$a{data}{name} cmp $$b{data}{name} }
+                                                @{$$billing_profiles{result}} ];
         } else {
             my $product;
             return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_product',
@@ -130,6 +142,12 @@ sub detail : Local {
                                                                 \$product
                                                               );
             $c->session->{voip_account}{product_name} = $$product{data}{name};
+            my $profile;
+            return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
+                                                                { handle => $c->session->{voip_account}{billing_profile} },
+                                                                \$profile
+                                                              );
+            $c->session->{voip_account}{billing_profile_name} = $$profile{data}{name};
         }
 
         $c->stash->{billing_features} = 1;
@@ -147,47 +165,19 @@ sub detail : Local {
     return 1;
 }
 
-=head2 create_account
+=head2 save_account 
 
-Creates a new VoIP account.
-
-=cut
-
-sub create_account : Local {
-    my ( $self, $c ) = @_;
-
-    my %messages;
-
-    my $acid;
-    if($c->model('Provisioning')->call_prov( $c, 'billing', 'create_voip_account',
-                                             { product       => $c->config->{def_product},
-                                               billing_group => $c->config->{def_billprof},
-                                             },
-                                             \$acid))
-    {
-        $messages{accmsg} = 'Web.Account.Created';
-        $c->session->{messages} = \%messages;
-        $c->response->redirect("/account/detail?account_id=$acid");
-        return;
-    }
-
-    $c->response->redirect("/account");
-    return;
-}
-
-=head2 update_account 
-
-Update details of a VoIP account.
+Create or update details of a VoIP account.
 
 =cut
 
-sub update_account : Local {
+sub save_account : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
     my %settings;
 
-    my $account_id = $c->request->params->{account_id};
+    my $account_id = $c->request->params->{account_id} || undef;
 
     my $product = $c->request->params->{product};
     $settings{product} = $product if defined $product;
@@ -195,17 +185,32 @@ sub update_account : Local {
     my $billing_profile = $c->request->params->{billing_profile};
     $settings{billing_profile} = $billing_profile if defined $billing_profile;
 
+    my $customer_id = $c->request->params->{customer_id};
+    $settings{customer_id} = $customer_id if defined $customer_id;
+
     if(keys %settings) {
-        if($c->model('Provisioning')->call_prov( $c, 'billing', 'update_voip_account',
-                                                 { id   => $account_id,
-                                                   data => \%settings,
-                                                 },
-                                                 undef))
-        {
-            $messages{accmsg} = 'Server.Voip.SavedSettings';
-            $c->session->{messages} = \%messages;
-            $c->response->redirect("/account/detail?account_id=$account_id");
-            return;
+        if(defined $account_id) {
+            if($c->model('Provisioning')->call_prov( $c, 'billing', 'update_voip_account',
+                                                     { id   => $account_id,
+                                                       data => \%settings,
+                                                     },
+                                                     undef))
+            {
+                $messages{accmsg} = 'Server.Voip.SavedSettings';
+                $c->session->{messages} = \%messages;
+                $c->response->redirect("/account/detail?account_id=$account_id");
+                return;
+            }
+        } else {
+            if($c->model('Provisioning')->call_prov( $c, 'billing', 'create_voip_account',
+                                                     { %settings },
+                                                     \$account_id))
+            {
+                $messages{accmsg} = 'Web.Account.Created';
+                $c->session->{messages} = \%messages;
+                $c->response->redirect("/account/detail?account_id=$account_id");
+                return;
+            }
         }
     }
 

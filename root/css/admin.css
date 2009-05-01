@@ -203,6 +203,13 @@ h3 {
 #contentplace h3 a:after {
 	content: "";
 }
+#contentplace a.force_arrows:after {
+	content: "\bb";
+	font-weight: bold;
+}
+#contentplace .p1 h3 {
+	margin: 10px 0px;
+}
 
 /* specify position of edit/lock/delete action links */
 #contentplace .actions {

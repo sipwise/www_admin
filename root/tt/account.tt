@@ -16,12 +16,9 @@
         </div>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <h3>Create new account</h3>
-        <div class="p1">
-          <form action="/account/create_account" method="post">
-            <input type="submit" value="Create &#187;" class="but" />
-          </form>
-        </div>
+      <div class="p1">
+        <h3><a class="force_arrows" href="/account/detail?edit_account=1">Create new account</a></h3>
+      </div>
       [% END %]
 
         [% IF subscriber_list %]

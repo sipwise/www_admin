@@ -370,6 +370,12 @@
 
         <h3 id="contract">Contracts</h3>
 
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <div class="actions">
+            <a href="/account/detail?edit_account=1&customer_id=[% customer.id %]" class="aaction">create new</a>
+        </div>
+      [% END %]
+
         <div class="p1">
         [% IF customer.contracts %]
           <table class="contracts">
