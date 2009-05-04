@@ -242,8 +242,17 @@
                       [% IF preference.value %]checked="checked"[% END %] />
                   </td>
                 </tr>
-                [% ELSIF preference.key == "prepaid"
-                      || preference.key == "has_extension" %]
+                [% ELSIF preference.key == "prepaid" %]
+                  [% IF Catalyst.config.billing_features %]
+                  <tr>
+                    <td class="tdkey">[% preference.key %]:</td>
+                    <td>
+                      <input type="checkbox" name="[% preference.key %]" class="checkbox"
+                        disabled="disabled" [% IF preference.value %]checked="checked"[% END %] />
+                    </td>
+                  </tr>
+                  [% END %]
+                [% ELSIF preference.key == "has_extension" %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>

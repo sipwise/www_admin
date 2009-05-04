@@ -17,7 +17,13 @@
 
       [% UNLESS Catalyst.session.admin.read_only %]
       <div class="p1">
-        <h3><a class="force_arrows" href="/account/detail?edit_account=1">Create new account</a></h3>
+        <h3><a class="force_arrows"
+             [% IF Catalyst.config.billing_features %]
+               href="/account/detail?edit_account=1"
+             [% ELSE %]
+               href="/account/save_account"
+             [% END %]
+              >Create new account</a></h3>
       </div>
       [% END %]
 

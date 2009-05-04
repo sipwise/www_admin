@@ -136,18 +136,22 @@ sub detail : Local {
             $c->stash->{billing_profiles} = [ sort { $$a{data}{name} cmp $$b{data}{name} }
                                                 @{$$billing_profiles{result}} ];
         } else {
-            my $product;
-            return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_product',
-                                                                { handle => $c->session->{voip_account}{product} },
-                                                                \$product
-                                                              );
-            $c->session->{voip_account}{product_name} = $$product{data}{name};
-            my $profile;
-            return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
-                                                                { handle => $c->session->{voip_account}{billing_profile} },
-                                                                \$profile
-                                                              );
-            $c->session->{voip_account}{billing_profile_name} = $$profile{data}{name};
+            if(defined $c->session->{voip_account}{product}) {
+                my $product;
+                return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_product',
+                                                                    { handle => $c->session->{voip_account}{product} },
+                                                                    \$product
+                                                                  );
+                $c->session->{voip_account}{product_name} = $$product{data}{name};
+            }
+            if(defined $c->session->{voip_account}{billing_profile}) {
+                my $profile;
+                return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
+                                                                    { handle => $c->session->{voip_account}{billing_profile} },
+                                                                    \$profile
+                                                                  );
+                $c->session->{voip_account}{billing_profile_name} = $$profile{data}{name};
+            }
         }
 
         $c->stash->{billing_features} = 1;
@@ -185,10 +189,10 @@ sub save_account : Local {
     my $billing_profile = $c->request->params->{billing_profile};
     $settings{billing_profile} = $billing_profile if defined $billing_profile;
 
-    my $customer_id = $c->request->params->{customer_id};
+    my $customer_id = $c->request->params->{customer_id} || undef;
     $settings{customer_id} = $customer_id if defined $customer_id;
 
-    if(keys %settings) {
+    if(keys %settings or (!$c->config->{billing_features} and !defined $account_id)) {
         if(defined $account_id) {
             if($c->model('Provisioning')->call_prov( $c, 'billing', 'update_voip_account',
                                                      { id   => $account_id,
