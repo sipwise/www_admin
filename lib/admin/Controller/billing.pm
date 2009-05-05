@@ -443,6 +443,9 @@ sub search_fees : Local {
                 $c->stash->{last_one} = 1;
             }
         }
+        foreach(@{$$fee_list{fees}}) {
+            $$_{destination} = $self->_denormalize_destination($c, $$_{destination});
+        }
     }
 
     return 1;
@@ -483,17 +486,8 @@ sub set_fees : Local {
             last;
         }
         @keyval{@elements} = @values;
-        if($keyval{destination} =~ /^\d+$/) {
-            $keyval{destination} = '^'. $keyval{destination} .'.*$';
-        } elsif($keyval{destination} =~ /^(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]+$/i
-                or $keyval{destination} =~ /^[\d.]+$/)
-        {
-            $keyval{destination} = '^.*@'. $keyval{destination} .'$';
-        } elsif($keyval{destination} =~ /^.+\@(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]+$/i
-                or $keyval{destination} =~ /^.+\@[\d.]+$/)
-        {
-            $keyval{destination} = '^'. $keyval{destination} .'$';
-        } else {
+        $keyval{destination} = $self->_normalize_destination($c, $keyval{destination});
+        unless(defined $keyval{destination}) {
             $messages{feeerr} = 'Web.Fees.InvalidDestination';
             $c->session->{feeerr}{line} = $line;
             last;
@@ -536,10 +530,13 @@ sub edit_fee : Local {
     my $destination = $c->stash->{destination} = $c->request->params->{destination};
     $c->stash->{offset} = $c->request->params->{offset} || 0;
 
+    $destination = $self->_normalize_destination($c, $destination)
+        if defined $destination;
+
     if(ref $c->session->{restore_fee_input} eq 'HASH') {
         $c->stash->{fee} = $c->session->{restore_fee_input};
         delete $c->session->{restore_fee_input};
-    } else {
+    } elsif(defined $destination) {
         my $fee_list;
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'search_billing_profile_fees',
                                                             { handle => $bilprof,
@@ -554,6 +551,7 @@ sub edit_fee : Local {
                 $c->session->{messages}{feeerr} = 'Web.Fees.DuplicatedDestination';
             } else {
                 $c->stash->{fee} = $$fee_list{fees}[0];
+                $c->stash->{fee}{destination} = $self->_denormalize_destination($c, $c->stash->{fee}{destination});
             }
         } else {
             $c->session->{messages}{feeerr} = 'Web.Fees.NoSuchDestination';
@@ -578,8 +576,13 @@ sub do_edit_fee : Local {
     my $bilprof = $c->request->params->{bilprof};
     my $offset = $c->request->params->{offset};
     $settings{destination} = $c->request->params->{destination};
+    $settings{destination} = $self->_normalize_destination($c, $settings{destination})
+        if defined $settings{destination};
     if(defined $c->request->params->{new_destination}) {
-        $settings{destination} = $c->request->params->{new_destination};
+        $settings{destination} = $self->_normalize_destination($c, $c->request->params->{new_destination});
+        unless(defined $settings{destination}) {
+            $messages{destination} = 'Web.Fees.InvalidDestination';
+        }
     }
     $settings{zone} = $c->request->params->{zone};
     $settings{zone_detail} = $c->request->params->{zone_detail};
@@ -611,6 +614,8 @@ sub do_edit_fee : Local {
         return;
     }
 
+    $settings{destination} = $self->_denormalize_destination($c, $settings{destination})
+        if defined $settings{destination};
     $c->session->{restore_fee_input} = \%settings;
     $c->response->redirect("/billing/edit_fee?bilprof=$bilprof&offset=$offset");
     return;
@@ -629,6 +634,8 @@ sub do_delete_fee : Local {
     my $destination = $c->request->params->{destination};
     my $offset = $c->request->params->{offset};
 
+    $destination = $self->_normalize_destination($c, $destination);
+
     if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_billing_profile_fees',
                                              { handle => $bilprof,
                                                fees   => [ { destination => $destination } ],
@@ -644,6 +651,40 @@ sub do_delete_fee : Local {
 
     $c->response->redirect("/billing/search_fees?bilprof=$bilprof&use_session=1&offset=$offset");
     return;
+}
+
+sub _normalize_destination : Private {
+    my ($self, $c, $destination) = @_;
+
+    if($destination =~ /^\d+$/) {
+        $destination = '^' . $destination . '.*$';
+    } elsif($destination =~ /^(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]+$/i
+            or $destination =~ /^[\d.]+$/)
+    {
+        $destination =~ s/\./\\./g;
+        $destination = '^.*@'. $destination .'$';
+    } elsif($destination =~ /^.+\@(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]+$/i
+            or $destination =~ /^.+\@[\d.]+$/)
+    {
+        $destination =~ s/\./\\./g;
+        $destination = '^'. $destination .'$';
+    } else {
+        return undef;
+    }
+
+    return $destination;
+}
+
+sub _denormalize_destination : Private {
+    my ($self, $c, $destination) = @_;
+
+    $destination =~ s/\\\././g;
+    $destination =~ s/\$$//;
+    $destination =~ s/^\^//;
+    $destination =~ s/\.\*$//;
+    $destination =~ s/^\.\*\@//;
+
+    return $destination;
 }
 
 
