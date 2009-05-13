@@ -128,12 +128,15 @@ sub detail : Local {
                                                             },
                                                             \$preferences
                                                           );
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_voicebox_preferences',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain   => $c->session->{subscriber}{domain},
-                                                            },
-                                                            \$c->session->{subscriber}{voicebox_preferences}
-                                                          );
+        # voicebox requires a number
+        if(length $c->session->{subscriber}{sn}) {
+          return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_voicebox_preferences',
+                                                              { username => $c->session->{subscriber}{username},
+                                                                domain   => $c->session->{subscriber}{domain},
+                                                              },
+                                                              \$c->session->{subscriber}{voicebox_preferences}
+                                                            );
+        }
         my $regcon;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_registered_contacts',
                                                             { username => $c->session->{subscriber}{username},

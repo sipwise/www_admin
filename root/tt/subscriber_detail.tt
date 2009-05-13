@@ -346,6 +346,8 @@
           </form>
         </div>
 
+    [% IF subscriber.voicebox_preferences %]
+
         <h3 id="vboxprefs">Voicebox Preferences</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
@@ -391,4 +393,6 @@
           [% END %]
           </form>
         </div>
+
+    [% END %]
 
