@@ -207,7 +207,7 @@ sub save_account : Local {
             }
         } else {
             if($c->model('Provisioning')->call_prov( $c, 'billing', 'create_voip_account',
-                                                     { %settings },
+                                                     { data => \%settings },
                                                      \$account_id))
             {
                 $messages{accmsg} = 'Web.Account.Created';
