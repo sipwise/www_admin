@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use base 'Catalyst::Controller';
 
+my @WEEKDAYS = qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
+
 =head1 NAME
 
 admin::Controller::billing - Catalyst Controller
@@ -650,6 +652,149 @@ sub do_delete_fee : Local {
     }
 
     $c->response->redirect("/billing/search_fees?bilprof=$bilprof&use_session=1&offset=$offset");
+    return;
+}
+
+=head2 show_peaktimes
+
+Shows the lists of offpeak times.
+
+=cut
+
+sub show_peaktimes : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peaktimes.tt';
+
+    my $bilprof = $c->request->params->{bilprof};
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
+                                                        { handle => $bilprof },
+                                                        \$c->stash->{bilprof}
+                                                      );
+
+    my $edit_weekday = $c->request->params->{edit_weekday};
+    $c->stash->{edit_weekday} = $edit_weekday
+        if defined $edit_weekday;
+
+    my $peaktimes;
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile_offpeak_times',
+                                                        { handle => $bilprof },
+                                                        \$peaktimes
+                                                      );
+    my @weekdays;
+    for(0 .. 6) {
+        $weekdays[$_] = { name => $WEEKDAYS[$_] };
+    }
+    $$peaktimes{weekdays} = [] unless defined eval { @{$$peaktimes{weekdays}} };
+    foreach (sort { $$a{day} <=> $$b{day} } @{$$peaktimes{weekdays}}) {
+        if(defined $c->session->{restore_peaktimes} and $$_{day} == $edit_weekday) {
+            my $rpt = $c->session->{restore_peaktimes};
+            if(defined $$rpt{startold} or defined $$rpt{endold}) {
+                for(eval { @{$$_{ranges}} }) {
+                    if($$_{start} eq $$rpt{startold} and $$_{end} eq $$rpt{endold}) {
+                        $$_{restore_start} = $$rpt{start};
+                        $$_{restore_end} = $$rpt{end};
+                    }
+                }
+            } else {
+                $c->stash->{newrange}{start} = $$rpt{start};
+                $c->stash->{newrange}{end} = $$rpt{end};
+            }
+        }
+        $weekdays[$$_{day}]{ranges} = $$_{ranges};
+    }
+    $c->stash->{offpeaktimes}{weekdays} = \@weekdays;
+
+    delete $c->session->{restore_peaktimes};
+    return 1;
+}
+
+=head2 do_edit_peaktime
+
+Modifies a peaktime range entry in the database or creates a new one.
+
+=cut
+
+sub do_edit_peaktime : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $bilprof = $c->request->params->{bilprof};
+    my $weekday = $c->request->params->{weekday};
+    my $start = $c->request->params->{start};
+    my $end = $c->request->params->{end};
+    my $startold = $c->request->params->{startold};
+    my $endold = $c->request->params->{endold};
+
+    my $delete = 0;
+    if(!defined $start and !defined $end) {
+        $delete = 1;
+    } else {
+        if($start) {
+            $messages{epeakwerr} = 'Client.Syntax.MalformedDaytime' unless $start =~ /^(?:[01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/
+        } else {
+            $start = '00:00:00';
+        }
+        if($end) {
+            $messages{epeakwerr} = 'Client.Syntax.MalformedDaytime' unless $end =~ /^(?:[01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/
+        } else {
+            $end = '23:59:59';
+        }
+    }
+
+    $c->response->redirect("/billing/show_peaktimes?bilprof=$bilprof&edit_weekday=$weekday");
+
+    my $peaktimes;
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile_offpeak_times',
+                                                        { handle => $bilprof },
+                                                        \$peaktimes
+                                                      );
+
+    my @oldpeaktimes;
+    for(eval { @{$$peaktimes{weekdays}} }) {
+        if($$_{day} == $weekday) {
+            @oldpeaktimes = eval { @{$$_{ranges}} };
+            last;
+        }
+    }
+
+    if($startold and $endold) {
+        @oldpeaktimes = grep { !($$_{start} eq $startold and $$_{end} eq $endold) } @oldpeaktimes;
+    }
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_billing_profile_offpeak_times',
+                                                 { handle        => $bilprof,
+                                                   offpeak_times => {
+                                                       weekdays => [
+                                                           {
+                                                             day => $weekday,
+                                                             ranges => [
+                                                                 @oldpeaktimes,
+                                                                 ($delete ? () : 
+                                                                   {
+                                                                     start => $start,
+                                                                     end   => $end,
+                                                                   }
+                                                                 ),
+                                                             ]
+                                                           },
+                                                       ],
+                                                   }
+                                                 },
+                                                 undef))
+        {
+            $messages{epeakwmsg} = 'Web.Fees.SavedPeaktimes';
+            $c->session->{messages} = \%messages;
+            return;
+        }
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->session->{restore_peaktimes} = {
+        start => $start, end => $end,
+        startold => $startold, endold => $endold
+    };
     return;
 }
 

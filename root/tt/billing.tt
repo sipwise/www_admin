@@ -65,6 +65,7 @@
               <td />
               <td />
               <td />
+              <td />
             </tr>
             [% id = 0 %]
             [% FOREACH bilprof = bilprofs %]
@@ -91,13 +92,16 @@
                   </td>
                 </form>
                 <td>
-                  <a href="/billing/search_fees?bilprof=[% bilprof.handle %]" class="aaction">show fees</a>
+                  <a href="/billing/search_fees?bilprof=[% bilprof.handle %]" class="aaction">edit fees</a>
+                </td>
+                <td>
+                  <a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]" class="aaction">edit peak times</a>
                 </td>
               </tr>
             [% id = id + 1 %]
             [% END %]
           [% ELSE %]
-            <tr><td colspan="5">No billing profiles found in the database.</td></tr>
+            <tr><td colspan="6">No billing profiles found in the database.</td></tr>
           [% END %]
           </table>
 

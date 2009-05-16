@@ -246,8 +246,9 @@ h3 {
 	width: 120px;
 }
 
-/* decrease input text field for password */
-#edit_pass, #edit_webpass {
+/* decrease input text field for password and start / stop times*/
+#edit_pass, #edit_webpass,
+#contentplace input.peaktime {
 	width: 95px;
 }
 
@@ -310,7 +311,8 @@ h3 {
 #contentplace .contracts,
 #contentplace .order_payments,
 #contentplace .registered_contacts,
-#contentplace .billing_fees
+#contentplace .billing_fees,
+#contentplace .billing_peaktimes
 {
 	width: 100%;
 	border-spacing: 0px;
@@ -340,4 +342,13 @@ h3 {
 /* strikeout deactivated entries in list edit */
 #contentplace .listentry_disabled {
 	text-decoration: line-through;
+}
+
+#contentplace form.peakedit {
+	float: left;
+	margin-right: 10px;
+}
+
+#contentplace .reducespace {
+	margin-bottom: -10px;
 }

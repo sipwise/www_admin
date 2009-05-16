@@ -1,0 +1,80 @@
+        <h3>Edit Off-Peak Times for <a href="/billing#bilprof" class="force_arrows">[% bilprof.data.name %]</a></h3>
+
+        <h3 id="weekdays">Weekdays</h3>
+
+        <div class="p1">
+
+          <table class="billing_peaktimes">
+            <tr class="table_header">
+              <td style="width:120px;">weekday</td>
+              <td>ranges</td>
+              <td style="width:80px;" />
+            </tr>
+          [% wd = 0 %]
+          [% FOREACH weekday = offpeaktimes.weekdays %]
+            <tr>
+              <td class="tdkey">[% weekday.name %]</td>
+            [% IF wd == edit_weekday %]
+              <td>
+              [% IF weekday.ranges %]
+                [% id = 0 %]
+                [% FOREACH range = weekday.ranges %]
+                <div class="postlink">
+                  <form action="/billing/do_edit_peaktime" method="post" class="peakedit">
+                    <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+                    <input type="hidden" name="weekday" value="[% wd %]" />
+                    <input type="hidden" name="startold" value="[% range.start %]" />
+                    <input type="hidden" name="endold" value="[% range.end %]" />
+                    <input type="text" class="peaktime" name="start" value="[% range.restore_start || range.start %]" /> -
+                    <input type="text" class="peaktime" name="end" value="[% range.restore_end || range.end %]" />
+                    <label for="peaksave[% id %]">save</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksave[% id %]" />
+                  </form>
+                  <form action="/billing/do_edit_peaktime" method="post">
+                    <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+                    <input type="hidden" name="weekday" value="[% wd %]" />
+                    <input type="hidden" name="startold" value="[% range.start %]" />
+                    <input type="hidden" name="endold" value="[% range.end %]" />
+                    <label for="peakdel[% id %]">delete</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peakdel[% id %]" />
+                  </form><br clear="all" class="reducespace" />
+                </div>
+                [% id = id + 1 %]
+                [% END %]
+              [% END %]
+                <form action="/billing/do_edit_peaktime" method="post">
+                  <div class="postlink">
+                    <input type="hidden" name="weekday" value="[% wd %]" />
+                    <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+                    <input type="text" class="peaktime" name="start" value="[% newrange.start %]" /> -
+                    <input type="text" class="peaktime" name="end" value="[% newrange.end %]" />
+                    <label for="peaksavenew">save</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksavenew" />
+                  </div>
+                </form>
+                [% IF messages.epeakwmsg %]<div class="goodmsg">[% messages.epeakwmsg %]</div>[% END %]
+                [% IF messages.epeakwerr %]<div class="errormsg">[% messages.epeakwerr %]</div>[% END %]
+              </td>
+              <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]" class="aaction">exit</a></td>
+            [% ELSE %]
+              <td>
+              [% IF weekday.ranges %]
+                [% FOREACH range = weekday.ranges %]
+                  [% range.start %] - [% range.end %]<br />
+                [% END %]
+              [% ELSE %]
+                No ranges defined.
+              [% END %]
+              </td>
+              [% UNLESS Catalyst.session.admin.read_only %]
+              <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;edit_weekday=[% wd %]" class="aaction">edit</a></td>
+              [% ELSE %]
+              <td />
+              [% END %]
+            [% END %]
+            </tr>
+            [% wd = wd + 1 %]
+          [% END %]
+          </table>
+        </div>
+
