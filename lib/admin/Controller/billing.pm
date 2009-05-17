@@ -775,10 +775,11 @@ sub do_edit_peaktime : Local {
         }
     }
 
-    if($weekday) {
-        $c->response->redirect("/billing/show_peaktimes?bilprof=$bilprof&edit_weekday=$weekday");
-    } else {
+    if(defined $date) {
+        $messages{epeakerr} = 'Client.Syntax.Date' unless $date =~ /^\d{4}-\d\d-\d\d$/;
         $c->response->redirect("/billing/show_peaktimes?bilprof=$bilprof&show_year=$show_year&edit_date=". ($edit_date ? $edit_date : $date) ."#special");
+    } else {
+        $c->response->redirect("/billing/show_peaktimes?bilprof=$bilprof&edit_weekday=$weekday");
     }
 
     my $peaktimes;
@@ -788,7 +789,7 @@ sub do_edit_peaktime : Local {
                                                       );
 
     my @oldpeaktimes;
-    if($weekday) {
+    if(defined $weekday) {
         for(eval { @{$$peaktimes{weekdays}} }) {
             if($$_{day} == $weekday) {
                 @oldpeaktimes = eval { @{$$_{ranges}} };
@@ -815,10 +816,10 @@ sub do_edit_peaktime : Local {
         if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_billing_profile_offpeak_times',
                                                  { handle        => $bilprof,
                                                    offpeak_times => {
-                                                       ($weekday ? 'weekdays' : 'special') => [
+                                                       (defined $weekday ? 'weekdays' : 'special') => [
                                                            {
-                                                             $weekday ? ('day'  => $weekday)
-                                                                      : ('date' => $date),
+                                                             defined $weekday ? ('day'  => $weekday)
+                                                                              : ('date' => $date),
                                                              ranges => [
                                                                  @oldpeaktimes,
                                                                  ($delete ? () : 
