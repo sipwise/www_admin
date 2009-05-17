@@ -675,6 +675,13 @@ sub show_peaktimes : Local {
     $c->stash->{edit_weekday} = $edit_weekday
         if defined $edit_weekday;
 
+    my $show_year = $c->request->params->{show_year};
+    $c->stash->{show_year} = $show_year
+        if defined $show_year;
+    my $edit_date = $c->request->params->{edit_date};
+    $c->stash->{edit_date} = $edit_date
+        if defined $edit_date;
+
     my $peaktimes;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile_offpeak_times',
                                                         { handle => $bilprof },
@@ -686,7 +693,9 @@ sub show_peaktimes : Local {
     }
     $$peaktimes{weekdays} = [] unless defined eval { @{$$peaktimes{weekdays}} };
     foreach (sort { $$a{day} <=> $$b{day} } @{$$peaktimes{weekdays}}) {
-        if(defined $c->session->{restore_peaktimes} and $$_{day} == $edit_weekday) {
+        if(defined $c->session->{restore_peaktimes}
+           and defined $edit_weekday and $$_{day} == $edit_weekday)
+        {
             my $rpt = $c->session->{restore_peaktimes};
             if(defined $$rpt{startold} or defined $$rpt{endold}) {
                 for(eval { @{$$_{ranges}} }) {
@@ -703,6 +712,27 @@ sub show_peaktimes : Local {
         $weekdays[$$_{day}]{ranges} = $$_{ranges};
     }
     $c->stash->{offpeaktimes}{weekdays} = \@weekdays;
+
+    if(defined eval { @{$$peaktimes{special}} }) {
+        my @dates;
+        my %years;
+        for(sort { $$a{date} cmp $$b{date} } @{$$peaktimes{special}}) {
+            my $year = (split /-/, $$_{date})[0];
+            $years{$year} = 0;
+            if($year == $show_year) {
+                push @dates, { date => $$_{date}, ranges => [ sort { $$a{start} cmp $$b{start} } eval { @{$$_{ranges}} } ]};
+            }
+        }
+        $c->stash->{years} = [ reverse sort keys %years ];
+        $c->stash->{dates} = \@dates if @dates;
+    }
+
+    if(defined $c->session->{restore_peaktimes} and $edit_date eq 'new') {
+        my $rpt = $c->session->{restore_peaktimes};
+        $c->stash->{newrange}{start} = $$rpt{start};
+        $c->stash->{newrange}{end} = $$rpt{end};
+        $c->stash->{newrange}{date} = $$rpt{date};
+    }
 
     delete $c->session->{restore_peaktimes};
     return 1;
@@ -721,6 +751,9 @@ sub do_edit_peaktime : Local {
 
     my $bilprof = $c->request->params->{bilprof};
     my $weekday = $c->request->params->{weekday};
+    my $show_year = $c->request->params->{show_year};
+    my $date = $c->request->params->{date};
+    my $edit_date = $c->request->params->{edit_date};
     my $start = $c->request->params->{start};
     my $end = $c->request->params->{end};
     my $startold = $c->request->params->{startold};
@@ -731,18 +764,22 @@ sub do_edit_peaktime : Local {
         $delete = 1;
     } else {
         if($start) {
-            $messages{epeakwerr} = 'Client.Syntax.MalformedDaytime' unless $start =~ /^(?:[01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/
+            $messages{epeakerr} = 'Client.Syntax.MalformedDaytime' unless $start =~ /^(?:[01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/
         } else {
             $start = '00:00:00';
         }
         if($end) {
-            $messages{epeakwerr} = 'Client.Syntax.MalformedDaytime' unless $end =~ /^(?:[01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/
+            $messages{epeakerr} = 'Client.Syntax.MalformedDaytime' unless $end =~ /^(?:[01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/
         } else {
             $end = '23:59:59';
         }
     }
 
-    $c->response->redirect("/billing/show_peaktimes?bilprof=$bilprof&edit_weekday=$weekday");
+    if($weekday) {
+        $c->response->redirect("/billing/show_peaktimes?bilprof=$bilprof&edit_weekday=$weekday");
+    } else {
+        $c->response->redirect("/billing/show_peaktimes?bilprof=$bilprof&show_year=$show_year&edit_date=". ($edit_date ? $edit_date : $date) ."#special");
+    }
 
     my $peaktimes;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile_offpeak_times',
@@ -751,24 +788,37 @@ sub do_edit_peaktime : Local {
                                                       );
 
     my @oldpeaktimes;
-    for(eval { @{$$peaktimes{weekdays}} }) {
-        if($$_{day} == $weekday) {
-            @oldpeaktimes = eval { @{$$_{ranges}} };
-            last;
+    if($weekday) {
+        for(eval { @{$$peaktimes{weekdays}} }) {
+            if($$_{day} == $weekday) {
+                @oldpeaktimes = eval { @{$$_{ranges}} };
+                last;
+            }
+        }
+    } else {
+        for(eval { @{$$peaktimes{special}} }) {
+            if($$_{date} eq $date) {
+                @oldpeaktimes = eval { @{$$_{ranges}} };
+                last;
+            }
         }
     }
 
     if($startold and $endold) {
-        @oldpeaktimes = grep { !($$_{start} eq $startold and $$_{end} eq $endold) } @oldpeaktimes;
+        @oldpeaktimes = grep { !($$_{start} eq $startold and $$_{end} eq $endold) and
+                               !($$_{start} eq $start and $$_{end} eq $end) } @oldpeaktimes;
+    } else {
+        @oldpeaktimes = grep { !($$_{start} eq $start and $$_{end} eq $end) } @oldpeaktimes;
     }
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_billing_profile_offpeak_times',
                                                  { handle        => $bilprof,
                                                    offpeak_times => {
-                                                       weekdays => [
+                                                       ($weekday ? 'weekdays' : 'special') => [
                                                            {
-                                                             day => $weekday,
+                                                             $weekday ? ('day'  => $weekday)
+                                                                      : ('date' => $date),
                                                              ranges => [
                                                                  @oldpeaktimes,
                                                                  ($delete ? () : 
@@ -784,7 +834,11 @@ sub do_edit_peaktime : Local {
                                                  },
                                                  undef))
         {
-            $messages{epeakwmsg} = 'Web.Fees.SavedPeaktimes';
+            if(defined $edit_date and $edit_date eq 'new') {
+                my $year = (split /-/, $date)[0];
+                $c->response->redirect("/billing/show_peaktimes?bilprof=$bilprof&show_year=$year#special");
+            }
+            $messages{epeakmsg} = 'Web.Fees.SavedPeaktimes';
             $c->session->{messages} = \%messages;
             return;
         }
@@ -792,6 +846,7 @@ sub do_edit_peaktime : Local {
 
     $c->session->{messages} = \%messages;
     $c->session->{restore_peaktimes} = {
+        date  => $date,
         start => $start, end => $end,
         startold => $startold, endold => $endold
     };

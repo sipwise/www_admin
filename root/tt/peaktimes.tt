@@ -52,8 +52,8 @@
                     <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksavenew" />
                   </div>
                 </form>
-                [% IF messages.epeakwmsg %]<div class="goodmsg">[% messages.epeakwmsg %]</div>[% END %]
-                [% IF messages.epeakwerr %]<div class="errormsg">[% messages.epeakwerr %]</div>[% END %]
+                [% IF messages.epeakmsg %]<div class="goodmsg">[% messages.epeakmsg %]</div>[% END %]
+                [% IF messages.epeakerr %]<div class="errormsg">[% messages.epeakerr %]</div>[% END %]
               </td>
               <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]" class="aaction">exit</a></td>
             [% ELSE %]
@@ -76,5 +76,143 @@
             [% wd = wd + 1 %]
           [% END %]
           </table>
+        </div>
+
+        <h3 id="special">Dates</h3>
+
+        [% UNLESS Catalyst.session.admin.read_only %]
+          [% IF edit_date == "new" %]
+            <div class="p1">
+              <form action="/billing/do_edit_peaktime" method="post">
+                <div class="postlink">
+                  <input type="hidden" name="show_year" value="[% show_year %]" />
+                  <input type="text" name="date" value="[% newrange.date %]" />
+                  <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+                  <input type="text" class="peaktime" name="start" value="[% newrange.start %]" /> -
+                  <input type="text" class="peaktime" name="end" value="[% newrange.end %]" />
+                  <input type="hidden" name="edit_date" value="new" />
+                  <label for="peaksavenew">save</label>
+                  <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksavenew" />
+                  &nbsp;
+                  <a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]#special" class="aaction">cancel</a>
+                </div>
+              </form>
+              [% IF messages.epeakmsg %]<div class="goodmsg">[% messages.epeakmsg %]</div>[% END %]
+              [% IF messages.epeakerr %]<div class="errormsg">[% messages.epeakerr %]</div>[% END %]
+            </div>
+          [% ELSE %]
+            <div class="actions">
+              <a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]&amp;edit_date=new#special"
+                 class="aaction">add new date</a>
+            </div>
+          [% END %]
+        [% END %]
+
+        <div class="p1">
+        [% IF dates || years %]
+
+          <table class="billing_peaktimes">
+<!--
+            <tr class="table_header">
+              <td style="width:50px;">years</td>
+              <td />
+            </tr>
+-->
+            <tr>
+              <td class="tdkey padding6">
+            [% FOREACH year = years %]
+              [% IF year == show_year %]
+                [% year %]<br />
+              [% ELSE %]
+                <a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% year %]">[% year %]</a><br />
+              [% END %]
+            [% END %]
+              </td>
+              <td>
+              [% IF dates %]
+                <table class="billing_peaktimes">
+                  <tr class="table_header">
+                    <td style="width:80px;">date</td>
+                    <td>ranges</td>
+                    <td style="width:60px;" />
+                  </tr>
+                  [% dt = 0 %]
+                  [% FOREACH date = dates %]
+                  <tr>
+                    <td class="tdkey">[% date.date %]</td>
+                  [% IF date.date == edit_date %]
+                    <td>
+                    [% IF date.ranges %]
+                      [% id = 0 %]
+                      [% FOREACH range = date.ranges %]
+                      <div class="postlink">
+                        <form action="/billing/do_edit_peaktime" method="post" class="peakedit">
+                          <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+                          <input type="hidden" name="show_year" value="[% show_year %]" />
+                          <input type="hidden" name="date" value="[% date.date %]" />
+                          <input type="hidden" name="startold" value="[% range.start %]" />
+                          <input type="hidden" name="endold" value="[% range.end %]" />
+                          <input type="text" class="peaktime" name="start" value="[% range.restore_start || range.start %]" /> -
+                          <input type="text" class="peaktime" name="end" value="[% range.restore_end || range.end %]" />
+                          <label for="peaksave[% id %]">save</label>
+                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksave[% id %]" />
+                        </form>
+                        <form action="/billing/do_edit_peaktime" method="post">
+                          <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+                          <input type="hidden" name="show_year" value="[% show_year %]" />
+                          <input type="hidden" name="date" value="[% date.date %]" />
+                          <input type="hidden" name="startold" value="[% range.start %]" />
+                          <input type="hidden" name="endold" value="[% range.end %]" />
+                          <label for="peakdel[% id %]">delete</label>
+                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peakdel[% id %]" />
+                        </form><br clear="all" class="reducespace" />
+                      </div>
+                      [% id = id + 1 %]
+                      [% END %]
+                    [% END %]
+                      <form action="/billing/do_edit_peaktime" method="post">
+                        <div class="postlink">
+                          <input type="hidden" name="show_year" value="[% show_year %]" />
+                          <input type="hidden" name="date" value="[% date.date %]" />
+                          <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+                          <input type="text" class="peaktime" name="start" value="[% newrange.start %]" /> -
+                          <input type="text" class="peaktime" name="end" value="[% newrange.end %]" />
+                          <label for="peaksavenew">save</label>
+                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksavenew" />
+                        </div>
+                      </form>
+                      [% IF messages.epeakmsg %]<div class="goodmsg">[% messages.epeakmsg %]</div>[% END %]
+                      [% IF messages.epeakerr %]<div class="errormsg">[% messages.epeakerr %]</div>[% END %]
+                    </td>
+                    <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]#special" class="aaction">exit</a></td>
+                  [% ELSE %]
+                    <td>
+                    [% IF date.ranges %]
+                      [% FOREACH range = date.ranges %]
+                        [% range.start %] - [% range.end %]<br />
+                      [% END %]
+                    [% ELSE %]
+                      No ranges defined.
+                    [% END %]
+                    </td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                    <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]&amp;edit_date=[% date.date %]" class="aaction">edit</a></td>
+                    [% ELSE %]
+                    <td />
+                    [% END %]
+                  [% END %]
+
+                  </tr>
+                  [% dt = dt + 1 %]
+                  [% END %]
+                </table>
+              [% END %]
+              </td>
+            </tr>
+          </table>
+
+        [% ELSE %]
+          No ranges defined.
+        [% END %]
         </div>
 
