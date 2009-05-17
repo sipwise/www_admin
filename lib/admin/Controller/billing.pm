@@ -372,6 +372,8 @@ sub search_fees : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/billing_fees.tt';
 
+    $c->stash->{field_order} = join ', ', eval { @{$c->config->{fees_csv}{element_order}} };
+
     my $bilprof = $c->request->params->{bilprof};
 
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',

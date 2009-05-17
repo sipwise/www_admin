@@ -24,14 +24,17 @@
             [% END %]
             <label class="search_label" for="upload_fees">Upload file:</label>
 <!--            <div class="fileinputs"> -->
-              <input type="file" class="file" id="upload_fees" name="upload_fees" /> <br />
+              <input type="file" class="file" id="upload_fees" name="upload_fees"
+                     title="CSV field order: [% field_order %]" /> <br />
 <!--              <div class="fakefile">
                 <input type="text" /> <a href="" class="aaction">browse...</a>
               </div>
             </div>
 -->
             [% IF messages.feefileerr %]<div class="errormsg">[% messages.feefileerr %]</div>[% END %]
-            <input type="checkbox" id="purge_existing" name="purge_existing" [% IF purge_existing %]checked="checked"[% END %] />
+            <input type="checkbox" id="purge_existing" name="purge_existing"
+                   title="remove all existing fees before creating new ones"
+                   [% IF purge_existing %]checked="checked"[% END %] />
             <label for="purge_existing">purge existing fees</label><br />
             <input type="submit" value="Upload &#187;" class="but" />
           </form>
