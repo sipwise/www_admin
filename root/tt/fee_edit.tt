@@ -20,7 +20,8 @@
                 <td>[% fee.destination %]</td>
                 [% ELSE %]
                 <td>
-                  <input type="text" name="new_destination" value="[% fee.destination %]" />
+                  <input type="text" name="new_destination" title="string, e.g.: 431"
+                         value="[% fee.destination %]" />
                   E.164 prefix or SIP domain
                 </td>
                 [% END %]
@@ -31,7 +32,8 @@
               <tr>
                 <td class="tdkey">zone:</td>
                 <td>
-                  <input type="text" name="zone" value="[% fee.zone %]" />
+                  <input type="text" name="zone" title="string, e.g.: on-net"
+                         value="[% fee.zone %]" />
                   existing or new zone name
                 </td>
               </tr>
@@ -41,7 +43,8 @@
               <tr>
                 <td class="tdkey">zone detail:</td>
                 <td>
-                  <input type="text" name="zone_detail" value="[% fee.zone_detail %]" />
+                  <input type="text" name="zone_detail" title="string, e.g.: voicebox"
+                         value="[% fee.zone_detail %]" />
                   existing or new zone detail
                 </td>
               </tr>
@@ -51,8 +54,9 @@
               <tr>
                 <td class="tdkey">onpeak init rate:</td>
                 <td>
-                  <input type="text" name="onpeak_init_rate" value="[% fee.onpeak_init_rate %]" />
-                  rate in cent, float
+                  <input type="text" name="onpeak_init_rate" title="float, e.g.: 0.15"
+                         value="[% fee.onpeak_init_rate %]" />
+                  rate in cent per second
                 </td>
               </tr>
               [% IF messages.onpeak_init_rate %]
@@ -61,7 +65,8 @@
               <tr>
                 <td class="tdkey">onpeak init interval:</td>
                 <td>
-                  <input type="text" name="onpeak_init_interval" value="[% fee.onpeak_init_interval %]" />
+                  <input type="text" name="onpeak_init_interval" title="integer, e.g.: 60"
+                         value="[% fee.onpeak_init_interval %]" />
                   interval in seconds
                 </td>
               </tr>
@@ -71,8 +76,9 @@
               <tr>
                 <td class="tdkey">onpeak follow rate:</td>
                 <td>
-                  <input type="text" name="onpeak_follow_rate" value="[% fee.onpeak_follow_rate %]" />
-                  rate in cent, float
+                  <input type="text" name="onpeak_follow_rate" title="float, e.g.: 0.15"
+                         value="[% fee.onpeak_follow_rate %]" />
+                  rate in cent per second
                 </td>
               </tr>
               [% IF messages.onpeak_follow_rate %]
@@ -81,7 +87,8 @@
               <tr>
                 <td class="tdkey">onpeak follow interval:</td>
                 <td>
-                  <input type="text" name="onpeak_follow_interval" value="[% fee.onpeak_follow_interval %]" />
+                  <input type="text" name="onpeak_follow_interval" title="integer, e.g.: 30"
+                         value="[% fee.onpeak_follow_interval %]" />
                   interval in seconds
                 </td>
               </tr>
@@ -91,8 +98,9 @@
               <tr>
                 <td class="tdkey">offpeak init rate:</td>
                 <td>
-                  <input type="text" name="offpeak_init_rate" value="[% fee.offpeak_init_rate %]" />
-                  rate in cent, float
+                  <input type="text" name="offpeak_init_rate" title="float, e.g.: 0.1"
+                         value="[% fee.offpeak_init_rate %]" />
+                  rate in cent per second
                 </td>
               </tr>
               [% IF messages.offpeak_init_rate %]
@@ -101,7 +109,8 @@
               <tr>
                 <td class="tdkey">offpeak init interval:</td>
                 <td>
-                  <input type="text" name="offpeak_init_interval" value="[% fee.offpeak_init_interval %]" />
+                  <input type="text" name="offpeak_init_interval" title="integer, e.g.: 60"
+                         value="[% fee.offpeak_init_interval %]" />
                   interval in seconds
                 </td>
               </tr>
@@ -111,8 +120,9 @@
               <tr>
                 <td class="tdkey">offpeak follow rate:</td>
                 <td>
-                  <input type="text" name="offpeak_follow_rate" value="[% fee.offpeak_follow_rate %]" />
-                  rate in cent, float
+                  <input type="text" name="offpeak_follow_rate" title="float, e.g.: 0.1"
+                         value="[% fee.offpeak_follow_rate %]" />
+                  rate in cent per seconds
                 </td>
               </tr>
               [% IF messages.offpeak_follow_rate %]
@@ -121,7 +131,8 @@
               <tr>
                 <td class="tdkey">offpeak follow interval:</td>
                 <td>
-                  <input type="text" name="offpeak_follow_interval" value="[% fee.offpeak_follow_interval %]" />
+                  <input type="text" name="offpeak_follow_interval" title="integer, e.g.: 30"
+                         value="[% fee.offpeak_follow_interval %]" />
                   interval in seconds
                 </td>
               </tr>
@@ -131,7 +142,8 @@
               <tr>
                 <td class="tdkey">use free time:</td>
                 <td>
-                  <input type="checkbox" name="use_free_time" [% IF fee.use_free_time %]checked="checked"[% END %] />
+                  <input type="checkbox" name="use_free_time" title="free minutes may be used when calling this destination"
+                         [% IF fee.use_free_time %]checked="checked"[% END %] />
                 </td>
               </tr>
             </table>

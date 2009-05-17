@@ -45,17 +45,20 @@
             <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
 
             <label class="search_label" for="search_by_destination">Destination:</label>
-            <input type="text" id="search_by_destination" name="search_destination" value="[% search_destination %]" />
+            <input type="text" id="search_by_destination" name="search_destination" title="SQL wildcards allowed"
+                   value="[% search_destination %]" />
             <input type="checkbox" id="exact_destination" name="exact_destination" [% IF exact_destination %]checked="checked"[% END %] />
             <label for="exact_destination">exact match</label><br />
 
             <label class="search_label" for="search_by_zone">Zone:</label>
-            <input type="text" id="search_by_zone" name="search_zone" value="[% search_zone %]" />
+            <input type="text" id="search_by_zone" name="search_zone" title="SQL wildcards allowed"
+                   value="[% search_zone %]" />
             <input type="checkbox" id="exact_zone" name="exact_zone" [% IF exact_zone %]checked="checked"[% END %] />
             <label for="exact_zone">exact match</label><br />
 
             <label class="search_label" for="search_by_detail">Zone detail:</label>
-            <input type="text" id="search_by_detail" name="search_detail" value="[% search_detail %]" />
+            <input type="text" id="search_by_detail" name="search_detail" title="SQL wildcards allowed"
+                   value="[% search_detail %]" />
             <input type="checkbox" id="exact_detail" name="exact_detail" [% IF exact_detail %]checked="checked"[% END %] />
             <label for="exact_detail">exact match</label><br />
 
