@@ -17,18 +17,29 @@
                 [% IF handle %]
                 <td>[% bilprof.handle %]</td>
                 [% ELSE %]
-                <td><input type="text" name="handle" value="[% bilprof.handle %]" /></td>
+                <td>
+                  <input type="text" name="handle" title="alphanumeric characters and underscore only"
+                         value="[% bilprof.handle %]" />
+                  unique identifier string
+                </td>
                 [% END %]
               </tr>
               [% IF messages.handle %]<tr><td /><td><div class="errormsg">[% messages.handle %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">name:</td>
-                <td><input type="text" name="name" value="[% bilprof.data.name %]" /></td>
+                <td>
+                  <input type="text" name="name" title="free-form string"
+                         value="[% bilprof.data.name %]" />
+                  human readable profile name
+                </td>
               </tr>
               [% IF messages.name %]<tr><td /><td><div class="errormsg">[% messages.name %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">prepaid:</td>
-                <td><input type="checkbox" class="checkbox" name="prepaid" [% IF bilprof.data.prepaid %]checked="checked"[% END %] /></td>
+                <td>
+                  <input type="checkbox" class="checkbox" name="prepaid" title="uncheck for postpaid"
+                         [% IF bilprof.data.prepaid %]checked="checked"[% END %] />
+                </td>
               </tr>
 <!--
               <tr>
@@ -49,17 +60,29 @@
 -->
               <tr>
                 <td class="tdkey">interval charge:</td>
-                <td><input type="text" name="interval_charge" value="[% bilprof.data.interval_charge %]" /></td>
+                <td>
+                  <input type="text" name="interval_charge" title="float, specifying Euro"
+                         value="[% bilprof.data.interval_charge %]" />
+                  base fee charged per billing interval
+                </td>
               </tr>
               [% IF messages.charge %]<tr><td /><td><div class="errormsg">[% messages.charge %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">interval free time:</td>
-                <td><input type="text" name="interval_free_time" value="[% bilprof.data.interval_free_time %]" /></td>
+                <td>
+                  <input type="text" name="interval_free_time" title="integer, specifying seconds"
+                         value="[% bilprof.data.interval_free_time %]" />
+                  included time per billing interval
+                </td>
               </tr>
               [% IF messages.free_time %]<tr><td /><td><div class="errormsg">[% messages.free_time %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">interval free cash:</td>
-                <td><input type="text" name="interval_free_cash" value="[% bilprof.data.interval_free_cash %]" /></td>
+                <td>
+                  <input type="text" name="interval_free_cash" title="float, specifying Euro"
+                         value="[% bilprof.data.interval_free_cash %]" />
+                  included money per billing interval
+                </td>
               </tr>
               [% IF messages.free_cash %]<tr><td /><td><div class="errormsg">[% messages.free_cash %]</div></td></tr>[% END %]
             </table>
