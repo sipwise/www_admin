@@ -355,7 +355,12 @@ sub update_subscriber : Local {
             $messages{number_sn} = 'Client.Voip.MalformedSn'
                 unless $sn =~ /^[1-9][0-9]+$/;
         }
+    } else {
+        $settings{cc} = undef;
+        $settings{ac} = undef;
+        $settings{sn} = undef;
     }
+
     my $timezone = $c->request->params->{timezone};
     if(length $timezone) {
         $settings{timezone} = $timezone;
