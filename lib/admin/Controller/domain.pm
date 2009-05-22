@@ -63,6 +63,8 @@ sub do_edit_domain : Local {
 
     my $domain = $c->request->params->{domain};
 
+    $settings{local} = $c->request->params->{local} ? 1 : 0;
+
     $settings{cc} = $c->request->params->{cc};
     $messages{ecc} = 'Client.Voip.MalformedCc'
         unless $settings{cc} =~ /^\d+$/;
@@ -107,6 +109,8 @@ sub do_create_domain : Local {
     my %settings;
 
     my $domain = $c->request->params->{domain};
+
+    $settings{local} = $c->request->params->{local} ? 1 : 0;
 
     $settings{cc} = $c->request->params->{cc};
     $messages{acc} = 'Client.Voip.MalformedCc'

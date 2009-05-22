@@ -252,9 +252,19 @@ h3 {
 	width: 95px;
 }
 
-/* decrease input text fields for cc/ac */
+/* decrease input text fields */
+.imedium {
+	width: 140px;
+}
+
+/* decrease input text fields for ac */
 .ishort {
 	width: 50px;
+}
+
+/* decrease input text fields for cc */
+.irealshort {
+	width: 30px;
 }
 
 /* increase spacing between password and show/hide href */
@@ -312,7 +322,8 @@ h3 {
 #contentplace .order_payments,
 #contentplace .registered_contacts,
 #contentplace .billing_fees,
-#contentplace .billing_peaktimes
+#contentplace .billing_peaktimes,
+#contentplace .domains
 {
 	width: 100%;
 	border-spacing: 0px;

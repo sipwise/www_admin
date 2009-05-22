@@ -4,13 +4,14 @@
           [% IF messages.edommsg %]<div class="goodmsg">[% messages.edommsg %]</div>[% END %]
           [% IF messages.edomerr %]<div class="errormsg">[% messages.edomerr %]</div>[% END %]
 
-          <table>
+          <table class="domains">
             <tr class="table_header">
               <td>domain</td>
-              <td>country code</td>
-              <td>timezone</td>
-              <td />
-              <td />
+              <td class="tdcenter" style="width:40px;" >local</td>
+              <td class="tdcenter" style="width:40px;" >cc</td>
+              <td style="width:150px;" >timezone</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
             </tr>
             [% id = 0 %]
             [% FOREACH domain = domains %]
@@ -19,8 +20,16 @@
                 [% IF domain.domain == edit_domain %]
                   <form action="/domain/do_edit_domain" method="post">
                     <input type="hidden" name="domain" value="[% domain.domain %]" />
-                    <td class="tdcenter"><input class="ishort" name="cc" value="[% domain.cc %]" /></td>
-                    <td><input name="timezone" value="[% domain.timezone %]" /></td>
+                    <td class="tdcenter">
+                      <input type="checkbox" class="checkbox" title="check if domain contains local users"
+                             name="local" [% IF domain.local %]checked="checked"[% END %] />
+                    </td>
+                    <td class="tdcenter"><input class="irealshort" title="integer, country code"
+                        name="cc" value="[% domain.cc %]" /></td>
+                    <td>
+                      <input type="text" class="imedium" title="string, timezone in continent/capital format"
+                             name="timezone" value="[% domain.timezone %]" />
+                    </td>
                     <td>
                       <div class="postlink">
                         <label for="domsave[% id %]">save</label>
@@ -30,6 +39,10 @@
                   </form>
                   <td><a href="/domain" class="aaction">cancel</a></td>
                 [% ELSE %]
+                <td class="tdcenter">
+                  <input type="checkbox" class="checkbox" name="local"
+                       [% IF domain.local %]checked="checked"[% END %] disabled="disabled" />
+                </td>
                 <td class="tdcenter">[% domain.cc %]</td>
                 <td>[% domain.timezone %]</td>
                 <td>
@@ -52,7 +65,7 @@
               </tr>
               [% IF domain.domain == edit_domain %]
                 [% IF messages.ecc || messages.etimezone %]
-                  <tr><td colspan="5">
+                  <tr><td colspan="6">
                     <div class="errormsg">
                       [% messages.ecc %]
                       [% IF messages.ecc && messages.etimezone %]<br />[% END %]
@@ -73,26 +86,40 @@
           [% IF messages.cdommsg %]<div class="goodmsg">[% messages.cdommsg %]</div>[% END %]
           [% IF messages.cdomerr %]<div class="errormsg">[% messages.cdomerr %]</div>[% END %]
 
-          <table>
+          <table class="domains">
             <tr class="table_header">
               <td>domain</td>
-              <td>country code</td>
-              <td>timezone</td>
-              <td />
-              <td />
+              <td class="tdcenter" style="width:40px;" >local</td>
+              <td class="tdcenter" style="width:40px;" >cc</td>
+              <td style="width:150px;" >timezone</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
             </tr>
             <form action="/domain/do_create_domain" method="post">
               <tr>
-                <td><input type="text" size="20" name="domain" id="domainaddtxt" value="[% arefill.domain %]" /></td>
-                <td class="tdcenter"><input class="ishort" name="cc" value="[% arefill.cc %]" /></td>
-                <td><input name="timezone" value="[% arefill.timezone %]" /></td>
+                <td>
+                  <input type="text" size="20" name="domain" title="string, SIP domain"
+                         id="domainaddtxt" value="[% arefill.domain %]" />
+                </td>
+                <td class="tdcenter">
+                  <input type="checkbox" class="checkbox" title="check if domain contains local users"
+                         name="local" [% IF arefill.local %]checked="checked"[% END %] />
+                </td>
+                <td class="tdcenter">
+                  <input type="text" class="irealshort" title="integer, country code"
+                         name="cc" value="[% arefill.cc %]" />
+                </td>
+                <td>
+                  <input type="text" class="imedium" title="string, timezone in continent/capital format"
+                         name="timezone" value="[% arefill.timezone %]" />
+                </td>
+                <td />
                 <td>
                   <div class="postlink">
-                    <label for="domainadd">Add</label>
+                    <label for="domainadd">add</label>
                     <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="domainadd" />
                   </div>
                 </td>
-                <td />
               </tr>
               [% IF messages.acc || messages.atimezone %]
                 <tr><td colspan="5">
