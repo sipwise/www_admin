@@ -55,6 +55,7 @@ sub search : Local {
                 $exact{$sf} = 1 if $c->request->params->{'exact_'.$sf};
             }
         }
+        $filter{terminated} = 1 if $c->request->params->{terminated};
         $c->session->{search_filter} = { %filter };
         $c->session->{exact_filter} = { %exact };
     }
@@ -74,6 +75,7 @@ sub search : Local {
             $filter{$sf} =~ s/\%*$/\%/;
         }
     }
+    $c->stash->{terminated} = $filter{terminated};
 
     my $offset = $c->request->params->{offset} || 0;
     $offset = 0 if $offset !~ /^\d+$/;

@@ -19,8 +19,13 @@
 
             <label class="search_label" for="search_by_uuid">UUID:</label>
             <input type="text" id="search_by_uuid" name="search_uuid" value="[% search_uuid %]" />
-            <input type="checkbox" id="exact_uuid" name="exact_uuid" [% IF exact_uuid %]checked="checked"[% END %]/>
+            <input type="checkbox" id="exact_uuid" name="exact_uuid" [% IF exact_uuid %]checked="checked"[% END %] />
             <label for="exact_uuid">exact match</label><br />
+
+            <div class="topbottomspace">
+              <input type="checkbox" id="include_terminated" name="terminated" [% IF terminated %]checked="checked"[% END %] />
+              <label for="include_terminated">include terminated subscribers</label><br />
+            </div>
 
             <input type="submit" value="Search &#187;" class="but" />
           </form>
@@ -32,7 +37,7 @@
 
           <div class="p1">
             <table>
-              <tr><td>SIP URI</td><td class="tdcenter">Account ID</td></tr>
+              <tr class="table_header"><td>SIP URI</td><td class="tdcenter">Account ID</td></tr>
 
             [% FOREACH subscriber = subscriber_list %]
 
