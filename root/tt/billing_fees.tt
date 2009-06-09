@@ -60,10 +60,10 @@
             <label for="exact_zone">exact match</label><br />
 
             <label class="search_label" for="search_by_detail">Zone detail:</label>
-            <input type="text" id="search_by_detail" name="search_detail" title="SQL wildcards allowed"
-                   value="[% search_detail %]" />
-            <input type="checkbox" id="exact_detail" name="exact_detail" [% IF exact_detail %]checked="checked"[% END %] />
-            <label for="exact_detail">exact match</label><br />
+            <input type="text" id="search_by_detail" name="search_zone_detail" title="SQL wildcards allowed"
+                   value="[% search_zone_detail %]" />
+            <input type="checkbox" id="exact_zone_detail" name="exact_zone_detail" [% IF exact_zone_detail %]checked="checked"[% END %] />
+            <label for="exact_zone_detail">exact match</label><br />
 
             <input type="submit" value="Search &#187;" class="but" />
           </form>

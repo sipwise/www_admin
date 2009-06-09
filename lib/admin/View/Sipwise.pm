@@ -35,6 +35,7 @@ __PACKAGE__->config(
                                },
         },
     },
+    ENCODING     => 'utf-8',
 );
 
 =head1 BUGS AND LIMITATIONS
