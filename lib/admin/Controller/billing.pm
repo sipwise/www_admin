@@ -490,7 +490,8 @@ sub set_fees : Local {
             last;
         }
         @keyval{@elements} = @values;
-        $keyval{destination} = $self->_normalize_destination($c, $keyval{destination});
+        $keyval{destination} = $self->_normalize_destination($c, $keyval{destination}) || $keyval{destination}
+            if length $keyval{destination};
         unless(defined $keyval{destination}) {
             $messages{feeerr} = 'Web.Fees.InvalidDestination';
             $c->session->{feeerr}{line} = $line;
@@ -534,8 +535,8 @@ sub edit_fee : Local {
     my $destination = $c->stash->{destination} = $c->request->params->{destination};
     $c->stash->{offset} = $c->request->params->{offset} || 0;
 
-    $destination = $self->_normalize_destination($c, $destination)
-        if defined $destination;
+    $destination = $self->_normalize_destination($c, $destination) || $destination
+        if length $destination;
 
     if(ref $c->session->{restore_fee_input} eq 'HASH') {
         $c->stash->{fee} = $c->session->{restore_fee_input};
@@ -580,10 +581,12 @@ sub do_edit_fee : Local {
     my $bilprof = $c->request->params->{bilprof};
     my $offset = $c->request->params->{offset};
     $settings{destination} = $c->request->params->{destination};
-    $settings{destination} = $self->_normalize_destination($c, $settings{destination})
-        if defined $settings{destination};
+    $settings{destination} = $self->_normalize_destination($c, $settings{destination}) || $settings{destination}
+        if length $settings{destination};
     if(defined $c->request->params->{new_destination}) {
-        $settings{destination} = $self->_normalize_destination($c, $c->request->params->{new_destination});
+        $settings{destination} = $self->_normalize_destination($c, $c->request->params->{new_destination})
+                                   || $c->request->params->{new_destination}
+            if length $c->request->params->{new_destination};
         unless(defined $settings{destination}) {
             $messages{destination} = 'Web.Fees.InvalidDestination';
         }
@@ -638,7 +641,7 @@ sub do_delete_fee : Local {
     my $destination = $c->request->params->{destination};
     my $offset = $c->request->params->{offset};
 
-    $destination = $self->_normalize_destination($c, $destination);
+    $destination = $self->_normalize_destination($c, $destination) || $destination;
 
     if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_billing_profile_fees',
                                              { handle => $bilprof,
@@ -860,15 +863,18 @@ sub _normalize_destination : Private {
     my ($self, $c, $destination) = @_;
 
     if($destination =~ /^\d+$/) {
+        # E.164 number
         $destination = '^' . $destination . '.*$';
     } elsif($destination =~ /^(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]+$/i
-            or $destination =~ /^[\d.]+$/)
+            or $destination =~ /^[012]?[0-9]?[0-9](?:\.[012]?[0-9]?[0-9]){3}$/)
     {
+        # domain or IP address
         $destination =~ s/\./\\./g;
         $destination = '^.*@'. $destination .'$';
     } elsif($destination =~ /^.+\@(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]+$/i
-            or $destination =~ /^.+\@[\d.]+$/)
+            or $destination =~ /^.+\@[012]?[0-9]?[0-9](?:\.[012]?[0-9]?[0-9]){3}$/)
     {
+        # SIP URI
         $destination =~ s/\./\\./g;
         $destination = '^'. $destination .'$';
     } else {
@@ -881,13 +887,18 @@ sub _normalize_destination : Private {
 sub _denormalize_destination : Private {
     my ($self, $c, $destination) = @_;
 
+    my $backup = $destination;
     $destination =~ s/\\\././g;
     $destination =~ s/\$$//;
     $destination =~ s/^\^//;
     $destination =~ s/\.\*$//;
     $destination =~ s/^\.\*\@//;
 
-    return $destination;
+    if(defined $self->_normalize_destination($c, $destination)) {
+        return $destination;
+    } else {
+        return $backup;
+    }
 }
 
 
