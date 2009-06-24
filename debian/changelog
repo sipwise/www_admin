@@ -1,3 +1,13 @@
+sipwise-www-admin (1.2.0-1) unstable; urgency=low
+
+  * implemented product and billing-profile management
+  * implemented billing fees and peaktime management
+  * improved syntax checks and error handling
+  * introduced descriptive tooltips to parts of the interface
+  * some smaller functional improvements and bugfixes
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Mon, 18 May 2009 02:27:37 +0200
+
 sipwise-www-admin (1.1.4-1) unstable; urgency=low
 
   * Initial release.
