@@ -117,6 +117,7 @@ sub detail : Local {
 
     my $is_new = $c->request->params->{new};
     my $preferences;
+    my $speed_dial_slots;
 
     unless($is_new) {
         my $subscriber_id = $c->request->params->{subscriber_id};
@@ -146,6 +147,13 @@ sub detail : Local {
                                                             },
                                                             \$regcon
                                                           );
+        
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_speed_dial_slots',
+                                                            { username => $c->session->{subscriber}{username},
+                                                              domain   => $c->session->{subscriber}{domain},
+                                                            },
+                                                            \$speed_dial_slots
+                                                          );
 
         $c->session->{subscriber}{registered_contacts} = $$regcon{result} if $$regcon{result};
         $c->stash->{subscriber} = $c->session->{subscriber};
@@ -154,6 +162,7 @@ sub detail : Local {
                                                                                      config->{VARIABLES}{site_config}{language},
                                                                                  'Web.Subscriber.Lock'.$$preferences{lock})
             if $$preferences{lock};
+        
     } else {
         $c->stash->{account_id} = $c->request->params->{account_id};
         $c->stash->{edit_subscriber} = 1;
@@ -277,6 +286,27 @@ sub detail : Local {
         }
         push @{$c->stash->{subscriber}{preferences_array}}, $stashpref;
       }
+    }
+
+    my $i = 1;
+    my $default_speed_dial_slots = $self->_get_default_slot_list();
+    my @used_default_speed_dial_slots = ();
+    foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
+        push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
+                                                 number      => $i++,
+                                                 label       => 'Slot ' . $$sdentry{slot} . ': ' . $$sdentry{destination}
+                                               };
+        if (grep { $_ eq $$sdentry{slot} } @$default_speed_dial_slots) {
+            push @used_default_speed_dial_slots,$$sdentry{slot};
+        }
+    }
+    foreach my $free_slot (@$default_speed_dial_slots) {
+        unless (grep { $_ eq $free_slot } @used_default_speed_dial_slots) {
+            push @{$c->stash->{speed_dial_slots}}, { id          => '',
+                                                     number      => $i++,
+                                                     label       => 'Slot ' . $free_slot . ': empty'
+                                                   };
+        }
     }
 
     $c->stash->{show_pass} = $c->request->params->{show_pass};
@@ -745,7 +775,7 @@ sub edit_list : Local {
         my $i = 1;
         foreach my $blockentry (sort {$a->{entry} cmp $b->{entry}} @block_list_to_sort) {
             push @{$c->stash->{list_data}}, { number     => $$blockentry{entry},
-                                              background => $bg ? '' : 'alt',
+                                              background => $bg ? '' : 'tr_alt',
                                               id         => $i++,
                                               active     => $$blockentry{active},
                                             };
@@ -863,6 +893,151 @@ sub do_edit_list : Local {
 
 }
 
+sub edit_speed_dial_slots : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/speed_dial_list.tt';
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    my $speed_dial_slots;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_speed_dial_slots',
+                                                            { username => $c->session->{subscriber}{username},
+                                                              domain   => $c->session->{subscriber}{domain},
+                                                            },
+                                                            \$speed_dial_slots
+                                                          );
+
+    my $i = 1;
+    my $bg = '';
+    my $default_speed_dial_slots = $self->_get_default_slot_list();
+    my @used_default_speed_dial_slots = ();
+    foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
+        push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
+                                                 number      => $i++,
+                                                 background  => $bg ? '' : 'tr_alt',
+                                                 slot        => $$sdentry{slot},
+                                                 destination => $$sdentry{destination}
+                                               };
+        if (grep { $_ eq $$sdentry{slot} } @$default_speed_dial_slots) {
+            push @used_default_speed_dial_slots,$$sdentry{slot};
+        }
+        $bg = !$bg;
+    }
+    $i = 0;
+    foreach my $free_slot (@$default_speed_dial_slots) {
+        unless (grep { $_ eq $free_slot } @used_default_speed_dial_slots) {
+            $i++;
+            push @{$c->stash->{free_speed_dial_slots}}, { number => $i,
+                                                          slot   => $free_slot
+                                                        };
+        }
+    }
+
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    if(defined $c->session->{addslottxt}) {
+        $c->stash->{addslottxt} = $c->session->{addslottxt};
+        delete $c->session->{addslottxt};
+    }
+    if(defined $c->session->{adddestinationtxt}) {
+        $c->stash->{adddestinationtxt} = $c->session->{adddestinationtxt};
+        delete $c->session->{adddestinationtxt};
+    }
+
+    return 1;
+}
+
+sub do_edit_sd_list : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    # add new entry form
+    my $add_slot = $c->request->params->{add_slot};
+    my $add_destination = $c->request->params->{add_destination};
+    if(defined $add_slot) {
+        $c->model('Provisioning')->call_prov( $c, 'voip', 'create_speed_dial_slot',
+                                              { username => $c->session->{subscriber}{username},
+                                                domain => $c->session->{subscriber}{domain},
+                                                data => {
+                                                                 slot        => $add_slot,
+                                                                 destination => $add_destination
+                                                        },
+                                              },
+                                              undef
+                                            );
+
+        #$messages{msgadd} = 'Client.Voip.MalformedNumberPattern';
+        $c->session->{addslottxt} = $add_slot;        
+        $c->session->{adddestinationtxt} = $add_destination;
+
+    }
+
+    # delete link forms
+    my $delete_slotid = $c->request->params->{delete_id};
+    if(defined $delete_slotid) {
+        #unless(keys %messages) {
+            $c->model('Provisioning')->call_prov( $c, 'voip', 'delete_speed_dial_slot',
+                                              { username => $c->session->{subscriber}{username},
+                                                domain => $c->session->{subscriber}{domain},
+                                                id => $delete_slotid
+                                              },
+                                              undef
+                                            );
+        #} else {
+        #    $messages{numerr} = 'Client.Voip.InputErrorFound';
+        #}
+    }
+
+    # update link forms
+    my $update_slotid = $c->request->params->{update_id};
+    my $slot = $c->request->params->{slot};
+    my $destination = $c->request->params->{destination};
+    if(defined $update_slotid) {
+        $c->model('Provisioning')->call_prov( $c, 'voip', 'update_speed_dial_slot',
+                                              { username => $c->session->{subscriber}{username},
+                                                domain => $c->session->{subscriber}{domain},
+                                                id => $update_slotid,
+                                                data => {
+                                                                 slot        => $slot,
+                                                                 destination => $destination
+                                                        },
+                                              },
+                                              undef
+                                            );
+    }
+
+    #unless(keys %messages) {
+    #    $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_preferences',
+    #                                          { username => $c->session->{subscriber}{username},
+    #                                            domain => $c->session->{subscriber}{domain},
+    #                                            preferences => {
+    #                                                             $list => $$preferences{$list},
+    #                                                           },
+    #                                          },
+    #                                          undef
+    #                                        );
+    #} else {
+    #    $messages{numerr} = 'Client.Voip.InputErrorFound';
+    #}
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_speed_dial_slots?subscriber_id=$subscriber_id");
+
+}
+
 sub expire : Local {
     my ( $self, $c ) = @_;
 
@@ -889,6 +1064,20 @@ sub expire : Local {
     $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
 }
 
+#-# sub _get_default_slot_list
+#-# parameter none
+#-# return \@slots
+#-# description generates list of default speed dial slots
+sub _get_default_slot_list {
+  my $self = shift;
+
+  my @slots = ();
+  for (my $i = 0; $i < 10; $i++) {
+    push @slots,'#' . $i;
+  }
+  return \@slots;
+
+}
 
 =head1 BUGS AND LIMITATIONS
 

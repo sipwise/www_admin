@@ -212,9 +212,9 @@
         <div class="p1">
           [% IF messages.prefmsg %]<div class="goodmsg">[% messages.prefmsg %]</div>[% END %]
           [% IF messages.preferr %]<div class="errormsg">[% messages.preferr %]</div>[% END %]
-          <form action="update_preferences" method="post">
-            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
-            <table>
+            <form action="update_preferences" method="post">
+              <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
+              <table>
             [% FOREACH preference = subscriber.preferences_array %]
               [% IF preference.max_occur == 1 %]
                 [% IF preference.key == "block_in_mode" || preference.key == "block_out_mode" %]
@@ -346,6 +346,27 @@
           </form>
         </div>
 
+        <h3 id="userprefs">Speed Dial</h3>
+        <div class="p1">
+          <table>
+            <tr>
+              <td class="tdkey">Speed dial slots:</td>
+              <td>
+                <select size="1" name="speed_dial_slots">
+                [% FOREACH sdslot = speed_dial_slots %]
+                    <option>[% sdslot.label %]</option>
+                [% END %]
+                </select>
+                [% UNLESS Catalyst.session.admin.read_only %]
+                    &nbsp;
+                    <a href="edit_speed_dial_slots?subscriber_id=[% subscriber.subscriber_id %]&amp;"
+                       class="aaction">edit list</a>
+                [% END %]
+              </td>
+            </tr>
+          </table>
+        </div>
+     
     [% IF subscriber.voicebox_preferences %]
 
         <h3 id="vboxprefs">Voicebox Preferences</h3>
