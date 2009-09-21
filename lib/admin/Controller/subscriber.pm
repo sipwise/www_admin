@@ -540,7 +540,7 @@ sub update_preferences : Local {
         $$preferences{block_out_mode} = $block_out_mode eq 'whitelist' ? 1 : 0;
     }
 
-    $$preferences{block_in_clir} = $c->request->params->{block_in_clir} ? 1 : 0;
+    $$preferences{block_in_clir} = $c->request->params->{block_in_clir} ? 1 : undef;
 
     my $adm_block_in_mode = $c->request->params->{adm_block_in_mode};
     if(defined $adm_block_in_mode) {
@@ -643,7 +643,7 @@ sub update_preferences : Local {
         $$preferences{cli} = 'sip:'.$$preferences{cli}.'@'.$c->session->{subscriber}{domain};
     }
 
-    $$preferences{clir} = $c->request->params->{clir} ? 1 : 0;
+    $$preferences{clir} = $c->request->params->{clir} ? 1 : undef;
 
     $$preferences{cc} = $c->request->params->{cc} || undef;
     if(defined $$preferences{cc} and $$preferences{cc} !~ /^[1-9]\d*$/) {
