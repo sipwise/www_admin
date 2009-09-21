@@ -542,7 +542,16 @@ sub update_preferences : Local {
 
     $$preferences{block_in_clir} = $c->request->params->{block_in_clir} ? 1 : 0;
 
-    my $block_in_list = $c->request->params->{block_in_list};
+    my $adm_block_in_mode = $c->request->params->{adm_block_in_mode};
+    if(defined $adm_block_in_mode) {
+        $$preferences{adm_block_in_mode} = $adm_block_in_mode eq 'whitelist' ? 1 : 0;
+    }
+    my $adm_block_out_mode = $c->request->params->{adm_block_out_mode};
+    if(defined $adm_block_out_mode) {
+        $$preferences{adm_block_out_mode} = $adm_block_out_mode eq 'whitelist' ? 1 : 0;
+    }
+
+    $$preferences{adm_block_in_clir} = $c->request->params->{adm_block_in_clir} ? 1 : 0;
 
     ### call forwarding ###
 
@@ -652,6 +661,10 @@ sub update_preferences : Local {
     if(defined $$preferences{emerg_ac} and $$preferences{emerg_ac} !~ /^[1-9]\d*$/) {
         $messages{emerg_ac} = 'Client.Voip.MalformedAc';
     }
+
+    ### malicious call trace ###
+
+    $$preferences{mct} = $c->request->params->{mct} ? 1 : 0;
 
     ### save settings ###
 
@@ -790,7 +803,8 @@ sub edit_list : Local {
     my $list_mode = $list;
     $list_mode =~ s/list$/mode/;
     $c->stash->{list_mode} = $$preferences{$list_mode};
-    $c->stash->{block_in_clir} = $$preferences{block_in_clir};
+    $list_mode =~ s/mode$/clir/;
+    $c->stash->{block_in_clir} = $$preferences{$list_mode};
 
     if(defined $c->session->{blockaddtxt}) {
         $c->stash->{blockaddtxt} = $c->session->{blockaddtxt};

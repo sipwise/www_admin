@@ -11,7 +11,7 @@
           [% IF messages.numerr %]<div class="errormsg">[% messages.numerr %]</div>[% END %]
 
           <div class="list_explanation">
-          [% IF list_name == 'block_in_list' %]
+          [% IF list_name == 'block_in_list' || list_name == 'adm_block_in_list' %]
             [% IF list_mode %]
               [% IF list_data %]
                 All incoming calls are blocked by default, only the following callers are allowed.<br />

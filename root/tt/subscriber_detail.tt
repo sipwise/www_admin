@@ -217,7 +217,8 @@
               <table>
             [% FOREACH preference = subscriber.preferences_array %]
               [% IF preference.max_occur == 1 %]
-                [% IF preference.key == "block_in_mode" || preference.key == "block_out_mode" %]
+                [% IF preference.key == "block_in_mode" || preference.key == "block_out_mode"
+                   || preference.key == "adm_block_in_mode" || preference.key == "adm_block_out_mode" %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>
@@ -229,11 +230,13 @@
                   </td>
                 </tr>
                 [% ELSIF preference.key == "block_in_clir"
+                      || preference.key == "adm_block_in_clir"
                       || preference.key == "clir"
                       || preference.key == "cfu"
                       || preference.key == "cfb"
                       || preference.key == "cft"
-                      || preference.key == "cfna" %]
+                      || preference.key == "cfna"
+                      || preference.key == "mct" %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>
