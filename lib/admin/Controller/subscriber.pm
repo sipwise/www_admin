@@ -907,6 +907,115 @@ sub do_edit_list : Local {
 
 }
 
+sub edit_iplist : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_edit_iplist.tt';
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$preferences
+                                                      );
+    my $list = $c->request->params->{list_name};
+
+    if(defined $$preferences{$list}) {
+        my $iplist = ref $$preferences{$list} ? $$preferences{$list} : [ $$preferences{$list} ];
+
+        my $bg = '';
+        my $i = 1;
+        foreach my $entry (sort @$iplist) {
+            push @{$c->stash->{list_data}}, { ipnet      => $entry,
+                                              background => $bg ? '' : 'tr_alt',
+                                              id         => $i++,
+                                            };
+            $bg = !$bg;
+        }
+    }
+
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber_id} = $subscriber_id;
+    $c->stash->{list_name} = $list;
+
+    if(defined $c->session->{listaddtxt}) {
+        $c->stash->{listaddtxt} = $c->session->{listaddtxt};
+        delete $c->session->{listaddtxt};
+    }
+
+    return 1;
+}
+
+sub do_edit_iplist : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$preferences
+                                                      );
+    my $list = $c->request->params->{list_name};
+
+    # input text field to add new entry to IP list
+    my $add = $c->request->params->{list_add};
+    if(defined $add) {
+        my $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ipnet', $add, \$checkresult);
+        if($checkresult) {
+            my $iplist = $$preferences{$list};
+            $iplist = [] unless defined $iplist;
+            $iplist = [ $iplist ] unless ref $iplist;
+            $$preferences{$list} = [ @$iplist, $add ];
+        } else {
+            $messages{msgadd} = 'Client.Syntax.MalformedIPNet';
+            $c->session->{listaddtxt} = $add;
+        }
+    }
+
+    # delete link next to entries in IP list
+    my $del = $c->request->params->{list_del};
+    if(defined $del) {
+        my $iplist = $$preferences{$list};
+        if(defined $iplist) {
+            $iplist = [ $iplist ] unless ref $iplist;
+            $$preferences{$list} = [ grep { $_ ne $del } @$iplist ];
+        }
+    }
+
+    unless(keys %messages) {
+        $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_preferences',
+                                              { username => $c->session->{subscriber}{username},
+                                                domain => $c->session->{subscriber}{domain},
+                                                preferences => {
+                                                                 $list => $$preferences{$list},
+                                                               },
+                                              },
+                                              undef
+                                            );
+    } else {
+        $messages{numerr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_iplist?subscriber_id=$subscriber_id&list_name=$list");
+}
+
 sub edit_speed_dial_slots : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/speed_dial_list.tt';

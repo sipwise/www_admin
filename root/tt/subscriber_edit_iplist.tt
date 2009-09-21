@@ -1,0 +1,48 @@
+        <h3>Edit [% list_name %] for
+          <a class="noarrow" href="detail?subscriber_id=[% subscriber_id %]">
+            [% subscriber.username %]@[% subscriber.domain %]</a>
+        </h3>
+
+        <div class="actions">
+          <a href="detail?subscriber_id=[% subscriber_id %]&amp;#userprefs" class="aaction">back</a>
+        </div>
+        <div class="p1">
+          <div class="list_explanation">
+            The subscriber is limited to the following list of IP addresses. An empty list does not limit the subscriber at all.
+          </div>
+
+          <table>
+            [% FOREACH listentry = list_data %]
+              <tr class="[% listentry.background %]">
+                <td> [% listentry.ipnet %] </td>
+                <form action="do_edit_iplist" method="post">
+                  <td >
+                    <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                    <input type="hidden" name="list_name" value="[% list_name %]" />
+                    <input type="hidden" name="list_del" value="[% listentry.ipnet %]" />
+                    <div class="postlink">
+                      <label for="listdel[% listentry.id %]">delete</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="listdel[% listentry.id %]" />
+                    </div>
+                  </td>
+                </form>
+              </tr>
+            [% END %]
+          </table>
+
+          <br />
+
+          <form action="/subscriber/do_edit_iplist" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+            <input type="hidden" name="list_name" value="[% list_name %]" />
+            <label for="listaddtxt">New entry:</label><br />
+            <div class="postlink">
+              <input type="text" size="20" name="list_add" id="listaddtxt" value="[% listaddtxt %]" /> &nbsp;
+              <label for="listadd">Add entry</label>
+              <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="listadd" />
+              [% IF messages.msgadd %]<div class="errormsg">[% messages.msgadd %]</div>[% END %]
+            </div><br clear="all" />
+          </form>
+
+        </div>
+

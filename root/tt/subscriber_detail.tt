@@ -334,8 +334,13 @@
                   [% END %]
                   [% IF ! edit_preferences && ! Catalyst.session.admin.read_only %]
                     &nbsp;
-                    <a href="edit_list?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
-                       class="aaction">edit list</a>
+                    [% IF preference.key == "allowed_ips" %]
+                      <a href="edit_iplist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
+                         class="aaction">edit list</a>
+                    [% ELSE %]
+                      <a href="edit_list?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
+                         class="aaction">edit list</a>
+                    [% END %]
                   [% END %]
                 </td>
               </tr>
