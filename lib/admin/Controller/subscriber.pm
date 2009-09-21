@@ -790,7 +790,7 @@ sub edit_list : Local {
     my $list_mode = $list;
     $list_mode =~ s/list$/mode/;
     $c->stash->{list_mode} = $$preferences{$list_mode};
-    $c->stash->{block_in_clir} = $$preferences{$list_mode};
+    $c->stash->{block_in_clir} = $$preferences{block_in_clir};
 
     if(defined $c->session->{blockaddtxt}) {
         $c->stash->{blockaddtxt} = $c->session->{blockaddtxt};
