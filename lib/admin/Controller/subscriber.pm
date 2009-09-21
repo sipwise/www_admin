@@ -551,7 +551,7 @@ sub update_preferences : Local {
         $$preferences{adm_block_out_mode} = $adm_block_out_mode eq 'whitelist' ? 1 : 0;
     }
 
-    $$preferences{adm_block_in_clir} = $c->request->params->{adm_block_in_clir} ? 1 : 0;
+    $$preferences{adm_block_in_clir} = $c->request->params->{adm_block_in_clir} ? 1 : undef;
 
     ### call forwarding ###
 
@@ -664,7 +664,7 @@ sub update_preferences : Local {
 
     ### malicious call trace ###
 
-    $$preferences{mct} = $c->request->params->{mct} ? 1 : 0;
+    $$preferences{mct} = $c->request->params->{mct} ? 1 : undef;
 
     ### save settings ###
 
