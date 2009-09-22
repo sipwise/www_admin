@@ -112,10 +112,10 @@
           </form>
         </div>
 
-      [% IF billing_features %]
+      [% IF billing_features  && account.id %]
         <h3>Account Balance</h3>
 
-        [% UNLESS account.terminate_timestamp || Catalyst.session.admin.read_only %]
+        [% UNLESS account.terminate_timestamp || Catalyst.session.admin.read_only || edit_account %]
         <div class="actions">
           <a href="detail?account_id=[% account.id %]&amp;edit_balance=1" class="aaction">edit</a>
           [% IF edit_balance %]
@@ -165,13 +165,14 @@
         </div>
       [% END %]
 
+      [% IF account.id %]
         <h3>Subscribers</h3>
 
-      [% UNLESS Catalyst.session.admin.read_only %]
+        [% UNLESS Catalyst.session.admin.read_only || edit_account %]
         <div class="actions">
             <a href="/subscriber/detail?account_id=[% account.id %]&amp;new=1" class="aaction">create new</a>
         </div>
-      [% END %]
+        [% END %]
         <div class="p1">
         [% IF account.subscribers %]
           <table>
@@ -196,4 +197,6 @@
           </div>
         [% END %]
         </div>
+
+      [% END %]
 
