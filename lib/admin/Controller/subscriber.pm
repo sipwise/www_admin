@@ -291,7 +291,7 @@ sub detail : Local {
     my $i = 1;
     my $default_speed_dial_slots = $self->_get_default_slot_list();
     my @used_default_speed_dial_slots = ();
-    foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
+    foreach my $sdentry (sort {$a->{id} <=> $b->{id}} eval{@{$$speed_dial_slots{result}}}) {
         push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
                                                  number      => $i++,
                                                  label       => 'Slot ' . $$sdentry{slot} . ': ' . $$sdentry{destination}
