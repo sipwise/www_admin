@@ -1,0 +1,103 @@
+        <h3>SIP Peering Groups</h3>
+
+        <div class="p1">
+          [% IF messages.epeermsg %]<div class="goodmsg">[% messages.epeermsg %]</div>[% END %]
+          [% IF messages.epeererr %]<div class="errormsg">[% messages.epeererr %]</div>[% END %]
+
+          <table class="domains">
+            <tr class="table_header">
+              <td>Name</td>
+              <td>Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH grp = peer_groups %]
+              <tr>
+                [% IF grp.id == editid %]
+                  <td>[% grp.name %]</td>
+                  <form action="/peering/edit_grp" method="post">
+                    <input type="hidden" name="grpid" value="[% grp.id %]" />
+                    <td>
+                      <input type="text" id="addtxt" title="string, description of group"
+                             name="grpdesc" value="[% grp.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="grpsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="grpsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/peering" class="aaction">cancel</a></td>
+                [% ELSE %]
+                  <td><a href="/peering/detail?group_id=[%grp.id%]" class="aaction">[% grp.name %]</a></td>
+                  <td>[% grp.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/peering?editid=[% grp.id %]" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/peering/delete_grp" method="post">
+                    <input type="hidden" name="grpid" value="[% grp.id %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="grpdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="grpdel[% id %]" />
+                      </div>
+                    [% END %]
+                  </td>
+				[% END %]  
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+          </table>
+        </div>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <h3>Create Peering Group</h3>
+
+        <div class="p1">
+          [% IF messages.cpeermsg %]<div class="goodmsg">[% messages.cpeermsg %]</div>[% END %]
+          [% IF messages.cpeererr %]<div class="errormsg">[% messages.cpeererr %]</div>[% END %]
+
+          <table class="domains">
+            <tr class="table_header">
+              <td>Name</td>
+              <td>Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            <form action="/peering/create_grp" method="post">
+              <tr>
+                <td>
+                  <input type="text" size="20" name="grpname" title="string, name of group"
+                         id="addtxt" value="[% arefill.name %]" />
+                </td>
+                <td>
+                  <input type="text" size="20" name="grpdesc" title="string, description of group"
+                         id="addtxt" value="[% arefill.desc %]" />
+                </td>
+                <td>
+                  <div class="postlink">
+                    <label for="grpadd">add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="grpadd" />
+                  </div>
+                </td>
+              </tr>
+              [% IF messages.acc || messages.atimezone %]
+                <tr><td colspan="5">
+                  <div class="errormsg">
+                    [% messages.acc %]
+                  </div>
+                </td></tr>
+              [% END %]
+            </form>
+
+          </table>
+
+        </div>
+      [% END %]
+

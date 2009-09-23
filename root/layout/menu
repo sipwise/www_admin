@@ -30,7 +30,7 @@
           [% IF Catalyst.config.billing_features %]
           <li><a href="/billing">Billing</a></li>
           [% END %]
-[%#          <li><a href="/gwgroup">Gateway Settings</a></li> %]
+          <li><a href="/peering">SIP Peerings</a></li>
 [%#          <li><a href="/sipserver">SIP Server Settings</a></li> %]
         </ul>
       [% END %]
