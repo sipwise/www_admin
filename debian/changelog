@@ -1,0 +1,11 @@
+sipwise-www-admin (1.1.5-1) unstable; urgency=low
+
+  * using prov-iface E.164 check functions
+
+ -- unreleased
+
+sipwise-www-admin (1.1.4-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Michael Prokop <mika@grml.org>  Tue, 10 Feb 2009 18:45:14 +0100
