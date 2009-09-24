@@ -350,12 +350,22 @@ sub update_subscriber : Local {
         unless(length $cc and length $ac and length $sn) {
             $messages{number} = 'Client.Voip.MissingNumberPart';
         } else {
+            my $checkresult;
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
+                                                                $cc, \$checkresult
+                                                              );
             $messages{number_cc} = 'Client.Voip.MalformedCc'
-                unless $cc =~ /^[1-9][0-9]{0,2}$/;
+                unless $checkresult;
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
+                                                                $ac, \$checkresult
+                                                              );
             $messages{number_ac} = 'Client.Voip.MalformedAc'
-                unless $ac =~ /^[1-9][0-9]{0,4}$/;
+                unless $checkresult;
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sn',
+                                                                $sn, \$checkresult
+                                                              );
             $messages{number_sn} = 'Client.Voip.MalformedSn'
-                unless $sn =~ /^[1-9][0-9]+$/;
+                unless $checkresult;
         }
     } else {
         $settings{cc} = undef;
