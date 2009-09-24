@@ -289,15 +289,17 @@ sub detail : Local {
     }
 
     my $i = 1;
-    my $default_speed_dial_slots = $self->_get_default_slot_list();
+    my $default_speed_dial_slots = admin::Utils::get_default_slot_list($c);
     my @used_default_speed_dial_slots = ();
-    foreach my $sdentry (sort {$a->{id} <=> $b->{id}} eval{@{$$speed_dial_slots{result}}}) {
-        push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
-                                                 number      => $i++,
-                                                 label       => 'Slot ' . $$sdentry{slot} . ': ' . $$sdentry{destination}
-                                               };
-        if (grep { $_ eq $$sdentry{slot} } @$default_speed_dial_slots) {
-            push @used_default_speed_dial_slots,$$sdentry{slot};
+    if (ref $$speed_dial_slots{result} eq 'ARRAY') {
+        foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
+            push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
+                                                     number      => $i++,
+                                                     label       => 'Slot ' . $$sdentry{slot} . ': ' . $$sdentry{destination}
+                                                   };
+            if (grep { $_ eq $$sdentry{slot} } @$default_speed_dial_slots) {
+                push @used_default_speed_dial_slots,$$sdentry{slot};
+            }
         }
     }
     foreach my $free_slot (@$default_speed_dial_slots) {
@@ -1037,7 +1039,7 @@ sub edit_speed_dial_slots : Local {
 
     my $i = 1;
     my $bg = '';
-    my $default_speed_dial_slots = $self->_get_default_slot_list();
+    my $default_speed_dial_slots = admin::Utils::get_default_slot_list($c);
     my @used_default_speed_dial_slots = ();
     foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
         push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
@@ -1185,21 +1187,6 @@ sub expire : Local {
     }
 
     $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
-}
-
-#-# sub _get_default_slot_list
-#-# parameter none
-#-# return \@slots
-#-# description generates list of default speed dial slots
-sub _get_default_slot_list {
-  my $self = shift;
-
-  my @slots = ();
-  for (my $i = 0; $i < 10; $i++) {
-    push @slots,'#' . $i;
-  }
-  return \@slots;
-
 }
 
 =head1 BUGS AND LIMITATIONS

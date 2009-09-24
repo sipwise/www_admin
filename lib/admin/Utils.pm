@@ -40,4 +40,26 @@ sub paginate {
     return \@pagination;
 }
 
+#-# sub get_default_slot_list
+#-# parameter $c
+#-# return \@slots
+#-# description gets default speed dial slot set from admin.conf
+sub get_default_slot_list {
+  my ($c) = @_;
+  
+  if (defined $c->config->{speed_dial_vsc_presets} and ref $c->config->{speed_dial_vsc_presets}->{vsc} eq 'ARRAY') {
+    return $c->config->{speed_dial_vsc_presets}->{vsc};
+  } else {
+    return [];
+  }
+  
+  #my @slots = ();
+  
+  #for (my $i = 0; $i < 10; $i++) {
+  #  push @slots,'#' . $i;
+  #}
+  #return \@slots;
+
+}
+
 1;

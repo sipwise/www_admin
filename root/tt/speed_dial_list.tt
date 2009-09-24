@@ -16,6 +16,7 @@
                 No speed dial vertical service codes (slots) defined yet.<br />
               [% END %]
            </div>
+           [% IF speed_dial_slots %]
           <table>
             <tr class="table_header">
               <td>VSC</td>
@@ -51,6 +52,7 @@
               </tr>
             [% END %]
           </table>
+          [% END %]
 
           <br />
           
@@ -75,7 +77,7 @@
             </div><br clear="all" />
           </form>
           [% ELSE %]
-            All speed dial vertical service codes in use. Please delete or modify the exisitng ones.
+            All allowed speed dial vertical service codes in use. Please delete or modify the exisitng ones.
           [% END %]
 
         </div>
