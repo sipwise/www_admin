@@ -29,12 +29,13 @@
 				</select>
 				existing rewrite rules.
 				</td>
-				<td>
+				<td style="width:40px;">
                 <div class="postlink">
                 	<label for="cpapply">apply</label>
                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="cpapply" />
                   </div>
 				</td>
+              	<td style="width:60px;" />
 			</form>
 			</tr>
 			</table>
