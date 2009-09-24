@@ -4,6 +4,43 @@
         </h2>
 
 		<a href="detail?group_id=[% peer.group_id %]" class="aaction">back</a>
+		
+        [% UNLESS Catalyst.session.admin.read_only %]
+		<h3>Import Rewrite Rules from another host</h3>
+        <div class="p1">
+          [% IF messages.cpmsg %]<div class="goodmsg">[% messages.cpmsg %]</div>[% END %]
+          [% IF messages.cperr %]<div class="errormsg">[% messages.cperr %]</div>[% END %]
+			<table class="domains">
+			<tr>
+            <form action="/peering/copy_rewrite" method="post">
+                <input type="hidden" name="peerid" value="[% peer.id %]" />
+                <input type="hidden" name="grpid" value="[% peer.group_id %]" />
+				<td>
+				Copy rules from peering host 
+            	<select title="string, peering host" size="1" name="rpeerid">
+            		[% FOREACH cpeer = all_peers %]
+						<option value="[% cpeer.id %]">[% cpeer.name %]</option>
+					[% END %]
+				</select>
+				and
+            	<select title="string, copy policy" size="1" name="policy">
+					<option selected>keep</option>
+					<option>delete</option>
+				</select>
+				existing rewrite rules.
+				</td>
+				<td>
+                <div class="postlink">
+                	<label for="cpapply">apply</label>
+                   <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="cpapply" />
+                  </div>
+				</td>
+			</form>
+			</tr>
+			</table>
+		</div>
+		[% END %]
+
 
 		<h3 id="icaller">Inbound Rewrite Rules for Caller</h3>
 

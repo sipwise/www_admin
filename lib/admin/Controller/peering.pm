@@ -491,7 +491,21 @@ sub rewrite : Local {
 														{ id => $peerid },
                                                         \$peer_details
                                                       );
+	my $all_peer_details;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_group_details',
+														{ id => $$peer_details{group_id} },
+                                                        \$all_peer_details
+                                                      );
+	my $all_peers = $$all_peer_details{peers};
+	my @final_peers = ();
+	for(my $i = 0; $i < @$all_peers; ++$i)
+	{
+			my $peer = @$all_peers[$i];
+			push @final_peers, $peer if $$peer{id} != $peerid;
+	}
+
     $c->stash->{peer} = $peer_details;
+    $c->stash->{all_peers} = \@final_peers;
 	$c->stash->{ifeditid} = $c->request->params->{ifeditid};
 	$c->stash->{iteditid} = $c->request->params->{iteditid};
 	$c->stash->{ofeditid} = $c->request->params->{ofeditid};
@@ -677,6 +691,50 @@ sub edit_rewrite : Local {
     return;
 }
 
+=head2 copy_rewrite
+
+Copy a rewrite rule from current group 
+
+=cut
+
+sub copy_rewrite : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_rewrite.tt';
+
+    my %messages;
+    my %settings;
+
+    my $peerid = $c->request->params->{peerid};
+    my $rpeerid = $c->request->params->{rpeerid};
+    my $policy= $c->request->params->{policy};
+    my $grpid = $c->request->params->{grpid};
+	my $delete_old = $policy eq "delete" ? 1 : 0;
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'copy_peer_rewrites',
+                                                 { from_peer_id => $rpeerid,
+												   to_peer_id => $peerid,
+												   delete_old => $delete_old
+                                                 },
+                                                 undef
+                                               ))
+        {
+            	$messages{cpmsg} = 'Server.Voip.SavedSettings';
+	            $c->session->{messages} = \%messages;
+    	        $c->response->redirect("/peering/rewrite?peer_id=$peerid");
+        	    return;
+		}
+	}
+	else
+	{
+		$c->response->redirect("/peering/rewrite?peer_id=$peerid");
+        return;
+	}
+
+	return;
+
+
+}
 
 =head1 BUGS AND LIMITATIONS
 
