@@ -82,11 +82,13 @@ sub create_grp : Local {
     my $grpname = $c->request->params->{grpname};
     $messages{cpeererr} = 'Client.Syntax.MalformedPeerGroupName'
         unless $grpname =~ /^[a-zA-Z0-9_\-]+/;
+    my $priority = $c->request->params->{priority};
     my $grpdesc = $c->request->params->{grpdesc};
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_group',
                                                  { name => $grpname,
+												   priority => $priority,
 												   description => $grpdesc
                                                  },
                                                  undef
@@ -104,14 +106,13 @@ sub create_grp : Local {
     } else {
 		my %arefill = ();
 		$arefill{name} = $grpname;
+		$arefill{priority} = $priority;
 		$arefill{desc} = $grpdesc;
 
 		$c->stash->{arefill} = \%arefill;
     }
 
     $c->session->{messages} = \%messages;
-#$c->session->{restore_domedit_input} = \%settings;
-#    $c->response->redirect("/peering?edit_group=$grpname");
     $c->response->redirect("/peering");
     return;
 }
@@ -129,25 +130,24 @@ sub edit_grp : Local {
     my %settings;
 
     my $grpid = $c->request->params->{grpid};
+    my $priority = $c->request->params->{priority};
     my $grpdesc = $c->request->params->{grpdesc};
 
-	$c->log->debug('*** edit grp');
+#$c->log->debug('*** edit grp');
 
     unless(keys %messages) {
-		$c->log->debug('*** call backend');
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_group',
                                                  { id => $grpid,
+												   priority => $priority,
 												   description => $grpdesc
                                                  },
                                                  undef
                                                ))
         {
-			$c->log->debug('*** call backend ok');
             $messages{epeermsg} = 'Server.Voip.SavedSettings';
 		}
 		else
 		{
-			$c->log->debug('*** call backend failed');
         	$messages{epeererr} = 'Client.Voip.InputErrorFound';
 		}
     }
@@ -190,7 +190,6 @@ sub create_rule : Local {
     my $grpid = $c->request->params->{grpid};
     my $callee_prefix = $c->request->params->{callee_prefix};
     my $caller_pattern = $c->request->params->{caller_pattern};
-    my $priority = $c->request->params->{priority};
     my $description = $c->request->params->{description};
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
@@ -201,7 +200,6 @@ sub create_rule : Local {
                                                  { group_id => $grpid,
 												   callee_prefix => $callee_prefix,
 												   caller_pattern => $caller_pattern,
-												   priority => $priority,
 												   description => $description
                                                  },
                                                  undef
@@ -281,7 +279,6 @@ sub edit_rule : Local {
     my $ruleid = $c->request->params->{ruleid};
     my $callee_prefix = $c->request->params->{callee_prefix};
     my $caller_pattern = $c->request->params->{caller_pattern};
-    my $priority = $c->request->params->{priority};
     my $description = $c->request->params->{description};
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
@@ -292,7 +289,6 @@ sub edit_rule : Local {
                                                  { id => $ruleid,
 												   callee_prefix => $callee_prefix,
 												   caller_pattern => $caller_pattern,
-												   priority => $priority,
 												   description => $description
                                                  },
                                                  undef

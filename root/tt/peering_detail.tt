@@ -3,6 +3,8 @@
             [% grp.name %]</a>
         </h2>
 
+		<a href="/peering" class="aaction">back</a>
+
 		<h3>Peering Rules</h3>
 
         <div class="p1">
@@ -13,7 +15,6 @@
             <tr class="table_header">
               <td>Callee Prefix</td>
               <td>Caller Pattern</td>
-              <td>Priority</td>
               <td>Description</td>
               <td style="width:40px;" />
               <td style="width:60px;" />
@@ -34,15 +35,6 @@
                              name="caller_pattern" value="[% rule.caller_pattern %]" />
                     </td>
                     <td>
-                      <select title="string, priority" size="1" name="priority">
-					  	[% count = 1 %]
-						[% WHILE count < 10 %]
-					  		<option [% "selected" IF rule.priority == count %]>[% count %]</option>
-					  		[% count = count + 1 %]
-						[% END %]
-					  </select>
-                    </td>
-                    <td>
                       <input type="text" size="15" id="addtxt" title="string, rule description"
                              name="description" value="[% rule.description %]" />
                     </td>
@@ -57,7 +49,6 @@
                 [% ELSE %]
                   <td>[% rule.callee_prefix %]</td>
                   <td>[% rule.caller_pattern %]</td>
-                  <td>[% rule.priority %]</td>
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
@@ -90,15 +81,6 @@
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, caller pattern"
                              name="caller_pattern" value="" />
-                    </td>
-                    <td>
-                      <select title="string, priority" size="1" name="priority">
-					  	[% count = 1 %]
-						[% WHILE count < 10 %]
-					  		<option [% "selected" IF 1 == count %]>[% count %]</option>
-					  		[% count = count + 1 %]
-						[% END %]
-					  </select>
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, rule description"
