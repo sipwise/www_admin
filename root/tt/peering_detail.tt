@@ -148,7 +148,7 @@
                   </form>
                   <td><a href="/peering/detail?group_id=[% grp.id %]" class="aaction">cancel</a></td>
                 [% ELSE %]
-                  <td>[% peer.name %]</td>
+                  <td><a href="/peering/rewrite?peer_id=[% peer.id%]" class="aaction">[% peer.name %]</a></td>
                   <td>[% peer.ip %]</td>
                   <td>[% peer.port %]</td>
                   <td class="tdcenter">

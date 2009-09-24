@@ -1,0 +1,419 @@
+        <h2> SIP Peering Rewrite Rules for host 
+          <a class="noarrow" href="rewrite?peer_id=[% peer.id %]">
+            [% peer.name %]</a>
+        </h2>
+
+		<a href="detail?group_id=[% peer.group_id %]" class="aaction">back</a>
+
+		<h3 id="icaller">Inbound Rewrite Rules for Caller</h3>
+
+        <div class="p1">
+          [% IF messages.icallermsg %]<div class="goodmsg">[% messages.icallermsg %]</div>[% END %]
+          [% IF messages.icallererr %]<div class="errormsg">[% messages.icallererr %]</div>[% END %]
+
+          <table class="domains">
+            <tr class="table_header">
+              <td>Match Pattern</td>
+              <td>Replacement Pattern</td>
+              <td>Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH rule = peer.rewrite_in_caller %]
+              <tr>
+                [% IF rule.id == ifeditid %]
+                  <form action="/peering/edit_rewrite" method="post">
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <td>
+                      <input type="text" size="15 id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="[% rule.match_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="[% rule.replace_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
+                             name="description" value="[% rule.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="ifsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ifsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/peering/rewrite?peer_id=[% peer.id %]#icaller" class="aaction">cancel</a></td>
+                [% ELSE %]
+                  <td>[% rule.match_pattern %]</td>
+                  <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/peering/rewrite?peer_id=[% peer.id %]&ifeditid=[% rule.id %]#icallee" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/peering/delete_rewrite" method="post">
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="ifdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ifdel[% id %]" />
+                      </div>
+                    [% END %]
+                  </td>
+				[% END %]  
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+			<tr>
+                  <form action="/peering/create_rewrite" method="post">
+                    <input type="hidden" name="grpid" value="[% peer.group_id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="direction" value="in" />
+                    <input type="hidden" name="field" value="caller" />
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rule description"
+                             name="description" value="" />
+                    </td>
+                    <td>
+                  		<div class="postlink">
+                    		<label for="radd">add</label>
+                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="radd" />
+                  		</div>
+                  </form>
+                    </td>
+					<td />
+			</tr>
+
+
+
+          </table>
+        </div>
+
+		<h3 id="icallee">Inbound Rewrite Rules for Callee</h3>
+
+        <div class="p1">
+          [% IF messages.icalleemsg %]<div class="goodmsg">[% messages.icalleemsg %]</div>[% END %]
+          [% IF messages.icalleeerr %]<div class="errormsg">[% messages.icalleeerr %]</div>[% END %]
+
+          <table class="domains">
+            <tr class="table_header">
+              <td>Match Pattern</td>
+              <td>Replacement Pattern</td>
+              <td>Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH rule = peer.rewrite_in_callee %]
+              <tr>
+                [% IF rule.id == iteditid %]
+                  <form action="/peering/edit_rewrite" method="post">
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <td>
+                      <input type="text" size="15 id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="[% rule.match_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="[% rule.replace_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
+                             name="description" value="[% rule.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="itsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/peering/rewrite?peer_id=[% peer.id %]#icallee" class="aaction">cancel</a></td>
+                [% ELSE %]
+                  <td>[% rule.match_pattern %]</td>
+                  <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/peering/rewrite?peer_id=[% peer.id %]&iteditid=[% rule.id %]#icallee" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/peering/delete_rewrite" method="post">
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="itdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itdel[% id %]" />
+                      </div>
+                    [% END %]
+                  </td>
+				[% END %]  
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+			<tr>
+                  <form action="/peering/create_rewrite" method="post">
+                    <input type="hidden" name="grpid" value="[% peer.group_id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="direction" value="in" />
+                    <input type="hidden" name="field" value="callee" />
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rule description"
+                             name="description" value="" />
+                    </td>
+                    <td>
+                  		<div class="postlink">
+                    		<label for="itadd">add</label>
+                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itadd" />
+                  		</div>
+                  </form>
+                    </td>
+					<td />
+			</tr>
+
+
+
+          </table>
+        </div>
+
+		<h3 id="ocaller">Outbound Rewrite Rules for Caller</h3>
+
+        <div class="p1">
+          [% IF messages.ocallermsg %]<div class="goodmsg">[% messages.ocallermsg %]</div>[% END %]
+          [% IF messages.ocallererr %]<div class="errormsg">[% messages.ocallererr %]</div>[% END %]
+
+          <table class="domains">
+            <tr class="table_header">
+              <td>Match Pattern</td>
+              <td>Replacement Pattern</td>
+              <td>Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH rule = peer.rewrite_out_caller %]
+              <tr>
+                [% IF rule.id == ofeditid %]
+                  <form action="/peering/edit_rewrite" method="post">
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <td>
+                      <input type="text" size="15 id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="[% rule.match_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="[% rule.replace_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
+                             name="description" value="[% rule.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="ofsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ofsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/peering/rewrite?peer_id=[% peer.id %]#ocaller" class="aaction">cancel</a></td>
+                [% ELSE %]
+                  <td>[% rule.match_pattern %]</td>
+                  <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/peering/rewrite?peer_id=[% peer.id %]&ofeditid=[% rule.id %]#ocaller" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/peering/delete_rewrite" method="post">
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="ofdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ofdel[% id %]" />
+                      </div>
+                    [% END %]
+                  </td>
+				[% END %]  
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+			<tr>
+                  <form action="/peering/create_rewrite" method="post">
+                    <input type="hidden" name="grpid" value="[% peer.group_id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="direction" value="out" />
+                    <input type="hidden" name="field" value="caller" />
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rule description"
+                             name="description" value="" />
+                    </td>
+                    <td>
+                  		<div class="postlink">
+                    		<label for="ofadd">add</label>
+                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ofadd" />
+                  		</div>
+                  </form>
+                    </td>
+					<td />
+			</tr>
+
+
+
+          </table>
+        </div>
+
+		<h3 id="ocallee">Outbound Rewrite Rules for Callee</h3>
+
+        <div class="p1">
+          [% IF messages.ocalleemsg %]<div class="goodmsg">[% messages.ocalleemsg %]</div>[% END %]
+          [% IF messages.ocalleeerr %]<div class="errormsg">[% messages.ocalleeerr %]</div>[% END %]
+
+          <table class="domains">
+            <tr class="table_header">
+              <td>Match Pattern</td>
+              <td>Replacement Pattern</td>
+              <td>Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH rule = peer.rewrite_out_callee %]
+              <tr>
+                [% IF rule.id == oteditid %]
+                  <form action="/peering/edit_rewrite" method="post">
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <td>
+                      <input type="text" size="15 id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="[% rule.match_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="[% rule.replace_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
+                             name="description" value="[% rule.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="otsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="otsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/peering/rewrite?peer_id=[% peer.id %]#ocallee" class="aaction">cancel</a></td>
+                [% ELSE %]
+                  <td>[% rule.match_pattern %]</td>
+                  <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/peering/rewrite?peer_id=[% peer.id %]&oteditid=[% rule.id %]#ocallee" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/peering/delete_rewrite" method="post">
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="otdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="otdel[% id %]" />
+                      </div>
+                    [% END %]
+                  </td>
+				[% END %]  
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+			<tr>
+                  <form action="/peering/create_rewrite" method="post">
+                    <input type="hidden" name="grpid" value="[% peer.group_id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="direction" value="out" />
+                    <input type="hidden" name="field" value="callee" />
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rule description"
+                             name="description" value="" />
+                    </td>
+                    <td>
+                  		<div class="postlink">
+                    		<label for="otadd">add</label>
+                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="otadd" />
+                  		</div>
+                  </form>
+                    </td>
+					<td />
+			</tr>
+
+
+
+          </table>
+        </div>
+

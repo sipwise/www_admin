@@ -44,6 +44,7 @@ Delete a peering group
 
 sub delete_grp : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering.tt';
 
     my %messages;
     my %settings;
@@ -75,6 +76,7 @@ Create a peering group
 
 sub create_grp : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering.tt';
 
     my %messages;
     my %settings;
@@ -125,6 +127,7 @@ Edit a peering group
 
 sub edit_grp : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering.tt';
 
     my %messages;
     my %settings;
@@ -167,7 +170,6 @@ sub detail : Local {
 														{ id => $grpid },
                                                         \$peer_details
                                                       );
-	$c->log->debug(Dumper $peer_details);
     $c->stash->{grp} = $peer_details;
 	$c->stash->{reditid} = $c->request->params->{reditid};
 	$c->stash->{peditid} = $c->request->params->{peditid};
@@ -183,6 +185,7 @@ Create a peering rule for a given group
 
 sub create_rule : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_detail.tt';
 
     my %messages;
     my %settings;
@@ -236,6 +239,7 @@ Delete a peering rule
 
 sub delete_rule : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_detail.tt';
 
     my %messages;
     my %settings;
@@ -271,6 +275,7 @@ Edit a peering rule
 
 sub edit_rule : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_detail.tt';
 
     my %messages;
     my %settings;
@@ -325,6 +330,7 @@ Create a peering server for a given group
 
 sub create_peer : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_detail.tt';
 
     my %messages;
     my %settings;
@@ -383,6 +389,7 @@ Delete a peering host
 
 sub delete_peer : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_detail.tt';
 
     my %messages;
     my %settings;
@@ -418,6 +425,7 @@ Edit a peering host
 
 sub edit_peer : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_detail.tt';
 
     my %messages;
     my %settings;
@@ -463,6 +471,209 @@ sub edit_peer : Local {
 
     $c->session->{messages} = \%messages;
     $c->response->redirect("/peering/detail?group_id=$grpid");
+    return;
+}
+
+=head2 rewrite
+
+Show rewrite rules for a given peer
+
+=cut
+
+sub rewrite : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_rewrite.tt';
+    
+	my $peerid = $c->request->params->{peer_id};
+
+    my $peer_details;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_host_details',
+														{ id => $peerid },
+                                                        \$peer_details
+                                                      );
+    $c->stash->{peer} = $peer_details;
+	$c->stash->{ifeditid} = $c->request->params->{ifeditid};
+	$c->stash->{iteditid} = $c->request->params->{iteditid};
+	$c->stash->{ofeditid} = $c->request->params->{ofeditid};
+	$c->stash->{oteditid} = $c->request->params->{oteditid};
+
+    return 1;
+}
+
+=head2 create_rewrite
+
+Create a rewrite rule for a given peer with defined direction and field
+
+=cut
+
+sub create_rewrite : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_rewrite.tt';
+
+    my %messages;
+    my %settings;
+
+    my $grpid = $c->request->params->{grpid};
+    my $peerid = $c->request->params->{peerid};
+    my $match_pattern = $c->request->params->{match_pattern};
+    my $replace_pattern = $c->request->params->{replace_pattern};
+    my $description = $c->request->params->{description};
+    my $direction = $c->request->params->{direction};
+    my $field = $c->request->params->{field};
+
+	my $a = "";
+	if($field eq 'caller') { $a = 'caller'.$a; }
+	elsif($field eq 'callee') { $a = 'callee'.$a; }
+	if($direction eq 'in') { $a = 'i'.$a; }
+	elsif($direction eq 'out') { $a = 'o'.$a; }
+	my $m = $a.'msg'; my $e = $a.'err';
+
+#    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
+#        unless $callee_prefix =~ /^[a-zA-Z0-9_\.\-\@\:]+/;
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_rewrite',
+                                                 { peer_id => $peerid,
+												   match_pattern => $match_pattern,
+												   replace_pattern => $replace_pattern,
+												   description => $description,
+												   direction => $direction,
+												   field => $field
+                                                 },
+                                                 undef
+                                               ))
+        {
+            $messages{$m} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+            return;
+		}
+		else
+		{
+        	$messages{$e} = 'Client.Voip.InputErrorFound';
+		}
+    } else {
+		# TODO: add proper values here and set them in tt
+		my %arefill = ();
+#		$arefill{name} = $grpname;
+#		$arefill{desc} = $grpdesc;
+
+		$c->stash->{arefill} = \%arefill;
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+    return;
+}
+
+=head2 delete_rewrite
+
+Delete a rewrite rule
+
+=cut
+
+sub delete_rewrite : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_rewrite.tt';
+
+    my %messages;
+    my %settings;
+
+    my $peerid = $c->request->params->{peerid};
+    my $rewriteid = $c->request->params->{rewriteid};
+    my $direction = $c->request->params->{direction};
+    my $field = $c->request->params->{field};
+
+	my $a = "";
+	if($field eq 'caller') { $a = 'caller'.$a; }
+	elsif($field eq 'callee') { $a = 'callee'.$a; }
+	if($direction eq 'in') { $a = 'i'.$a; }
+	elsif($direction eq 'out') { $a = 'o'.$a; }
+	my $m = $a.'msg'; my $e = $a.'err';
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_peer_rewrite',
+                                                 { id => $rewriteid
+                                                 },
+                                                 undef
+                                               ))
+        {
+            $messages{$m} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+            return;
+		}
+    } else {
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+    return;
+}
+
+=head2 edit_rewrite
+
+Updates a rewrite rule
+
+=cut
+
+sub edit_rewrite : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_rewrite.tt';
+
+    my %messages;
+    my %settings;
+
+    my $peerid = $c->request->params->{peerid};
+    my $rewriteid = $c->request->params->{rewriteid};
+    my $match_pattern = $c->request->params->{match_pattern};
+    my $replace_pattern = $c->request->params->{replace_pattern};
+    my $description = $c->request->params->{description};
+    my $direction = $c->request->params->{direction};
+    my $field = $c->request->params->{field};
+
+	my $a = "";
+	if($field eq 'caller') { $a = 'caller'.$a; }
+	elsif($field eq 'callee') { $a = 'callee'.$a; }
+	if($direction eq 'in') { $a = 'i'.$a; }
+	elsif($direction eq 'out') { $a = 'o'.$a; }
+	my $m = $a.'msg'; my $e = $a.'err';
+
+#    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
+#        unless $callee_prefix =~ /^[a-zA-Z0-9_\.\-\@\:]+/;
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_rewrite',
+                                                 { id => $rewriteid,
+												   match_pattern => $match_pattern,
+												   replace_pattern => $replace_pattern,
+												   description => $description,
+												   direction => $direction,
+												   field => $field
+                                                 },
+                                                 undef
+                                               ))
+        {
+            $messages{$m} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+            return;
+		}
+		else
+		{
+        	$messages{$e} = 'Client.Voip.InputErrorFound';
+		}
+    } else {
+		# TODO: add proper values here and set them in tt
+		my %arefill = ();
+#		$arefill{name} = $grpname;
+#		$arefill{desc} = $grpdesc;
+
+		$c->stash->{arefill} = \%arefill;
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
     return;
 }
 
