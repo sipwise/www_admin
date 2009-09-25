@@ -1,11 +1,11 @@
-sipwise-www-admin (1.1.5-1) unstable; urgency=low
+sipwise-www-admin (1.1.5) unstable; urgency=low
 
   * using prov-iface E.164 check functions
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Thu, 24 Sep 2009 20:40:27 +0200
 
-sipwise-www-admin (1.1.4-1) unstable; urgency=low
+sipwise-www-admin (1.1.4) unstable; urgency=low
 
   * Initial release.
 
- -- Michael Prokop <mika@grml.org>  Tue, 10 Feb 2009 18:45:14 +0100
+ -- Michael Prokop <mprokop@sipwise.com>  Tue, 10 Feb 2009 18:45:14 +0100
