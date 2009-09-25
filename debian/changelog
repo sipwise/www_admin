@@ -1,4 +1,4 @@
-sipwise-www-admin (1.2.1-1) unstable; urgency=low
+sipwise-www-admin (1.2.1) unstable; urgency=low
 
   * allowing direct entry of regex in billing fee destinations
   * now handling domains with local subscribers as "local" domains
@@ -8,7 +8,7 @@ sipwise-www-admin (1.2.1-1) unstable; urgency=low
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Tue, 09 Jun 2009 05:36:24 +0200
 
-sipwise-www-admin (1.2.0-1) unstable; urgency=low
+sipwise-www-admin (1.2.0) unstable; urgency=low
 
   * implemented product and billing-profile management
   * implemented billing fees and peaktime management
@@ -18,8 +18,8 @@ sipwise-www-admin (1.2.0-1) unstable; urgency=low
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Mon, 18 May 2009 02:27:37 +0200
 
-sipwise-www-admin (1.1.4-1) unstable; urgency=low
+sipwise-www-admin (1.1.4) unstable; urgency=low
 
   * Initial release.
 
- -- Michael Prokop <mika@grml.org>  Tue, 10 Feb 2009 18:45:14 +0100
+ -- Michael Prokop <mprokop@sipwise.com>  Tue, 10 Feb 2009 18:45:14 +0100
