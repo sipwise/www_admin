@@ -293,6 +293,9 @@ sub detail : Local {
     my @used_default_speed_dial_slots = ();
     if (ref $$speed_dial_slots{result} eq 'ARRAY') {
         foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
+            $$sdentry{destination} =~ s/^sip://i;
+            $$sdentry{destination} =~ s/\@.*$//
+                if $$sdentry{destination} =~ /^\+?\d+\@/;
             push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
                                                      number      => $i++,
                                                      label       => 'Slot ' . $$sdentry{slot} . ': ' . $$sdentry{destination}
@@ -1051,17 +1054,42 @@ sub edit_speed_dial_slots : Local {
     my $bg = '';
     my $default_speed_dial_slots = admin::Utils::get_default_slot_list($c);
     my @used_default_speed_dial_slots = ();
-    foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
-        push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
+    if (ref $$speed_dial_slots{result} eq 'ARRAY') {
+        foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
+            my $updateerrormsg;
+            if(defined $c->session->{updateslotidtxt} and $c->session->{updateslotidtxt} eq $$sdentry{id}) {
+                if (defined $c->session->{updateslottxt}) {
+                    $$sdentry{slot} = $c->session->{updateslottxt};
+                    delete $c->session->{updateslottxt};
+                }
+                if (defined $c->session->{updatedestinationtxt}) {
+                    $$sdentry{destination} = $c->session->{updatedestinationtxt};
+                    delete $c->session->{updatedestinationtxt};
+                }
+                delete $c->session->{updateslotidtxt};
+                $updateerrormsg = $c->session->{messages}{updateerr} ?
+                                    $c->model('Provisioning')->localize($c->view($c->config->{view})->
+                                                                      config->{VARIABLES}{site_config}{language},
+                                                                      $c->session->{messages}{updateerr})
+                                    : undef;
+                #delete $c->session->{updateerrmsg};
+            } else {
+                $$sdentry{destination} =~ s/^sip://i;
+                $$sdentry{destination} =~ s/\@.*$//
+                    if $$sdentry{destination} =~ /^\+?\d+\@/;
+            }
+            push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
                                                  number      => $i++,
                                                  background  => $bg ? '' : 'tr_alt',
                                                  slot        => $$sdentry{slot},
-                                                 destination => $$sdentry{destination}
+                                                 destination => $$sdentry{destination},
+                                                 error       => $updateerrormsg
                                                };
-        if (grep { $_ eq $$sdentry{slot} } @$default_speed_dial_slots) {
-            push @used_default_speed_dial_slots,$$sdentry{slot};
+            if (grep { $_ eq $$sdentry{slot} } @$default_speed_dial_slots) {
+                push @used_default_speed_dial_slots,$$sdentry{slot};
+            }
+            $bg = !$bg;
         }
-        $bg = !$bg;
     }
     $i = 0;
     foreach my $free_slot (@$default_speed_dial_slots) {
@@ -1084,7 +1112,7 @@ sub edit_speed_dial_slots : Local {
         $c->stash->{adddestinationtxt} = $c->session->{adddestinationtxt};
         delete $c->session->{adddestinationtxt};
     }
-
+    
     return 1;
 }
 
@@ -1103,70 +1131,116 @@ sub do_edit_sd_list : Local {
     my $add_slot = $c->request->params->{add_slot};
     my $add_destination = $c->request->params->{add_destination};
     if(defined $add_slot) {
-        $c->model('Provisioning')->call_prov( $c, 'voip', 'create_speed_dial_slot',
-                                              { username => $c->session->{subscriber}{username},
-                                                domain => $c->session->{subscriber}{domain},
-                                                data => {
+        
+        my $checkadd_slot;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $add_slot, \$checkadd_slot);
+        my $checkadd_destination;
+        my $destination;
+        if ($add_destination =~ /^\d+$/) {
+            $destination = 'sip:'. $add_destination .'@'. $c->session->{subscriber}{domain};
+        } else {
+            $destination = $add_destination;
+        }
+        if ($destination =~ /^sip:.+\@.+$/) {
+            $checkadd_destination = 1;
+        }
+        
+        if($checkadd_slot and $checkadd_destination) {
+            $c->model('Provisioning')->call_prov( $c, 'voip', 'create_speed_dial_slot',
+                                                  { username => $c->session->{subscriber}{username},
+                                                    domain => $c->session->{subscriber}{domain},
+                                                    data => {
                                                                  slot        => $add_slot,
                                                                  destination => $add_destination
-                                                        },
-                                              },
-                                              undef
-                                            );
-
-        #$messages{msgadd} = 'Client.Voip.MalformedNumberPattern';
-        $c->session->{addslottxt} = $add_slot;        
-        $c->session->{adddestinationtxt} = $add_destination;
-
+                                                            },
+                                                  },
+                                                  undef
+                                                );
+        } else {
+            unless ($checkadd_destination) {
+                $c->session->{adddestinationtxt} = $add_destination;
+                $messages{msgadd} = 'Client.Syntax.MalformedSpeedDialDestination';
+            }
+            #we display the slot error in case of both errors occurring at the same time
+            #since it should never occur (dropdown box selection of valid vsc strings)
+            #and would thus be more severe (system config misconfiguration).
+            #we should consider displaying an internal error at all...
+            unless ($checkadd_slot) {
+                $c->session->{addslottxt} = $add_slot;
+                $messages{msgadd} = 'Client.Syntax.MalformedVSC';
+            }
+            $messages{numerr} = 'Client.Voip.InputErrorFound';
+        }
+ 
     }
 
     # delete link forms
     my $delete_slotid = $c->request->params->{delete_id};
     if(defined $delete_slotid) {
-        #unless(keys %messages) {
-            $c->model('Provisioning')->call_prov( $c, 'voip', 'delete_speed_dial_slot',
-                                              { username => $c->session->{subscriber}{username},
-                                                domain => $c->session->{subscriber}{domain},
-                                                id => $delete_slotid
-                                              },
-                                              undef
-                                            );
-        #} else {
-        #    $messages{numerr} = 'Client.Voip.InputErrorFound';
-        #}
+        $c->model('Provisioning')->call_prov( $c, 'voip', 'delete_speed_dial_slot',
+                                          { username => $c->session->{subscriber}{username},
+                                            domain => $c->session->{subscriber}{domain},
+                                            id => $delete_slotid
+                                          },
+                                          undef
+                                        );
     }
 
     # update link forms
     my $update_slotid = $c->request->params->{update_id};
-    my $slot = $c->request->params->{slot};
-    my $destination = $c->request->params->{destination};
+    my $update_slot = $c->request->params->{slot};
+    my $update_destination = $c->request->params->{destination};
     if(defined $update_slotid) {
-        $c->model('Provisioning')->call_prov( $c, 'voip', 'update_speed_dial_slot',
-                                              { username => $c->session->{subscriber}{username},
-                                                domain => $c->session->{subscriber}{domain},
-                                                id => $update_slotid,
-                                                data => {
-                                                                 slot        => $slot,
-                                                                 destination => $destination
-                                                        },
-                                              },
-                                              undef
-                                            );
+        
+        my $checkupdate_slot;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $update_slot, \$checkupdate_slot);
+        my $checkupdate_destination;
+        my $destination;
+        if ($update_destination =~ /^\d+$/) {
+            $destination = 'sip:'. $update_destination .'@'. $c->session->{subscriber}{domain};
+        } else {
+            $destination = $update_destination;
+        }
+        if ($destination =~ /^sip:.+\@.+$/) {
+            $checkupdate_destination = 1;
+        }
+        
+        if($checkupdate_slot and $checkupdate_destination) {
+            $c->model('Provisioning')->call_prov( $c, 'voip', 'update_speed_dial_slot',
+                                                  { username => $c->session->{subscriber}{username},
+                                                    domain => $c->session->{subscriber}{domain},
+                                                    id => $update_slotid,
+                                                    data => {
+                                                                     slot        => $update_slot,
+                                                                     destination => $update_destination
+                                                            },
+                                                  },
+                                                  undef
+                                                );
+        } else {
+            $c->session->{updateslotidtxt} = $update_slotid;
+            unless ($checkupdate_destination) {
+                $c->session->{updatedestinationtxt} = $update_destination;
+                $messages{updateerr} = 'Client.Syntax.MalformedSpeedDialDestination';
+                #$c->session->{updateerrmsg} = 'Client.Syntax.MalformedSpeedDialDestination';
+            }
+            #we display the slot error in case of both errors occurring at the same time
+            #since it should never occur (dropdown box selection of valid vsc strings)
+            #and would thus be more severe (system config misconfiguration).
+            #we should consider displaying an internal error at all...
+            unless ($checkupdate_slot) {
+                $c->session->{updateslottxt} = $update_slot;
+                $messages{updateerr} = 'Client.Syntax.MalformedVSC';
+                #$messages{updateerrmsg} = 'Client.Syntax.MalformedVSC';
+            }
+            $messages{numerr} = 'Client.Voip.InputErrorFound';
+        }
+            
     }
 
-    #unless(keys %messages) {
-    #    $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_preferences',
-    #                                          { username => $c->session->{subscriber}{username},
-    #                                            domain => $c->session->{subscriber}{domain},
-    #                                            preferences => {
-    #                                                             $list => $$preferences{$list},
-    #                                                           },
-    #                                          },
-    #                                          undef
-    #                                        );
-    #} else {
-    #    $messages{numerr} = 'Client.Voip.InputErrorFound';
-    #}
+    unless(keys %messages) {
+        $messages{numsg} = 'Server.Voip.SavedSettings';
+    }
 
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/edit_speed_dial_slots?subscriber_id=$subscriber_id");

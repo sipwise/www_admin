@@ -23,6 +23,7 @@
               <td>destination</td>
               <td />
               <td />
+              <td />
             </tr>
             [% FOREACH sdentry = speed_dial_slots %]
               <tr class="[% sdentry.background %]">
@@ -40,7 +41,11 @@
                   </td>
                 </form>
                 <form action="/subscriber/do_edit_sd_list" method="post">
-                  <td >
+                  [% IF sdentry.error %]
+                    <td>
+                  [% ELSE %]
+                    <td colspan="2">
+                  [% END %]
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="delete_id" value="[% sdentry.id %]" />
                     <div class="postlink">
@@ -49,6 +54,7 @@
                     </div>
                   </td>
                 </form>
+                [% IF sdentry.error %]<td><div class="errormsg">[% sdentry.error %]</div></td>[% END %]
               </tr>
             [% END %]
           </table>
