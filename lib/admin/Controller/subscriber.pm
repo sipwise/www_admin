@@ -1239,7 +1239,7 @@ sub do_edit_sd_list : Local {
     }
 
     unless(keys %messages) {
-        $messages{numsg} = 'Server.Voip.SavedSettings';
+        $messages{nummsg} = 'Server.Voip.SavedSettings';
     }
 
     $c->session->{messages} = \%messages;
