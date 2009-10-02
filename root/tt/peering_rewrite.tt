@@ -4,7 +4,8 @@
         </h2>
 
 		<a href="detail?group_id=[% peer.group_id %]" class="aaction">back</a>
-		
+
+		[% IF all_peers.size > 0 %]	
         [% UNLESS Catalyst.session.admin.read_only %]
 		<h3>Import Rewrite Rules from another host</h3>
         <div class="p1">
@@ -40,6 +41,7 @@
 			</tr>
 			</table>
 		</div>
+		[% END %]
 		[% END %]
 
 

@@ -710,6 +710,11 @@ sub copy_rewrite : Local {
     my $grpid = $c->request->params->{grpid};
 	my $delete_old = $policy eq "delete" ? 1 : 0;
 
+	unless(defined $peerid && defined $rpeerid)
+	{
+    	$messages{cperr} = 'Client.Voip.NoSuchPeerHost';
+	}
+
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'copy_peer_rewrites',
                                                  { from_peer_id => $rpeerid,
