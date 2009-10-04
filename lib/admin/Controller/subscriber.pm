@@ -681,6 +681,10 @@ sub update_preferences : Local {
 
     $$preferences{mct} = $c->request->params->{mct} ? 1 : undef;
 
+    ### subscriber activation flag ###
+
+    $$preferences{in_use} = $c->request->params->{in_use} ? 1 : undef;
+
     ### save settings ###
 
     unless(keys %messages) {

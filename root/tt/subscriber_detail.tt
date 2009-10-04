@@ -236,7 +236,8 @@
                       || preference.key == "cfb"
                       || preference.key == "cft"
                       || preference.key == "cfna"
-                      || preference.key == "mct" %]
+                      || preference.key == "mct"
+                      || preference.key == "in_use" %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>
