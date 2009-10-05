@@ -168,6 +168,164 @@ sub do_delete_domain : Local {
     return;
 }
 
+=head2 rewrite
+
+Show rewrite rules for a given domain
+
+=cut
+
+sub rewrite : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/domain_rewrite.tt';
+    
+	my $domain = $c->request->params->{domain};
+
+    my $domain_rw;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_domain_rewrites',
+														{ domain => $domain },
+                                                        \$domain_rw
+                                                      );
+    $c->stash->{domain} = $domain_rw;
+	$c->stash->{iteditid} = $c->request->params->{iteditid};
+
+    return 1;
+}
+
+=head2 create_rewrite
+
+Create a rewrite rule for a given domain
+
+=cut
+
+sub create_rewrite : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/domain_rewrite.tt';
+
+    my %messages;
+    my %settings;
+
+    my $domain = $c->request->params->{domain};
+    my $match_pattern = $c->request->params->{match_pattern};
+    my $replace_pattern = $c->request->params->{replace_pattern};
+    my $description = $c->request->params->{description};
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_domain_rewrite',
+                                                 { domain => $domain,
+												   match_pattern => $match_pattern,
+												   replace_pattern => $replace_pattern,
+												   description => $description,
+                                                 },
+                                                 undef
+                                               ))
+        {
+            $messages{icalleemsg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/domain/rewrite?domain=$domain");
+            return;
+		}
+		else
+		{
+        	$messages{icalleeerr} = 'Client.Voip.InputErrorFound';
+		}
+    } else {
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/domain/rewrite?domain=$domain");
+    return;
+}
+
+=head2 edit_rewrite
+
+Updates a rewrite rule
+
+=cut
+
+sub edit_rewrite : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/domain_rewrite.tt';
+
+    my %messages;
+    my %settings;
+
+    my $domain = $c->request->params->{domain};
+    my $rewriteid = $c->request->params->{rewriteid};
+    my $match_pattern = $c->request->params->{match_pattern};
+    my $replace_pattern = $c->request->params->{replace_pattern};
+    my $description = $c->request->params->{description};
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_domain_rewrite',
+                                                 { id => $rewriteid,
+												   match_pattern => $match_pattern,
+												   replace_pattern => $replace_pattern,
+												   description => $description,
+                                                 },
+                                                 undef
+                                               ))
+        {
+            $messages{icalleemsg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/domain/rewrite?domain=$domain");
+            return;
+		}
+		else
+		{
+        	$messages{icalleeerr} = 'Client.Voip.InputErrorFound';
+		}
+    } else {
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/domain/rewrite?domain=$domain");
+    return;
+}
+
+=head2 delete_rewrite
+
+Delete a rewrite rule
+
+=cut
+
+sub delete_rewrite : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/domain_rewrite.tt';
+
+    my %messages;
+    my %settings;
+
+    my $domain = $c->request->params->{domain};
+    my $rewriteid = $c->request->params->{rewriteid};
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_domain_rewrite',
+                                                 { id => $rewriteid
+                                                 },
+                                                 undef
+                                               ))
+        {
+            $messages{icalleemsg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/domain/rewrite?domain=$domain");
+            return;
+		}
+    } else {
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/domain/rewrite?domain=$domain");
+    return;
+}
+
+
+
+
+
+
+
+
+
 =head1 BUGS AND LIMITATIONS
 
 =over

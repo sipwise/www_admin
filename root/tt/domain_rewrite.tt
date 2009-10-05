@@ -1,0 +1,103 @@
+        <h2> Domain Rewrite Rules for domain
+          <a class="noarrow" href="rewrite?domain=[% domain.domain %]">
+            [% domain.domain %]</a>
+        </h2>
+
+		<a href="/domain" class="aaction">back</a>
+
+		<h3 id="icallee">Inbound Rewrite Rules for Callee</h3>
+
+        <div class="p1">
+          [% IF messages.icalleemsg %]<div class="goodmsg">[% messages.icalleemsg %]</div>[% END %]
+          [% IF messages.icalleeerr %]<div class="errormsg">[% messages.icalleeerr %]</div>[% END %]
+
+          <table class="domains">
+            <tr class="table_header">
+              <td>Match Pattern</td>
+              <td>Replacement Pattern</td>
+              <td>Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH rule = domain.rewrites %]
+              <tr>
+                [% IF rule.id == iteditid %]
+                  <form action="/domain/edit_rewrite" method="post">
+                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <td>
+                      <input type="text" size="15 id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="[% rule.match_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="[% rule.replace_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
+                             name="description" value="[% rule.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="itsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/domain/rewrite?domain=[% domain.domain %]" class="aaction">cancel</a></td>
+                [% ELSE %]
+                  <td>[% rule.match_pattern %]</td>
+                  <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/domain/rewrite?domain=[% domain.domain %]&iteditid=[% rule.id %]" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/domain/delete_rewrite" method="post">
+                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="itdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itdel[% id %]" />
+                      </div>
+                    [% END %]
+                  </td>
+				[% END %]  
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+			<tr>
+                  <form action="/domain/create_rewrite" method="post">
+                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rule description"
+                             name="description" value="" />
+                    </td>
+                    <td>
+                  		<div class="postlink">
+                    		<label for="itadd">add</label>
+                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itadd" />
+                  		</div>
+                  </form>
+                    </td>
+					<td />
+			</tr>
+
+
+
+          </table>
+        </div>
+
