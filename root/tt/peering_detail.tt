@@ -22,7 +22,7 @@
             [% id = 0 %]
             [% FOREACH rule = grp.rules %]
               <tr>
-                [% IF rule.id == reditid %]
+                [% IF rule.id == reditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.id %]" />
                     <input type="hidden" name="ruleid" value="[% rule.id %]" />
@@ -71,6 +71,7 @@
               </tr>
             [% id = id + 1 %]
             [% END %]
+            [% UNLESS Catalyst.session.admin.read_only %]
 			<tr>
                   <form action="/peering/create_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.id %]" />
@@ -95,6 +96,7 @@
                     </td>
 					<td />
 			</tr>
+			[% END %]
 
 
 
@@ -119,7 +121,7 @@
             [% id = 0 %]
             [% FOREACH peer = grp.peers %]
               <tr>
-                [% IF peer.id == peditid %]
+                [% IF peer.id == peditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_peer" method="post">
                     <input type="hidden" name="grpid" value="[% grp.id %]" />
                     <input type="hidden" name="peerid" value="[% peer.id %]" />
@@ -176,6 +178,7 @@
               </tr>
             [% id = id + 1 %]
             [% END %]
+            [% UNLESS Catalyst.session.admin.read_only %]
 			<tr>
                   <form action="/peering/create_peer" method="post">
                     <input type="hidden" name="grpid" value="[% grp.id %]" />
@@ -204,9 +207,7 @@
                     </td>
 					<td />
 			</tr>
-
-
-
+            [% END %]
           </table>
         </div>
 

@@ -22,7 +22,7 @@
             [% id = 0 %]
             [% FOREACH rule = domain.rewrites %]
               <tr>
-                [% IF rule.id == iteditid %]
+                [% IF rule.id == iteditid && !Catalyst.session.admin.read_only %]
                   <form action="/domain/edit_rewrite" method="post">
                     <input type="hidden" name="domain" value="[% domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
@@ -71,6 +71,7 @@
               </tr>
             [% id = id + 1 %]
             [% END %]
+            [% UNLESS Catalyst.session.admin.read_only %]
 			<tr>
                   <form action="/domain/create_rewrite" method="post">
                     <input type="hidden" name="domain" value="[% domain.domain %]" />
@@ -95,7 +96,7 @@
                     </td>
 					<td />
 			</tr>
-
+			[% END %]
 
 
           </table>
