@@ -332,6 +332,18 @@ sub detail : Local {
         }
     }
 
+    if(ref $c->session->{subscriber}{fax_preferences} eq 'HASH' and
+       ref $c->session->{subscriber}{fax_preferences}{destinations} eq 'ARRAY')
+    {
+        for(@{$c->session->{subscriber}{fax_preferences}{destinations}}) {
+            if($$_{destination} =~ /^\d+$/) {
+                my $scc = $c->session->{subscriber}{cc};
+                $$_{destination} = '+'.$$_{destination};
+                $$_{destination} =~ s/^\+$scc/0/;
+            }
+        }
+    }
+
     $c->stash->{show_pass} = $c->request->params->{show_pass};
     $c->stash->{show_webpass} = $c->request->params->{show_webpass};
     $c->stash->{show_faxpass} = $c->request->params->{show_faxpass};
