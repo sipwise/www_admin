@@ -212,6 +212,7 @@
         <div class="p1">
           [% IF messages.prefmsg %]<div class="goodmsg">[% messages.prefmsg %]</div>[% END %]
           [% IF messages.preferr %]<div class="errormsg">[% messages.preferr %]</div>[% END %]
+          [% IF edit_preferences && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
             <form action="update_preferences" method="post">
               <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
               <table>
@@ -399,6 +400,7 @@
         <div class="p1">
           [% IF messages.vboxmsg %]<div class="goodmsg">[% messages.vboxmsg %]</div>[% END %]
           [% IF messages.vboxerr %]<div class="errormsg">[% messages.vboxerr %]</div>[% END %]
+          [% IF edit_voicebox && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
           <form action="update_voicebox" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
             <table>
@@ -449,6 +451,7 @@
         <div class="p1">
           [% IF messages.faxmsg %]<div class="goodmsg">[% messages.faxmsg %]</div>[% END %]
           [% IF messages.faxerr %]<div class="errormsg">[% messages.faxerr %]</div>[% END %]
+          [% IF edit_fax && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
           <form action="update_fax" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
             <table>
