@@ -155,6 +155,13 @@ sub detail : Local {
                                                             \$speed_dial_slots
                                                           );
 
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
+                                                            { username => $c->session->{subscriber}{username},
+                                                              domain   => $c->session->{subscriber}{domain},
+                                                            },
+                                                            \$c->session->{subscriber}{fax_preferences}
+                                                          );
+
         $c->session->{subscriber}{registered_contacts} = $$regcon{result} if $$regcon{result};
         $c->stash->{subscriber} = $c->session->{subscriber};
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
@@ -210,6 +217,15 @@ sub detail : Local {
         }
         delete $c->session->{restore_vboxprefs_input};
     }
+    if(ref $c->session->{restore_faxprefs_input} eq 'HASH') {
+        if(ref $c->stash->{subscriber}{fax_preferences} eq 'HASH') {
+            $c->stash->{subscriber}{fax_preferences} = { %{$c->stash->{subscriber}{fax_preferences}},
+                                                         %{$c->session->{restore_faxprefs_input}} };
+        } else {
+            $c->stash->{subscriber}{fax_preferences} = $c->session->{restore_faxprefs_input};
+        }
+        delete $c->session->{restore_faxprefs_input};
+    }
 
     ### build preference array for TT ###
 
@@ -239,8 +255,10 @@ sub detail : Local {
            or $$pref{attribute} eq 'cfna')
         {
           if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
-            if($$preferences{$$pref{attribute}} =~ /voicebox\.local$/) {
+            if($$preferences{$$pref{attribute}} =~ /\@voicebox\.local$/) {
               $$cftarget{voicebox} = 1;
+            } elsif($$preferences{$$pref{attribute}} =~ /\@fax2mail\.local$/) {
+              $$cftarget{fax2mail} = 1;
             } else {
               $$cftarget{sipuri} = $$preferences{$$pref{attribute}};
               $$cftarget{sipuri} =~ s/^sip://i;
@@ -316,10 +334,12 @@ sub detail : Local {
 
     $c->stash->{show_pass} = $c->request->params->{show_pass};
     $c->stash->{show_webpass} = $c->request->params->{show_webpass};
+    $c->stash->{show_faxpass} = $c->request->params->{show_faxpass};
     $c->stash->{edit_subscriber} = $c->request->params->{edit_subscriber}
         unless $is_new;
     $c->stash->{edit_preferences} = $c->request->params->{edit_preferences};
     $c->stash->{edit_voicebox} = $c->request->params->{edit_voicebox};
+    $c->stash->{edit_fax} = $c->request->params->{edit_fax};
 
     return 1;
 }
@@ -607,6 +627,8 @@ sub update_preferences : Local {
         }
     } elsif($fw_target_select eq 'voicebox') {
         $fw_target = 'sip:vmu'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}.'@voicebox.local';
+    } elsif($fw_target_select eq 'fax2mail') {
+        $fw_target = 'sip:'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}.'@fax2mail.local';
     } else {
         # wtf?
     }
@@ -1249,6 +1271,187 @@ sub do_edit_sd_list : Local {
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/edit_speed_dial_slots?subscriber_id=$subscriber_id");
 
+}
+
+sub update_fax : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    my $faxprefs;
+    $$faxprefs{name} = $c->request->params->{name} || undef;
+    $$faxprefs{password} = $c->request->params->{password} || undef;
+    $$faxprefs{active} = $c->request->params->{active} ? 1 : undef;
+
+    ### save settings ###
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_fax_preferences',
+                                                 { username => $c->session->{subscriber}{username},
+                                                   domain => $c->session->{subscriber}{domain},
+                                                   preferences => $faxprefs,
+                                                 },
+                                                 undef
+                                               ))
+        {
+            $messages{faxmsg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#faxprefs");
+            return;
+        }
+    } else {
+        $messages{faxerr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->session->{messages} = \%messages;
+    $$faxprefs{repass} = $$faxprefs{password};
+    $c->session->{restore_faxprefs_input} = $faxprefs;
+    $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id&edit_fax=1#faxprefs");
+    return;
+}
+
+sub edit_destlist : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_edit_destlist.tt';
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$preferences
+                                                      );
+    my $list = $c->request->params->{list_name};
+
+    if(defined $$preferences{$list}) {
+        my $destlist = ref $$preferences{$list} ? $$preferences{$list} : [ $$preferences{$list} ];
+
+        my $bg = '';
+        my $i = 1;
+        foreach my $entry (sort { $$a{destination} cmp $$b{destination} } @$destlist) {
+            if($$entry{destination} =~ /^\d+$/) {
+                my $scc = $c->session->{subscriber}{cc};
+                $$entry{destination} = '+'.$$entry{destination};
+                $$entry{destination} =~ s/^\+$scc/0/;
+            }
+            push @{$c->stash->{list_data}}, { %$entry,
+                                              background => $bg ? '' : 'tr_alt',
+                                              id         => $i++,
+                                            };
+            $bg = !$bg;
+        }
+    }
+
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber_id} = $subscriber_id;
+    $c->stash->{list_name} = $list;
+    $c->stash->{edit_dest} = $c->request->params->{list_edit};
+
+    if(defined $c->session->{arefill}) {
+        $c->stash->{arefill} = $c->session->{arefill};
+        delete $c->session->{arefill};
+    }
+
+    return 1;
+}
+
+sub do_edit_destlist : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %entry;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$preferences
+                                                      );
+    my $list = $c->request->params->{list_name};
+
+    # delete link in destination list
+    # this is also sent by the save link next to entries in edit mode
+    my $del = $c->request->params->{list_del};
+    if(defined $del) {
+        my $destlist = $$preferences{$list};
+        if(defined $destlist) {
+            $destlist = [ $destlist ] unless ref $destlist;
+            $$preferences{$list} = [ grep { $$_{destination} ne $del } @$destlist ];
+        }
+    }
+
+    # input text field to add new entry to destination list
+    # this is also sent by the save link next to entries in edit mode
+    my $add = $c->request->params->{list_add};
+    if(defined $add) {
+        my $checkresult;
+        if($add =~ /^\d+$/) {
+            if($add =~ /^\+[1-9][0-9]+$/) {
+                $add =~ s/^\+//;
+            } elsif($add =~ /^00[1-9][0-9]+$/) {
+                $add =~ s/^00//;
+            } elsif($add =~ /^0[1-9][0-9]+$/) {
+                $add =~ s/^0/$c->session->{subscriber}{cc}/e;
+            } else {
+                $add = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add;
+            }
+          return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $add, \$checkresult);
+        } else {
+          return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_email', $add, \$checkresult);
+        }
+        unless($checkresult) {
+            $messages{msgadd} = 'Client.Voip.MalformedFaxDestination';
+            $c->session->{arefill}{destination} = $add;
+        }
+        $entry{destination} = $add;
+        $entry{filetype} = $c->request->params->{filetype} || 'TIFF';
+        $entry{cc} = $c->request->params->{cc} ? 1 : 0;
+        $entry{incoming} = $c->request->params->{incoming} ? 1 : 0;
+        $entry{outgoing} = $c->request->params->{outgoing} ? 1 : 0;
+        $entry{status} = $c->request->params->{status} ? 1 : 0;
+
+        my $destlist = $$preferences{$list};
+        $destlist = [] unless defined $destlist;
+        $destlist = [ $destlist ] unless ref $destlist;
+        $$preferences{$list} = [ @$destlist, \%entry ];
+
+        $c->session->{arefill} = \%entry if keys %messages;
+    }
+
+    unless(keys %messages) {
+        $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_fax_preferences',
+                                              { username => $c->session->{subscriber}{username},
+                                                domain => $c->session->{subscriber}{domain},
+                                                preferences => {
+                                                                 $list => $$preferences{$list},
+                                                               },
+                                              },
+                                              undef
+                                            );
+    } else {
+        $messages{numerr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_destlist?subscriber_id=$subscriber_id&list_name=$list");
 }
 
 sub expire : Local {

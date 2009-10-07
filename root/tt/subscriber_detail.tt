@@ -271,8 +271,14 @@
                   [% IF edit_preferences %]
                     <label for="cfvoicebox">
                       <input type="radio" id="cfvoicebox" value="voicebox" name="fw_target" class="radio"
-                        [% IF ! preference.value.sipuri %]checked="checked"[% END %] />
+                        [% IF preference.value.voicebox %]checked="checked"[% END %] />
                       Voicebox
+                    </label>
+                    <br clear="all" />
+                    <label for="cffaxserver">
+                      <input type="radio" id="cffaxserver" value="fax2mail" name="fw_target" class="radio"
+                        [% IF preference.value.fax2mail %]checked="checked"[% END %] />
+                      Fax2Mail
                     </label>
                     <br clear="all" />
                     <label for="cfsipuri">
@@ -283,11 +289,13 @@
                     <input type="text" id="cfsipuritxt" name="fw_sipuri" size="25" value="[% preference.value.sipuri %]"
                       [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] />
                   [% ELSE %]
-                    [% IF preference.value.sipuri %]
-                      <input type="text" size="25" value="[% preference.value.sipuri %]"
-                             class="disabled" disabled="disabled" />
-                    [% ELSE %]
+                    [% IF preference.value.voicebox %]
                       Voicebox
+                    [% ELSIF preference.value.fax2mail %]
+                      Fax2Mail
+                    [% ELSE %]
+                      <input type="text" size="25" value="[% preference.value.sipuri %]"
+                             class="disabled txtpreference" disabled="disabled" />
                     [% END %]
                   [% END %]
                   </td>
@@ -419,6 +427,93 @@
               </tr>
             </table>
           [% IF edit_voicebox %]
+            <input type="submit" class="but" value="Save &#187;" />
+          [% END %]
+          </form>
+        </div>
+
+    [% END %]
+
+    [% IF subscriber.fax_preferences %]
+
+        <h3 id="faxprefs">Fax Preferences</h3>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <div class="actions">
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_fax=1#faxprefs" class="aaction">edit</a>
+          [% IF edit_fax %]
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]#faxprefs" class="aaction">cancel</a>
+          [% END %]
+        </div>
+      [% END %]
+        <div class="p1">
+          [% IF messages.faxmsg %]<div class="goodmsg">[% messages.faxmsg %]</div>[% END %]
+          [% IF messages.faxerr %]<div class="errormsg">[% messages.faxerr %]</div>[% END %]
+          <form action="update_fax" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
+            <table>
+              <tr>
+                <td class="tdkey">name:</td>
+                <td>
+                  <input type="text" name="name" [% IF ! edit_fax %]class="disabled" disabled="disabled"[% END %]
+                    value="[% subscriber.fax_preferences.name %]" />
+                </td>
+              </tr>
+              [% IF messages.faxname %]<tr><td /><td><div class="errormsg">[% messages.faxname %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">password:</td>
+                <td>
+                [% IF edit_fax %]
+                  <input type="text" name="password" value="[% subscriber.fax_preferences.repass %]" />
+                [% ELSE %]
+                  <input type="text" name="password" class="disabled" disabled="disabled"
+                  [% IF show_faxpass && Catalyst.session.admin.show_passwords %]
+                    value="[% subscriber.fax_preferences.password %]" />
+                    <a href="?subscriber_id=[% subscriber.subscriber_id %]#faxprefs" class="apass">Hide</a>
+                  [% ELSE %]
+                    [% IF subscriber.password %]
+                      value="********" />
+                      [% IF Catalyst.session.admin.show_passwords %]
+                        <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_faxpass=1#faxprefs" class="apass">Show</a>
+                      [% END %]
+                    [% ELSE %]
+                      value="" />
+                    [% END %]
+                  [% END %]
+                [% END %]
+                </td>
+              </tr>
+              [% IF messages.faxpass %]<tr><td /><td><div class="errormsg">[% messages.faxpass %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">active:</td>
+                <td>
+                  <input type="checkbox" name="active" class="checkbox" [% IF ! edit_fax %]disabled="disabled"[% END %]
+                    [% IF subscriber.fax_preferences.active %]checked="checked"[% END %] />
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">destinations:</td>
+                <td>
+                  [% IF subscriber.fax_preferences.destinations %]
+                    <select size="1" name="destinations">
+                    [% FOREACH dest = subscriber.fax_preferences.destinations %]
+                      <option>[% dest.destination %]</option>
+                    [% END %]
+                    </select>
+                  [% ELSE %]
+                  <select size="1" name="destinations">
+                    <option />
+                  </select>
+                  [% END %]
+                  [% IF ! edit_fax && ! Catalyst.session.admin.read_only %]
+                    &nbsp;
+                      <a href="edit_destlist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=destinations"
+                         class="aaction">edit list</a>
+                  [% END %]
+                </td>
+              </tr>
+            </table>
+          [% IF edit_fax %]
             <input type="submit" class="but" value="Save &#187;" />
           [% END %]
           </form>
