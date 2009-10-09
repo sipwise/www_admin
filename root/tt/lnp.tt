@@ -1,0 +1,299 @@
+        <h3 id="provider">LNP Providers</h3>
+
+        <div class="p1">
+          [% IF messages.provmsg %]<div class="goodmsg">[% messages.provmsg %]</div>[% END %]
+          [% IF messages.proverr %]<div class="errormsg">[% messages.proverr %]</div>[% END %]
+          <table>
+            <tr class="table_header">
+              <td>ID</td>
+              <td>name</td>
+              <td />
+              <td />
+            </tr>
+            [% FOREACH provider = providers %]
+              [% IF provider.id == edit_provider %]
+                <tr>
+                  <form action="/lnp/do_update_provider" method="post">
+                    <td>[% provider.id %]</td>
+                    <td>
+                      <input type="text" name="name" title="descriptive name, free-form"
+                             value="[% provider.name %]" />
+                    </td>
+                    <td>
+                      <input type="hidden" name="id" value="[% provider.id %]" />
+                      <div class="postlink">
+                        <label for="listedit[% provider.id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif"
+                               alt="" id="listedit[% provider.id %]" />
+                      </div>
+                    </td>
+                    <td><a href="/lnp" class="aaction">cancel</a></td>
+                  </form>
+                </tr>
+                [% IF messages.peditnamsg %]
+                <tr><td colspan="4"><div class="errormsg">[% messages.peditnamsg %]</div></td></tr>
+                [% END %]
+              [% ELSE %]
+                <tr>
+                  <td>[% provider.id %]</td>
+                  <td>[% provider.name %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/lnp?edit_provider=[% provider.id %]" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <form action="/lnp/do_delete_provider" method="post">
+                      <input type="hidden" name="id" value="[% provider.id %]" />
+                      <div class="postlink">
+                        <label for="provdel[% provider.id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif"
+                               alt="" id="provdel[% provider.id %]" />
+                      </div>
+                    </form>
+                  [% END %]
+                  </td>
+                </tr>
+              [% END %]
+            [% END %]
+            <tr>
+              <form action="/lnp/do_create_provider" method="post">
+                <td>
+                  <input type="text" class="ishort" name="id" title="unique, integer ID"
+                         value="[% parefill.id %]" />
+                </td>
+                <td>
+                  <input type="text" name="name" title="descriptive name, free-form"
+                         value="[% parefill.name %]" />
+                </td>
+                <td>
+                  <div class="postlink">
+                    <label for="listpadd">add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif"
+                           alt="" id="listpadd" />
+                  </div>
+                </td>
+                <td />
+              </form>
+            </tr>
+          </table>
+          [% IF messages.paddidmsg %]<div class="errormsg">[% messages.paddidmsg %]</div>[% END %]
+          [% IF messages.paddnamsg %]<div class="errormsg">[% messages.paddnamsg %]</div>[% END %]
+        </div>
+
+        [% UNLESS Catalyst.session.admin.read_only %]
+        <h3 id="create_number">Add Ported Number</h3>
+
+        <div class="p1">
+          [% IF messages.cnumsg %]<div class="goodmsg">[% messages.cnumsg %]</div>[% END %]
+          [% IF narefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          <form action="/lnp/do_create_number" method="post">
+            <table>
+              <tr>
+                <td>number</td>
+                <td><input type="text" name="number" value="[% narefill.number %]"
+                           title="E.164 phone number with intl. prefix" />
+                </td>
+              </tr>
+              <tr>
+                <td>provider</td>
+                <td>
+                  <select size="1" name="lnp_provider_id">
+                    [% FOREACH provider = providers %]
+                      <option value="[% provider.id %]"
+                              [% IF narefill.lnp_provider_id == provider.id %]selected="selected"[% END %]
+                             >[% provider.name %]</option>
+                    [% END %]
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>start</td>
+                <td><input type="text" name="start" value="[% narefill.start %]"
+                           title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
+                </td>
+              </tr>
+              <tr>
+                <td>end</td>
+                <td><input type="text" name="end" value="[% narefill.end %]"
+                           title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
+                </td>
+              </tr>
+            </table>
+            <input type="submit" value="Add &#187;" class="but" />
+          </form>
+        </div>
+        [% END %]
+
+        <h3 id="search_numbers">Search Ported Numbers</h3>
+
+        <div class="p1">
+          <form action="lnp/search_numbers" method="post" class="search_subscriber">
+            <label class="search_label" for="search_by_provid">Provider:</label>
+            <select size="1" name="search_provid">
+              <option value="0" [% UNLESS nerefill.lnp_provider_id %]selected="selected"[% END %] />
+              [% FOREACH provider = providers %]
+                <option value="[% provider.id %]"
+                        [% IF searched_numbers.lnp_provider_id == provider.id %]selected="selected"[% END %]
+                       >[% provider.name %]</option>
+              [% END %]
+            </select><br clear="all" />
+            <label class="search_label" for="search_by_number">Number:</label>
+            <input type="text" id="search_by_number" name="search_number" title="SQL wildcards allowed"
+                   value="[% searched_numbers.number %]"
+                   value="[% search_number %]" />
+            <input type="checkbox" id="exact_number" name="exact_number"
+                   [% IF searched_numbers.exact_number %]checked="checked"[% END %] />
+            <label for="exact_number">exact match</label><br />
+
+            <input type="submit" value="Search &#187;" class="but" />
+          </form>
+        </div>
+
+        [% IF numbers %]
+        <h3 id="stored_numbers">Found Ported Numbers</h3>
+
+        <div class="p1">
+          [% IF messages.enumsg %]<div class="goodmsg">[% messages.enumsg %]</div>[% END %]
+          <table width="100%" style="border-spacing: 0px">
+            <tr class="table_header">
+              <td>number</td>
+              <td>provider ID</td>
+              <td style="width:135px;" >start</td>
+              <td style="width:135px;" >end</td>
+              <td style="width:30px;" />
+              <td style="width:30px;"  />
+            </tr>
+            [% bgflip = 1 %]
+            [% FOREACH number = numbers %]
+              [% IF edit_number == number.id %]
+              <form action="/lnp/do_update_number" method="post">
+                [% IF bgflip %]
+                  [% bgflip = 0 %]
+                  <tr class="tr_alt">
+                [% ELSE %]
+                  [% bgflip = 1 %]
+                  <tr>
+                [% END %]
+                  <td><input type="text" class="ilnpnumedit" name="number" value="[% nerefill.number %]"
+                             title="E.164 phone number with intl. prefix" />
+                  </td>
+                  <td>
+                    <select size="1" class="ilnpproedit" name="lnp_provider_id">
+                      [% FOREACH provider = providers %]
+                        <option value="[% provider.id %]"
+                                [% IF nerefill.lnp_provider_id == provider.id %]selected="selected"[% END %]
+                               >[% provider.name %]</option>
+                      [% END %]
+                    </select>
+                  </td>
+                  <td><input type="text" class="ilnptimedit" name="start" value="[% nerefill.start %]"
+                             title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
+                  </td>
+                  <td><input type="text" class="ilnptimedit" name="end" value="[% nerefill.end %]"
+                             title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
+                  </td>
+                  <td>
+                    <input type="hidden" name="id" value="[% number.id %]" />
+                    <div class="postlink">
+                      <label for="numedit[% number.id %]">save</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif"
+                             alt="" id="numedit[% number.id %]" />
+                    </div>
+                  </td>
+                  <td>
+                    <a href="/lnp#stored_numbers" class="aaction">cancel</a>
+                  </td>
+                </tr>
+                [% IF nerefill && prov_error %]
+                [% IF bgflip %]
+                  <tr>
+                [% ELSE %]
+                  <tr class="tr_alt">
+                [% END %]
+                  <td colspan="6"><div class="errormsg">[% prov_error %]</div></td>
+                </tr>
+                [% END %]
+              </form>
+              [% ELSE %]
+                [% IF bgflip %]
+                  [% bgflip = 0 %]
+                  <tr class="tr_alt">
+                [% ELSE %]
+                  [% bgflip = 1 %]
+                  <tr>
+                [% END %]
+                  <td>[% number.number %]</td>
+                  <td>[% number.lnp_provider %]</td>
+                  <td style="white-space:nowrap;">[% number.start %]</td>
+                  <td style="white-space:nowrap;">[% number.end %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/lnp?edit_number=[% number.id %]#stored_numbers" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <td>
+                    <form action="/lnp/do_delete_number" method="post">
+                      <input type="hidden" name="id" value="[% number.id %]" />
+                      <input type="hidden" name="last_one" value="[% last_one %]" />
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="numdel[% number.id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif"
+                               alt="" id="numdel[% number.id %]" />
+                      </div>
+                    [% END %]
+                    </form>
+                  </td>
+                </tr>
+              [% END %]
+            [% END %]
+          </table>
+
+          [% IF pagination %]
+          <div class="pagination">
+            <ul>
+              [% IF searched_numbers.offset == 0 %]
+                <li class="disablepage">&#171; prev</li>
+              [% ELSE %]
+                <li class="nextpage">
+                  <a href="/lnp/search_numbers?offset=[% searched_numbers.offset - 1 %]#stored_numbers">&#171; prev</a>
+                </li>
+              [% END %]
+              [% FOREACH pagine = pagination %]
+                [% IF pagine.offset == searched_numbers.offset %]
+                  <li class="currentpage">
+                    [% pagine.offset + 1 %]
+                  </li>
+                [% ELSIF pagine.offset == -1 %]
+                   ...
+                [% ELSE %]
+                  <li>
+                    <a href="/lnp/search_numbers?offset=[% pagine.offset %]#stored_numbers">[% pagine.offset + 1 %]</a>
+                  </li>
+                [% END %]
+              [% END %]
+              [% IF searched_numbers.offset >= max_offset %]
+                <li class="disablepage">
+                  next &#187;
+                </li>
+              [% ELSE %]
+                <li class="nextpage">
+                  <a href="/lnp/search_numbers?offset=[% searched_numbers.offset + 1 %]#stored_numbers">next &#187;</a>
+                </li>
+              [% END %]
+            </ul>
+          </div>
+          [% END %]
+
+        </div>
+
+        [% END %]
+
+        [% IF searched_numbers  && ! numbers %]
+        <div class="p1">
+          No numbers found in the database.
+        </div>
+        [% END %]
+

@@ -257,6 +257,20 @@ h3 {
 	width: 140px;
 }
 
+/* decrease input text fields  for LNP number edit */
+.ilnpnumedit {
+	margin: 0 -2px 0 -6px;
+	width: 115px;
+}
+.ilnpproedit {
+	margin: 0 -4px 0 -2px;
+	width: 145px;
+}
+.ilnptimedit {
+	margin: 0 -2px;
+	width: 135px;
+}
+
 /* decrease input text fields for ac */
 .ishort {
 	width: 50px;
