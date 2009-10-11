@@ -314,6 +314,27 @@
                       value="[% preference.value %]" />
                   </td>
                 </tr>
+                [% ELSIF preference.key == "ncos" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    [% IF ncos_levels %]
+                      <select size="1" name="[% preference.key %]"
+                              [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
+                          <option value="" [% IF preference.value == "" %]
+                                             selected="selected"
+                                           [% END %]>[% lvl.level %]</option>
+                        [% FOREACH lvl = ncos_levels %]
+                          <option value="[% lvl.level %]"
+                                  [% IF preference.value == lvl.level %]selected="selected"[% END %]
+                                 >[% lvl.level %]</option>
+                        [% END %]
+                      </select>
+                    [% ELSE %]
+                      [% IF edit_preferences %]no NCOS levels defined[% END %]
+                    [% END %]
+                  </td>
+                </tr>
                 [% ELSE %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>

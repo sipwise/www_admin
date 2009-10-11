@@ -273,6 +273,13 @@ sub detail : Local {
             $$preferences{$$pref{attribute}} =~ s/\@.*$//
                 if $$preferences{$$pref{attribute}} =~ /^\+?\d+\@/;
           }
+        } elsif($$pref{attribute} eq 'ncos') {
+          my $ncoslvl;
+          return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_ncos_levels',
+                                                              undef,
+                                                              \$ncoslvl
+                                                            );
+          $c->stash->{ncos_levels} = $$ncoslvl{result} if eval { @{$$ncoslvl{result}} };
         }
 
         push @stashprefs,
@@ -599,6 +606,14 @@ sub update_preferences : Local {
     }
 
     $$preferences{adm_block_in_clir} = $c->request->params->{adm_block_in_clir} ? 1 : undef;
+
+    if(defined $c->request->params->{ncos}) {
+        if(length $c->request->params->{ncos}) {
+            $$preferences{ncos} = $c->request->params->{ncos};
+        } else {
+            $$preferences{ncos} = undef;
+        }
+    }
 
     ### call forwarding ###
 
