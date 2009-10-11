@@ -1,0 +1,126 @@
+        <h3>Existing NCOS Levels</h3>
+
+        <div class="p1">
+          [% IF messages.elvlmsg %]<div class="goodmsg">[% messages.elvlmsg %]</div>[% END %]
+          [% IF messages.elvlerr %]<div class="errormsg">[% messages.elvlerr %]</div>[% END %]
+
+        [% IF levels %]
+          <table class="ncoslevels">
+            <tr class="table_header">
+              <td style="width:60px;">Level</td>
+              <td style="width:80px;">Mode</td>
+              <td style="width:310px;">Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% FOREACH level = levels %]
+              [% IF level.level == edit_level %]
+                <tr>
+                  <form action="/ncos/do_update_level" method="post">
+                    <input type="hidden" name="level" value="[% level.level %]" />
+                    <td class="tdkey">[% level.level %]</td>
+                    <td>
+                      <select size="1" name="mode">
+                        <option value="blacklist"
+                                [% IF erefill.mode == 'blacklist' %]selected="selected"[% END %]
+                               >blacklist</option>
+                        <option value="whitelist"
+                                [% IF erefill.mode == 'whitelist' %]selected="selected"[% END %]
+                               >whitelist</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input type="text" class="ilong" title="free-form description string"
+                             name="description" value="[% erefill.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="lvlsave[% level.level %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lvlsave[% level.level %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/ncos" class="aaction">cancel</a></td>
+                </tr>
+                [% IF messages.elvl %]
+                  <tr><td colspan="5"><div class="errormsg">[% messages.elvl %]</div></td></tr>
+                [% END %]
+              [% ELSE %]
+                <tr>
+                  <td><a href="/ncos/lists?level=[% level.level %]" class="aaction">[% level.level %]</a></td>
+                  <td>[% level.mode %]</td>
+                  <td>[% level.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/ncos?edit_level=[% level.level %]" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/ncos/do_delete_level" method="post">
+                    <input type="hidden" name="level" value="[% level.level %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="lvldel[% level.level %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lvldel[% level.level %]" />
+                      </div>
+                    [% END %]
+                    </td>
+                  </form>
+                </tr>
+              [% END %]
+            [% END %]
+          </table>
+        [% ELSE %]
+          No NCOS levels found in the database.
+        [% END %]
+        </div>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <h3 id="create_level">Create NCOS Level</h3>
+
+        <div class="p1">
+          [% IF messages.clvlmsg %]<div class="goodmsg">[% messages.clvlmsg %]</div>[% END %]
+          [% IF messages.clvlerr %]<div class="errormsg">[% messages.clvlerr %]</div>[% END %]
+
+          <form action="/ncos/do_create_level" method="post">
+            <table class="ncoslevels">
+              <tr class="table_header">
+                <td style="width:60px;">Level</td>
+                <td style="width:80px;">Mode</td>
+                <td style="width:310px;">Description</td>
+                <td style="width:40px;" />
+                <td style="width:60px;" />
+              </tr>
+              <tr>
+                <td><input type="text" class="ishort" title="unique identifier, string"
+                           name="level" value="[% crefill.level %]" />
+                </td>
+                <td>
+                  <select size="1" name="mode">
+                    <option value="blacklist"
+                            [% IF crefill.mode == 'blacklist' %]selected="selected"[% END %]
+                           >blacklist</option>
+                    <option value="whitelist"
+                            [% IF crefill.mode == 'whitelist' %]selected="selected"[% END %]
+                           >whitelist</option>
+                  </select>
+                </td>
+                <td>
+                  <input type="text" class="ilong" title="free-form description string"
+                         name="description" value="[% crefill.description %]" />
+                </td>
+                <td>
+                  <div class="postlink">
+                    <label for="lvladd">add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lvladd" />
+                  </div>
+                </td>
+                <td />
+              </tr>
+            </table>
+          </form>
+          [% IF crefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+
+        </div>
+      [% END %]
+

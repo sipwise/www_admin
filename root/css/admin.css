@@ -252,6 +252,11 @@ h3 {
 	width: 95px;
 }
 
+/* increase input text fields */
+.ilong {
+	width: 300px;
+}
+
 /* decrease input text fields */
 .imedium {
 	width: 140px;

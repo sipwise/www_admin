@@ -1,0 +1,203 @@
+        <h2>NCOS Level <a href="/ncos/lists?level=[% level.level %]">[% level.level %]</a></h2>
+
+        <div class="actions">
+          <a href="/ncos" class="aaction">back</a>
+        </div>
+        <br />
+
+        <div class="p1">
+        <table>
+          <tr><td class="tdkey">Mode:</td><td>[% level.mode %]</td></tr>
+          <tr><td class="tdkey">Description:</td><td>[% level.description %]</td></tr>
+        </table>
+        </div>
+
+        <h3 id="pattern">Number Patterns</h3>
+
+        <div class="p1">
+          [% IF messages.patmsg %]<div class="goodmsg">[% messages.patmsg %]</div>[% END %]
+          [% IF messages.paterr %]<div class="errormsg">[% messages.paterr %]</div>[% END %]
+
+          <table class="ncospatterns">
+            <tr class="table_header">
+              <td style="width:120px;">Pattern</td>
+              <td style="width:310px;">Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH pattern = patterns %]
+              [% id = id + 1 %]
+              [% IF pattern.pattern == edit_pattern %]
+                <tr>
+                  <form action="/ncos/do_update_pattern" method="post">
+                    <input type="hidden" name="level" value="[% level.level %]" />
+                    <input type="hidden" name="oldpattern" value="[% pattern.pattern %]" />
+                    <td>
+                      <input type="text" title="POSIX regular expression"
+                             name="newpattern" value="[% perefill.pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" class="ilong" title="free-form description string"
+                             name="description" value="[% perefill.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="patsave">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="patsave" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/ncos/lists?level=[% level.level %]" class="aaction">cancel</a></td>
+                </tr>
+                [% IF messages.epat %]
+                  <tr><td colspan="5"><div class="errormsg">[% messages.epat %]</div></td></tr>
+                [% END %]
+                [% IF perefill && prov_error %]<tr><td colspan="5"><div class="errormsg">[% prov_error %]</div></td></tr>[% END %]
+              [% ELSE %]
+                <tr>
+                  <td>[% pattern.pattern %]</td>
+                  <td>[% pattern.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/ncos/lists?level=[% level.level %]&amp;edit_pattern=[% pattern.pattern %]" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/ncos/do_delete_pattern" method="post">
+                    <input type="hidden" name="level" value="[% level.level %]" />
+                    <input type="hidden" name="pattern" value="[% pattern.pattern %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="patdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="patdel[% id %]" />
+                      </div>
+                    [% END %]
+                    </td>
+                  </form>
+                </tr>
+              [% END %]
+            [% END %]
+            <tr>
+              <form action="/ncos/do_create_pattern" method="post">
+                <input type="hidden" name="level" value="[% level.level %]" />
+                <td>
+                  <input type="text" title="POSIX regular expression"
+                         name="pattern" value="[% pcrefill.pattern %]" />
+                </td>
+                <td>
+                  <input type="text" class="ilong" title="free-form description string"
+                         name="description" value="[% pcrefill.description %]" />
+                </td>
+                <td>
+                  <div class="postlink">
+                    <label for="patadd">add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="patadd" />
+                  </div>
+                </td>
+              </form>
+              <td />
+            </tr>
+          </table>
+            [% IF messages.cpat %]<div class="errormsg">[% messages.cpat %]</div>[% END %]
+            [% IF pcrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+        </div>
+
+        <h3 id="LNP">LNP Provider List</h3>
+
+        <div class="p1">
+          [% IF messages.lnpmsg %]<div class="goodmsg">[% messages.lnpmsg %]</div>[% END %]
+          [% IF messages.lnperr %]<div class="errormsg">[% messages.lnperr %]</div>[% END %]
+
+          <table class="ncoslnp">
+            <tr class="table_header">
+              <td style="width:120px;">LNP Provider</td>
+              <td style="width:310px;">Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH lnpid = lnpids %]
+              [% id = id + 1 %]
+              [% IF lnpid.lnp_provider_id == edit_lnpid %]
+                <tr>
+                  <form action="/ncos/do_set_lnp_provider_id" method="post">
+                    <input type="hidden" name="level" value="[% level.level %]" />
+                    <input type="hidden" name="lnp_provider_id" value="[% lnpid.lnp_provider_id %]" />
+                    <td class="tdkey">[% lnpid.lnp_provider %]</td>
+                    <td>
+                      <input type="text" class="ilong" title="free-form description string"
+                             name="description" value="[% lerefill.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="lnpsave">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lnpsave" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/ncos/lists?level=[% level.level %]#LNP" class="aaction">cancel</a></td>
+                </tr>
+                [% IF messages.elnp %]
+                  <tr><td colspan="5"><div class="errormsg">[% messages.elnp %]</div></td></tr>
+                [% END %]
+                [% IF lerefill && prov_error %]<tr><td colspan="5"><div class="errormsg">[% prov_error %]</div></td></tr>[% END %]
+              [% ELSE %]
+                <tr>
+                  <td>[% lnpid.lnp_provider %]</td>
+                  <td>[% lnpid.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/ncos/lists?level=[% level.level %]&amp;edit_lnpid=[% lnpid.lnp_provider_id %]" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/ncos/do_delete_lnp_provider_id" method="post">
+                    <input type="hidden" name="level" value="[% level.level %]" />
+                    <input type="hidden" name="lnp_provider_id" value="[% lnpid.lnp_provider_id %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="lnpdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lnpdel[% id %]" />
+                      </div>
+                    [% END %]
+                    </td>
+                  </form>
+                </tr>
+              [% END %]
+            [% END %]
+            [% IF providers %]
+              <tr>
+                <form action="/ncos/do_set_lnp_provider_id" method="post">
+                  <input type="hidden" name="level" value="[% level.level %]" />
+                  <input type="hidden" name="new" value="1" />
+                  <td>
+                    <select size="1" name="lnp_provider_id">                                    
+                      [% FOREACH provider = providers %]                                        
+                        <option value="[% provider.id %]"                                       
+                                [% IF lcrefill.lnp_provider_id == provider.id %]selected="selected"[% END %]
+                               >[% provider.name %]</option>                                                
+                      [% END %]                                                                             
+                    </select>
+                  </td>
+                  <td>
+                    <input type="text" class="ilong" title="free-form description string"
+                           name="description" value="[% lcrefill.description %]" />
+                  </td>
+                  <td>
+                    <div class="postlink">
+                      <label for="lnpadd">add</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lnpadd" />
+                    </div>
+                  </td>
+                </form>
+                <td />
+              </tr>
+            [% ELSE %]
+              <tr><td colspan="5" class="tdcenter">No unused LNP providers found.</td></tr>
+            [% END %]
+          </table>
+            [% IF messages.clnp %]<div class="errormsg">[% messages.clnp %]</div>[% END %]
+            [% IF lcrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+        </div>
+
