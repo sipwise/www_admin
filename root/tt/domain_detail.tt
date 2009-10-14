@@ -195,3 +195,126 @@
           [% IF acrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
         </div>
 
+
+        <h3 id="vsc">Vertical Service Codes</h3>
+
+        <div class="p1">
+          [% IF messages.vscmsg %]<div class="goodmsg">[% messages.vscmsg %]</div>[% END %]
+          [% IF messages.vscerr %]<div class="errormsg">[% messages.vscerr %]</div>[% END %]
+
+          <table class="vscs">
+            <tr class="table_header">
+              <td style="width:120px;">Action</td>
+              <td style="width:40;">Digits</td>
+              <td style="width:120px;">Audio</td>
+              <td style="width:250px;">Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH vsc = vscs %]
+              [% id = id + 1 %]
+              [% IF vsc.action == edit_vsc %]
+                <tr>
+                  <form action="/domain/do_update_vsc" method="post">
+                    <td>[% vsc.action %]</td>
+                    <td>
+                      <input type="text" maxlength="2" class="irealshort" title="two-digit dialcode for VoIP devices"
+                             name="digits" value="[% verefill.digits %]" />
+                    </td>
+                    <td>
+                      <select size="1" name="audio_file_handle"
+                              title="the audio which will be played after execution">
+                        [% FOREACH audio = audio_files %]
+                          <option value="[% audio.handle %]"
+                                  [% IF verefill.audio_file_handle == audio.handle %]selected="selected"[% END %]
+                                 >[% audio.handle %]</option>
+                        [% END %]
+                      </select>
+                    </td>
+                    <td>
+                      <input type="text" class="iaudiodesc" title="free-form description string"
+                             name="description" value="[% verefill.description %]" />
+                    </td>
+                    <td>
+                      <input type="hidden" name="domain" value="[% domain.domain %]" />
+                      <input type="hidden" name="action" value="[% vsc.action %]" />
+                      <div class="postlink">
+                        <label for="vscsave">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="vscsave" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/domain/detail?domain=[% domain.domain %]#vsc" class="aaction">cancel</a></td>
+                </tr>
+                [% IF verefill && prov_error %]<tr><td colspan="5"><div class="errormsg">[% prov_error %]</div></td></tr>[% END %]
+              [% ELSE %]
+                <tr>
+                  <td>[% vsc.action %]</td>
+                  <td>[% vsc.digits %]</td>
+                  <td>[% vsc.audio_file_handle %]</td>
+                  <td>[% vsc.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/domain/detail?domain=[% domain.domain %]&amp;edit_vsc=[% vsc.action %]#vsc" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <td>
+                    <form action="/domain/do_delete_vsc" method="post">
+                      <input type="hidden" name="domain" value="[% domain.domain %]" />
+                      <input type="hidden" name="action" value="[% vsc.action %]" />
+                      [% UNLESS Catalyst.session.admin.read_only %]
+                        <div class="postlink">
+                          <label for="vscdel[% id %]">delete</label>
+                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="vscdel[% id %]" />
+                        </div>
+                      [% END %]
+                    </form>
+                  </td>
+                </tr>
+              [% END %]
+            [% END %]
+            <tr>
+              <form action="/domain/do_create_vsc" method="post">
+                <td>
+                  <select size="1" name="action"
+                          title="the VSC action that should be triggered">
+                    [% FOREACH action = vsc_actions %]
+                      <option value="[% action %]"
+                              [% IF vcrefill.action == action %]selected="selected"[% END %]
+                             >[% action %]</option>
+                    [% END %]
+                  </select>
+                </td>
+                <td>
+                  <input type="text" maxlength="2" class="irealshort" title="two-digit dialcode for VoIP devices"
+                         name="digits" value="[% vcrefill.data.digits %]" />
+                </td>
+                <td>
+                  <select size="1" name="audio_file_handle"
+                          title="the audio which will be played after execution">
+                    [% FOREACH audio = audio_files %]
+                      <option value="[% audio.handle %]"
+                              [% IF vcrefill.data.audio_file_handle == audio.handle %]selected="selected"[% END %]
+                             >[% audio.handle %]</option>
+                    [% END %]
+                  </select>
+                </td>
+                <td>
+                  <input type="text" class="iaudiodesc" title="free-form description string"
+                         name="description" value="[% vcrefill.data.description %]" />
+                </td>
+                <td>
+                  <input type="hidden" name="domain" value="[% domain.domain %]" />
+                  <div class="postlink">
+                    <label for="vscadd">add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="vscadd" />
+                  </div>
+                </td>
+              </form>
+              <td />
+            </tr>
+          </table>
+          [% IF vcrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+        </div>
+

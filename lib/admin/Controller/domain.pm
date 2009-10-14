@@ -213,6 +213,43 @@ sub detail : Local {
         }
     }
 
+    my $vscs;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_domain_vscs',
+                                                        { domain => $domain },
+                                                        \$vscs
+                                                      );
+    $c->stash->{vscs} = $$vscs{result} if eval { @{$$vscs{result}} };
+
+    my $vsc_actions;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_vsc_actions',
+                                                        { },
+                                                        \$vsc_actions
+                                                      );
+    @{$$vsc_actions{result}} = grep { my $tmp = $_;
+                                      ! grep { $$_{action} eq $tmp }
+                                             eval { @{$$vscs{result}} }
+                                    }
+                                    eval { @{$$vsc_actions{result}} };
+    $c->stash->{vsc_actions} = $$vsc_actions{result} if @{$$vsc_actions{result}};
+
+    $c->stash->{edit_vsc} = $c->request->params->{edit_vsc};
+
+    if(exists $c->session->{vcrefill}) {
+        $c->stash->{vcrefill} = $c->session->{vcrefill};
+        delete $c->session->{vcrefill};
+    }
+    if(exists $c->session->{verefill}) {
+        $c->stash->{verefill} = $c->session->{verefill};
+        delete $c->session->{verefill};
+    } elsif($c->request->params->{edit_vsc}) {
+        foreach my $vsc (eval { @{$$vscs{result}} }) {
+            if($$vsc{action} eq $c->request->params->{edit_vsc}) {
+                $c->stash->{verefill} = $vsc;
+                last;
+            }
+        }
+    }
+
     return 1;
 }
 
@@ -498,6 +535,128 @@ sub listen_audio : Local {
     }
 
     $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+    return;
+}
+
+=head2 do_create_vsc
+
+Store a new VSC entry in the database.
+
+=cut
+
+sub do_create_vsc : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    $settings{domain} = $c->request->params->{domain};
+    unless(length $settings{domain}) {
+        $c->response->redirect("/domain");
+        return;
+    }
+    $settings{action} = $c->request->params->{action};
+    $settings{data}{digits} = $c->request->params->{digits}
+        if length $c->request->params->{digits};
+    $settings{data}{audio_file_handle} = $c->request->params->{audio_file_handle};
+    $settings{data}{description} = $c->request->params->{description}
+        if length $c->request->params->{description};
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_domain_vsc',
+                                             \%settings,
+                                             undef))
+    {
+        $messages{vscmsg} = 'Web.VSC.Created';
+        $c->session->{messages} = \%messages;
+        $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
+        return;
+    }
+
+    $messages{vscerr} = 'Client.Voip.InputErrorFound';
+    $c->session->{messages} = \%messages;
+    $c->session->{vcrefill} = \%settings;
+    $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
+    return;
+}
+
+=head2 do_update_vsc
+
+Update a VSC entry in the database.
+
+=cut
+
+sub do_update_vsc : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    $settings{domain} = $c->request->params->{domain};
+    unless(length $settings{domain}) {
+        $c->response->redirect("/domain");
+        return;
+    }
+    $settings{action} = $c->request->params->{action};
+    unless(length $settings{action}) {
+        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        return;
+    }
+    $settings{data}{digits} = length $c->request->params->{digits}
+                                     ? $c->request->params->{digits}
+                                     : undef;
+    $settings{data}{audio_file_handle} = $c->request->params->{audio_file_handle}
+        if defined $c->request->params->{audio_file_handle};
+    $settings{data}{description} = $c->request->params->{description};
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_domain_vsc',
+                                             \%settings,
+                                             undef))
+    {
+        $messages{vscmsg} = 'Web.VSC.Updated';
+        $c->session->{messages} = \%messages;
+        $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
+        return;
+    }
+
+    $messages{vscerr} = 'Client.Voip.InputErrorFound';
+    $c->session->{messages} = \%messages;
+    $c->session->{verefill} = $settings{data};
+    $c->response->redirect("/domain/detail?domain=$settings{domain}&amp;edit_vsc=$settings{action}#vsc");
+    return;
+}
+
+=head2 do_delete_vsc
+
+Delete a VSC entry from the database.
+
+=cut
+
+sub do_delete_vsc : Local {
+    my ( $self, $c ) = @_;
+
+    my %settings;
+
+    $settings{domain} = $c->request->params->{domain};
+    unless(length $settings{domain}) {
+        $c->response->redirect("/domain");
+        return;
+    }
+    $settings{action} = $c->request->params->{action};
+    unless(length $settings{action}) {
+        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        return;
+    }
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_domain_vsc',
+                                             \%settings,
+                                             undef))
+    {
+        $c->session->{messages} = { vscmsg => 'Web.VSC.Deleted' };
+        $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
+        return;
+    }
+
+    $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
     return;
 }
 
