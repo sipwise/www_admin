@@ -135,11 +135,11 @@
                              name="ip" value="[% peer.ip %]" />
                     </td>
                     <td>
-                      <input type="text" size="5" id="addtxt" title="int, peer port"
+                      <input type="text" size="5" id="addtxt" title="int, peer port (1-65535)"
                              name="port" value="[% peer.port %]" />
                     </td>
                     <td>
-                      <input type="text" size="3" id="addtxt" title="int, peer weight"
+                      <input type="text" size="3" id="addtxt" title="int, peer weight (0-255)"
                              name="weight" value="[% peer.weight %]" />
                     </td>
                     <td class="tdcenter">
@@ -197,11 +197,11 @@
                              name="ip" value="" />
                     </td>
                     <td>
-                      <input type="text" size="5" id="addtxt" title="string, peer port (1-65535)"
+                      <input type="text" size="5" id="addtxt" title="int, peer port (1-65535)"
                              name="port" value="5060" />
                     </td>
                     <td>
-                      <input type="text" size="3" id="addtxt" title="string, peer weight (0-255)"
+                      <input type="text" size="3" id="addtxt" title="int, peer weight (0-255)"
                              name="weight" value="1" />
                     </td>
                     <td class="tdcenter">
