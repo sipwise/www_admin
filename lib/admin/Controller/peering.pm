@@ -339,6 +339,7 @@ sub create_peer : Local {
     my $name = $c->request->params->{name};
     my $ip = $c->request->params->{ip};
     my $port = $c->request->params->{port};
+    my $weight = $c->request->params->{weight};
     my $via_lb = defined $c->request->params->{via_lb} ? 1 : 0;
 
 #TODO: add syntax checks here
@@ -353,6 +354,7 @@ sub create_peer : Local {
 												   name => $name,
 												   ip => $ip,
 												   port => $port,
+												   weight => $weight,
 												   via_lb => $via_lb
                                                  },
                                                  undef
@@ -435,6 +437,7 @@ sub edit_peer : Local {
     my $name = $c->request->params->{name};
     my $ip = $c->request->params->{ip};
     my $port = $c->request->params->{port};
+    my $weight = $c->request->params->{weight};
     my $via_lb = defined $c->request->params->{via_lb} ? 1 : 0;
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
@@ -446,6 +449,7 @@ sub edit_peer : Local {
 												   name => $name,
 												   ip => $ip,
 												   port => $port,
+												   weight => $weight,
 												   via_lb => $via_lb
                                                  },
                                                  undef

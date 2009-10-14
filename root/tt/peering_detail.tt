@@ -114,6 +114,7 @@
               <td>Name</td>
               <td>IP Address</td>
               <td>Port</td>
+              <td>Weight</td>
               <td>Via Loadbalancer</td>
               <td style="width:40px;" />
               <td style="width:60px;" />
@@ -137,6 +138,10 @@
                       <input type="text" size="5" id="addtxt" title="int, peer port"
                              name="port" value="[% peer.port %]" />
                     </td>
+                    <td>
+                      <input type="text" size="3" id="addtxt" title="int, peer weight"
+                             name="weight" value="[% peer.weight %]" />
+                    </td>
                     <td class="tdcenter">
                       <input type="checkbox" class="checkbox" title="check to route via load balancer "
                              name="via_lb" [% IF peer.via_lb %]checked="checked"[% END %] />
@@ -153,6 +158,7 @@
                   <td><a href="/peering/rewrite?peer_id=[% peer.id%]" class="aaction">[% peer.name %]</a></td>
                   <td>[% peer.ip %]</td>
                   <td>[% peer.port %]</td>
+                  <td>[% peer.weight %]</td>
                   <td class="tdcenter">
                     <input type="checkbox" class="checkbox" name="via_lb"
                        [% IF peer.via_lb %]checked="checked"[% END %] disabled="disabled" />
@@ -191,8 +197,12 @@
                              name="ip" value="" />
                     </td>
                     <td>
-                      <input type="text" size="5" id="addtxt" title="string, peer port"
+                      <input type="text" size="5" id="addtxt" title="string, peer port (1-65535)"
                              name="port" value="5060" />
+                    </td>
+                    <td>
+                      <input type="text" size="3" id="addtxt" title="string, peer weight (0-255)"
+                             name="weight" value="1" />
                     </td>
                     <td class="tdcenter">
                       <input type="checkbox" class="checkbox" title="check to route via load balancer "
