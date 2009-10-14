@@ -72,6 +72,10 @@ Attempt to render a view, if needed.
 sub end : ActionClass('RenderView') {
     my ( $self, $c ) = @_;
 
+    if(defined $c->stash->{current_view} and $c->stash->{current_view} eq 'Plain') {
+        return 1;
+    }
+
     $c->stash->{current_view} = $c->config->{view};
 
     unless($c->response->{status} =~ /^3/) { # only if not a redirect

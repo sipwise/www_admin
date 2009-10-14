@@ -51,7 +51,7 @@
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/domain/detail?domain=[% domain.domain %]&iteditid=[% rule.id %]" class="aaction">edit</a>
+                    <a href="/domain/detail?domain=[% domain.domain %]&amp;iteditid=[% rule.id %]" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/domain/delete_rewrite" method="post">
@@ -98,5 +98,100 @@
             [% END %]
 
           </table>
+        </div>
+
+
+        <h3 id="audio">Audio Files</h3>
+
+        <div class="p1">
+          [% IF messages.audiomsg %]<div class="goodmsg">[% messages.audiomsg %]</div>[% END %]
+          [% IF messages.audioerr %]<div class="errormsg">[% messages.audioerr %]</div>[% END %]
+
+          <table class="audiofiles">
+            <tr class="table_header">
+              <td style="width:100px;">Handle</td>
+              <td style="width:250px;">Description</td>
+              <td style="width:180px;">Audio</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH audio = audio_files %]
+              [% id = id + 1 %]
+              [% IF audio.handle == edit_audio %]
+                <tr>
+                  <form action="/domain/do_update_audio" enctype="multipart/form-data" method="post">
+                    <td>[% audio.handle %]</td>
+                    <td>
+                      <input type="text" class="iaudiodesc" title="free-form description string"
+                             name="description" value="[% aerefill.description %]" />
+                    </td> 
+                    <td>
+                      <input type="file" size="10" class="file" id="eupload_audio" name="eupload_audio"
+                             title="audio file in wave format" />
+                    </td>
+                    <td>
+                      <input type="hidden" name="domain" value="[% domain.domain %]" />
+                      <input type="hidden" name="handle" value="[% audio.handle %]" />
+                      <div class="postlink">
+                        <label for="audiosave">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="audiosave" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/domain/detail?domain=[% domain.domain %]#audio" class="aaction">cancel</a></td>
+                </tr>
+                [% IF aerefill && prov_error %]<tr><td colspan="5"><div class="errormsg">[% prov_error %]</div></td></tr>[% END %]
+              [% ELSE %]
+                <tr>
+                  <td>[% audio.handle %]</td>
+                  <td>[% audio.description %]</td>
+                  <td><a href="/domain/listen_audio?domain=[% domain.domain %]&amp;handle=[% audio.handle %]">listen</a></td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/domain/detail?domain=[% domain.domain %]&amp;edit_audio=[% audio.handle %]#audio" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <td>
+                    <form action="/domain/do_delete_audio" method="post">
+                      <input type="hidden" name="domain" value="[% domain.domain %]" />
+                      <input type="hidden" name="handle" value="[% audio.handle %]" />
+                      [% UNLESS Catalyst.session.admin.read_only %]
+                        <div class="postlink">
+                          <label for="audiodel[% id %]">delete</label>
+                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="audiodel[% id %]" />
+                        </div>
+                      [% END %]
+                    </form>
+                  </td>
+                </tr>
+              [% END %]
+            [% END %]
+            <tr>
+              <form action="/domain/do_create_audio" enctype="multipart/form-data" method="post">
+                <td>
+                  <input type="text" class="ihandle" title="unique identifier string"
+                         name="handle" value="[% acrefill.handle %]" />
+                </td>
+                <td>
+                  <input type="text" class="iaudiodesc" title="free-form description string"
+                         name="description" value="[% acrefill.data.description %]" />
+                </td>
+                <td>
+                  <input type="file" size="10" class="file" id="cupload_audio" name="cupload_audio"
+                         title="audio file in wave format" />
+                </td>
+                <td>
+                  <input type="hidden" name="domain" value="[% domain.domain %]" />
+                  <div class="postlink">
+                    <label for="audioadd">add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="audioadd" />
+                  </div>
+                </td>
+              </form>
+              <td />
+            </tr>
+          </table>
+          [% IF acrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
         </div>
 

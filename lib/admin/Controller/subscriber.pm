@@ -15,7 +15,7 @@ This provides functionality for VoIP subscriber administration.
 
 =head1 METHODS
 
-=head2 index 
+=head2 index
 
 Display search form.
 
@@ -28,7 +28,7 @@ sub index : Private {
     return 1;
 }
 
-=head2 search 
+=head2 search
 
 Search for subscribers and display results.
 
@@ -105,7 +105,7 @@ sub search : Local {
     return 1;
 }
 
-=head2 detail 
+=head2 detail
 
 Display subscriber details.
 
@@ -147,7 +147,7 @@ sub detail : Local {
                                                             },
                                                             \$regcon
                                                           );
-        
+
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_speed_dial_slots',
                                                             { username => $c->session->{subscriber}{username},
                                                               domain   => $c->session->{subscriber}{domain},
@@ -169,7 +169,16 @@ sub detail : Local {
                                                                                      config->{VARIABLES}{site_config}{language},
                                                                                  'Web.Subscriber.Lock'.$$preferences{lock})
             if $$preferences{lock};
-        
+
+        my $audio_files;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
+                                                            { username => $c->session->{subscriber}{username},
+                                                              domain   => $c->session->{subscriber}{domain},
+                                                            },
+                                                            \$audio_files
+                                                          );
+        $c->session->{subscriber}{audio_files} = $$audio_files{result} if eval { @{$$audio_files{result}} };
+
     } else {
         $c->stash->{account_id} = $c->request->params->{account_id};
         $c->stash->{edit_subscriber} = 1;
@@ -1165,7 +1174,7 @@ sub edit_speed_dial_slots : Local {
         $c->stash->{adddestinationtxt} = $c->session->{adddestinationtxt};
         delete $c->session->{adddestinationtxt};
     }
-    
+
     return 1;
 }
 
@@ -1184,7 +1193,7 @@ sub do_edit_sd_list : Local {
     my $add_slot = $c->request->params->{add_slot};
     my $add_destination = $c->request->params->{add_destination};
     if(defined $add_slot) {
-        
+
         my $checkadd_slot;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $add_slot, \$checkadd_slot);
         my $checkadd_destination;
@@ -1197,7 +1206,7 @@ sub do_edit_sd_list : Local {
         if ($destination =~ /^sip:.+\@.+$/) {
             $checkadd_destination = 1;
         }
-        
+
         if($checkadd_slot and $checkadd_destination) {
             $c->model('Provisioning')->call_prov( $c, 'voip', 'create_speed_dial_slot',
                                                   { username => $c->session->{subscriber}{username},
@@ -1224,7 +1233,7 @@ sub do_edit_sd_list : Local {
             }
             $messages{numerr} = 'Client.Voip.InputErrorFound';
         }
- 
+
     }
 
     # delete link forms
@@ -1244,7 +1253,7 @@ sub do_edit_sd_list : Local {
     my $update_slot = $c->request->params->{slot};
     my $update_destination = $c->request->params->{destination};
     if(defined $update_slotid) {
-        
+
         my $checkupdate_slot;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $update_slot, \$checkupdate_slot);
         my $checkupdate_destination;
@@ -1257,7 +1266,7 @@ sub do_edit_sd_list : Local {
         if ($destination =~ /^sip:.+\@.+$/) {
             $checkupdate_destination = 1;
         }
-        
+
         if($checkupdate_slot and $checkupdate_destination) {
             $c->model('Provisioning')->call_prov( $c, 'voip', 'update_speed_dial_slot',
                                                   { username => $c->session->{subscriber}{username},
@@ -1288,7 +1297,7 @@ sub do_edit_sd_list : Local {
             }
             $messages{numerr} = 'Client.Voip.InputErrorFound';
         }
-            
+
     }
 
     unless(keys %messages) {
@@ -1479,6 +1488,233 @@ sub do_edit_destlist : Local {
 
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/edit_destlist?subscriber_id=$subscriber_id&list_name=$list");
+}
+
+sub edit_audio_files : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_edit_audio_files.tt';
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my %settings;
+    $settings{username} = $c->session->{subscriber}{username};
+    $settings{domain} = $c->session->{subscriber}{domain};
+
+    my $audio_files;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
+                                                        { %settings },
+                                                        \$audio_files
+                                                      );
+    $c->stash->{audio_files} = $$audio_files{result} if eval { @{$$audio_files{result}} };
+
+    $c->stash->{edit_audio} = $c->request->params->{edit_audio};
+
+    if(exists $c->session->{acrefill}) {
+        $c->stash->{acrefill} = $c->session->{acrefill};
+        delete $c->session->{acrefill};
+    }
+    if(exists $c->session->{aerefill}) {
+        $c->stash->{aerefill} = $c->session->{aerefill};
+        delete $c->session->{aerefill};
+    } elsif($c->request->params->{edit_audio}) {
+        foreach my $audio (eval { @{$$audio_files{result}} }) {
+            if($$audio{handle} eq $c->request->params->{edit_audio}) {
+                $c->stash->{aerefill} = $audio;
+                last;
+            }
+        }
+    }
+
+    return 1;
+}
+
+=head2 do_create_audio
+
+Store a new audio file in the database.
+
+=cut
+
+sub do_create_audio : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    $settings{username} = $c->session->{subscriber}{username};
+    $settings{domain} = $c->session->{subscriber}{domain};
+    $settings{handle} = $c->request->params->{handle};
+    $settings{data}{description} = $c->request->params->{description}
+        if length $c->request->params->{description};
+    my $upload = $c->req->upload('cupload_audio');
+    $settings{data}{audio} = eval { $upload->slurp };
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_audio_file',
+                                                 \%settings,
+                                                 undef))
+        {
+            $messages{audiomsg} = 'Web.AudioFile.Created';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
+            return;
+        }
+    }
+
+    $messages{audioerr} = 'Client.Voip.InputErrorFound';
+    $c->session->{messages} = \%messages;
+    $c->session->{acrefill} = \%settings;
+    $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
+    return;
+}
+
+=head2 do_update_audio
+
+Update an audio file in the database.
+
+=cut
+
+sub do_update_audio : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    $settings{username} = $c->session->{subscriber}{username};
+    $settings{domain} = $c->session->{subscriber}{domain};
+    $settings{handle} = $c->request->params->{handle};
+    unless(length $settings{handle}) {
+        $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
+        return;
+    }
+    $settings{data}{description} = $c->request->params->{description};
+    my $upload = $c->req->upload('eupload_audio');
+    $settings{data}{audio} = eval { $upload->slurp } if defined $upload;
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_audio_file',
+                                                 \%settings,
+                                                 undef))
+        {
+            $messages{audiomsg} = 'Web.AudioFile.Updated';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
+            return;
+        }
+        $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id&amp;edit_audio=$settings{handle}");
+        return;
+    }
+
+    $messages{audioerr} = 'Client.Voip.InputErrorFound';
+    $c->session->{messages} = \%messages;
+    $c->session->{aerefill} = $settings{data};
+    $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id&amp;edit_audio=$settings{handle}");
+    return;
+}
+
+=head2 do_delete_audio
+
+Delete an audio file from the database.
+
+=cut
+
+sub do_delete_audio : Local {
+    my ( $self, $c ) = @_;
+
+    my %settings;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    $settings{username} = $c->session->{subscriber}{username};
+    $settings{domain} = $c->session->{subscriber}{domain};
+    $settings{handle} = $c->request->params->{handle};
+    unless(length $settings{handle}) {
+        $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
+        return;
+    }
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_audio_file',
+                                             \%settings,
+                                             undef))
+    {
+        $c->session->{messages} = { provmsg => 'Web.AudioFile.Deleted' };
+        $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
+        return;
+    }
+
+    $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
+    return;
+}
+
+=head2 listen_audio
+
+Listen to an audio file from the database.
+
+=cut
+
+sub listen_audio : Local {
+    my ( $self, $c ) = @_;
+
+    my %settings;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    $settings{username} = $c->session->{subscriber}{username};
+    $settings{domain} = $c->session->{subscriber}{domain};
+    $settings{handle} = $c->request->params->{handle};
+    unless(length $settings{handle}) {
+        $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
+        return;
+    }
+
+    my $audio;
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_file',
+                                             \%settings,
+                                             \$audio))
+    {
+        $c->stash->{current_view} = 'Plain';
+        $c->stash->{content_type} = 'audio/x-wav';
+        $c->stash->{content} = eval { $$audio{audio}->value() };
+        return;
+    }
+
+    $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
+    return;
 }
 
 sub expire : Local {

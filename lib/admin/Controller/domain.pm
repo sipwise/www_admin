@@ -14,7 +14,7 @@ Catalyst Controller.
 
 =head1 METHODS
 
-=head2 index 
+=head2 index
 
 Display domain list.
 
@@ -49,7 +49,7 @@ sub index : Private {
     return 1;
 }
 
-=head2 do_edit_domain 
+=head2 do_edit_domain
 
 Change settings for a domain.
 
@@ -96,7 +96,7 @@ sub do_edit_domain : Local {
     return;
 }
 
-=head2 do_create_domain 
+=head2 do_create_domain
 
 Create a new domain.
 
@@ -144,7 +144,7 @@ sub do_create_domain : Local {
     return;
 }
 
-=head2 do_delete_domain 
+=head2 do_delete_domain
 
 Delete a domain.
 
@@ -177,7 +177,7 @@ Show details for a given domain: rewrite rules
 sub detail : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/domain_detail.tt';
-    
+
     my $domain = $c->request->params->{domain};
 
     my $domain_rw;
@@ -187,6 +187,31 @@ sub detail : Local {
                                                       );
     $c->stash->{domain} = $domain_rw;
     $c->stash->{iteditid} = $c->request->params->{iteditid};
+
+    my $audio_files;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
+                                                        { domain => $domain },
+                                                        \$audio_files
+                                                      );
+    $c->stash->{audio_files} = $$audio_files{result} if eval { @{$$audio_files{result}} };
+
+    $c->stash->{edit_audio} = $c->request->params->{edit_audio};
+
+    if(exists $c->session->{acrefill}) {
+        $c->stash->{acrefill} = $c->session->{acrefill};
+        delete $c->session->{acrefill};
+    }
+    if(exists $c->session->{aerefill}) {
+        $c->stash->{aerefill} = $c->session->{aerefill};
+        delete $c->session->{aerefill};
+    } elsif($c->request->params->{edit_audio}) {
+        foreach my $audio (eval { @{$$audio_files{result}} }) {
+            if($$audio{handle} eq $c->request->params->{edit_audio}) {
+                $c->stash->{aerefill} = $audio;
+                last;
+            }
+        }
+    }
 
     return 1;
 }
@@ -315,12 +340,166 @@ sub delete_rewrite : Local {
     return;
 }
 
+=head2 do_create_audio
 
+Store a new audio file in the database.
 
+=cut
 
+sub do_create_audio : Local {
+    my ( $self, $c ) = @_;
 
+    my %messages;
+    my %settings;
 
+    $settings{domain} = $c->request->params->{domain};
+    unless(length $settings{domain}) {
+        $c->response->redirect("/domain");
+        return;
+    }
+    $settings{handle} = $c->request->params->{handle};
+    $settings{data}{description} = $c->request->params->{description}
+        if length $c->request->params->{description};
+    my $upload = $c->req->upload('cupload_audio');
+    $settings{data}{audio} = eval { $upload->slurp };
 
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_audio_file',
+                                                 \%settings,
+                                                 undef))
+        {
+            $messages{audiomsg} = 'Web.AudioFile.Created';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+            return;
+        }
+    }
+
+    $messages{audioerr} = 'Client.Voip.InputErrorFound';
+    $c->session->{messages} = \%messages;
+    $c->session->{acrefill} = \%settings;
+    $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+    return;
+}
+
+=head2 do_update_audio
+
+Update an audio file in the database.
+
+=cut
+
+sub do_update_audio : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    $settings{domain} = $c->request->params->{domain};
+    unless(length $settings{domain}) {
+        $c->response->redirect("/domain");
+        return;
+    }
+    $settings{handle} = $c->request->params->{handle};
+    unless(length $settings{handle}) {
+        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        return;
+    }
+    $settings{data}{description} = $c->request->params->{description};
+    my $upload = $c->req->upload('eupload_audio');
+    $settings{data}{audio} = eval { $upload->slurp } if defined $upload;
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_audio_file',
+                                                 \%settings,
+                                                 undef))
+        {
+            $messages{audiomsg} = 'Web.AudioFile.Updated';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+            return;
+        }
+        $c->response->redirect("/domain/detail?domain=$settings{domain}&amp;edit_audio=$settings{handle}#audio");
+        return;
+    }
+
+    $messages{audioerr} = 'Client.Voip.InputErrorFound';
+    $c->session->{messages} = \%messages;
+    $c->session->{aerefill} = $settings{data};
+    $c->response->redirect("/domain/detail?domain=$settings{domain}&amp;edit_audio=$settings{handle}#audio");
+    return;
+}
+
+=head2 do_delete_audio
+
+Delete an audio file from the database.
+
+=cut
+
+sub do_delete_audio : Local {
+    my ( $self, $c ) = @_;
+
+    my %settings;
+
+    $settings{domain} = $c->request->params->{domain};
+    unless(length $settings{domain}) {
+        $c->response->redirect("/domain");
+        return;
+    }
+    $settings{handle} = $c->request->params->{handle};
+    unless(length $settings{handle}) {
+        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        return;
+    }
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_audio_file',
+                                             \%settings,
+                                             undef))
+    {
+        $c->session->{messages} = { provmsg => 'Web.AudioFile.Deleted' };
+        $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+        return;
+    }
+
+    $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+    return;
+}
+
+=head2 listen_audio
+
+Listen to an audio file from the database.
+
+=cut
+
+sub listen_audio : Local {
+    my ( $self, $c ) = @_;
+
+    my %settings;
+
+    $settings{domain} = $c->request->params->{domain};
+    unless(length $settings{domain}) {
+        $c->response->redirect("/domain");
+        return;
+    }
+    $settings{handle} = $c->request->params->{handle};
+    unless(length $settings{handle}) {
+        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        return;
+    }
+
+    my $audio;
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_file',
+                                             \%settings,
+                                             \$audio))
+    {
+        $c->stash->{current_view} = 'Plain';
+        $c->stash->{content_type} = 'audio/x-wav';
+        $c->stash->{content} = eval { $$audio{audio}->value() };
+        return;
+    }
+
+    $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+    return;
+}
 
 
 =head1 BUGS AND LIMITATIONS

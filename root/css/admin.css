@@ -276,6 +276,13 @@ h3 {
 	width: 135px;
 }
 
+.ihandle {
+	width: 90px;
+}
+.iaudiodesc {
+	width: 240px;
+}
+
 /* decrease input text fields for ac */
 .ishort {
 	width: 50px;
