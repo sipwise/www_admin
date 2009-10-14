@@ -1,11 +1,10 @@
-        <h2> Domain Rewrite Rules for domain
-          <a class="noarrow" href="detail?domain=[% domain.domain %]">
-            [% domain.domain %]</a>
+        <h2> Domain
+          <a class="noarrow" href="detail?domain=[% domain.domain %]">[% domain.domain %]</a>
         </h2>
 
-		<a href="/domain" class="aaction">back</a>
+        <a href="/domain" class="aaction">back</a>
 
-		<h3 id="icallee">Inbound Rewrite Rules for Callee</h3>
+        <h3 id="icallee">Inbound Rewrite Rules for Callee</h3>
 
         <div class="p1">
           [% IF messages.icalleemsg %]<div class="goodmsg">[% messages.icalleemsg %]</div>[% END %]
@@ -66,38 +65,37 @@
                       </div>
                     [% END %]
                   </td>
-				[% END %]  
+                [% END %]  
                 </form>
               </tr>
             [% id = id + 1 %]
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
-			<tr>
-                  <form action="/domain/create_rewrite" method="post">
-                    <input type="hidden" name="domain" value="[% domain.domain %]" />
-                    <td>
-                      <input type="text" size="15" id="addtxt" title="string, match pattern"
-                             name="match_pattern" value="" />
-                    </td>
-                    <td>
-                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
-                             name="replace_pattern" value="" />
-                    </td>
-                    <td>
-                      <input type="text" size="15" id="addtxt" title="string, rule description"
-                             name="description" value="" />
-                    </td>
-                    <td>
-                  		<div class="postlink">
-                    		<label for="itadd">add</label>
-                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itadd" />
-                  		</div>
-                  </form>
-                    </td>
-					<td />
-			</tr>
-			[% END %]
-
+              <tr>
+                <form action="/domain/create_rewrite" method="post">
+                  <input type="hidden" name="domain" value="[% domain.domain %]" />
+                  <td>
+                    <input type="text" size="15" id="addtxt" title="string, match pattern"
+                           name="match_pattern" value="" />
+                  </td>
+                  <td>
+                    <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                           name="replace_pattern" value="" />
+                  </td>
+                  <td>
+                    <input type="text" size="15" id="addtxt" title="string, rule description"
+                           name="description" value="" />
+                  </td>
+                  <td>
+                    <div class="postlink">
+                      <label for="itadd">add</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itadd" />
+                    </div>
+                  </td>
+                  <td />
+                </form>
+              </tr>
+            [% END %]
 
           </table>
         </div>
