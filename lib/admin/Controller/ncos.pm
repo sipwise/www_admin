@@ -76,7 +76,7 @@ sub do_create_level : Local {
                                                  \%settings,
                                                  undef))
         {
-            $messages{clvlmsg} = 'Web.NCOS.LevelCreated';
+            $messages{clvlmsg} = 'Web.NCOSLevel.Created';
             $c->session->{messages} = \%messages;
             $c->response->redirect("/ncos#create_level");
             return;
