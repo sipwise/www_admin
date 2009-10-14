@@ -178,15 +178,15 @@ sub rewrite : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/domain_rewrite.tt';
     
-	my $domain = $c->request->params->{domain};
+    my $domain = $c->request->params->{domain};
 
     my $domain_rw;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_domain_rewrites',
-														{ domain => $domain },
+                                                        { domain => $domain },
                                                         \$domain_rw
                                                       );
     $c->stash->{domain} = $domain_rw;
-	$c->stash->{iteditid} = $c->request->params->{iteditid};
+    $c->stash->{iteditid} = $c->request->params->{iteditid};
 
     return 1;
 }
@@ -212,9 +212,9 @@ sub create_rewrite : Local {
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_domain_rewrite',
                                                  { domain => $domain,
-												   match_pattern => $match_pattern,
-												   replace_pattern => $replace_pattern,
-												   description => $description,
+                                                   match_pattern => $match_pattern,
+                                                   replace_pattern => $replace_pattern,
+                                                   description => $description,
                                                  },
                                                  undef
                                                ))
@@ -223,11 +223,11 @@ sub create_rewrite : Local {
             $c->session->{messages} = \%messages;
             $c->response->redirect("/domain/rewrite?domain=$domain");
             return;
-		}
-		else
-		{
-        	$messages{icalleeerr} = 'Client.Voip.InputErrorFound';
-		}
+        }
+        else
+        {
+            $messages{icalleeerr} = 'Client.Voip.InputErrorFound';
+        }
     } else {
     }
 
@@ -258,9 +258,9 @@ sub edit_rewrite : Local {
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_domain_rewrite',
                                                  { id => $rewriteid,
-												   match_pattern => $match_pattern,
-												   replace_pattern => $replace_pattern,
-												   description => $description,
+                                                   match_pattern => $match_pattern,
+                                                   replace_pattern => $replace_pattern,
+                                                   description => $description,
                                                  },
                                                  undef
                                                ))
@@ -269,11 +269,11 @@ sub edit_rewrite : Local {
             $c->session->{messages} = \%messages;
             $c->response->redirect("/domain/rewrite?domain=$domain");
             return;
-		}
-		else
-		{
-        	$messages{icalleeerr} = 'Client.Voip.InputErrorFound';
-		}
+        }
+        else
+        {
+            $messages{icalleeerr} = 'Client.Voip.InputErrorFound';
+        }
     } else {
     }
 
@@ -309,7 +309,7 @@ sub delete_rewrite : Local {
             $c->session->{messages} = \%messages;
             $c->response->redirect("/domain/rewrite?domain=$domain");
             return;
-		}
+        }
     } else {
     }
 
