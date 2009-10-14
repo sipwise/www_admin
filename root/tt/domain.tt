@@ -16,7 +16,7 @@
             [% id = 0 %]
             [% FOREACH domain = domains %]
               <tr>
-                <td><a href="/domain/rewrite?domain=[% domain.domain %]" class="aaction">[% domain.domain %]</a></td>
+                <td><a href="/domain/detail?domain=[% domain.domain %]" class="aaction">[% domain.domain %]</a></td>
                 [% IF domain.domain == edit_domain %]
                   <form action="/domain/do_edit_domain" method="post">
                     <input type="hidden" name="domain" value="[% domain.domain %]" />

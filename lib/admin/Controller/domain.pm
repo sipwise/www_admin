@@ -168,15 +168,15 @@ sub do_delete_domain : Local {
     return;
 }
 
-=head2 rewrite
+=head2 detail
 
-Show rewrite rules for a given domain
+Show details for a given domain: rewrite rules
 
 =cut
 
-sub rewrite : Local {
+sub detail : Local {
     my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/domain_rewrite.tt';
+    $c->stash->{template} = 'tt/domain_detail.tt';
     
     my $domain = $c->request->params->{domain};
 
@@ -199,7 +199,6 @@ Create a rewrite rule for a given domain
 
 sub create_rewrite : Local {
     my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/domain_rewrite.tt';
 
     my %messages;
     my %settings;
@@ -221,7 +220,7 @@ sub create_rewrite : Local {
         {
             $messages{icalleemsg} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/rewrite?domain=$domain");
+            $c->response->redirect("/domain/detail?domain=$domain");
             return;
         }
         else
@@ -232,7 +231,7 @@ sub create_rewrite : Local {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/domain/rewrite?domain=$domain");
+    $c->response->redirect("/domain/detail?domain=$domain");
     return;
 }
 
@@ -244,7 +243,6 @@ Updates a rewrite rule
 
 sub edit_rewrite : Local {
     my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/domain_rewrite.tt';
 
     my %messages;
     my %settings;
@@ -267,7 +265,7 @@ sub edit_rewrite : Local {
         {
             $messages{icalleemsg} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/rewrite?domain=$domain");
+            $c->response->redirect("/domain/detail?domain=$domain");
             return;
         }
         else
@@ -278,7 +276,7 @@ sub edit_rewrite : Local {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/domain/rewrite?domain=$domain");
+    $c->response->redirect("/domain/detail?domain=$domain");
     return;
 }
 
@@ -290,7 +288,6 @@ Delete a rewrite rule
 
 sub delete_rewrite : Local {
     my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/domain_rewrite.tt';
 
     my %messages;
     my %settings;
@@ -307,14 +304,14 @@ sub delete_rewrite : Local {
         {
             $messages{icalleemsg} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/rewrite?domain=$domain");
+            $c->response->redirect("/domain/detail?domain=$domain");
             return;
         }
     } else {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/domain/rewrite?domain=$domain");
+    $c->response->redirect("/domain/detail?domain=$domain");
     return;
 }
 
