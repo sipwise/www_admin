@@ -117,7 +117,7 @@ sub do_update_level : Local {
                                                  \%settings,
                                                  undef))
         {
-            $messages{provmsg} = 'Web.NCOSLevel.Updated';
+            $messages{elvlmsg} = 'Web.NCOSLevel.Updated';
             $c->session->{messages} = \%messages;
             $c->response->redirect("/ncos");
             return;
@@ -153,7 +153,7 @@ sub do_delete_level : Local {
                                              \%settings,
                                              undef))
     {
-        $c->session->{messages} = { provmsg => 'Web.NCOSLevel.Deleted' };
+        $c->session->{messages} = { elvlmsg => 'Web.NCOSLevel.Deleted' };
         $c->response->redirect("/ncos");
         return;
     }

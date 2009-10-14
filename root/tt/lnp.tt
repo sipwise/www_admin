@@ -80,7 +80,7 @@
           </table>
           [% IF messages.paddidmsg %]<div class="errormsg">[% messages.paddidmsg %]</div>[% END %]
           [% IF messages.paddnamsg %]<div class="errormsg">[% messages.paddnamsg %]</div>[% END %]
-        </div>
+        </div> 
 
         [% UNLESS Catalyst.session.admin.read_only %]
         <h3 id="create_number">Add Ported Number</h3>
@@ -88,39 +88,24 @@
         <div class="p1">
           [% IF messages.cnumsg %]<div class="goodmsg">[% messages.cnumsg %]</div>[% END %]
           [% IF narefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
-          <form action="/lnp/do_create_number" method="post">
-            <table>
-              <tr>
-                <td>number</td>
-                <td><input type="text" name="number" value="[% narefill.number %]"
-                           title="E.164 phone number with intl. prefix" />
-                </td>
-              </tr>
-              <tr>
-                <td>provider</td>
-                <td>
-                  <select size="1" name="lnp_provider_id">
-                    [% FOREACH provider = providers %]
-                      <option value="[% provider.id %]"
-                              [% IF narefill.lnp_provider_id == provider.id %]selected="selected"[% END %]
-                             >[% provider.name %]</option>
-                    [% END %]
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>start</td>
-                <td><input type="text" name="start" value="[% narefill.start %]"
-                           title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
-                </td>
-              </tr>
-              <tr>
-                <td>end</td>
-                <td><input type="text" name="end" value="[% narefill.end %]"
-                           title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
-                </td>
-              </tr>
-            </table>
+          <form action="/lnp/do_create_number" method="post" class="search_subscriber">
+            <label class="search_label" for="numaddnum">Number:</label>
+            <input type="text" name="number" id="numaddnum" value="[% narefill.number %]"
+                   title="E.164 phone number with country code" /><br />
+            <label class="search_label" for="numaddprov">Provider:</label>
+            <select size="1" name="lnp_provider_id" id="numaddprov">
+              [% FOREACH provider = providers %]
+                <option value="[% provider.id %]"
+                        [% IF narefill.lnp_provider_id == provider.id %]selected="selected"[% END %]
+                       >[% provider.name %]</option>
+              [% END %]
+            </select><br />
+            <label class="search_label" for="numaddstart">Start:</label>
+            <input type="text" id="numaddstart" name="start" value="[% narefill.start %]"
+                   title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" /><br />
+            <label class="search_label" for="numaddend">End:</label>
+            <input type="text" id="numaddend" name="end" value="[% narefill.end %]"
+                   title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" /><br />
             <input type="submit" value="Add &#187;" class="but" />
           </form>
         </div>
@@ -132,17 +117,16 @@
           <form action="lnp/search_numbers" method="post" class="search_subscriber">
             <label class="search_label" for="search_by_provid">Provider:</label>
             <select size="1" name="search_provid">
-              <option value="0" [% UNLESS nerefill.lnp_provider_id %]selected="selected"[% END %] />
+              <option value="0" [% UNLESS nerefill.lnp_provider_id %]selected="selected"[% END %]>&nbsp;</option>
               [% FOREACH provider = providers %]
                 <option value="[% provider.id %]"
                         [% IF searched_numbers.lnp_provider_id == provider.id %]selected="selected"[% END %]
                        >[% provider.name %]</option>
               [% END %]
-            </select><br clear="all" />
+            </select><br />
             <label class="search_label" for="search_by_number">Number:</label>
             <input type="text" id="search_by_number" name="search_number" title="SQL wildcards allowed"
-                   value="[% searched_numbers.number %]"
-                   value="[% search_number %]" />
+                   value="[% searched_numbers.number %]" />
             <input type="checkbox" id="exact_number" name="exact_number"
                    [% IF searched_numbers.exact_number %]checked="checked"[% END %] />
             <label for="exact_number">exact match</label><br />
@@ -177,7 +161,7 @@
                   <tr>
                 [% END %]
                   <td><input type="text" class="ilnpnumedit" name="number" value="[% nerefill.number %]"
-                             title="E.164 phone number with intl. prefix" />
+                             title="E.164 phone number with country code" />
                   </td>
                   <td>
                     <select size="1" class="ilnpproedit" name="lnp_provider_id">

@@ -196,6 +196,7 @@ sub detail : Local {
     $c->stash->{audio_files} = $$audio_files{result} if eval { @{$$audio_files{result}} };
 
     $c->stash->{edit_audio} = $c->request->params->{edit_audio};
+    $c->stash->{delete_audio} = $c->request->params->{daf};
 
     if(exists $c->session->{acrefill}) {
         $c->stash->{acrefill} = $c->session->{acrefill};
@@ -445,17 +446,13 @@ sub do_update_audio : Local {
     my $upload = $c->req->upload('eupload_audio');
     $settings{data}{audio} = eval { $upload->slurp } if defined $upload;
 
-    unless(keys %messages) {
-        if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_audio_file',
-                                                 \%settings,
-                                                 undef))
-        {
-            $messages{audiomsg} = 'Web.AudioFile.Updated';
-            $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
-            return;
-        }
-        $c->response->redirect("/domain/detail?domain=$settings{domain}&amp;edit_audio=$settings{handle}#audio");
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_audio_file',
+                                             \%settings,
+                                             undef))
+    {
+        $messages{audiomsg} = 'Web.AudioFile.Updated';
+        $c->session->{messages} = \%messages;
+        $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
         return;
     }
 
@@ -492,12 +489,12 @@ sub do_delete_audio : Local {
                                              \%settings,
                                              undef))
     {
-        $c->session->{messages} = { provmsg => 'Web.AudioFile.Deleted' };
+        $c->session->{messages} = { audiomsg => 'Web.AudioFile.Deleted' };
         $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
         return;
     }
 
-    $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+    $c->response->redirect("/domain/detail?domain=$settings{domain}&amp;daf=$settings{handle}#audio");
     return;
 }
 
