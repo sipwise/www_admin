@@ -1,9 +1,51 @@
+        <h3 id="contract">SIP Peering Contracts</h3>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        [% IF Catalyst.config.billing_features %]
+          <div class="actions">
+              <a href="/peering/contract_detail?edit_contract=1" class="aaction">create new</a>
+          </div>
+	[% END %]
+      [% END %]
+
+        <div class="p1">
+        [% IF contracts %]
+          <table class="contracts">
+            <tr>
+              <td class="table_header">ContractID</td>
+              <td class="table_header">Billing Profile</td>
+	      <td class="table_header">Contact</td>
+              <td class="table_header">created</td>
+	      <td style="width:40px;" />
+            </tr>
+	    [% FOREACH contract = contracts %]
+            <tr class="[% sdentry.background %]">
+              <td>[% contract.id %]</td>
+              <td>[% contract.billing_profile_name%]</td>
+	      <td>[% contract.short_contact %]</td>
+              <td>[% contract.create_timestamp %]</td>
+              [% UNLESS Catalyst.session.admin.read_only %]
+	        [% IF Catalyst.config.billing_features %]
+                <td><a href="/peering/contract_detail?edit_contract=1&amp;contract_id=[% contract.id %]" class="aaction">edit</a></td>
+		[% END %]
+              [% END %]
+            </tr>
+	    [% END %]
+          </table>
+        [% ELSE %]
+          <div>
+            No sip peering contracts created yet.
+          </div>
+        [% END %]
+        </div>
+
         <h3>SIP Peering Groups</h3>
 
         <div class="p1">
           [% IF messages.epeermsg %]<div class="goodmsg">[% messages.epeermsg %]</div>[% END %]
           [% IF messages.epeererr %]<div class="errormsg">[% messages.epeererr %]</div>[% END %]
-
+          
+	  [% IF peer_groups %]
           <table class="domains">
             <tr class="table_header">
               <td>Name</td>
@@ -65,6 +107,11 @@
             [% id = id + 1 %]
             [% END %]
           </table>
+	[% ELSE %]
+          <div>
+            No sip peering groups defined yet.
+          </div>
+        [% END %]
         </div>
 
       [% UNLESS Catalyst.session.admin.read_only %]
@@ -121,4 +168,5 @@
 
         </div>
       [% END %]
+
 

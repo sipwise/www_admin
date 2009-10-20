@@ -62,4 +62,47 @@ sub get_default_slot_list {
 
 }
 
+#-# sub short_contact
+#-# parameter $c, $contact
+#-# return $short_contact
+#-# description gets a short representation of a (contract) contact
+sub short_contact {
+  my ($c,$contact) = @_;
+  
+  if (defined $contact->{company} and length($contact->{company})) {
+    return $contact->{company};
+  } elsif (defined $contact->{lastname} and length($contact->{lastname})) {
+    if (defined $contact->{firstname} and length($contact->{firstname})) {
+        return $contact->{lastname} . ', ' . $contact->{firstname};
+    } else {
+        return $contact->{lastname};
+    }
+  } elsif (defined $contact->{firstname} and length($contact->{firstname})) {
+      return $contact->{firstname};
+  } else {
+    #die?
+    return '';
+  }
+
+}
+
+#-# sub get_contract_contact_form_fields
+#-# parameter $c
+#-# return \%contract_contact_form_fields
+#-# description defines contract contact form fields
+sub get_contract_contact_form_fields {
+    my ($c,$contact) = @_;
+    
+    return [ { field => 'firstname',
+               label => 'Firtst Name',
+               value => $contact->{firstname} },
+             { field => 'lastname',
+               label => 'Last Name',
+               value => $contact->{lastname}  },
+             { field => 'company',
+               label => 'Company',
+               value => $contact->{company}    }];
+    
+}
+
 1;

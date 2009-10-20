@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base 'Catalyst::Controller';
 use Data::Dumper;
+use admin::Utils;
 
 =head1 NAME
 
@@ -30,8 +31,40 @@ sub index : Private {
                                                         undef,
                                                         \$peer_groups
                                                       );
-    $c->stash->{peer_groups} = $$peer_groups{result};
-	$c->stash->{editid} = $c->request->params->{editid};
+    if (ref $$peer_groups{result} eq 'ARRAY' and @{$$peer_groups{result}}) {
+        $c->stash->{peer_groups} = $$peer_groups{result};	
+    }
+    $c->stash->{editid} = $c->request->params->{editid};
+    
+    my $peering_contracts;
+    my $contracts;
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_sip_peering_contracts',
+                                                        1,
+                                                        \$peering_contracts
+                                                      );
+    if (ref $$peering_contracts{result} eq 'ARRAY' and @{$$peering_contracts{result}}) {
+	$contracts = [];
+        #foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$peering_contracts{result}}) {
+	foreach my $peering_contract (@{$$peering_contracts{result}}) {
+	    my %contract; # = {};
+	    $contract{id} = $peering_contract->{id};
+	    if(defined $peering_contract->{billing_profile} and length $peering_contract->{billing_profile}) {
+	        my $profile;
+	        return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
+                                                                    { handle => $peering_contract->{billing_profile} },
+                                                                    \$profile
+                                                                  );
+                $contract{billing_profile_name} = $$profile{data}{name};
+	    } else {
+		$contract{billing_profile_name} = '';
+	    }
+	    $contract{short_contact} = admin::Utils::short_contact($c,$peering_contract->{contact});
+	    #$contract{status} = $peering_contract->{status};
+	    $contract{create_timestamp} = $peering_contract->{create_timestamp};
+	    push @$contracts,\%contract;
+	}
+	$c->stash->{contracts} = $contracts;
+    }
 
     return 1;
 }
@@ -743,6 +776,179 @@ sub copy_rewrite : Local {
 	return;
 
 
+}
+
+=head2 detail 
+
+Show SIP peering contract details.
+
+=cut
+
+sub contract_detail : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/contract_detail.tt';
+
+    my $contract;
+    my $contract_id = $c->request->params->{contract_id} || undef;
+    if(defined $contract_id) {
+        return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_sip_peering_contract_by_id',
+                                                            { id => $contract_id },
+                                                            \$contract
+                                                          );
+    }
+    if(ref $c->session->{restore_contract_input} eq 'HASH') {
+        if($c->config->{billing_features}) {
+            $contract->{billing_profile} = $c->session->{restore_contract_input}{billing_profile};
+	}
+        $contract->{contact} = $c->session->{restore_contract_input}{contact};
+        delete $c->session->{restore_contract_input};
+    }
+
+    # we only use this to fill the drop-down lists
+    if($c->request->params->{edit_contract}) {
+        my $billing_profiles;
+        return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profiles',
+                                                            undef,
+                                                            \$billing_profiles
+                                                          );
+
+        $c->stash->{billing_profiles} = [ sort { $$a{data}{name} cmp $$b{data}{name} }
+                                            @{$$billing_profiles{result}} ];
+    } else {
+        if(defined $contract->{billing_profile}) {
+            my $profile;
+            return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
+                                                                { handle => $contract->{billing_profile} },
+                                                                \$profile
+                                                              );
+            $contract->{billing_profile_name} = $$profile{data}{name};
+        }
+    }
+
+    $c->stash->{contract} = $contract;
+    $c->stash->{contact_form_fields} = admin::Utils::get_contract_contact_form_fields($c,$contract->{contact});
+    if($c->config->{billing_features}) {
+        $c->stash->{billing_features} = 1;
+    }
+    $c->stash->{edit_contract} = $c->request->params->{edit_contract};
+
+    return 1;
+}
+
+=head2 save_account 
+
+Create or update details of a SIP peering contract.
+
+=cut
+
+sub save_contract : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    my $contract_id = $c->request->params->{contract_id} || undef;
+
+    my $billing_profile = $c->request->params->{billing_profile};
+    $settings{billing_profile} = $billing_profile if defined $billing_profile;
+    
+    my %contact;
+    my $contract_contact_form_fields = admin::Utils::get_contract_contact_form_fields($c,undef);
+    if (ref $contract_contact_form_fields eq 'ARRAY') {
+      foreach my $form_field (@$contract_contact_form_fields) {
+	if (defined $c->request->params->{$form_field->{field}} and length($c->request->params->{$form_field->{field}})) {
+	  $contact{$form_field->{field}} = $c->request->params->{$form_field->{field}};
+	}
+      }
+    }
+    $settings{contact} = \%contact;
+
+    if(keys %settings or (!$c->config->{billing_features} and !defined $contract_id)) {
+        if(defined $contract_id) {
+            if($c->model('Provisioning')->call_prov( $c, 'billing', 'update_sip_peering_contract',
+                                                     { id   => $contract_id,
+                                                       data => \%settings,
+                                                     },
+                                                     undef))
+            {
+                $messages{conmsg} = 'Server.Voip.SavedSettings';
+                $c->session->{messages} = \%messages;
+                $c->response->redirect("/peering/contract_detail?edit_contract=1&amb;contract_id=$contract_id");
+                return;
+            }
+        } else {
+            if($c->model('Provisioning')->call_prov( $c, 'billing', 'create_sip_peering_contract',
+                                                     { data => \%settings },
+                                                     \$contract_id))
+            {
+                $messages{conmsg} = 'Web.Account.Created';
+                $c->session->{messages} = \%messages;
+                $c->response->redirect("/peering/contract_detail?edit_contract=1&amb;contract_id=$contract_id");
+                return;
+            }
+        }
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->session->{restore_contract_input} = \%settings;
+    $c->response->redirect("/peering/contract_detail?edit_contract=1&amb;contract_id=$contract_id");
+    return;
+}
+
+=head2 terminate
+
+Terminates a SIP peering contract.
+
+=cut
+
+sub terminate_contract : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $contract_id = $c->request->params->{contract_id};
+
+    if($c->model('Provisioning')->call_prov( $c, 'billing', 'terminate_sip_peering_contract',
+                                             { id => $contract_id },
+                                             undef))
+    {
+        $messages{topmsg} = 'Server.Voip.SubscriberDeleted';
+        $c->session->{messages} = \%messages;
+        $c->response->redirect("/peering");
+        return;
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/peering/contract_detail?edit_contract=1&amb;contract_id=$contract_id");
+    return;
+}
+
+=head2 delete
+
+Deletes a SIP peering contract.
+
+=cut
+
+sub delete_contract : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $contract_id = $c->request->params->{contract_id};
+
+    if($c->model('Provisioning')->call_prov( $c, 'billing', 'delete_sip_peering_contract',
+                                             { id => $contract_id },
+                                             undef))
+    {
+        $messages{topmsg} = 'Server.Voip.SubscriberDeleted';
+        $c->session->{messages} = \%messages;
+        $c->response->redirect("/peering");
+        return;
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/peering/contract_detail?edit_contract=1&amb;contract_id=$contract_id");
+    return;
 }
 
 =head1 BUGS AND LIMITATIONS
