@@ -1,3 +1,5 @@
+      [% IF Catalyst.config.billing_features %]
+
         <h3 id="contract">SIP Peering Contracts</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
@@ -38,6 +40,8 @@
           </div>
         [% END %]
         </div>
+
+      [% END %]
 
         <h3>SIP Peering Groups</h3>
 
