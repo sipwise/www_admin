@@ -3,11 +3,9 @@
         <h3 id="contract">SIP Peering Contracts</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        [% IF Catalyst.config.billing_features %]
-          <div class="actions">
-              <a href="/peering/contract_detail?edit_contract=1" class="aaction">create new</a>
-          </div>
-	[% END %]
+        <div class="actions">
+          <a href="/peering/contract_detail?edit_contract=1" class="aaction">create new</a>
+        </div>
       [% END %]
 
         <div class="p1">
@@ -27,9 +25,7 @@
 	      <td>[% contract.short_contact %]</td>
               <td>[% contract.create_timestamp %]</td>
               [% UNLESS Catalyst.session.admin.read_only %]
-	        [% IF Catalyst.config.billing_features %]
                 <td><a href="/peering/contract_detail?edit_contract=1&amp;contract_id=[% contract.id %]" class="aaction">edit</a></td>
-		[% END %]
               [% END %]
             </tr>
 	    [% END %]
