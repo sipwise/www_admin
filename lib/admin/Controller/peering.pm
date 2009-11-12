@@ -31,9 +31,7 @@ sub index : Private {
                                                         undef,
                                                         \$peer_groups
                                                       );
-    if (ref $$peer_groups{result} eq 'ARRAY' and @{$$peer_groups{result}}) {
-        $c->stash->{peer_groups} = $$peer_groups{result};	
-    }
+    $c->stash->{peer_groups} = $peer_groups if eval { @$peer_groups };	
     $c->stash->{editid} = $c->request->params->{editid};
     
     my $peering_contracts;
@@ -42,10 +40,10 @@ sub index : Private {
                                                         1,
                                                         \$peering_contracts
                                                       );
-    if (ref $$peering_contracts{result} eq 'ARRAY' and @{$$peering_contracts{result}}) {
+    if (eval { @$peering_contracts }) {
 	$contracts = [];
-        #foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$peering_contracts{result}}) {
-	foreach my $peering_contract (@{$$peering_contracts{result}}) {
+        #foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @$peering_contracts) {
+	foreach my $peering_contract (@$peering_contracts) {
 	    my %contract; # = {};
 	    $contract{id} = $peering_contract->{id};
 	    if(defined $peering_contract->{billing_profile} and length $peering_contract->{billing_profile}) {
@@ -813,7 +811,7 @@ sub contract_detail : Local {
                                                           );
 
         $c->stash->{billing_profiles} = [ sort { $$a{data}{name} cmp $$b{data}{name} }
-                                            @{$$billing_profiles{result}} ];
+                                            @$billing_profiles ];
     } else {
         if(defined $contract->{billing_profile}) {
             my $profile;

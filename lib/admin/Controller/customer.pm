@@ -131,13 +131,13 @@ sub detail : Local {
                                                             { id => $customer_id },
                                                             \$contracts
                                                           );
-        $c->session->{customer}{contracts} = $$contracts{result} if eval { @{$$contracts{result}} };
+        $c->session->{customer}{contracts} = $contracts if eval { @$contracts };
         my $orders;
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_customer_orders',
                                                             { id => $customer_id },
                                                             \$orders
                                                           );
-        $c->session->{customer}{orders} = $$orders{result} if eval { @{$$orders{result}} };
+        $c->session->{customer}{orders} = $orders if eval { @$orders };
 
         $c->stash->{customer} = $c->session->{customer};
     }

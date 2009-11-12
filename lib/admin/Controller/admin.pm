@@ -30,7 +30,7 @@ sub index : Private {
                                                             undef,
                                                             \$admins
                                                           );
-        $c->stash->{admins} = $$admins{result};
+        $c->stash->{admins} = $admins if eval { @$admins };
     } else { # only own settings
         my $admin;
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_admin',

@@ -125,7 +125,7 @@ sub detail : Local {
                                                               );
             $c->stash->{products} = [ grep { $$_{data}{class} eq 'voip' }
                                         sort { $$a{data}{name} cmp $$b{data}{name} }
-                                          @{$$products{result}}
+                                          eval { @$products }
                                     ];
             my $billing_profiles;
             return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profiles',
@@ -134,7 +134,8 @@ sub detail : Local {
                                                               );
 
             $c->stash->{billing_profiles} = [ sort { $$a{data}{name} cmp $$b{data}{name} }
-                                                @{$$billing_profiles{result}} ];
+                                                eval { @$billing_profiles }
+                                            ];
         } else {
             if(defined $c->session->{voip_account}{product}) {
                 my $product;

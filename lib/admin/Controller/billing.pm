@@ -31,14 +31,14 @@ sub index : Private {
                                                         undef,
                                                         \$products
                                                       );
-    $c->stash->{products} = $$products{result} if eval { @{$$products{result}} };
+    $c->stash->{products} = $products if eval { @$products };
 
     my $bilprofs;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profiles',
                                                         undef,
                                                         \$bilprofs
                                                       );
-    $c->stash->{bilprofs} = $$bilprofs{result} if eval { @{$$bilprofs{result}} };
+    $c->stash->{bilprofs} = $bilprofs if eval { @$bilprofs };
 
     return 1;
 }
@@ -78,7 +78,7 @@ sub edit_product : Local {
                                                         undef,
                                                         \$bilprofs
                                                       );
-    $c->stash->{bilprofs} = $$bilprofs{result} if eval { @{$$bilprofs{result}} };
+    $c->stash->{bilprofs} = $bilprofs if eval { @$bilprofs };
     unshift @{$c->stash->{bilprofs}}, { handle => undef, data => { name => '' } };
 
     return 1;

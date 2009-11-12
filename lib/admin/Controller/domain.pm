@@ -29,7 +29,7 @@ sub index : Private {
                                                         undef,
                                                         \$domains
                                                       );
-    $c->stash->{domains} = $$domains{result};
+    $c->stash->{domains} = $domains if eval { @$domains };
 
     $c->stash->{edit_domain} = $c->request->params->{edit_domain};
 
@@ -193,7 +193,7 @@ sub detail : Local {
                                                         { domain => $domain },
                                                         \$audio_files
                                                       );
-    $c->stash->{audio_files} = $$audio_files{result} if eval { @{$$audio_files{result}} };
+    $c->stash->{audio_files} = $audio_files if eval { @$audio_files };
 
     $c->stash->{edit_audio} = $c->request->params->{edit_audio};
     $c->stash->{delete_audio} = $c->request->params->{daf};
@@ -206,7 +206,7 @@ sub detail : Local {
         $c->stash->{aerefill} = $c->session->{aerefill};
         delete $c->session->{aerefill};
     } elsif($c->request->params->{edit_audio}) {
-        foreach my $audio (eval { @{$$audio_files{result}} }) {
+        foreach my $audio (eval { @$audio_files }) {
             if($$audio{handle} eq $c->request->params->{edit_audio}) {
                 $c->stash->{aerefill} = $audio;
                 last;
@@ -219,19 +219,19 @@ sub detail : Local {
                                                         { domain => $domain },
                                                         \$vscs
                                                       );
-    $c->stash->{vscs} = $$vscs{result} if eval { @{$$vscs{result}} };
+    $c->stash->{vscs} = $vscs if eval { @$vscs };
 
     my $vsc_actions;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_vsc_actions',
                                                         { },
                                                         \$vsc_actions
                                                       );
-    @{$$vsc_actions{result}} = grep { my $tmp = $_;
+    @$vsc_actions = grep { my $tmp = $_;
                                       ! grep { $$_{action} eq $tmp }
-                                             eval { @{$$vscs{result}} }
+                                             eval { @$vscs }
                                     }
-                                    eval { @{$$vsc_actions{result}} };
-    $c->stash->{vsc_actions} = $$vsc_actions{result} if @{$$vsc_actions{result}};
+                                    eval { @$vsc_actions };
+    $c->stash->{vsc_actions} = $vsc_actions if @$vsc_actions;
 
     $c->stash->{edit_vsc} = $c->request->params->{edit_vsc};
 
@@ -243,7 +243,7 @@ sub detail : Local {
         $c->stash->{verefill} = $c->session->{verefill};
         delete $c->session->{verefill};
     } elsif($c->request->params->{edit_vsc}) {
-        foreach my $vsc (eval { @{$$vscs{result}} }) {
+        foreach my $vsc (eval { @$vscs }) {
             if($$vsc{action} eq $c->request->params->{edit_vsc}) {
                 $c->stash->{verefill} = $vsc;
                 last;

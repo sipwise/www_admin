@@ -29,7 +29,7 @@ sub index : Private {
                                                         undef,
                                                         \$providers
                                                       );
-    $c->stash->{providers} = $$providers{result} if eval { @{$$providers{result}} };
+    $c->stash->{providers} = $providers if eval { @$providers };
 
 
     $c->stash->{edit_provider} = $c->request->params->{edit_provider};
@@ -357,9 +357,9 @@ sub _do_search_numbers {
                                                             undef,
                                                             \$providers
                                                           );
-        if(@{$$providers{result}}) {
+        if(@$providers) {
             foreach my $num (@{$c->session->{lnp_numbers}{numbers}}) {
-                for(@{$$providers{result}}) {
+                for(@$providers) {
                     $$num{lnp_provider} = $$_{name}
                         if $$num{lnp_provider_id} == $$_{id};
                 }

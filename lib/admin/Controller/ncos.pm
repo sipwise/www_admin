@@ -29,7 +29,7 @@ sub index : Private {
                                                         undef,
                                                         \$levels
                                                       );
-    $c->stash->{levels} = $$levels{result} if eval { @{$$levels{result}} };
+    $c->stash->{levels} = $levels if eval { @$levels };
 
 
     $c->stash->{edit_level} = $c->request->params->{edit_level};
@@ -42,7 +42,7 @@ sub index : Private {
         $c->stash->{erefill} = $c->session->{erefill};
         delete $c->session->{erefill};
     } elsif($c->request->params->{edit_level}) {
-        foreach my $lvl (eval { @{$$levels{result}} }) {
+        foreach my $lvl (eval { @$levels }) {
             if($$lvl{level} == $c->request->params->{edit_level}) {
                 $c->stash->{erefill} = $lvl;
                 last;
@@ -186,22 +186,22 @@ sub lists : Local {
                                                         { level => $level },
                                                         \$patterns
                                                       );
-    $c->stash->{patterns} = $$patterns{result} if eval { @{$$patterns{result}} };
+    $c->stash->{patterns} = $patterns if eval { @$patterns };
 
     my $lnpids;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_ncos_lnp_list',
                                                         { level => $level },
                                                         \$lnpids
                                                       );
-    $c->stash->{lnpids} = $$lnpids{result} if eval { @{$$lnpids{result}} };
+    $c->stash->{lnpids} = $lnpids if eval { @$lnpids };
 
     my $providers;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_lnp_providers',
                                                         { level => $level },
                                                         \$providers
                                                       );
-    foreach my $lnpid (eval { @{$$lnpids{result}} }) {
-        for(eval { @{$$providers{result}} }) {
+    foreach my $lnpid (eval { @$lnpids }) {
+        for(eval { @$providers }) {
             if($$_{id} == $$lnpid{lnp_provider_id}) {
                 $$lnpid{lnp_provider} = $$_{name};
             }
@@ -209,12 +209,12 @@ sub lists : Local {
     }
 
     # filter already used LNP providers
-    @{$$providers{result}} = grep { my $tmp = $$_{id};
-                                    ! grep { $$_{lnp_provider_id} == $tmp }
-                                           eval { @{$$lnpids{result}} }
-                                  }
-                                  eval { @{$$providers{result}} };
-    $c->stash->{providers} = $$providers{result} if @{$$providers{result}};
+    @$providers = grep { my $tmp = $$_{id};
+                         ! grep { $$_{lnp_provider_id} == $tmp }
+                                eval { @$lnpids }
+                       }
+                       eval { @$providers };
+    $c->stash->{providers} = $providers if @$providers;
 
     $c->stash->{edit_pattern} = $c->request->params->{edit_pattern};
     $c->stash->{edit_lnpid} = $c->request->params->{edit_lnpid};
@@ -227,7 +227,7 @@ sub lists : Local {
         $c->stash->{perefill} = $c->session->{perefill};
         delete $c->session->{perefill};
     } elsif($c->request->params->{edit_pattern}) {
-        foreach my $pat (eval { @{$$patterns{result}} }) {
+        foreach my $pat (eval { @$patterns }) {
             if($$pat{pattern} eq $c->request->params->{edit_pattern}) {
                 $c->stash->{perefill} = $pat;
                 last;
@@ -243,7 +243,7 @@ sub lists : Local {
         $c->stash->{lerefill} = $c->session->{lerefill};
         delete $c->session->{lerefill};
     } elsif($c->request->params->{edit_lnpid}) {
-        foreach my $lnpid (eval { @{$$lnpids{result}} }) {
+        foreach my $lnpid (eval { @$lnpids }) {
             if($$lnpid{lnp_provider_id} == $c->request->params->{edit_lnpid}) {
                 $c->stash->{lerefill} = $lnpid;
                 last;
@@ -307,7 +307,7 @@ sub do_delete_pattern : Local {
         $c->response->redirect("/ncos/lists?level=$settings{level}");
         return;
     }
-    @{$settings{patterns}} = grep { $$_{pattern} ne $pattern } @{$$patterns{result}};
+    @{$settings{patterns}} = grep { $$_{pattern} ne $pattern } @$patterns;
     $settings{purge_existing} = 1;
 
     if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_ncos_pattern_list',
@@ -346,7 +346,7 @@ sub do_update_pattern : Local {
         $c->response->redirect("/ncos/lists?level=$settings{level}");
         return;
     }
-    @{$settings{patterns}} = grep { $$_{pattern} ne $oldpattern } @{$$patterns{result}};
+    @{$settings{patterns}} = grep { $$_{pattern} ne $oldpattern } @$patterns;
     $settings{purge_existing} = 1;
     push @{$settings{patterns}}, { pattern => $newpattern, description => $description };
 
@@ -430,7 +430,7 @@ sub do_delete_lnp_provider_id : Local {
         $c->response->redirect("/ncos/lists?level=$settings{level}#LNP");
         return;
     }
-    @{$settings{lnp_provider_ids}} = grep { $$_{lnp_provider_id} != $lnpid } @{$$lnpids{result}};
+    @{$settings{lnp_provider_ids}} = grep { $$_{lnp_provider_id} != $lnpid } @$lnpids;
     $settings{purge_existing} = 1;
 
     if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_ncos_lnp_list',

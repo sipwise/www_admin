@@ -162,7 +162,7 @@ sub detail : Local {
                                                             \$c->session->{subscriber}{fax_preferences}
                                                           );
 
-        $c->session->{subscriber}{registered_contacts} = $$regcon{result} if $$regcon{result};
+        $c->session->{subscriber}{registered_contacts} = $regcon if eval { @$regcon };
         $c->stash->{subscriber} = $c->session->{subscriber};
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
         $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c->view($c->config->{view})->
@@ -177,7 +177,7 @@ sub detail : Local {
                                                             },
                                                             \$audio_files
                                                           );
-        $c->session->{subscriber}{audio_files} = $$audio_files{result} if eval { @{$$audio_files{result}} };
+        $c->session->{subscriber}{audio_files} = $audio_files if eval { @$audio_files };
 
     } else {
         $c->stash->{account_id} = $c->request->params->{account_id};
@@ -186,14 +186,14 @@ sub detail : Local {
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_domains',
                                                             undef, \$domains
                                                           );
-        $c->stash->{domains} = $$domains{result};
+        $c->stash->{domains} = $domains if eval { @$domains };
     }
 
     my $db_prefs;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
                                                         undef, \$db_prefs
                                                       );
-    $c->session->{voip_preferences} = $$db_prefs{result};
+    $c->session->{voip_preferences} = $db_prefs if eval { @$db_prefs };
 
     ### restore data entered by the user ###
 
@@ -288,7 +288,7 @@ sub detail : Local {
                                                               undef,
                                                               \$ncoslvl
                                                             );
-          $c->stash->{ncos_levels} = $$ncoslvl{result} if eval { @{$$ncoslvl{result}} };
+          $c->stash->{ncos_levels} = $ncoslvl if eval { @$ncoslvl };
         }
 
         push @stashprefs,
@@ -325,8 +325,8 @@ sub detail : Local {
     my $i = 1;
     my $default_speed_dial_slots = admin::Utils::get_default_slot_list($c);
     my @used_default_speed_dial_slots = ();
-    if (ref $$speed_dial_slots{result} eq 'ARRAY') {
-        foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
+    if (eval { @$speed_dial_slots }) {
+        foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @$speed_dial_slots) {
             $$sdentry{destination} =~ s/^sip://i;
             $$sdentry{destination} =~ s/\@.*$//
                 if $$sdentry{destination} =~ /^\+?\d+\@/;
@@ -1116,8 +1116,8 @@ sub edit_speed_dial_slots : Local {
     my $bg = '';
     my $default_speed_dial_slots = admin::Utils::get_default_slot_list($c);
     my @used_default_speed_dial_slots = ();
-    if (ref $$speed_dial_slots{result} eq 'ARRAY') {
-        foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @{$$speed_dial_slots{result}}) {
+    if (eval { @$speed_dial_slots }) {
+        foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @$speed_dial_slots) {
             my $updateerrormsg;
             if(defined $c->session->{updateslotidtxt} and $c->session->{updateslotidtxt} eq $$sdentry{id}) {
                 if (defined $c->session->{updateslottxt}) {
@@ -1512,7 +1512,7 @@ sub edit_audio_files : Local {
                                                         { %settings },
                                                         \$audio_files
                                                       );
-    $c->stash->{audio_files} = $$audio_files{result} if eval { @{$$audio_files{result}} };
+    $c->stash->{audio_files} = $audio_files if eval { @$audio_files };
 
     $c->stash->{edit_audio} = $c->request->params->{edit_audio};
 
@@ -1524,7 +1524,7 @@ sub edit_audio_files : Local {
         $c->stash->{aerefill} = $c->session->{aerefill};
         delete $c->session->{aerefill};
     } elsif($c->request->params->{edit_audio}) {
-        foreach my $audio (eval { @{$$audio_files{result}} }) {
+        foreach my $audio (eval { @$audio_files }) {
             if($$audio{handle} eq $c->request->params->{edit_audio}) {
                 $c->stash->{aerefill} = $audio;
                 last;
