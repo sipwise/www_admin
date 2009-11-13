@@ -39,7 +39,7 @@
 
       [% END %]
 
-        <h3>SIP Peering Groups</h3>
+        <h3 id="groups">SIP Peering Groups</h3>
 
         <div class="p1">
           [% IF messages.epeermsg %]<div class="goodmsg">[% messages.epeermsg %]</div>[% END %]
@@ -51,6 +51,9 @@
               <td>Name</td>
               <td>Priority</td>
               <td>Description</td>
+              [% IF Catalyst.config.billing_features %]
+                <td>Peering Contract</td>
+              [% END %]
               <td style="width:40px;" />
               <td style="width:60px;" />
             </tr>
@@ -74,6 +77,18 @@
                       <input type="text" id="addtxt" title="string, description of group"
                              name="grpdesc" value="[% grp.description %]" />
                     </td>
+                  [% IF Catalyst.config.billing_features %]
+                    <td>
+                      <select size="1" name="peering_contract_id">
+                        <option value="0" [% UNLESS grp.peering_contract_id %]selected="selected"[% END %]>&nbsp;</option>
+                        [% FOREACH contract = contracts %]
+                          <option value="[% contract.id %]"
+                                  [% IF grp.peering_contract_id == contract.id %]selected="selected"[% END %]
+                                 >[% contract.id %]</option>
+                        [% END %]
+                      </select>
+                    </td>
+                  [% END %]
                     <td>
                       <div class="postlink">
                         <label for="grpsave[% id %]">save</label>
@@ -86,6 +101,9 @@
                   <td><a href="/peering/detail?group_id=[%grp.id%]" class="aaction">[% grp.name %]</a></td>
                   <td>[% grp.priority %]</td>
                   <td>[% grp.description %]</td>
+                  [% IF Catalyst.config.billing_features %]
+                    <td>[% grp.peering_contract_id %]</td>
+                  [% END %]
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
                     <a href="/peering?editid=[% grp.id %]" class="aaction">edit</a>
@@ -115,7 +133,7 @@
         </div>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <h3>Create Peering Group</h3>
+        <h3 id="create_group">Create Peering Group</h3>
 
         <div class="p1">
           [% IF messages.cpeermsg %]<div class="goodmsg">[% messages.cpeermsg %]</div>[% END %]
@@ -126,6 +144,9 @@
               <td>Name</td>
               <td>Priority</td>
               <td>Description</td>
+              [% IF Catalyst.config.billing_features %]
+                <td>Peering Contract</td>
+              [% END %]
               <td style="width:40px;" />
               <td style="width:60px;" />
             </tr>
@@ -133,21 +154,33 @@
               <tr>
                 <td>
                   <input type="text" size="20" name="grpname" title="string, name of group"
-                         id="addtxt" value="[% arefill.name %]" />
+                         id="addtxt" value="[% garefill.name %]" />
                 </td>
                 <td>
                   <select title="string, priority" size="1" name="priority">
-					[% count = 1 %]
-					[% WHILE count < 10 %]
-				  		<option [% "selected" IF 1 == count %]>[% count %]</option>
-				  		[% count = count + 1 %]
-					[% END %]
-				  </select>
+                    [% count = 1 %]
+                    [% WHILE count < 10 %]
+                      <option [% IF garefill.priority == count %]selected="selected"[% END %]>[% count %]</option>
+                      [% count = count + 1 %]
+                    [% END %]
+                  </select>
                 </td>
                 <td>
                   <input type="text" size="20" name="grpdesc" title="string, description of group"
-                         id="addtxt" value="[% arefill.desc %]" />
+                         id="addtxt" value="[% garefill.description %]" />
                 </td>
+              [% IF Catalyst.config.billing_features %]
+                <td>
+                  <select size="1" name="peering_contract_id">
+                    <option value="0" [% UNLESS garefill.peering_contract_id %]selected="selected"[% END %]>&nbsp;</option>
+                    [% FOREACH contract = contracts %]
+                      <option value="[% contract.id %]"
+                              [% IF garefill.peering_contract_id == contract.id %]selected="selected"[% END %]
+                             >[% contract.id %]</option>
+                    [% END %]
+                  </select>
+                </td>
+              [% END %]
                 <td>
                   <div class="postlink">
                     <label for="grpadd">add</label>

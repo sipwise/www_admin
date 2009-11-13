@@ -64,6 +64,11 @@ sub index : Private {
 	$c->stash->{contracts} = $contracts;
     }
 
+    if(exists $c->session->{garefill}) {
+        $c->stash->{garefill} = $c->session->{garefill};
+        delete $c->session->{garefill};
+    }
+
     return 1;
 }
 
@@ -112,18 +117,17 @@ sub create_grp : Local {
     my %messages;
     my %settings;
 
-    my $grpname = $c->request->params->{grpname};
+    $settings{name} = $c->request->params->{grpname};
     $messages{cpeererr} = 'Client.Syntax.MalformedPeerGroupName'
-        unless $grpname =~ /^[a-zA-Z0-9_\-]+/;
-    my $priority = $c->request->params->{priority};
-    my $grpdesc = $c->request->params->{grpdesc};
+        unless $settings{name} =~ /^[a-zA-Z0-9_\-]+/;
+    $settings{priority} = $c->request->params->{priority};
+    $settings{description} = $c->request->params->{grpdesc};
+    $settings{peering_contract_id} = $c->request->params->{peering_contract_id}
+        if $c->request->params->{peering_contract_id};
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_group',
-                                                 { name => $grpname,
-												   priority => $priority,
-												   description => $grpdesc
-                                                 },
+                                                 { %settings },
                                                  undef
                                                ))
         {
@@ -131,22 +135,14 @@ sub create_grp : Local {
             $c->session->{messages} = \%messages;
             $c->response->redirect("/peering");
             return;
-		}
-		else
-		{
-        	$messages{cpeererr} = 'Client.Voip.InputErrorFound';
-		}
+        }
     } else {
-		my %arefill = ();
-		$arefill{name} = $grpname;
-		$arefill{priority} = $priority;
-		$arefill{desc} = $grpdesc;
-
-		$c->stash->{arefill} = \%arefill;
+        $messages{cpeererr} = 'Client.Voip.InputErrorFound';
     }
 
+    $c->session->{garefill} = \%settings;
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering");
+    $c->response->redirect("/peering#create_group");
     return;
 }
 
@@ -163,30 +159,24 @@ sub edit_grp : Local {
     my %messages;
     my %settings;
 
-    my $grpid = $c->request->params->{grpid};
-    my $priority = $c->request->params->{priority};
-    my $grpdesc = $c->request->params->{grpdesc};
+    $settings{id} = $c->request->params->{grpid};
+    $settings{priority} = $c->request->params->{priority};
+    $settings{description} = $c->request->params->{grpdesc};
+    $settings{peering_contract_id} = $c->request->params->{peering_contract_id} || undef;
 
 #$c->log->debug('*** edit grp');
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_group',
-                                                 { id => $grpid,
-												   priority => $priority,
-												   description => $grpdesc
-                                                 },
+                                                 \%settings,
                                                  undef
                                                ))
         {
             $messages{epeermsg} = 'Server.Voip.SavedSettings';
-		}
-		else
-		{
-        	$messages{epeererr} = 'Client.Voip.InputErrorFound';
-		}
+        }
     }
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering");
+    $c->response->redirect("/peering#groups");
     return;
 }
 
@@ -833,7 +823,7 @@ sub contract_detail : Local {
     return 1;
 }
 
-=head2 save_account 
+=head2 save_contract 
 
 Create or update details of a SIP peering contract.
 
@@ -869,9 +859,9 @@ sub save_contract : Local {
                                                      },
                                                      undef))
             {
-                $messages{conmsg} = 'Server.Voip.SavedSettings';
+                $messages{topmsg} = 'Web.Contract.Updated';
                 $c->session->{messages} = \%messages;
-                $c->response->redirect("/peering/contract_detail?edit_contract=1&amb;contract_id=$contract_id");
+                $c->response->redirect("/peering");
                 return;
             }
         } else {
@@ -879,9 +869,9 @@ sub save_contract : Local {
                                                      { data => \%settings },
                                                      \$contract_id))
             {
-                $messages{conmsg} = 'Web.Account.Created';
+                $messages{topmsg} = 'Web.Contract.Created';
                 $c->session->{messages} = \%messages;
-                $c->response->redirect("/peering/contract_detail?edit_contract=1&amb;contract_id=$contract_id");
+                $c->response->redirect("/peering");
                 return;
             }
         }
@@ -910,7 +900,7 @@ sub terminate_contract : Local {
                                              { id => $contract_id },
                                              undef))
     {
-        $messages{topmsg} = 'Server.Voip.SubscriberDeleted';
+        $messages{topmsg} = 'Web.Contract.Deleted';
         $c->session->{messages} = \%messages;
         $c->response->redirect("/peering");
         return;
@@ -938,7 +928,7 @@ sub delete_contract : Local {
                                              { id => $contract_id },
                                              undef))
     {
-        $messages{topmsg} = 'Server.Voip.SubscriberDeleted';
+        $messages{topmsg} = 'Web.Contract.Deleted';
         $c->session->{messages} = \%messages;
         $c->response->redirect("/peering");
         return;
