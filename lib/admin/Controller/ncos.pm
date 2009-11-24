@@ -365,6 +365,46 @@ sub do_update_pattern : Local {
     return;
 }
 
+=head2 save_local_ac
+
+Set or unset "local_ac" for an ncos level.
+
+=cut
+
+sub save_local_ac : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    $settings{level} = $c->request->params->{level};
+    unless(length $settings{level}) {
+        $c->response->redirect("/ncos");
+        return;
+    }
+
+    $settings{data}{local_ac} = $c->request->params->{local_ac} ? 1 : 0;
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'billing', 'update_ncos_level',
+                                                 \%settings,
+                                                 undef))
+        {
+            $messages{lacmsg} = $settings{data}{local_ac} ? 'Web.NCOSLevel.LACSet' : 'Web.NCOSLevel.LACUnset';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/ncos/lists?level=$settings{level}#pattern");
+            return;
+        }
+        $c->response->redirect("/ncos/lists?level=$settings{level}");
+        return;
+    }
+
+    $messages{lacerr} = 'Client.Voip.InputErrorFound';
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/ncos/lists?level=$settings{level}#pattern");
+    return;
+}
+
 =head2 do_set_lnp_provider_id
 
 Creates or updates an entry in the LNP provider list of an NCOS level.

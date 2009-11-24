@@ -401,3 +401,10 @@ h3 {
 .topbottomspace {
 	margin: 5px 0;
 }
+
+#local_ac {
+	margin: 5px 0 7px 10px;
+}
+#save_local_ac {
+	margin: 0 0 0 15px;
+}
