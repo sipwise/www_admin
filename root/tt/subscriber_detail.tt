@@ -238,7 +238,8 @@
                       || preference.key == "cft"
                       || preference.key == "cfna"
                       || preference.key == "mct"
-                      || preference.key == "in_use" %]
+                      || preference.key == "in_use"
+                      || preference.key == "ignore_allowed_ips" %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>
@@ -314,7 +315,7 @@
                       value="[% preference.value %]" />
                   </td>
                 </tr>
-                [% ELSIF preference.key == "ncos" %]
+                [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>
@@ -365,7 +366,7 @@
                   [% END %]
                   [% IF ! edit_preferences && ! Catalyst.session.admin.read_only %]
                     &nbsp;
-                    [% IF preference.key == "allowed_ips" %]
+                    [% IF preference.key == "allowed_ips" || preference.key == "man_allowed_ips" %]
                       <a href="edit_iplist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
                          class="aaction">edit list</a>
                     [% ELSE %]

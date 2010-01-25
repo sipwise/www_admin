@@ -282,7 +282,7 @@ sub detail : Local {
             $$preferences{$$pref{attribute}} =~ s/\@.*$//
                 if $$preferences{$$pref{attribute}} =~ /^\+?\d+\@/;
           }
-        } elsif($$pref{attribute} eq 'ncos') {
+        } elsif(!$c->stash->{ncos_levels} and ($$pref{attribute} eq 'ncos' or $$pref{attribute} eq 'adm_ncos')) {
           my $ncoslvl;
           return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_ncos_levels',
                                                               undef,
@@ -624,6 +624,14 @@ sub update_preferences : Local {
         }
     }
 
+    if(defined $c->request->params->{adm_ncos}) {
+        if(length $c->request->params->{adm_ncos}) {
+            $$preferences{adm_ncos} = $c->request->params->{adm_ncos};
+        } else {
+            $$preferences{adm_ncos} = undef;
+        }
+    }
+
     ### call forwarding ###
 
     my $fw_target_select = $c->request->params->{fw_target};
@@ -742,6 +750,10 @@ sub update_preferences : Local {
     ### subscriber activation flag ###
 
     $$preferences{in_use} = $c->request->params->{in_use} ? 1 : undef;
+
+    ### allowed IPs override ###
+
+    $$preferences{ignore_allowed_ips} = $c->request->params->{ignore_allowed_ips} ? 1 : undef;
 
     ### save settings ###
 
