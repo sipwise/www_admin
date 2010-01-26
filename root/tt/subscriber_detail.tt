@@ -324,7 +324,7 @@
                               [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
                           <option value="" [% IF preference.value == "" %]
                                              selected="selected"
-                                           [% END %]>[% lvl.level %]</option>
+                                           [% END %]></option>
                         [% FOREACH lvl = ncos_levels %]
                           <option value="[% lvl.level %]"
                                   [% IF preference.value == lvl.level %]selected="selected"[% END %]
