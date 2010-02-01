@@ -1,3 +1,17 @@
+sipwise-www-admin (2.0.0) UNRELEASED; urgency=low
+
+  * speed dial
+  * LNP database handling
+  * NCOS levels
+  * SIP peering configuration
+  * number rewrite rules for SIP peerings
+  * vertical service code configuration
+  * fax number configuration
+  * new user preferences
+  * minor interface bugfixes
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Mon, 01 Feb 2010 02:08:50 +0100
+
 sipwise-www-admin (1.2.1) unstable; urgency=low
 
   * allowing direct entry of regex in billing fee destinations
