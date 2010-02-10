@@ -4,6 +4,8 @@
 
         <a href="/domain" class="aaction">back</a>
 
+      [% IF Catalyst.config.domain.rewrite_features %]
+
         <h3 id="icallee">Inbound Rewrite Rules for Callee</h3>
 
         <div class="p1">
@@ -100,6 +102,9 @@
           </table>
         </div>
 
+      [% END %]
+
+      [% IF Catalyst.config.domain.audiofile_features %]
 
         <h3 id="audio">Audio Files</h3>
 
@@ -198,6 +203,9 @@
           [% IF acrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
         </div>
 
+      [% END %]
+
+      [% IF Catalyst.config.domain.vsc_features %]
 
         <h3 id="vsc">Vertical Service Codes</h3>
 
@@ -324,4 +332,6 @@
           </table>
           [% IF vcrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
         </div>
+
+      [% END %]
 

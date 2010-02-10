@@ -271,18 +271,22 @@
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>
                   [% IF edit_preferences %]
+                    [% IF Catalyst.config.voicemail_features %]
                     <label for="cfvoicebox">
                       <input type="radio" id="cfvoicebox" value="voicebox" name="fw_target" class="radio"
                         [% IF preference.value.voicebox %]checked="checked"[% END %] />
                       Voicebox
                     </label>
                     <br clear="all" />
+                    [% END %]
+                    [% IF Catalyst.config.fax_features %]
                     <label for="cffaxserver">
                       <input type="radio" id="cffaxserver" value="fax2mail" name="fw_target" class="radio"
                         [% IF preference.value.fax2mail %]checked="checked"[% END %] />
                       Fax2Mail
                     </label>
                     <br clear="all" />
+                    [% END %]
                     <label for="cfsipuri">
                       <input type="radio" id="cfsipuri" value="sipuri" name="fw_target" class="radio"
                         [% IF preference.value.sipuri %]checked="checked"[% END %] />
@@ -407,6 +411,8 @@
           </table>
         </div>
 
+      [% IF Catalyst.config.subscriber.audiofile_features %]
+
         <h3 id="audio">Audio Files</h3>
         <div class="p1">
           <table>
@@ -427,6 +433,8 @@
             </tr>
           </table>
         </div>
+
+    [% END %]
 
     [% IF subscriber.voicebox_preferences %]
 

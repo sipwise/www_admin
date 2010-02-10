@@ -132,7 +132,7 @@ sub detail : Local {
                                                             \$preferences
                                                           );
         # voicebox requires a number
-        if(length $c->session->{subscriber}{sn}) {
+        if(length $c->session->{subscriber}{sn} && $c->config->{voicemail_features}) {
           return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_voicebox_preferences',
                                                               { username => $c->session->{subscriber}{username},
                                                                 domain   => $c->session->{subscriber}{domain},
@@ -155,12 +155,14 @@ sub detail : Local {
                                                             \$speed_dial_slots
                                                           );
 
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain   => $c->session->{subscriber}{domain},
-                                                            },
-                                                            \$c->session->{subscriber}{fax_preferences}
-                                                          );
+        if($c->config->{fax_features}) {
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
+                                                                { username => $c->session->{subscriber}{username},
+                                                                  domain   => $c->session->{subscriber}{domain},
+                                                                },
+                                                                \$c->session->{subscriber}{fax_preferences}
+                                                              );
+        }
 
         $c->session->{subscriber}{registered_contacts} = $regcon if eval { @$regcon };
         $c->stash->{subscriber} = $c->session->{subscriber};
@@ -170,14 +172,16 @@ sub detail : Local {
                                                                                  'Web.Subscriber.Lock'.$$preferences{lock})
             if $$preferences{lock};
 
-        my $audio_files;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain   => $c->session->{subscriber}{domain},
-                                                            },
-                                                            \$audio_files
-                                                          );
-        $c->session->{subscriber}{audio_files} = $audio_files if eval { @$audio_files };
+        if($c->config->{subscriber}{audiofile_features}) {
+            my $audio_files;
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
+                                                                { username => $c->session->{subscriber}{username},
+                                                                  domain   => $c->session->{subscriber}{domain},
+                                                                },
+                                                                \$audio_files
+                                                              );
+            $c->session->{subscriber}{audio_files} = $audio_files if eval { @$audio_files };
+        }
 
     } else {
         $c->stash->{account_id} = $c->request->params->{account_id};

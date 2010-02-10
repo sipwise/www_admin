@@ -30,7 +30,9 @@
           [% IF Catalyst.config.billing_features %]
           <li><a href="/billing">Billing</a></li>
           [% END %]
+          [% IF Catalyst.config.peering_features %]
           <li><a href="/peering">SIP Peerings</a></li>
+          [% END %]
         </ul>
 
         <h3>Number Management</h3>
