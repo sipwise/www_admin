@@ -230,6 +230,18 @@
                     </select>
                   </td>
                 </tr>
+                [% IF preference.key == "on_preselect" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <select size="1" name="[% preference.key %]"
+                      [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
+                      <option value="0" [% IF preference.value == 0 %]selected="selected"[% END %]>ignore</option>
+                      <option value="1" [% IF preference.value == 1 %]selected="selected"[% END %]>strip</option>
+                      <option value="2" [% IF preference.value == 2 %]selected="selected"[% END %]>deny</option>
+                    </select>
+                  </td>
+                </tr>
                 [% ELSIF preference.key == "block_in_clir"
                       || preference.key == "adm_block_in_clir"
                       || preference.key == "clir"

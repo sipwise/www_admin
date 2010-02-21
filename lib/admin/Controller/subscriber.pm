@@ -759,6 +759,10 @@ sub update_preferences : Local {
 
     $$preferences{ignore_allowed_ips} = $c->request->params->{ignore_allowed_ips} ? 1 : undef;
 
+    ### preselection handling ###
+
+    $$preferences{on_preselect} = $c->request->params->{on_preselect};
+
     ### save settings ###
 
     unless(keys %messages) {
