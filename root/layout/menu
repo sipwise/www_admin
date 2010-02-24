@@ -15,31 +15,31 @@
         <h3>User Administration</h3>
         <ul>
           [% IF Catalyst.config.billing_features %]
-          <li><a href="/customer">Customers</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "customer" %]><a href="/customer">Customers</a></li>
           [% END %]
-          <li><a href="/account">Accounts</a></li>
-          <li><a href="/subscriber">Subscribers</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "account" %]><a href="/account">Accounts</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "subscriber" %]><a href="/subscriber">Subscribers</a></li>
 [%#          <li><a href="/registration">Devices</a></li> %]
 [%#          <li><a href="/registration">Registrations</a></li> %]
         </ul>
 
         <h3>System Administration</h3>
         <ul>
-          <li><a href="/domain">Domains</a></li>
-          <li><a href="/admin">Administrators</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "domain" %]><a href="/domain">Domains</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "admin" %]><a href="/admin">Administrators</a></li>
           [% IF Catalyst.config.billing_features %]
-          <li><a href="/billing">Billing</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "billing" %]><a href="/billing">Billing</a></li>
           [% END %]
           [% IF Catalyst.config.peering_features %]
-          <li><a href="/peering">SIP Peerings</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "peering" %]><a href="/peering">SIP Peerings</a></li>
           [% END %]
         </ul>
 
         <h3>Number Management</h3>
         <ul>
-          <li><a href="/number">Number Blocks</a></li>
-          <li><a href="/lnp">LNP</a></li>
-          <li><a href="/ncos">NCOS</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "number" %]><a href="/number">Number Blocks</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "lnp" %]><a href="/lnp">LNP</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "ncos" %]><a href="/ncos">NCOS</a></li>
         </ul>
       [% END %]
 

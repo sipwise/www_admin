@@ -37,6 +37,9 @@ h3 {
 	text-align: right;
 }
 
+#contentmenu li.active_menu a {
+	color: #D60808;
+}
 
 /* hmm, menu doesn't extend container height ... */
 #container #content {

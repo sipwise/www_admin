@@ -44,6 +44,9 @@ sub auto : Private {
         return;
     }
 
+    $c->stash->{menu}{active} = $c->request->path;
+    $c->stash->{menu}{active} =~ s#/.*$##;
+
     return 1;
 }
 
