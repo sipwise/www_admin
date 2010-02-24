@@ -230,7 +230,7 @@
                     </select>
                   </td>
                 </tr>
-                [% IF preference.key == "on_preselect" %]
+                [% ELSIF preference.key == "on_preselect" %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>
