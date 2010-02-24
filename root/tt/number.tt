@@ -1,0 +1,145 @@
+        <h3>Existing Number Blocks</h3>
+
+        <div class="p1">
+          [% IF messages.eblockmsg %]<div class="goodmsg">[% messages.eblockmsg %]</div>[% END %]
+          [% IF messages.eblockerr %]<div class="errormsg">[% messages.eblockerr %]</div>[% END %]
+          [% IF erefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+
+        [% IF blocks %]
+          <table class="numberblocks">
+            <tr class="table_header">
+              <td style="width:60px;">cc</td>
+              <td style="width:60px;">ac</td>
+              <td style="width:80px;">sn_prefix</td>
+              <td style="width:80px;">sn_length</td>
+              <td class="tdcenter" style="width:100px;">authoritative</td>
+              <td class="tdcenter" style="width:100px;">allocable</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH block = blocks %]
+              [% id = id + 1 %]
+              [% IF block.cc == edit_cc && block.ac == edit_ac && block.sn_prefix == edit_sn_prefix %]
+                <tr>
+                  <form action="/number/do_update_block" method="post">
+                    <input type="hidden" name="cc" value="[% block.cc %]" />
+                    <input type="hidden" name="ac" value="[% block.ac %]" />
+                    <input type="hidden" name="sn_prefix" value="[% block.sn_prefix %]" />
+                    <td class="tdkey">[% block.cc %]</td>
+                    <td class="tdkey">[% block.ac %]</td>
+                    <td class="tdkey">[% block.sn_prefix %]</td>
+                    <td class="tdkey">[% block.data.sn_length %]</td>
+                    <td class="tdcenter">
+                      <input type="checkbox" class="checkbox" title="check if NGCP is authoritative for this number block"
+                             name="authoritative" [% IF erefill.data.authoritative %]checked="checked"[% END %] />
+                    </td>
+                    <td class="tdcenter">
+                      <input type="checkbox" class="checkbox" title="check if numbers should be automatically assigned from this number block"
+                             name="allocable" [% IF erefill.data.allocable %]checked="checked"[% END %] />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="blocksave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blocksave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/number" class="aaction">cancel</a></td>
+                </tr>
+              [% ELSE %]
+                <tr>
+                  <td>[% block.cc %]</td>
+                  <td>[% block.ac %]</td>
+                  <td>[% block.sn_prefix %]</td>
+                  <td>[% block.data.sn_length %]</td>
+                  <td class="tdcenter">
+                    <input type="checkbox" class="checkbox" title="check if NGCP is authoritative for this number block"
+                           name="authoritative" disabled="disabled" [% IF block.data.authoritative %]checked="checked"[% END %] />
+                  </td>
+                  <td class="tdcenter">
+                    <input type="checkbox" class="checkbox" title="check if numbers should be automatically assigned from this number block"
+                           name="allocable" disabled="disabled" [% IF block.data.allocable %]checked="checked"[% END %] />
+                  </td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/number?edit_cc=[% block.cc %]&amp;edit_ac=[% block.ac %]&amp;edit_sn_prefix=[% block.sn_prefix %]" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/number/do_delete_block" method="post">
+                    <input type="hidden" name="cc" value="[% block.cc %]" />
+                    <input type="hidden" name="ac" value="[% block.ac %]" />
+                    <input type="hidden" name="sn_prefix" value="[% block.sn_prefix %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="blockdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockdel[% id %]" />
+                      </div>
+                    [% END %]
+                    </td>
+                  </form>
+                </tr>
+              [% END %]
+            [% END %]
+          </table>
+        [% ELSE %]
+          No number blocks found in the database.
+        [% END %]
+        </div>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <h3 id="create_block">Create Number Block</h3>
+
+        <div class="p1">
+          [% IF messages.cblockmsg %]<div class="goodmsg">[% messages.cblockmsg %]</div>[% END %]
+          [% IF messages.cblockerr %]<div class="errormsg">[% messages.cblockerr %]</div>[% END %]
+
+          <form action="/number/do_create_block" method="post">
+            <table class="numberblocks">
+                <tr class="table_header">
+                <td style="width:60px;">cc</td>
+                <td style="width:60px;">ac</td>
+                <td style="width:80px;">sn_prefix</td>
+                <td style="width:80px;">sn_length</td>
+                <td class="tdcenter" style="width:100px;">authoritative</td>
+                <td class="tdcenter" style="width:100px;">allocable</td>
+                <td style="width:40px;" />
+                <td style="width:60px;" />
+              </tr>
+              <tr>
+                <td><input type="text" class="irealshort" title="country code, integer"
+                           name="cc" value="[% crefill.cc %]" />
+                </td>
+                <td><input type="text" class="irealshort" title="area code, integer"
+                           name="ac" value="[% crefill.ac %]" />
+                </td>
+                <td><input type="text" class="ishort" title="subscriber number prefix, numeric string"
+                           name="sn_prefix" value="[% crefill.sn_prefix %]" />
+                </td>
+                <td><input type="text" class="irealshort" title="subscriber number length, integer"
+                           name="sn_length" value="[% crefill.data.sn_length %]" />
+                </td>
+                <td class="tdcenter">
+                  <input type="checkbox" class="checkbox" title="check if NGCP is authoritative for this number block"
+                         name="authoritative" [% IF crefill.data.authoritative %]checked="checked"[% END %] />
+                </td>
+                <td class="tdcenter">
+                  <input type="checkbox" class="checkbox" title="check if numbers should be automatically assigned from this number block"
+                         name="allocable" [% IF crefill.data.allocable %]checked="checked"[% END %] />
+                </td>
+                <td>
+                  <div class="postlink">
+                    <label for="blockadd">add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockadd" />
+                  </div>
+                </td>
+                <td />
+              </tr>
+            </table>
+          </form>
+          [% IF crefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+
+        </div>
+      [% END %]
+

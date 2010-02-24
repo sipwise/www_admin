@@ -37,6 +37,7 @@
 
         <h3>Number Management</h3>
         <ul>
+          <li><a href="/number">Number Blocks</a></li>
           <li><a href="/lnp">LNP</a></li>
           <li><a href="/ncos">NCOS</a></li>
         </ul>
