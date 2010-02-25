@@ -54,6 +54,61 @@ h3 {
 	margin-left: 230px;
 }
 
+/* submenu below headers in contentplace */
+ul#topsubmenu {
+	float: left;
+	list-style: none;
+	padding: 0;
+	width: 95%;
+	margin: 0px 0px 0px -3px;
+}
+
+#topsubmenu li {
+	float: left;
+	color: #a0b6a0;
+	font-weight: bold;
+	margin: 0;
+}
+
+#topsubmenu li.active_submenu {
+	padding: 0px 10px;
+	border-top: 1px solid #c0d6c0;
+	color: #607660;
+}
+
+#topsubmenu li.inactive_submenu {
+	padding: 0px 10px;
+	border-top: 1px solid #c0d6c0;
+	color: #c0d6c0;
+}
+
+#topsubmenu li.active_submenu a {
+	color: #D60808;
+}
+
+#topsubmenu li.inactive_submenu a {
+	color: #006600;
+}
+
+#topsubmenu a:hover {
+	color: #D60808;
+	text-decoration: none;
+}
+#topsubmenu a:after {
+	content: "" !important;
+}
+
+#topsubmenuhr {
+	float: left;
+	width: 721px;
+	margin-top: 1px;
+	margin-bottom: 20px;
+	border-top: 1px solid #c0d6c0;
+	border-bottom: none;
+	border-left: none;
+	border-right: none;
+}
+
 /* red error messages */
 .errormsg {
 	width: auto;

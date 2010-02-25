@@ -1,0 +1,402 @@
+        <h3> Subscriber
+          <a class="noarrow" href="detail?subscriber_id=[% subscriber.subscriber_id %]">
+            [% subscriber.username %]@[% subscriber.domain %]</a>
+        </h3>
+
+        <ul id="topsubmenu">
+          <li>|</li>
+          <li class="inactive_submenu"><a href="detail?subscriber_id=[% subscriber.subscriber_id %]">User</a></li>
+          <li>|</li>
+          <li class="active_submenu"><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]">Preferences</a></li>
+          <li>|</li>
+        </ul><br />
+        <hr id="topsubmenuhr" />
+
+        <h3 id="userprefs">User Preferences</h3>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <div class="actions">
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_preferences=1#userprefs" class="aaction">edit</a>
+          [% IF edit_preferences %]
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#userprefs" class="aaction">cancel</a>
+          [% END %]
+        </div>
+      [% END %]
+        <div class="p1">
+          [% IF messages.prefmsg %]<div class="goodmsg">[% messages.prefmsg %]</div>[% END %]
+          [% IF messages.preferr %]<div class="errormsg">[% messages.preferr %]</div>[% END %]
+          [% IF edit_preferences && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+            <form action="update_preferences" method="post">
+              <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
+              <table>
+            [% FOREACH preference = subscriber.preferences_array %]
+              [% IF preference.max_occur == 1 %]
+                [% IF preference.key == "block_in_mode" || preference.key == "block_out_mode"
+                   || preference.key == "adm_block_in_mode" || preference.key == "adm_block_out_mode" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <select size="1" name="[% preference.key %]"
+                      [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
+                      <option [% IF ! preference.value %]selected="selected"[% END %]>blacklist</option>
+                      <option [% IF preference.value %]selected="selected"[% END %]>whitelist</option>
+                    </select>
+                  </td>
+                </tr>
+                [% ELSIF preference.key == "on_preselect" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <select size="1" name="[% preference.key %]"
+                      [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
+                      <option value="0" [% IF preference.value == 0 %]selected="selected"[% END %]>ignore</option>
+                      <option value="1" [% IF preference.value == 1 %]selected="selected"[% END %]>strip</option>
+                      <option value="2" [% IF preference.value == 2 %]selected="selected"[% END %]>deny</option>
+                    </select>
+                  </td>
+                </tr>
+                [% ELSIF preference.key == "block_in_clir"
+                      || preference.key == "adm_block_in_clir"
+                      || preference.key == "clir"
+                      || preference.key == "cfu"
+                      || preference.key == "cfb"
+                      || preference.key == "cft"
+                      || preference.key == "cfna"
+                      || preference.key == "mct"
+                      || preference.key == "in_use"
+                      || preference.key == "ignore_allowed_ips" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <input type="checkbox" name="[% preference.key %]" class="checkbox"
+                      [% IF ! edit_preferences %]disabled="disabled"[% END %]
+                      [% IF preference.value %]checked="checked"[% END %] />
+                  </td>
+                </tr>
+                [% ELSIF preference.key == "prepaid" %]
+                  [% IF Catalyst.config.billing_features %]
+                  <tr>
+                    <td class="tdkey">[% preference.key %]:</td>
+                    <td>
+                      <input type="checkbox" name="[% preference.key %]" class="checkbox"
+                        disabled="disabled" [% IF preference.value %]checked="checked"[% END %] />
+                    </td>
+                  </tr>
+                  [% END %]
+                [% ELSIF preference.key == "has_extension" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <input type="checkbox" name="[% preference.key %]" class="checkbox"
+                      disabled="disabled" [% IF preference.value %]checked="checked"[% END %] />
+                  </td>
+                </tr>
+                [% ELSIF preference.key == "cftarget" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                  [% IF edit_preferences %]
+                    [% IF Catalyst.config.voicemail_features %]
+                    <label for="cfvoicebox">
+                      <input type="radio" id="cfvoicebox" value="voicebox" name="fw_target" class="radio"
+                        [% IF preference.value.voicebox %]checked="checked"[% END %] />
+                      Voicebox
+                    </label>
+                    <br clear="all" />
+                    [% END %]
+                    [% IF Catalyst.config.fax_features %]
+                    <label for="cffaxserver">
+                      <input type="radio" id="cffaxserver" value="fax2mail" name="fw_target" class="radio"
+                        [% IF preference.value.fax2mail %]checked="checked"[% END %] />
+                      Fax2Mail
+                    </label>
+                    <br clear="all" />
+                    [% END %]
+                    <label for="cfsipuri">
+                      <input type="radio" id="cfsipuri" value="sipuri" name="fw_target" class="radio"
+                        [% IF preference.value.sipuri %]checked="checked"[% END %] />
+                        number or SIP-URI:
+                    </label>
+                    <input type="text" id="cfsipuritxt" name="fw_sipuri" size="25" value="[% preference.value.sipuri %]"
+                      [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] />
+                  [% ELSE %]
+                    [% IF preference.value.voicebox %]
+                      Voicebox
+                    [% ELSIF preference.value.fax2mail %]
+                      Fax2Mail
+                    [% ELSE %]
+                      <input type="text" size="25" value="[% preference.value.sipuri %]"
+                             class="disabled txtpreference" disabled="disabled" />
+                    [% END %]
+                  [% END %]
+                  </td>
+                </tr>
+                [% IF messages.target %]<tr><td /><td><div class="errormsg">[% messages.target %]</div></td></tr>[% END %]
+                [% ELSIF preference.key == "base_cli"
+                      || preference.key == "extension"
+                      || preference.key == "lock"
+                      || preference.key == "base_user" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <input type="text" name="[% preference.key %]"
+                      class="disabled txtpreference" disabled="disabled"
+                      value="[% preference.value %]" />
+                  </td>
+                </tr>
+                [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    [% IF ncos_levels %]
+                      <select size="1" name="[% preference.key %]"
+                              [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
+                          <option value="" [% IF preference.value == "" %]
+                                             selected="selected"
+                                           [% END %]></option>
+                        [% FOREACH lvl = ncos_levels %]
+                          <option value="[% lvl.level %]"
+                                  [% IF preference.value == lvl.level %]selected="selected"[% END %]
+                                 >[% lvl.level %]</option>
+                        [% END %]
+                      </select>
+                    [% ELSE %]
+                      [% IF edit_preferences %]no NCOS levels defined[% END %]
+                    [% END %]
+                  </td>
+                </tr>
+                [% ELSE %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <input type="text" name="[% preference.key %]" [% IF ! edit_preferences %]
+                      class="disabled txtpreference" disabled="disabled"
+                      [% ELSE %]
+                      class="txtpreference"
+                      [% END %]
+                      value="[% preference.value %]" />
+                  </td>
+                </tr>
+                [% END %]
+              [% ELSE %]
+              <tr>
+                <td class="tdkey">[% preference.key %]:</td>
+                <td>
+                  [% IF preference.value %]
+                    <select size="1" name="[% preference.key %]">
+                    [% FOREACH pref_entry = preference.value %]
+                      <option>[% pref_entry %]</option>
+                    [% END %]
+                    </select>
+                  [% ELSE %]
+                  <select size="1" name="[% preference.key %]">
+                    <option />
+                  </select>
+                  [% END %]
+                  [% IF ! edit_preferences && ! Catalyst.session.admin.read_only %]
+                    &nbsp;
+                    [% IF preference.key == "allowed_ips" || preference.key == "man_allowed_ips" %]
+                      <a href="edit_iplist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
+                         class="aaction">edit list</a>
+                    [% ELSE %]
+                      <a href="edit_list?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
+                         class="aaction">edit list</a>
+                    [% END %]
+                  [% END %]
+                </td>
+              </tr>
+              [% END %]
+              [% IF preference.error %]<tr><td /><td><div class="errormsg">[% preference.error %]</div></td></tr>[% END %]
+            [% END %]
+            </table>
+          [% IF edit_preferences %]
+            <input type="submit" class="but" value="Save &#187;" />
+          [% END %]
+          </form>
+        </div>
+
+        <h3 id="speeddial">Speed Dial</h3>
+        <div class="p1">
+          <table>
+            <tr>
+              <td class="tdkey">Speed dial slots:</td>
+              <td>
+                <select size="1" name="speed_dial_slots">
+                [% FOREACH sdslot = speed_dial_slots %]
+                    <option>[% sdslot.label %]</option>
+                [% END %]
+                </select>
+                [% UNLESS Catalyst.session.admin.read_only %]
+                    &nbsp;
+                    <a href="edit_speed_dial_slots?subscriber_id=[% subscriber.subscriber_id %]&amp;"
+                       class="aaction">edit list</a>
+                [% END %]
+              </td>
+            </tr>
+          </table>
+        </div>
+
+      [% IF Catalyst.config.subscriber.audiofile_features %]
+
+        <h3 id="audio">Audio Files</h3>
+        <div class="p1">
+          <table>
+            <tr>
+              <td class="tdkey">Existing audio files:</td>
+              <td>
+                <select size="1" name="audio_files">
+                [% FOREACH audio = subscriber.audio_files %]
+                    <option>[% audio.handle %]</option>
+                [% END %]
+                </select>
+                [% UNLESS Catalyst.session.admin.read_only %]
+                    &nbsp;
+                    <a href="edit_audio_files?subscriber_id=[% subscriber.subscriber_id %]"
+                       class="aaction">edit list</a>
+                [% END %]
+              </td>
+            </tr>
+          </table>
+        </div>
+
+    [% END %]
+
+    [% IF subscriber.voicebox_preferences %]
+
+        <h3 id="vboxprefs">Voicebox Preferences</h3>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <div class="actions">
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_voicebox=1#vboxprefs" class="aaction">edit</a>
+          [% IF edit_voicebox %]
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#vboxprefs" class="aaction">cancel</a>
+          [% END %]
+        </div>
+      [% END %]
+        <div class="p1">
+          [% IF messages.vboxmsg %]<div class="goodmsg">[% messages.vboxmsg %]</div>[% END %]
+          [% IF messages.vboxerr %]<div class="errormsg">[% messages.vboxerr %]</div>[% END %]
+          [% IF edit_voicebox && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          <form action="update_voicebox" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
+            <table>
+              <tr>
+                <td class="tdkey">PIN:</td>
+                <td>
+                  <input type="text" name="password" [% IF ! edit_voicebox %]class="disabled" disabled="disabled"[% END %]
+                    value="[% subscriber.voicebox_preferences.password %]" />
+                </td>
+              </tr>
+              [% IF messages.vpin %]<tr><td /><td><div class="errormsg">[% messages.vpin %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">E-Mail:</td>
+                <td>
+                  <input type="text" name="email" [% IF ! edit_voicebox %]class="disabled" disabled="disabled"[% END %]
+                    value="[% subscriber.voicebox_preferences.email %]" />
+                </td>
+              </tr>
+              [% IF messages.vemail %]<tr><td /><td><div class="errormsg">[% messages.vemail %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">Attach WAV:</td>
+                <td>
+                  <input type="checkbox" name="attach" class="checkbox" [% IF ! edit_voicebox %]disabled="disabled"[% END %]
+                    [% IF subscriber.voicebox_preferences.attach %]checked="checked"[% END %] />
+                </td>
+              </tr>
+            </table>
+          [% IF edit_voicebox %]
+            <input type="submit" class="but" value="Save &#187;" />
+          [% END %]
+          </form>
+        </div>
+
+    [% END %]
+
+    [% IF subscriber.fax_preferences %]
+
+        <h3 id="faxprefs">Fax Preferences</h3>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <div class="actions">
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_fax=1#faxprefs" class="aaction">edit</a>
+          [% IF edit_fax %]
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#faxprefs" class="aaction">cancel</a>
+          [% END %]
+        </div>
+      [% END %]
+        <div class="p1">
+          [% IF messages.faxmsg %]<div class="goodmsg">[% messages.faxmsg %]</div>[% END %]
+          [% IF messages.faxerr %]<div class="errormsg">[% messages.faxerr %]</div>[% END %]
+          [% IF edit_fax && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          <form action="update_fax" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
+            <table>
+              <tr>
+                <td class="tdkey">name:</td>
+                <td>
+                  <input type="text" name="name" [% IF ! edit_fax %]class="disabled" disabled="disabled"[% END %]
+                    value="[% subscriber.fax_preferences.name %]" />
+                </td>
+              </tr>
+              [% IF messages.faxname %]<tr><td /><td><div class="errormsg">[% messages.faxname %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">password:</td>
+                <td>
+                [% IF edit_fax %]
+                  <input type="text" name="password" value="[% subscriber.fax_preferences.repass %]" />
+                [% ELSE %]
+                  <input type="text" name="password" class="disabled" disabled="disabled"
+                  [% IF show_faxpass && Catalyst.session.admin.show_passwords %]
+                    value="[% subscriber.fax_preferences.password %]" />
+                    <a href="?subscriber_id=[% subscriber.subscriber_id %]#faxprefs" class="apass">Hide</a>
+                  [% ELSE %]
+                    [% IF subscriber.password %]
+                      value="********" />
+                      [% IF Catalyst.session.admin.show_passwords %]
+                        <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_faxpass=1#faxprefs" class="apass">Show</a>
+                      [% END %]
+                    [% ELSE %]
+                      value="" />
+                    [% END %]
+                  [% END %]
+                [% END %]
+                </td>
+              </tr>
+              [% IF messages.faxpass %]<tr><td /><td><div class="errormsg">[% messages.faxpass %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">active:</td>
+                <td>
+                  <input type="checkbox" name="active" class="checkbox" [% IF ! edit_fax %]disabled="disabled"[% END %]
+                    [% IF subscriber.fax_preferences.active %]checked="checked"[% END %] />
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">destinations:</td>
+                <td>
+                  [% IF subscriber.fax_preferences.destinations %]
+                    <select size="1" name="destinations">
+                    [% FOREACH dest = subscriber.fax_preferences.destinations %]
+                      <option>[% dest.destination %]</option>
+                    [% END %]
+                    </select>
+                  [% ELSE %]
+                  <select size="1" name="destinations">
+                    <option />
+                  </select>
+                  [% END %]
+                  [% IF ! edit_fax && ! Catalyst.session.admin.read_only %]
+                    &nbsp;
+                      <a href="edit_destlist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=destinations"
+                         class="aaction">edit list</a>
+                  [% END %]
+                </td>
+              </tr>
+            </table>
+          [% IF edit_fax %]
+            <input type="submit" class="but" value="Save &#187;" />
+          [% END %]
+          </form>
+        </div>
+
+    [% END %]
+

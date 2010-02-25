@@ -3,7 +3,7 @@
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
 
-        <a href="detail?subscriber_id=[% subscriber_id %]&amp;#audio" class="aaction">back</a>
+        <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#audio" class="aaction">back</a>
 
         <div class="p1">
           [% IF messages.audiomsg %]<div class="goodmsg">[% messages.audiomsg %]</div>[% END %]

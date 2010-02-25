@@ -117,7 +117,6 @@ sub detail : Local {
 
     my $is_new = $c->request->params->{new};
     my $preferences;
-    my $speed_dial_slots;
 
     unless($is_new) {
         my $subscriber_id = $c->request->params->{subscriber_id};
@@ -125,21 +124,14 @@ sub detail : Local {
                                                             { subscriber_id => $subscriber_id },
                                                             \$c->session->{subscriber}
                                                           );
+
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
                                                             { username => $c->session->{subscriber}{username},
                                                               domain => $c->session->{subscriber}{domain},
                                                             },
                                                             \$preferences
                                                           );
-        # voicebox requires a number
-        if(length $c->session->{subscriber}{sn} && $c->config->{voicemail_features}) {
-          return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_voicebox_preferences',
-                                                              { username => $c->session->{subscriber}{username},
-                                                                domain   => $c->session->{subscriber}{domain},
-                                                              },
-                                                              \$c->session->{subscriber}{voicebox_preferences}
-                                                            );
-        }
+
         my $regcon;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_registered_contacts',
                                                             { username => $c->session->{subscriber}{username},
@@ -147,41 +139,14 @@ sub detail : Local {
                                                             },
                                                             \$regcon
                                                           );
-
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_speed_dial_slots',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain   => $c->session->{subscriber}{domain},
-                                                            },
-                                                            \$speed_dial_slots
-                                                          );
-
-        if($c->config->{fax_features}) {
-            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
-                                                                { username => $c->session->{subscriber}{username},
-                                                                  domain   => $c->session->{subscriber}{domain},
-                                                                },
-                                                                \$c->session->{subscriber}{fax_preferences}
-                                                              );
-        }
-
         $c->session->{subscriber}{registered_contacts} = $regcon if eval { @$regcon };
+
         $c->stash->{subscriber} = $c->session->{subscriber};
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
         $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c->view($c->config->{view})->
                                                                                      config->{VARIABLES}{site_config}{language},
                                                                                  'Web.Subscriber.Lock'.$$preferences{lock})
             if $$preferences{lock};
-
-        if($c->config->{subscriber}{audiofile_features}) {
-            my $audio_files;
-            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
-                                                                { username => $c->session->{subscriber}{username},
-                                                                  domain   => $c->session->{subscriber}{domain},
-                                                                },
-                                                                \$audio_files
-                                                              );
-            $c->session->{subscriber}{audio_files} = $audio_files if eval { @$audio_files };
-        }
 
     } else {
         $c->stash->{account_id} = $c->request->params->{account_id};
@@ -192,12 +157,6 @@ sub detail : Local {
                                                           );
         $c->stash->{domains} = $domains if eval { @$domains };
     }
-
-    my $db_prefs;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
-                                                        undef, \$db_prefs
-                                                      );
-    $c->session->{voip_preferences} = $db_prefs if eval { @$db_prefs };
 
     ### restore data entered by the user ###
 
@@ -213,165 +172,11 @@ sub detail : Local {
             if defined $c->session->{restore_subscriber_input}{webpassword};
         delete $c->session->{restore_subscriber_input};
     }
-    if(ref $c->session->{restore_preferences_input} eq 'HASH') {
-        if(ref $preferences eq 'HASH') {
-            $preferences = { %$preferences, %{$c->session->{restore_preferences_input}} };
-        } else {
-            $preferences = $c->session->{restore_preferences_input};
-        }
-        delete $c->session->{restore_preferences_input};
-    }
-    if(ref $c->session->{restore_vboxprefs_input} eq 'HASH') {
-        if(ref $c->stash->{subscriber}{voicebox_preferences} eq 'HASH') {
-            $c->stash->{subscriber}{voicebox_preferences} = { %{$c->stash->{subscriber}{voicebox_preferences}},
-                                                              %{$c->session->{restore_vboxprefs_input}} };
-        } else {
-            $c->stash->{subscriber}{voicebox_preferences} = $c->session->{restore_vboxprefs_input};
-        }
-        delete $c->session->{restore_vboxprefs_input};
-    }
-    if(ref $c->session->{restore_faxprefs_input} eq 'HASH') {
-        if(ref $c->stash->{subscriber}{fax_preferences} eq 'HASH') {
-            $c->stash->{subscriber}{fax_preferences} = { %{$c->stash->{subscriber}{fax_preferences}},
-                                                         %{$c->session->{restore_faxprefs_input}} };
-        } else {
-            $c->stash->{subscriber}{fax_preferences} = $c->session->{restore_faxprefs_input};
-        }
-        delete $c->session->{restore_faxprefs_input};
-    }
-
-    ### build preference array for TT ###
-
-    if(ref $c->session->{voip_preferences} eq 'ARRAY') {
-
-      my $cftarget;
-      my @stashprefs;
-
-      foreach my $pref (@{$c->session->{voip_preferences}}) {
-
-        # not a subscriber preference
-        next if $$pref{attribute} eq 'cc';
-        # managed separately
-        next if $$pref{attribute} eq 'lock';
-
-        # only for extensions enabled systems
-        next if (   $$pref{attribute} eq 'base_cli'
-                 or $$pref{attribute} eq 'base_user'
-                 or $$pref{attribute} eq 'extension'
-                 or $$pref{attribute} eq 'has_extension' )
-                and !$c->config->{extension_features};
-
-
-        if($$pref{attribute} eq 'cfu'
-           or $$pref{attribute} eq 'cfb'
-           or $$pref{attribute} eq 'cft'
-           or $$pref{attribute} eq 'cfna')
-        {
-          if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
-            if($$preferences{$$pref{attribute}} =~ /\@voicebox\.local$/) {
-              $$cftarget{voicebox} = 1;
-            } elsif($$preferences{$$pref{attribute}} =~ /\@fax2mail\.local$/) {
-              $$cftarget{fax2mail} = 1;
-            } else {
-              $$cftarget{sipuri} = $$preferences{$$pref{attribute}};
-              $$cftarget{sipuri} =~ s/^sip://i;
-              if($$cftarget{sipuri} =~ /^\+?\d+\@/) {
-                $$cftarget{sipuri} =~ s/\@.*$//;
-              }
-            }
-          }
-        } elsif($$pref{attribute} eq 'cli') {
-          if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
-            $$preferences{$$pref{attribute}} =~ s/^sip://i;
-            $$preferences{$$pref{attribute}} =~ s/\@.*$//
-                if $$preferences{$$pref{attribute}} =~ /^\+?\d+\@/;
-          }
-        } elsif(!$c->stash->{ncos_levels} and ($$pref{attribute} eq 'ncos' or $$pref{attribute} eq 'adm_ncos')) {
-          my $ncoslvl;
-          return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_ncos_levels',
-                                                              undef,
-                                                              \$ncoslvl
-                                                            );
-          $c->stash->{ncos_levels} = $ncoslvl if eval { @$ncoslvl };
-        }
-
-        push @stashprefs,
-             { key       => $$pref{attribute},
-               value     => $$preferences{$$pref{attribute}},
-               max_occur => $$pref{max_occur},
-               error     => $c->session->{messages}{$$pref{attribute}}
-                            ? $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                    config->{VARIABLES}{site_config}{language},
-                                                                  $c->session->{messages}{$$pref{attribute}})
-                            : undef,
-             };
-      }
-
-      # OMG
-      # reorder preferences so "cftarget" appears just above "cfu" and friends
-      foreach my $stashpref (@stashprefs) {
-        if($$stashpref{key} eq 'cfu') {
-          push @{$c->stash->{subscriber}{preferences_array}},
-               { key       => 'cftarget',
-                 value     => $cftarget,
-                 max_occur => 1,
-                 error     => $c->session->{messages}{cftarget}
-                              ? $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                      config->{VARIABLES}{site_config}{language},
-                                                                    $c->session->{messages}{cftarget})
-                              : undef,
-               };
-        }
-        push @{$c->stash->{subscriber}{preferences_array}}, $stashpref;
-      }
-    }
-
-    my $i = 1;
-    my $default_speed_dial_slots = admin::Utils::get_default_slot_list($c);
-    my @used_default_speed_dial_slots = ();
-    if (eval { @$speed_dial_slots }) {
-        foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @$speed_dial_slots) {
-            $$sdentry{destination} =~ s/^sip://i;
-            $$sdentry{destination} =~ s/\@.*$//
-                if $$sdentry{destination} =~ /^\+?\d+\@/;
-            push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
-                                                     number      => $i++,
-                                                     label       => 'Slot ' . $$sdentry{slot} . ': ' . $$sdentry{destination}
-                                                   };
-            if (grep { $_ eq $$sdentry{slot} } @$default_speed_dial_slots) {
-                push @used_default_speed_dial_slots,$$sdentry{slot};
-            }
-        }
-    }
-    foreach my $free_slot (@$default_speed_dial_slots) {
-        unless (grep { $_ eq $free_slot } @used_default_speed_dial_slots) {
-            push @{$c->stash->{speed_dial_slots}}, { id          => '',
-                                                     number      => $i++,
-                                                     label       => 'Slot ' . $free_slot . ': empty'
-                                                   };
-        }
-    }
-
-    if(ref $c->session->{subscriber}{fax_preferences} eq 'HASH' and
-       ref $c->session->{subscriber}{fax_preferences}{destinations} eq 'ARRAY')
-    {
-        for(@{$c->session->{subscriber}{fax_preferences}{destinations}}) {
-            if($$_{destination} =~ /^\d+$/) {
-                my $scc = $c->session->{subscriber}{cc};
-                $$_{destination} = '+'.$$_{destination};
-                $$_{destination} =~ s/^\+$scc/0/;
-            }
-        }
-    }
 
     $c->stash->{show_pass} = $c->request->params->{show_pass};
     $c->stash->{show_webpass} = $c->request->params->{show_webpass};
-    $c->stash->{show_faxpass} = $c->request->params->{show_faxpass};
     $c->stash->{edit_subscriber} = $c->request->params->{edit_subscriber}
         unless $is_new;
-    $c->stash->{edit_preferences} = $c->request->params->{edit_preferences};
-    $c->stash->{edit_voicebox} = $c->request->params->{edit_voicebox};
-    $c->stash->{edit_fax} = $c->request->params->{edit_fax};
 
     return 1;
 }
@@ -570,6 +375,269 @@ sub terminate : Local {
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
     return;
+}
+
+sub expire : Local {
+    my ( $self, $c ) = @_;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $contact_id = $c->request->params->{contact_id};
+
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_registered_contact',
+                                             { username => $c->session->{subscriber}{username},
+                                               domain   => $c->session->{subscriber}{domain},
+                                               id       => $contact_id,
+                                             },
+                                             undef
+                                           ))
+    {
+        $c->session->{messages}{contmsg} = 'Server.Voip.RemovedRegisteredContact';
+        $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
+    }
+
+    $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
+}
+
+=head2 preferences
+
+Display subscriber preferences.
+
+=cut
+
+sub preferences : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_preferences.tt';
+
+    my $preferences;
+    my $speed_dial_slots;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$preferences
+                                                      );
+
+    # voicebox requires a number
+    if(length $c->session->{subscriber}{sn} && $c->config->{voicemail_features}) {
+      return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_voicebox_preferences',
+                                                          { username => $c->session->{subscriber}{username},
+                                                            domain   => $c->session->{subscriber}{domain},
+                                                          },
+                                                          \$c->session->{subscriber}{voicebox_preferences}
+                                                        );
+    }
+
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_speed_dial_slots',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain   => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$speed_dial_slots
+                                                      );
+
+    if($c->config->{fax_features}) {
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
+                                                            { username => $c->session->{subscriber}{username},
+                                                              domain   => $c->session->{subscriber}{domain},
+                                                            },
+                                                            \$c->session->{subscriber}{fax_preferences}
+                                                          );
+    }
+
+    if($c->config->{subscriber}{audiofile_features}) {
+        my $audio_files;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
+                                                            { username => $c->session->{subscriber}{username},
+                                                              domain   => $c->session->{subscriber}{domain},
+                                                            },
+                                                            \$audio_files
+                                                          );
+        $c->session->{subscriber}{audio_files} = $audio_files if eval { @$audio_files };
+    }
+
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+    $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c->view($c->config->{view})->
+                                                                                 config->{VARIABLES}{site_config}{language},
+                                                                             'Web.Subscriber.Lock'.$$preferences{lock})
+        if $$preferences{lock};
+
+    my $db_prefs;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
+                                                        undef, \$db_prefs
+                                                      );
+    $c->session->{voip_preferences} = $db_prefs if eval { @$db_prefs };
+
+    ### restore data entered by the user ###
+
+    if(ref $c->session->{restore_preferences_input} eq 'HASH') {
+        if(ref $preferences eq 'HASH') {
+            $preferences = { %$preferences, %{$c->session->{restore_preferences_input}} };
+        } else {
+            $preferences = $c->session->{restore_preferences_input};
+        }
+        delete $c->session->{restore_preferences_input};
+    }
+    if(ref $c->session->{restore_vboxprefs_input} eq 'HASH') {
+        if(ref $c->stash->{subscriber}{voicebox_preferences} eq 'HASH') {
+            $c->stash->{subscriber}{voicebox_preferences} = { %{$c->stash->{subscriber}{voicebox_preferences}},
+                                                              %{$c->session->{restore_vboxprefs_input}} };
+        } else {
+            $c->stash->{subscriber}{voicebox_preferences} = $c->session->{restore_vboxprefs_input};
+        }
+        delete $c->session->{restore_vboxprefs_input};
+    }
+    if(ref $c->session->{restore_faxprefs_input} eq 'HASH') {
+        if(ref $c->stash->{subscriber}{fax_preferences} eq 'HASH') {
+            $c->stash->{subscriber}{fax_preferences} = { %{$c->stash->{subscriber}{fax_preferences}},
+                                                         %{$c->session->{restore_faxprefs_input}} };
+        } else {
+            $c->stash->{subscriber}{fax_preferences} = $c->session->{restore_faxprefs_input};
+        }
+        delete $c->session->{restore_faxprefs_input};
+    }
+
+    ### build preference array for TT ###
+
+    if(ref $c->session->{voip_preferences} eq 'ARRAY') {
+
+      my $cftarget;
+      my @stashprefs;
+
+      foreach my $pref (@{$c->session->{voip_preferences}}) {
+
+        # not a subscriber preference
+        next if $$pref{attribute} eq 'cc';
+        # managed separately
+        next if $$pref{attribute} eq 'lock';
+
+        # only for extensions enabled systems
+        next if (   $$pref{attribute} eq 'base_cli'
+                 or $$pref{attribute} eq 'base_user'
+                 or $$pref{attribute} eq 'extension'
+                 or $$pref{attribute} eq 'has_extension' )
+                and !$c->config->{extension_features};
+
+
+        if($$pref{attribute} eq 'cfu'
+           or $$pref{attribute} eq 'cfb'
+           or $$pref{attribute} eq 'cft'
+           or $$pref{attribute} eq 'cfna')
+        {
+          if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
+            if($$preferences{$$pref{attribute}} =~ /\@voicebox\.local$/) {
+              $$cftarget{voicebox} = 1;
+            } elsif($$preferences{$$pref{attribute}} =~ /\@fax2mail\.local$/) {
+              $$cftarget{fax2mail} = 1;
+            } else {
+              $$cftarget{sipuri} = $$preferences{$$pref{attribute}};
+              $$cftarget{sipuri} =~ s/^sip://i;
+              if($$cftarget{sipuri} =~ /^\+?\d+\@/) {
+                $$cftarget{sipuri} =~ s/\@.*$//;
+              }
+            }
+          }
+        } elsif($$pref{attribute} eq 'cli') {
+          if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
+            $$preferences{$$pref{attribute}} =~ s/^sip://i;
+            $$preferences{$$pref{attribute}} =~ s/\@.*$//
+                if $$preferences{$$pref{attribute}} =~ /^\+?\d+\@/;
+          }
+        } elsif(!$c->stash->{ncos_levels} and ($$pref{attribute} eq 'ncos' or $$pref{attribute} eq 'adm_ncos')) {
+          my $ncoslvl;
+          return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_ncos_levels',
+                                                              undef,
+                                                              \$ncoslvl
+                                                            );
+          $c->stash->{ncos_levels} = $ncoslvl if eval { @$ncoslvl };
+        }
+
+        push @stashprefs,
+             { key       => $$pref{attribute},
+               value     => $$preferences{$$pref{attribute}},
+               max_occur => $$pref{max_occur},
+               error     => $c->session->{messages}{$$pref{attribute}}
+                            ? $c->model('Provisioning')->localize($c->view($c->config->{view})->
+                                                                    config->{VARIABLES}{site_config}{language},
+                                                                  $c->session->{messages}{$$pref{attribute}})
+                            : undef,
+             };
+      }
+
+      # OMG
+      # reorder preferences so "cftarget" appears just above "cfu" and friends
+      foreach my $stashpref (@stashprefs) {
+        if($$stashpref{key} eq 'cfu') {
+          push @{$c->stash->{subscriber}{preferences_array}},
+               { key       => 'cftarget',
+                 value     => $cftarget,
+                 max_occur => 1,
+                 error     => $c->session->{messages}{cftarget}
+                              ? $c->model('Provisioning')->localize($c->view($c->config->{view})->
+                                                                      config->{VARIABLES}{site_config}{language},
+                                                                    $c->session->{messages}{cftarget})
+                              : undef,
+               };
+        }
+        push @{$c->stash->{subscriber}{preferences_array}}, $stashpref;
+      }
+    }
+
+    my $i = 1;
+    my $default_speed_dial_slots = admin::Utils::get_default_slot_list($c);
+    my @used_default_speed_dial_slots = ();
+    if (eval { @$speed_dial_slots }) {
+        foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @$speed_dial_slots) {
+            $$sdentry{destination} =~ s/^sip://i;
+            $$sdentry{destination} =~ s/\@.*$//
+                if $$sdentry{destination} =~ /^\+?\d+\@/;
+            push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
+                                                     number      => $i++,
+                                                     label       => 'Slot ' . $$sdentry{slot} . ': ' . $$sdentry{destination}
+                                                   };
+            if (grep { $_ eq $$sdentry{slot} } @$default_speed_dial_slots) {
+                push @used_default_speed_dial_slots,$$sdentry{slot};
+            }
+        }
+    }
+    foreach my $free_slot (@$default_speed_dial_slots) {
+        unless (grep { $_ eq $free_slot } @used_default_speed_dial_slots) {
+            push @{$c->stash->{speed_dial_slots}}, { id          => '',
+                                                     number      => $i++,
+                                                     label       => 'Slot ' . $free_slot . ': empty'
+                                                   };
+        }
+    }
+
+    if(ref $c->session->{subscriber}{fax_preferences} eq 'HASH' and
+       ref $c->session->{subscriber}{fax_preferences}{destinations} eq 'ARRAY')
+    {
+        for(@{$c->session->{subscriber}{fax_preferences}{destinations}}) {
+            if($$_{destination} =~ /^\d+$/) {
+                my $scc = $c->session->{subscriber}{cc};
+                $$_{destination} = '+'.$$_{destination};
+                $$_{destination} =~ s/^\+$scc/0/;
+            }
+        }
+    }
+
+    $c->stash->{show_faxpass} = $c->request->params->{show_faxpass};
+    $c->stash->{edit_preferences} = $c->request->params->{edit_preferences};
+    $c->stash->{edit_voicebox} = $c->request->params->{edit_voicebox};
+    $c->stash->{edit_fax} = $c->request->params->{edit_fax};
+
+    return 1;
 }
 
 sub update_preferences : Local {
@@ -776,7 +844,7 @@ sub update_preferences : Local {
         {
             $messages{prefmsg} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#userprefs");
+            $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id#userprefs");
             return;
 
         }
@@ -786,7 +854,7 @@ sub update_preferences : Local {
 
     $c->session->{messages} = \%messages;
     $c->session->{restore_preferences_input} = $preferences;
-    $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id&edit_preferences=1#userprefs");
+    $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&edit_preferences=1#userprefs");
     return;
 
 }
@@ -839,7 +907,7 @@ sub update_voicebox : Local {
         {
             $messages{vboxmsg} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#vboxprefs");
+            $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id#vboxprefs");
             return;
         }
     } else {
@@ -848,7 +916,7 @@ sub update_voicebox : Local {
 
     $c->session->{messages} = \%messages;
     $c->session->{restore_vboxprefs_input} = $vboxprefs;
-    $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id&edit_voicebox=1#vboxprefs");
+    $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&edit_voicebox=1#vboxprefs");
     return;
 }
 
@@ -1115,7 +1183,7 @@ sub do_edit_iplist : Local {
 
 sub edit_speed_dial_slots : Local {
     my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/speed_dial_list.tt';
+    $c->stash->{template} = 'tt/subscriber_edit_speeddial.tt';
 
     my %messages;
 
@@ -1357,7 +1425,7 @@ sub update_fax : Local {
         {
             $messages{faxmsg} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#faxprefs");
+            $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id#faxprefs");
             return;
         }
     } else {
@@ -1367,7 +1435,7 @@ sub update_fax : Local {
     $c->session->{messages} = \%messages;
     $$faxprefs{repass} = $$faxprefs{password};
     $c->session->{restore_faxprefs_input} = $faxprefs;
-    $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id&edit_fax=1#faxprefs");
+    $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&edit_fax=1#faxprefs");
     return;
 }
 
@@ -1735,32 +1803,6 @@ sub listen_audio : Local {
 
     $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
     return;
-}
-
-sub expire : Local {
-    my ( $self, $c ) = @_;
-
-    my $subscriber_id = $c->request->params->{subscriber_id};
-    my $contact_id = $c->request->params->{contact_id};
-
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
-                                                        { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
-                                                      );
-
-    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_registered_contact',
-                                             { username => $c->session->{subscriber}{username},
-                                               domain   => $c->session->{subscriber}{domain},
-                                               id       => $contact_id,
-                                             },
-                                             undef
-                                           ))
-    {
-        $c->session->{messages}{contmsg} = 'Server.Voip.RemovedRegisteredContact';
-        $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
-    }
-
-    $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
 }
 
 =head1 BUGS AND LIMITATIONS
