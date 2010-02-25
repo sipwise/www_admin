@@ -28,7 +28,7 @@
             [% FOREACH sdentry = speed_dial_slots %]
               <tr class="[% sdentry.background %]">
                 <td >[% sdentry.slot %]</td>
-                <form action="/subscriber/do_edit_sd_list" method="post">
+                <form action="/subscriber/do_edit_speed_dial_slots" method="post">
                   <td>
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="update_id" value="[% sdentry.id %]" />
@@ -40,7 +40,7 @@
                     </div>
                   </td>
                 </form>
-                <form action="/subscriber/do_edit_sd_list" method="post">
+                <form action="/subscriber/do_edit_speed_dial_slots" method="post">
                   [% IF sdentry.error %]
                     <td>
                   [% ELSE %]
@@ -63,7 +63,7 @@
           <br />
           
           [% IF free_speed_dial_slots %]
-          <form action="/subscriber/do_edit_sd_list" method="post">
+          <form action="/subscriber/do_edit_speed_dial_slots" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
             <label for="addslot">New entry:</label><br />
             <div class="postlink">

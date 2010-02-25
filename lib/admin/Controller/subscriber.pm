@@ -1266,7 +1266,7 @@ sub edit_speed_dial_slots : Local {
     return 1;
 }
 
-sub do_edit_sd_list : Local {
+sub do_edit_speed_dial_slots : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
