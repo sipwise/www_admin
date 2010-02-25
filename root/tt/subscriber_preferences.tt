@@ -350,7 +350,7 @@
                     value="[% subscriber.fax_preferences.password %]" />
                     <a href="?subscriber_id=[% subscriber.subscriber_id %]#faxprefs" class="apass">Hide</a>
                   [% ELSE %]
-                    [% IF subscriber.password %]
+                    [% IF subscriber.fax_preferences.password %]
                       value="********" />
                       [% IF Catalyst.session.admin.show_passwords %]
                         <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_faxpass=1#faxprefs" class="apass">Show</a>
