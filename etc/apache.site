@@ -1,0 +1,52 @@
+# should be automatically set in ports.conf
+# Listen 443
+# NameVirtualHost *:443
+
+PerlSwitches -I/usr/local/admin/lib
+
+<VirtualHost *:443>
+        ServerAdmin support@sipwise.com
+        ServerName YOUR.SERVER
+        SSLEngine on
+        SSLCertificateFile /etc/apache2/ssl/YOUR.SERVER.crt
+        SSLCertificateKeyFile /etc/apache2/ssl/YOUR.SERVER.pem
+
+        PerlModule Apache2::RequestUtil admin
+
+        # always keep "Location /" at the top!
+        # it will be overridden by later more specific locations
+        <Location />
+                SetHandler modperl
+                PerlResponseHandler admin
+        </Location>
+
+        <Location /SOAP>
+                AuthName "Sipwise NGCP Provisioning"
+                AuthType Basic
+                AuthUserFile /usr/local/etc/provisioning.htpasswd
+                Require valid-user
+
+                SetHandler perl-script
+                PerlHandler Sipwise::Provisioning::SOAP
+        </Location>
+
+        <Location /XMLRPC>
+                AuthName "Sipwise NGCP Provisioning"
+                AuthType Basic
+                AuthUserFile /usr/local/etc/provisioning.htpasswd
+                Require valid-user
+
+                SetHandler perl-script
+                PerlHandler Apache::XMLRPC::Lite
+                PerlSetVar dispatch_to '/usr/local/lib/site_perl/Sipwise/Provisioning/backends'
+        </Location>
+
+        # requires module dumpio
+        # LogLevel debug
+        # DumpIOInput Off
+        # DumpIOOutput Off
+
+        LogLevel info
+        ErrorLog syslog
+        CustomLog "|/usr/bin/logger -p daemon.info -t oss" combined
+</VirtualHost>
