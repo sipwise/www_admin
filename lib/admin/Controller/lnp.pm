@@ -40,7 +40,6 @@ sub index : Private {
         $self->_do_search_numbers($c, $c->session->{searched_lnp_numbers})
             unless exists $c->session->{lnp_numbers}{numbers};
     }
-    # TODO: paginate!
     if(ref $c->session->{lnp_numbers}{numbers} eq 'ARRAY' and
        @{$c->session->{lnp_numbers}{numbers}})
     {
@@ -48,8 +47,9 @@ sub index : Private {
         $c->stash->{numbers} = $$nums{numbers};
         $c->stash->{num_total_count} = $$nums{total_count};
         if($$nums{total_count} > @{$$nums{numbers}}) {
+            # paginate!
             $c->stash->{pagination} =
-                admin::Utils::paginate($c, $nums, $c->session->{searched_lnp_numbers}{offset}, $c->session->{searched_lnp_numbers}{limit});
+                admin::Utils::paginate($$nums{total_count}, $c->session->{searched_lnp_numbers}{offset}, $c->session->{searched_lnp_numbers}{limit});
             $c->stash->{max_offset} = $#{$c->stash->{pagination}};
             # delete_number will decrease offset if no number remains on current page
             if(@{$$nums{numbers}} == 1) {

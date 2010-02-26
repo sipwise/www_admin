@@ -97,7 +97,7 @@ sub search : Local {
         $c->stash->{offset} = $offset;
         if($$subscriber_list{total_count} > @{$$subscriber_list{subscribers}}) {
             # paginate!
-            $c->stash->{pagination} = admin::Utils::paginate($c, $subscriber_list, $offset, $limit);
+            $c->stash->{pagination} = admin::Utils::paginate($$subscriber_list{total_count}, $offset, $limit);
             $c->stash->{max_offset} = $#{$c->stash->{pagination}};
         }
     }
