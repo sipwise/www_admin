@@ -1411,6 +1411,8 @@ sub update_fax : Local {
     $$faxprefs{name} = $c->request->params->{name} || undef;
     $$faxprefs{password} = $c->request->params->{password} if length $c->request->params->{password};
     $$faxprefs{active} = $c->request->params->{active} ? 1 : 0;
+    $$faxprefs{send_status} = $c->request->params->{send_status} ? 1 : 0;
+    $$faxprefs{send_copy} = $c->request->params->{send_copy} ? 1 : 0;
 
     ### save settings ###
 

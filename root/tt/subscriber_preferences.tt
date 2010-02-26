@@ -335,6 +335,7 @@
                 <td class="tdkey">name:</td>
                 <td>
                   <input type="text" name="name" [% IF ! edit_fax %]class="disabled" disabled="disabled"[% END %]
+                         title="the subscriber's real name, will be printed on fax headers"
                     value="[% subscriber.fax_preferences.name %]" />
                 </td>
               </tr>
@@ -343,7 +344,8 @@
                 <td class="tdkey">password:</td>
                 <td>
                 [% IF edit_fax %]
-                  <input type="text" name="password" value="[% subscriber.fax_preferences.repass %]" />
+                  <input type="text" name="password" value="[% subscriber.fax_preferences.repass %]"
+                         title="the password for hylafax authentication" />
                 [% ELSE %]
                   <input type="text" name="password" class="disabled" disabled="disabled"
                   [% IF show_faxpass && Catalyst.session.admin.show_passwords %]
@@ -367,7 +369,24 @@
                 <td class="tdkey">active:</td>
                 <td>
                   <input type="checkbox" name="active" class="checkbox" [% IF ! edit_fax %]disabled="disabled"[% END %]
+                         title="if checked, sending and receiving fax messages is enabled"
                     [% IF subscriber.fax_preferences.active %]checked="checked"[% END %] />
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">send reports:</td>
+                <td>
+                  <input type="checkbox" name="send_status" class="checkbox" [% IF ! edit_fax %]disabled="disabled"[% END %]
+                         title="if checked, transmission reports for outgoing fax messages will be sent to the configured destinations"
+                    [% IF subscriber.fax_preferences.send_status %]checked="checked"[% END %] />
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">send copies:</td>
+                <td>
+                  <input type="checkbox" name="send_copy" class="checkbox" [% IF ! edit_fax %]disabled="disabled"[% END %]
+                         title="if checked, copies of outgoing fax messages will be sent to the configured destinations"
+                    [% IF subscriber.fax_preferences.send_copy %]checked="checked"[% END %] />
                 </td>
               </tr>
               <tr>
