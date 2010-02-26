@@ -24,12 +24,33 @@ sub index : Private {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/number.tt';
 
+    my $limit = 10;
+    my $offset = $c->request->params->{offset} || 0;
+    $offset = 0 if $offset !~ /^\d+$/;
+
     my $blocks;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_number_blocks',
-                                                        undef,
+                                                        { filter => { limit  => $limit,
+                                                                      offset => $limit * $offset,
+                                                                    },
+                                                        },
                                                         \$blocks
                                                       );
-    $c->stash->{blocks} = $blocks if eval { @$blocks };
+
+    if(eval { @{$$blocks{number_blocks}} }) {
+        $c->stash->{blocks} = $$blocks{number_blocks};
+        $c->stash->{total_count} = $$blocks{total_count};
+        $c->stash->{offset} = $offset;
+
+        if($$blocks{total_count} > @{$$blocks{number_blocks}})  {
+            # paginate!
+            $c->stash->{pagination} = admin::Utils::paginate($$blocks{total_count}, $offset, $limit);
+            $c->stash->{max_offset} = $#{$c->stash->{pagination}};
+            if(@{$$blocks{number_blocks}} == 1) {
+                $c->stash->{last_one} = 1;
+            }
+        }
+    }
 
 
     $c->stash->{edit_cc} = $c->request->params->{edit_cc};
@@ -70,6 +91,8 @@ sub do_create_block : Local {
     my %messages;
     my %settings;
 
+    my $offset = $c->request->params->{offset} || 0;
+
     $settings{cc} = $c->request->params->{cc};
     $settings{ac} = $c->request->params->{ac};
     $settings{sn_prefix} = $c->request->params->{sn_prefix};
@@ -84,18 +107,18 @@ sub do_create_block : Local {
         {
             $messages{cblockmsg} = 'Web.NumberBlock.Created';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/number#create_block");
+            $c->response->redirect("/number?offset=$offset#create_block");
             return;
         }
         $c->session->{crefill} = \%settings;
-        $c->response->redirect("/number#create_block");
+        $c->response->redirect("/number?offset=$offset#create_block");
         return;
     }
 
     $messages{cblockerr} = 'Client.Voip.InputErrorFound';
     $c->session->{messages} = \%messages;
     $c->session->{crefill} = \%settings;
-    $c->response->redirect("/number#create_block");
+    $c->response->redirect("/number?offset=$offset#create_block");
     return;
 }
 
@@ -110,6 +133,8 @@ sub do_update_block : Local {
 
     my %messages;
     my %settings;
+
+    my $offset = $c->request->params->{offset} || 0;
 
     $settings{cc} = $c->request->params->{cc};
     $settings{ac} = $c->request->params->{ac};
@@ -128,18 +153,18 @@ sub do_update_block : Local {
         {
             $messages{eblockmsg} = 'Web.NumberBlock.Updated';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/number");
+            $c->response->redirect("/number?offset=$offset#existing_blocks");
             return;
         }
         $c->session->{erefill} = \%settings;
-        $c->response->redirect("/number?edit_cc=$settings{cc}&amp;edit_ac=$settings{ac}&amp;edit_sn_prefix=$settings{sn_prefix}");
+        $c->response->redirect("/number?edit_cc=$settings{cc}&amp;edit_ac=$settings{ac}&amp;edit_sn_prefix=$settings{sn_prefix}&amp;offset=$offset#existing_blocks");
         return;
     }
 
     $messages{eblockerr} = 'Client.Voip.InputErrorFound';
     $c->session->{messages} = \%messages;
     $c->session->{erefill} = \%settings;
-    $c->response->redirect("/number?edit_cc=$settings{cc}&amp;edit_ac=$settings{ac}&amp;edit_sn_prefix=$settings{sn_prefix}");
+    $c->response->redirect("/number?edit_cc=$settings{cc}&amp;edit_ac=$settings{ac}&amp;edit_sn_prefix=$settings{sn_prefix}&amp;offset=$offset#existing_blocks");
     return;
 }
 
@@ -154,6 +179,8 @@ sub do_delete_block : Local {
 
     my %settings;
 
+    my $offset = $c->request->params->{offset} || 0;
+
     $settings{cc} = $c->request->params->{cc};
     $settings{ac} = $c->request->params->{ac};
     $settings{sn_prefix} = $c->request->params->{sn_prefix};
@@ -167,11 +194,11 @@ sub do_delete_block : Local {
                                              undef))
     {
         $c->session->{messages} = { eblockmsg => 'Web.NumberBlock.Deleted' };
-        $c->response->redirect("/number");
+        $c->response->redirect("/number?offset=$offset#existing_blocks");
         return;
     }
 
-    $c->response->redirect("/number");
+    $c->response->redirect("/number?offset=$offset#existing_blocks");
     return;
 }
 
