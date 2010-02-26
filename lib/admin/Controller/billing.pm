@@ -442,7 +442,7 @@ sub search_fees : Local {
         if($$fee_list{total_count} > @{$$fee_list{fees}}) {
             # paginate!
             $c->stash->{pagination} = admin::Utils::paginate($$fee_list{total_count}, $offset, $limit);
-            $c->stash->{max_offset} = $#{$c->stash->{pagination}};
+            $c->stash->{max_offset} = ${$c->stash->{pagination}}[-1]{offset};
             if(@{$$fee_list{fees}} == 1) {
                 $c->stash->{last_one} = 1;
             }

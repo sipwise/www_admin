@@ -50,7 +50,7 @@ sub index : Private {
             # paginate!
             $c->stash->{pagination} =
                 admin::Utils::paginate($$nums{total_count}, $c->session->{searched_lnp_numbers}{offset}, $c->session->{searched_lnp_numbers}{limit});
-            $c->stash->{max_offset} = $#{$c->stash->{pagination}};
+            $c->stash->{max_offset} = ${$c->stash->{pagination}}[-1]{offset};
             # delete_number will decrease offset if no number remains on current page
             if(@{$$nums{numbers}} == 1) {
                 $c->stash->{last_one} = 1;
