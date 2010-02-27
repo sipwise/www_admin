@@ -28,14 +28,66 @@ sub index : Private {
     my $offset = $c->request->params->{offset} || 0;
     $offset = 0 if $offset !~ /^\d+$/;
 
+    my %filter;
+    my %exact;     
+
+    if($c->request->params->{use_session}) {
+        %filter = %{ $c->session->{search_filter} };
+        %exact = %{ $c->session->{exact_filter} };
+    } else {
+        foreach my $sf (qw(cc ac sn_prefix)) {
+            if(   defined $c->request->params->{'search_'.$sf}
+               and length $c->request->params->{'search_'.$sf})
+               
+            {
+                $filter{$sf} = $c->request->params->{'search_'.$sf};
+                $exact{$sf} = 1 if $c->request->params->{'exact_'.$sf};
+            }
+        }
+        $filter{sn_length} = $c->request->params->{search_sn_length}
+            if defined $c->request->params->{search_sn_length} and
+               length $c->request->params->{search_sn_length};
+        $filter{authoritative} = $c->request->params->{search_authoritative}
+            if defined $c->request->params->{search_authoritative} and
+               $c->request->params->{search_authoritative} =~ /^0|1$/;
+        $filter{allocable} = $c->request->params->{search_allocable}
+            if defined $c->request->params->{search_allocable} and
+               $c->request->params->{search_allocable} =~ /^0|1$/;
+
+        $c->session->{search_filter} = { %filter };
+        $c->session->{exact_filter} = { %exact };
+    }
+
+    foreach my $sf (qw(cc ac sn_prefix)) {
+        next unless defined $filter{$sf};
+
+        # set values for webform
+        $c->stash->{'exact_'.$sf} = $exact{$sf};
+        $c->stash->{'search_'.$sf} = $filter{$sf};
+
+        # alter filter for SOAP call
+        $filter{$sf} =~ s/\*/\%/g;
+        $filter{$sf} =~ s/\?/\_/g;
+        unless($exact{$sf}) {
+            $filter{$sf} =~ s/^\%*/\%/;
+            $filter{$sf} =~ s/\%*$/\%/;
+        }
+    }
+    $c->stash->{search_sn_length} = $filter{sn_length};
+    $c->stash->{search_authoritative} = $filter{authoritative};
+    $c->stash->{search_allocable} = $filter{allocable};
+
     my $blocks;
-    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_number_blocks',
-                                                        { filter => { limit  => $limit,
-                                                                      offset => $limit * $offset,
-                                                                    },
-                                                        },
-                                                        \$blocks
-                                                      );
+    do {
+        return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_number_blocks',
+                                                            { filter => { %filter,
+                                                                          limit  => $limit,
+                                                                          offset => $limit * $offset,
+                                                                        },
+                                                            },
+                                                            \$blocks
+                                                          );
+    } until eval { @{$$blocks{number_blocks}} } or --$offset < 0;
 
     if(eval { @{$$blocks{number_blocks}} }) {
         $c->stash->{blocks} = $$blocks{number_blocks};
@@ -65,10 +117,10 @@ sub index : Private {
         $c->stash->{erefill} = $c->session->{erefill};
         delete $c->session->{erefill};
     } elsif($c->request->params->{edit_cc}) {
-        foreach my $block (eval { @$blocks }) {
+        foreach my $block (eval { @{$$blocks{number_blocks}} }) {
             if($$block{cc} == $c->stash->{edit_cc}
                and $$block{ac} == $c->stash->{edit_ac}
-               and $$block{sn_prefix} == $c->stash->{edit_sn_prefix})
+               and $$block{sn_prefix} eq $c->stash->{edit_sn_prefix})
             {
                 $c->stash->{erefill} = $block;
                 last;
@@ -107,18 +159,18 @@ sub do_create_block : Local {
         {
             $messages{cblockmsg} = 'Web.NumberBlock.Created';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/number?offset=$offset#create_block");
+            $c->response->redirect("/number?offset=$offset&amp;use_session=1#create_block");
             return;
         }
         $c->session->{crefill} = \%settings;
-        $c->response->redirect("/number?offset=$offset#create_block");
+        $c->response->redirect("/number?offset=$offset&amp;use_session=1#create_block");
         return;
     }
 
     $messages{cblockerr} = 'Client.Voip.InputErrorFound';
     $c->session->{messages} = \%messages;
     $c->session->{crefill} = \%settings;
-    $c->response->redirect("/number?offset=$offset#create_block");
+    $c->response->redirect("/number?offset=$offset&amp;use_session=1#create_block");
     return;
 }
 
@@ -153,18 +205,18 @@ sub do_update_block : Local {
         {
             $messages{eblockmsg} = 'Web.NumberBlock.Updated';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/number?offset=$offset#existing_blocks");
+            $c->response->redirect("/number?offset=$offset&amp;use_session=1#existing_blocks");
             return;
         }
         $c->session->{erefill} = \%settings;
-        $c->response->redirect("/number?edit_cc=$settings{cc}&amp;edit_ac=$settings{ac}&amp;edit_sn_prefix=$settings{sn_prefix}&amp;offset=$offset#existing_blocks");
+        $c->response->redirect("/number?edit_cc=$settings{cc}&amp;edit_ac=$settings{ac}&amp;edit_sn_prefix=$settings{sn_prefix}&amp;offset=$offset&amp;use_session=1#existing_blocks");
         return;
     }
 
     $messages{eblockerr} = 'Client.Voip.InputErrorFound';
     $c->session->{messages} = \%messages;
     $c->session->{erefill} = \%settings;
-    $c->response->redirect("/number?edit_cc=$settings{cc}&amp;edit_ac=$settings{ac}&amp;edit_sn_prefix=$settings{sn_prefix}&amp;offset=$offset#existing_blocks");
+    $c->response->redirect("/number?edit_cc=$settings{cc}&amp;edit_ac=$settings{ac}&amp;edit_sn_prefix=$settings{sn_prefix}&amp;offset=$offset&amp;use_session=1#existing_blocks");
     return;
 }
 
@@ -194,11 +246,11 @@ sub do_delete_block : Local {
                                              undef))
     {
         $c->session->{messages} = { eblockmsg => 'Web.NumberBlock.Deleted' };
-        $c->response->redirect("/number?offset=$offset#existing_blocks");
+        $c->response->redirect("/number?offset=$offset&amp;use_session=1#existing_blocks");
         return;
     }
 
-    $c->response->redirect("/number?offset=$offset#existing_blocks");
+    $c->response->redirect("/number?offset=$offset&amp;use_session=1#existing_blocks");
     return;
 }
 

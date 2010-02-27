@@ -433,6 +433,9 @@ ul#topsubmenu {
 	min-width: 50px;
 	margin: 3px 0;
 }
+#contentplace .search_subscriber .radio {
+	margin: 6px 0px 8px 0px;
+}
 
 /* increase spacing around list explanation text */
 #contentplace .list_explanation {

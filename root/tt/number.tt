@@ -54,6 +54,60 @@
         </div>
       [% END %]
 
+        <h3 id="search">Search Number Blocks</h3>
+
+        <div class="p1">
+          <form action="/number#search" method="post" class="search_subscriber">
+            <input type="hidden" name="offset" value="[% offset %]" />
+
+            <label class="search_label" for="search_by_cc">cc:</label>
+            <input type="text" id="search_by_cc" name="search_cc" title="SQL wildcards allowed"
+                   value="[% search_cc %]" />
+            <input type="checkbox" id="exact_cc" name="exact_cc" [% IF exact_cc %]checked="checked"[% END %] />
+            <label for="exact_cc">exact match</label><br />
+
+            <label class="search_label" for="search_by_ac">ac:</label>
+            <input type="text" id="search_by_ac" name="search_ac" title="SQL wildcards allowed"
+                   value="[% search_ac %]" />
+            <input type="checkbox" id="exact_ac" name="exact_ac" [% IF exact_ac %]checked="checked"[% END %] />
+            <label for="exact_ac">exact match</label><br />
+
+            <label class="search_label" for="search_by_sn_prefix">sn_prefix:</label>
+            <input type="text" id="search_by_sn_prefix" name="search_sn_prefix" title="SQL wildcards allowed"
+                   value="[% search_sn_prefix %]" />
+            <input type="checkbox" id="exact_sn_prefix" name="exact_sn_prefix" [% IF exact_sn_prefix %]checked="checked"[% END %] />
+            <label for="exact_sn_prefix">exact match</label><br />
+
+            <label class="search_label" for="search_by_sn_length">sn_length:</label>
+            <input type="text" id="search_by_sn_length" name="search_sn_length" title="integer number"
+                   value="[% search_sn_length %]" /><br />
+
+            <label class="search_label" for="search_by_authoritative_true">authoritative:</label>
+            <input type="radio" class="radio" id="search_by_authoritative_true" name="search_authoritative"
+                   value="1" [% IF search_authoritative == 1 %]checked="checked"[% END %] />
+            <label for="search_by_authoritative_true">yes</label>
+            <input type="radio" class="radio" id="search_by_authoritative_false" name="search_authoritative"
+                   value="0" [% IF search_authoritative == 0 %]checked="checked"[% END %] />
+            <label for="search_by_authoritative_false">no</label>
+            <input type="radio" class="radio" id="search_by_authoritative_both" name="search_authoritative"
+                   value="" [% IF search_authoritative == "" %]checked="checked"[% END %] />
+            <label for="search_by_authoritative_both">both</label><br />
+
+            <label class="search_label" for="search_by_allocable_true">allocable:</label>
+            <input type="radio" class="radio" id="search_by_allocable_true" name="search_allocable"
+                   value="1" [% IF search_allocable == 1 %]checked="checked"[% END %] />
+            <label for="search_by_allocable_true">yes</label>
+            <input type="radio" class="radio" id="search_by_allocable_false" name="search_allocable"
+                   value="0" [% IF search_allocable == 0 %]checked="checked"[% END %] />
+            <label for="search_by_allocable_false">no</label>
+            <input type="radio" class="radio" id="search_by_allocable_both" name="search_allocable"
+                   value="" [% IF search_allocable == "" %]checked="checked"[% END %] />
+            <label for="search_by_allocable_both">both</label><br />
+
+            <input type="submit" value="Search &#187;" class="but" />
+          </form>
+        </div>
+
         <h3 id="existing_blocks">Existing Number Blocks</h3>
 
         <div class="p1">
@@ -109,7 +163,7 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/number?offset=[% offset %]" class="aaction">cancel</a></td>
+                  <td><a href="/number?offset=[% offset %]&amp;use_session=1" class="aaction">cancel</a></td>
                 </tr>
               [% ELSE %]
               [% IF bgflip %]
@@ -133,7 +187,7 @@
                   </td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/number?edit_cc=[% block.cc %]&amp;edit_ac=[% block.ac %]&amp;edit_sn_prefix=[% block.sn_prefix %]&amp;offset=[% offset %]" class="aaction">edit</a>
+                    <a href="/number?edit_cc=[% block.cc %]&amp;edit_ac=[% block.ac %]&amp;edit_sn_prefix=[% block.sn_prefix %]&amp;offset=[% offset %]&amp;use_session=1" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/number/do_delete_block" method="post">
@@ -162,7 +216,7 @@
                 <li class="disablepage">&#171; prev</li>
               [% ELSE %]
                 <li class="nextpage">
-                  <a href="/number?offset=[% offset - 1 %]#existing_blocks">&#171; prev</a>
+                  <a href="/number?offset=[% offset - 1 %]&amp;use_session=1#existing_blocks">&#171; prev</a>
                 </li>
               [% END %]
               [% FOREACH pagine = pagination %]
@@ -174,7 +228,7 @@
                    ...
                 [% ELSE %]
                   <li>
-                    <a href="/number?offset=[% pagine.offset %]#existing_blocks">[% pagine.offset + 1 %]</a>
+                    <a href="/number?offset=[% pagine.offset %]&amp;use_session=1#existing_blocks">[% pagine.offset + 1 %]</a>
                   </li>
                 [% END %]
               [% END %]
@@ -184,7 +238,7 @@
                 </li>
               [% ELSE %]
                 <li class="nextpage">
-                  <a href="/number?offset=[% offset + 1 %]#existing_blocks">next &#187;</a>
+                  <a href="/number?offset=[% offset + 1 %]&amp;use_session=1#existing_blocks">next &#187;</a>
                 </li>
               [% END %]
             </ul>
