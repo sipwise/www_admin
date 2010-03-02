@@ -58,10 +58,6 @@
                 [% ELSIF preference.key == "block_in_clir"
                       || preference.key == "adm_block_in_clir"
                       || preference.key == "clir"
-                      || preference.key == "cfu"
-                      || preference.key == "cfb"
-                      || preference.key == "cft"
-                      || preference.key == "cfna"
                       || preference.key == "mct"
                       || preference.key == "in_use"
                       || preference.key == "ignore_allowed_ips" %]
@@ -91,47 +87,56 @@
                       disabled="disabled" [% IF preference.value %]checked="checked"[% END %] />
                   </td>
                 </tr>
-                [% ELSIF preference.key == "cftarget" %]
+                [% ELSIF preference.key == "cfu"
+                      || preference.key == "cfb"
+                      || preference.key == "cft"
+                      || preference.key == "cfna" %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>
                   [% IF edit_preferences %]
+                    <label for="[% preference.key %]disable">
+                      <input type="radio" id="[% preference.key %]disable" value="disable" name="[% preference.key %]_target" class="radio"
+                        [% IF preference.value == "" && ! preference.error %]checked="checked"[% END %] />
+                      disable
+                    </label>
+                    <br clear="all" />
                     [% IF Catalyst.config.voicemail_features %]
-                    <label for="cfvoicebox">
-                      <input type="radio" id="cfvoicebox" value="voicebox" name="fw_target" class="radio"
-                        [% IF preference.value.voicebox %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]voicebox">
+                      <input type="radio" id="[% preference.key %]voicebox" value="voicebox" name="[% preference.key %]_target" class="radio"
+                        [% IF preference.value == "voicebox" %]checked="checked"[% END %] />
                       Voicebox
                     </label>
                     <br clear="all" />
                     [% END %]
                     [% IF Catalyst.config.fax_features %]
-                    <label for="cffaxserver">
-                      <input type="radio" id="cffaxserver" value="fax2mail" name="fw_target" class="radio"
-                        [% IF preference.value.fax2mail %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]faxserver">
+                      <input type="radio" id="[% preference.key %]faxserver" value="fax2mail" name="[% preference.key %]_target" class="radio"
+                        [% IF preference.value == "fax2mail" %]checked="checked"[% END %] />
                       Fax2Mail
                     </label>
                     <br clear="all" />
                     [% END %]
-                    <label for="cfsipuri">
-                      <input type="radio" id="cfsipuri" value="sipuri" name="fw_target" class="radio"
-                        [% IF preference.value.sipuri %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]sipuri">
+                      <input type="radio" id="[% preference.key %]sipuri" value="sipuri" name="[% preference.key %]_target" class="radio"
+                        [% IF (preference.value || preference.error) && preference.value != "voicebox" && preference.value != "fax2mail" %]checked="checked"[% END %] />
                         number or SIP-URI:
                     </label>
-                    <input type="text" id="cfsipuritxt" name="fw_sipuri" size="25" value="[% preference.value.sipuri %]"
-                      [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] />
+                    <input type="text" id="[% preference.key %]sipuritxt" name="[% preference.key %]_sipuri" size="25"
+                           value="[% preference.value UNLESS preference.value == "voicebox" OR preference.value == "fax2mail" %]" />
                   [% ELSE %]
-                    [% IF preference.value.voicebox %]
+                    [% IF preference.value == "voicebox" %]
                       Voicebox
-                    [% ELSIF preference.value.fax2mail %]
+                    [% ELSIF preference.value == "fax2mail" %]
                       Fax2Mail
                     [% ELSE %]
-                      <input type="text" size="25" value="[% preference.value.sipuri %]"
+                      <input type="text" size="25" value="[% preference.value %]"
                              class="disabled txtpreference" disabled="disabled" />
                     [% END %]
                   [% END %]
                   </td>
                 </tr>
-                [% IF messages.target %]<tr><td /><td><div class="errormsg">[% messages.target %]</div></td></tr>[% END %]
+                [% IF preference.value.error %]<tr><td /><td><div class="errormsg">[% preference.value.error %]</div></td></tr>[% END %]
                 [% ELSIF preference.key == "base_cli"
                       || preference.key == "extension"
                       || preference.key == "lock"

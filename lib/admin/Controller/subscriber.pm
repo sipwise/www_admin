@@ -537,14 +537,13 @@ sub preferences : Local {
         {
           if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
             if($$preferences{$$pref{attribute}} =~ /\@voicebox\.local$/) {
-              $$cftarget{voicebox} = 1;
+              $$preferences{$$pref{attribute}} = 'voicebox';
             } elsif($$preferences{$$pref{attribute}} =~ /\@fax2mail\.local$/) {
-              $$cftarget{fax2mail} = 1;
+              $$preferences{$$pref{attribute}} = 'fax2mail';
             } else {
-              $$cftarget{sipuri} = $$preferences{$$pref{attribute}};
-              $$cftarget{sipuri} =~ s/^sip://i;
-              if($$cftarget{sipuri} =~ /^\+?\d+\@/) {
-                $$cftarget{sipuri} =~ s/\@.*$//;
+              $$preferences{$$pref{attribute}} =~ s/^sip://i;
+              if($$preferences{$$pref{attribute}} =~ /^\+?\d+\@/) {
+                $$preferences{$$pref{attribute}} =~ s/\@.*$//;
               }
             }
           }
@@ -575,23 +574,7 @@ sub preferences : Local {
              };
       }
 
-      # OMG
-      # reorder preferences so "cftarget" appears just above "cfu" and friends
-      foreach my $stashpref (@stashprefs) {
-        if($$stashpref{key} eq 'cfu') {
-          push @{$c->stash->{subscriber}{preferences_array}},
-               { key       => 'cftarget',
-                 value     => $cftarget,
-                 max_occur => 1,
-                 error     => $c->session->{messages}{cftarget}
-                              ? $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                      config->{VARIABLES}{site_config}{language},
-                                                                    $c->session->{messages}{cftarget})
-                              : undef,
-               };
-        }
-        push @{$c->stash->{subscriber}{preferences_array}}, $stashpref;
-      }
+      $c->stash->{subscriber}{preferences_array} = \@stashprefs;
     }
 
     my $i = 1;
@@ -705,88 +688,55 @@ sub update_preferences : Local {
     }
 
     ### call forwarding ###
+    foreach my $fwtype (qw(cfu cfb cft cfna)) {
+        my $fw_target_select = $c->request->params->{$fwtype .'_target'} || 'disable';
 
-    my $fw_target_select = $c->request->params->{fw_target};
-    unless($fw_target_select) {
-        $messages{target} = 'Client.Voip.MalformedTargetClass';
-    }
-    my $fw_target;
-    if($fw_target_select eq 'sipuri') {
-        $fw_target = $c->request->params->{fw_sipuri};
+        my $fw_target;
+        if($fw_target_select eq 'sipuri') {
+            $fw_target = $c->request->params->{$fwtype .'_sipuri'};
 
-        # normalize, so we can do some checks.
-        $fw_target =~ s/^sip://i;
-        if($fw_target =~ /^\+?\d+\@[a-z0-9.-]+$/i) {
-            $fw_target =~ s/\@.+$//;
-        }
+            # normalize, so we can do some checks.
+            $fw_target =~ s/^sip://i;
+            if($fw_target =~ /^\+?\d+\@[a-z0-9.-]+$/i) {
+                $fw_target =~ s/\@.+$//;
+            }
 
-        if($fw_target =~ /^\+?\d+$/) {
-            if($fw_target =~ /^\+[1-9][0-9]+$/) {
-                $fw_target = 'sip:'. $fw_target .'@'. $c->session->{subscriber}{domain};
-            } elsif($fw_target =~ /^00[1-9][0-9]+$/) {
-                $fw_target =~ s/^00/+/;
-                $fw_target = 'sip:'. $fw_target .'@'. $c->session->{subscriber}{domain};
-            } elsif($fw_target =~ /^0[1-9][0-9]+$/) {
-                $fw_target =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
-                $fw_target = 'sip:'. $fw_target .'@'. $c->session->{subscriber}{domain};
+            if($fw_target =~ /^\+?\d+$/) {
+                if($fw_target =~ /^\+[1-9][0-9]+$/) {
+                    $fw_target = 'sip:'. $fw_target .'@'. $c->session->{subscriber}{domain};
+                } elsif($fw_target =~ /^00[1-9][0-9]+$/) {
+                    $fw_target =~ s/^00/+/;
+                    $fw_target = 'sip:'. $fw_target .'@'. $c->session->{subscriber}{domain};
+                } elsif($fw_target =~ /^0[1-9][0-9]+$/) {
+                    $fw_target =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
+                    $fw_target = 'sip:'. $fw_target .'@'. $c->session->{subscriber}{domain};
+                } else {
+                    $messages{$fwtype} = 'Client.Voip.MalformedNumber';
+                    $fw_target = $c->request->params->{$fwtype .'_sipuri'};
+                }
+            } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+$/i) {
+                $fw_target = 'sip:'. lc $fw_target;
+            } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+$/) {
+                $fw_target = 'sip:'. lc($fw_target) .'@'. $c->session->{subscriber}{domain};
             } else {
-                $messages{target} = 'Client.Voip.MalformedNumber';
-                $fw_target = $c->request->params->{fw_sipuri};
+                $messages{$fwtype} = 'Client.Voip.MalformedTarget';
+                $fw_target = $c->request->params->{$fwtype .'_sipuri'};
             }
-        } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+$/i) {
-            $fw_target = 'sip:'. lc $fw_target;
-        } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+$/) {
-            $fw_target = 'sip:'. lc($fw_target) .'@'. $c->session->{subscriber}{domain};
-        } else {
-            $messages{target} = 'Client.Voip.MalformedTarget';
-            $fw_target = $c->request->params->{fw_sipuri};
+        } elsif($fw_target_select eq 'voicebox') {
+            $fw_target = 'sip:vmu'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}.'@voicebox.local';
+        } elsif($fw_target_select eq 'fax2mail') {
+            $fw_target = 'sip:'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}.'@fax2mail.local';
         }
-    } elsif($fw_target_select eq 'voicebox') {
-        $fw_target = 'sip:vmu'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}.'@voicebox.local';
-    } elsif($fw_target_select eq 'fax2mail') {
-        $fw_target = 'sip:'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}.'@fax2mail.local';
-    } else {
-        # wtf?
+        $$preferences{$fwtype} = $fw_target;
     }
 
-    my $cfu = $c->request->params->{cfu};
-    my $cfb = $c->request->params->{cfb};
-    my $cft = $c->request->params->{cft};
-    my $cfna = $c->request->params->{cfna};
-
-    # clear all forwards
-    $$preferences{cfu} = undef;
-    $$preferences{cft} = undef;
-    $$preferences{cfb} = undef;
-    $$preferences{cfna} = undef;
     $$preferences{ringtimeout} = undef;
-
-    unless(defined $cfu or defined $cfb or defined $cft or defined $cfna) {
-        delete $messages{target} if exists $messages{target};
-    } else {
-        if(defined $cfu) {
-            # forward unconditionally
-            $$preferences{cfu} = $fw_target;
-        } else {
-            if(defined $cfb) {
-                $$preferences{cfb} = $fw_target;
-            }
-            if(defined $cft) {
-                $$preferences{cft} = $fw_target;
-            }
-            if(defined $cfna) {
-                $$preferences{cfna} = $fw_target;
-            }
-        }
-    }
-
-    if(defined $$preferences{cft}) {
-        $$preferences{ringtimeout} = $c->request->params->{ringtimeout};
-        unless(defined $$preferences{ringtimeout} and $$preferences{ringtimeout} =~ /^\d+$/
-           and $$preferences{ringtimeout} < 301 and $$preferences{ringtimeout} > 4)
-        {
-            $messages{ringtimeout} = 'Client.Voip.MissingRingtimeout';
-        }
+    $$preferences{ringtimeout} = $c->request->params->{ringtimeout} || undef;
+    unless(defined $$preferences{ringtimeout} and $$preferences{ringtimeout} =~ /^\d+$/
+       and $$preferences{ringtimeout} < 301 and $$preferences{ringtimeout} > 4)
+    {
+        $messages{ringtimeout} = 'Client.Voip.MissingRingtimeout'
+            if $$preferences{cft};
     }
 
     ### outgoing calls ###
