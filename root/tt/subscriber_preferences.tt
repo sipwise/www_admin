@@ -284,6 +284,7 @@
                 <td class="tdkey">PIN:</td>
                 <td>
                   <input type="text" name="password" [% IF ! edit_voicebox %]class="disabled" disabled="disabled"[% END %]
+                         title="numeric password for the voicebox, usually 4 digits"
                     value="[% subscriber.voicebox_preferences.password %]" />
                 </td>
               </tr>
@@ -292,6 +293,7 @@
                 <td class="tdkey">E-Mail:</td>
                 <td>
                   <input type="text" name="email" [% IF ! edit_voicebox %]class="disabled" disabled="disabled"[% END %]
+                         title="email address where notifications will be sent"
                     value="[% subscriber.voicebox_preferences.email %]" />
                 </td>
               </tr>
@@ -300,7 +302,16 @@
                 <td class="tdkey">Attach WAV:</td>
                 <td>
                   <input type="checkbox" name="attach" class="checkbox" [% IF ! edit_voicebox %]disabled="disabled"[% END %]
+                         title="if checked, the recording will be attached to the email"
                     [% IF subscriber.voicebox_preferences.attach %]checked="checked"[% END %] />
+                </td>
+              </tr>
+              <tr>
+                <td class="tdkey">Delete WAV:</td>
+                <td>
+                  <input type="checkbox" name="delete" class="checkbox" [% IF ! edit_voicebox %]disabled="disabled"[% END %]
+                         title="if checked, the recording will be removed after it has been sent vial email"
+                    [% IF subscriber.voicebox_preferences.delete %]checked="checked"[% END %] />
                 </td>
               </tr>
             </table>

@@ -893,6 +893,7 @@ sub update_voicebox : Local {
     }
 
     $$vboxprefs{attach} = $c->request->params->{attach} ? 1 : 0;
+    $$vboxprefs{delete} = $c->request->params->{delete} ? 1 : 0;
 
     ### save settings ###
 
