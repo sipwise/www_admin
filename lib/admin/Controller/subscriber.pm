@@ -468,6 +468,13 @@ sub preferences : Local {
         $c->session->{subscriber}{audio_files} = $audio_files if eval { @$audio_files };
     }
 
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_reminder',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain   => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$c->session->{subscriber}{reminder}
+                                                      );
+
     $c->stash->{subscriber} = $c->session->{subscriber};
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
     $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c->view($c->config->{view})->
@@ -508,6 +515,15 @@ sub preferences : Local {
             $c->stash->{subscriber}{fax_preferences} = $c->session->{restore_faxprefs_input};
         }
         delete $c->session->{restore_faxprefs_input};
+    }
+    if(ref $c->session->{restore_reminder_input} eq 'HASH') {
+        if(ref $c->stash->{subscriber}{reminder} eq 'HASH') {
+            $c->stash->{subscriber}{reminder} = { %{$c->stash->{subscriber}{reminder}},
+                                                  %{$c->session->{restore_reminder_input}} };
+        } else {
+            $c->stash->{subscriber}{reminder} = $c->session->{restore_reminder_input};
+        }
+        delete $c->session->{restore_reminder_input};
     }
 
     ### build preference array for TT ###
@@ -621,6 +637,7 @@ sub preferences : Local {
     $c->stash->{edit_preferences} = $c->request->params->{edit_preferences};
     $c->stash->{edit_voicebox} = $c->request->params->{edit_voicebox};
     $c->stash->{edit_fax} = $c->request->params->{edit_fax};
+    $c->stash->{edit_reminder} = $c->request->params->{edit_reminder};
 
     return 1;
 }
@@ -809,6 +826,46 @@ sub update_preferences : Local {
     $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&edit_preferences=1#userprefs");
     return;
 
+}
+
+sub update_reminder : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    my $reminder;
+    $$reminder{time} = $c->request->params->{time};
+    $$reminder{recur} = $c->request->params->{recur} || 'never';
+
+    ### save settings ###
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_reminder',
+                                                 { username => $c->session->{subscriber}{username},
+                                                   domain => $c->session->{subscriber}{domain},
+                                                   data => $reminder,
+                                                 },
+                                                 undef
+                                               ))
+        {
+            $messages{remmsg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id#reminder");
+            return;
+        }
+    } else {
+        $messages{faxerr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->session->{restore_reminder_input} = $reminder;
+    $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&edit_reminder=1#reminder");
+    return;
 }
 
 sub update_voicebox : Local {
