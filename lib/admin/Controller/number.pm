@@ -32,8 +32,10 @@ sub index : Private {
     my %exact;     
 
     if($c->request->params->{use_session}) {
-        %filter = %{ $c->session->{search_filter} };
-        %exact = %{ $c->session->{exact_filter} };
+        %filter = %{ $c->session->{search_filter} }
+            if defined $c->session->{search_filter};
+        %exact = %{ $c->session->{exact_filter} }
+            if defined $c->session->{exact_filter};
     } else {
         foreach my $sf (qw(cc ac sn_prefix)) {
             if(   defined $c->request->params->{'search_'.$sf}

@@ -386,10 +386,14 @@ sub search_fees : Local {
     my %exact;
 
     if($c->request->params->{use_session}) {
-        %filter = %{ $c->session->{search_filter} };
-        %exact = %{ $c->session->{exact_filter} };
-        $c->stash->{feeerr} = $c->session->{feeerr};
-        delete $c->session->{feeerr};
+        %filter = %{ $c->session->{search_filter} }
+            if defined $c->session->{search_filter};
+        %exact = %{ $c->session->{exact_filter} }
+            if defined $c->session->{exact_filter};
+        if(defined $c->session->{feeerr}) {
+            $c->stash->{feeerr} = $c->session->{feeerr};
+            delete $c->session->{feeerr};
+        }
     } else {
         foreach my $sf (qw(destination zone zone_detail)) {
             if((    defined $c->request->params->{'search_'.$sf}

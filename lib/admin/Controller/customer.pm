@@ -43,7 +43,8 @@ sub search : Local {
     $offset = 0 if $offset !~ /^\d+$/;
 
     if($c->request->params->{use_session}) {
-        $filter = $c->session->{search_filter};
+        $filter = $c->session->{search_filter}
+            if defined $c->session->{search_filter};
     } else {
         $filter = $c->request->params->{search_string} || '';
         $c->session->{search_filter} = $filter;
