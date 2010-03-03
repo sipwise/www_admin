@@ -41,7 +41,7 @@ sub auto : Private {
     if (!$c->user_exists) {
         $c->log->debug('***Root::auto User not found, forwarding to /');
         $c->session->{unauth_uri} = $c->request->method eq 'GET'
-                                    ? $c->request->uri
+                                    ? ($c->request->uri =~ m#/logout$# ? undef : $c->request->uri)
                                     : $c->request->headers->referer;
         $c->response->redirect($c->uri_for('/'));
         return;
