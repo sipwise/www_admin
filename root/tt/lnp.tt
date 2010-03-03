@@ -127,7 +127,7 @@
             <label class="search_label" for="search_by_number">Number:</label>
             <input type="text" id="search_by_number" name="search_number" title="SQL wildcards allowed"
                    value="[% searched_numbers.number %]" />
-            <input type="checkbox" id="exact_number" name="exact_number"
+            <input type="checkbox" class="checkbox" id="exact_number" name="exact_number"
                    [% IF searched_numbers.exact_number %]checked="checked"[% END %] />
             <label for="exact_number">exact match</label><br />
 

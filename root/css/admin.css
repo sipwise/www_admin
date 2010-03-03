@@ -228,8 +228,9 @@ ul#topsubmenu {
 }
 */
 
-/* sigh, no border for checkboxes */
-#contentplace .checkbox {
+/* sigh, no border for checkboxes and radios */
+#contentplace .checkbox,
+#contentplace .radio {
 	border: none !important;
 }
 
@@ -427,14 +428,18 @@ ul#topsubmenu {
 	margin-top: 3px;
 }
 #contentplace .search_subscriber input {
-	margin: 3px 0;
+	margin: 4px 0;
 }
 #contentplace .search_subscriber select {
 	min-width: 50px;
 	margin: 3px 0;
 }
 #contentplace .search_subscriber .radio {
-	margin: 6px 0px 8px 0px;
+	margin: 6px 0px;
+}
+
+#contentplace .usr_preferences .radio {
+	margin: 2px 0px;
 }
 
 /* increase spacing around list explanation text */

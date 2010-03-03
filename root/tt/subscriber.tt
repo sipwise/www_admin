@@ -4,26 +4,26 @@
 
             <label class="search_label" for="search_by_username">Username:</label>
             <input type="text" id="search_by_username" name="search_username" value="[% search_username %]" />
-            <input type="checkbox" id="exact_username" name="exact_username" [% IF exact_username %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_username" name="exact_username" [% IF exact_username %]checked="checked"[% END %] />
             <label for="exact_username">exact match</label><br />
 
             <label class="search_label" for="search_by_domain">Domain:</label>
             <input type="text" id="search_by_domain" name="search_domain" value="[% search_domain %]" />
-            <input type="checkbox" id="exact_domain" name="exact_domain" [% IF exact_domain %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_domain" name="exact_domain" [% IF exact_domain %]checked="checked"[% END %] />
             <label for="exact_domain">exact match</label><br />
 
             <label class="search_label" for="search_by_number">E.164 number:</label>
             <input type="text" id="search_by_number" name="search_number" value="[% search_number %]" />
-            <input type="checkbox" id="exact_number" name="exact_number" [% IF exact_number %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_number" name="exact_number" [% IF exact_number %]checked="checked"[% END %] />
             <label for="exact_number">exact match</label><br />
 
             <label class="search_label" for="search_by_uuid">UUID:</label>
             <input type="text" id="search_by_uuid" name="search_uuid" value="[% search_uuid %]" />
-            <input type="checkbox" id="exact_uuid" name="exact_uuid" [% IF exact_uuid %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_uuid" name="exact_uuid" [% IF exact_uuid %]checked="checked"[% END %] />
             <label for="exact_uuid">exact match</label><br />
 
             <div class="topbottomspace">
-              <input type="checkbox" id="include_terminated" name="terminated" [% IF terminated %]checked="checked"[% END %] />
+              <input type="checkbox" class="checkbox" id="include_terminated" name="terminated" [% IF terminated %]checked="checked"[% END %] />
               <label for="include_terminated">include terminated subscribers</label><br />
             </div>
 

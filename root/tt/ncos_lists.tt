@@ -107,7 +107,7 @@
           [% IF messages.lacerr %]<div class="errormsg">[% messages.lacerr %]</div>[% END %]
           <form action="/ncos/save_local_ac" method="post">
             <input type="hidden" name="level" value="[% level.level %]" />
-            <input type="checkbox" id="local_ac" name="local_ac" [% IF level.local_ac %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="local_ac" name="local_ac" [% IF level.local_ac %]checked="checked"[% END %] />
             <label for="local_ac">include local area code in list</label>
             <span id="save_local_ac" class="postlink">
               <label for="lacsave">save</label>

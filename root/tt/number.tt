@@ -63,19 +63,19 @@
             <label class="search_label" for="search_by_cc">cc:</label>
             <input type="text" id="search_by_cc" name="search_cc" title="SQL wildcards allowed"
                    value="[% search_cc %]" />
-            <input type="checkbox" id="exact_cc" name="exact_cc" [% IF exact_cc %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_cc" name="exact_cc" [% IF exact_cc %]checked="checked"[% END %] />
             <label for="exact_cc">exact match</label><br />
 
             <label class="search_label" for="search_by_ac">ac:</label>
             <input type="text" id="search_by_ac" name="search_ac" title="SQL wildcards allowed"
                    value="[% search_ac %]" />
-            <input type="checkbox" id="exact_ac" name="exact_ac" [% IF exact_ac %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_ac" name="exact_ac" [% IF exact_ac %]checked="checked"[% END %] />
             <label for="exact_ac">exact match</label><br />
 
             <label class="search_label" for="search_by_sn_prefix">sn_prefix:</label>
             <input type="text" id="search_by_sn_prefix" name="search_sn_prefix" title="SQL wildcards allowed"
                    value="[% search_sn_prefix %]" />
-            <input type="checkbox" id="exact_sn_prefix" name="exact_sn_prefix" [% IF exact_sn_prefix %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_sn_prefix" name="exact_sn_prefix" [% IF exact_sn_prefix %]checked="checked"[% END %] />
             <label for="exact_sn_prefix">exact match</label><br />
 
             <label class="search_label" for="search_by_sn_length">sn_length:</label>
