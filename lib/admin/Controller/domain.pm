@@ -672,11 +672,17 @@ Provisioning model, Sipwise::Provisioning::Billing, Catalyst
 
 =head1 AUTHORS
 
-Daniel Tiefnig <dtiefnig@sipwise.com>
+=over
+
+=item Daniel Tiefnig <dtiefnig@sipwise.com>
+
+=item Andreas Granig <agranig@sipwise.com>
+
+=back
 
 =head1 COPYRIGHT
 
-The domain controller is Copyright (c) 2007 Sipwise GmbH, Austria. All
+The domain controller is Copyright (c) 2007-2009 Sipwise GmbH, Austria. All
 rights reserved.
 
 =cut

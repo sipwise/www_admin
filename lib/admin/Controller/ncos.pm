@@ -505,7 +505,7 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The billing controller is Copyright (c) 2009 Sipwise GmbH, Austria. All
+The ncos controller is Copyright (c) 2009 Sipwise GmbH, Austria. All
 rights reserved.
 
 =cut

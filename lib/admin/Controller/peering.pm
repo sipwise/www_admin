@@ -953,12 +953,20 @@ Provisioning model, Sipwise::Provisioning::Billing, Catalyst
 
 =head1 AUTHORS
 
-Andreas Granig <agranig@sipwise.com>
+=over
+
+=item Andreas Granig <agranig@sipwise.com>
+
+=item Rene Krenn <rkrenn@sipwise.com>
+
+=item Daniel Tiefnig <dtiefnig@sipwise.com>
+
+=back
 
 =head1 COPYRIGHT
 
-The domain controller is Copyright (c) 2007 Sipwise GmbH, Austria. All
-rights reserved.
+The peering controller is Copyright (c) 2009-2010 Sipwise GmbH, Austria.
+All rights reserved.
 
 =cut
 

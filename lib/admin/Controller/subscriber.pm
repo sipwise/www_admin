@@ -1774,12 +1774,18 @@ Provisioning model, Catalyst
 
 =head1 AUTHORS
 
-Daniel Tiefnig <dtiefnig@sipwise.com>
+=over
+
+=item Daniel Tiefnig <dtiefnig@sipwise.com>
+
+=item Rene Krenn <rkrenn@sipwise.com>
+
+=back
 
 =head1 COPYRIGHT
 
-The subscriber controller is Copyright (c) 2007 Sipwise GmbH, Austria. All
-rights reserved.
+The subscriber controller is Copyright (c) 2007-2010 Sipwise GmbH,
+Austria. All rights reserved.
 
 =cut
 
