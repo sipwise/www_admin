@@ -3,10 +3,13 @@ sipwise-www-admin (2.0.0) UNRELEASED; urgency=low
   * speed dial
   * LNP database handling
   * NCOS levels
+  * local number blocks
   * SIP peering configuration
   * number rewrite rules for SIP peerings
   * vertical service code configuration
+  * split view for subscribers
   * fax number configuration
+  * reminder call configuration
   * new user preferences
   * minor interface bugfixes
 
