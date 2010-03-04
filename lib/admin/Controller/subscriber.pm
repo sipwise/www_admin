@@ -601,8 +601,12 @@ sub preferences : Local {
     if (eval { @$speed_dial_slots }) {
         foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @$speed_dial_slots) {
             $$sdentry{destination} =~ s/^sip://i;
-            $$sdentry{destination} =~ s/\@.*$//
-                if $$sdentry{destination} =~ /^\+?\d+\@/;
+            if($$sdentry{destination} =~ /^\+?\d+\@/ or $$sdentry{destination} =~ /^\+?\d+$/) {
+                my $scc = $c->session->{subscriber}{cc};
+                $$sdentry{destination} =~ s/\@.*$//;
+                $$sdentry{destination} =~ s/^\+*/+/;
+                $$sdentry{destination} =~ s/^\+$scc/0/;
+            }
             push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
                                                      number      => $i++,
                                                      label       => 'Slot ' . $$sdentry{slot} . ': ' . $$sdentry{destination}
@@ -627,7 +631,7 @@ sub preferences : Local {
         for(@{$c->session->{subscriber}{fax_preferences}{destinations}}) {
             if($$_{destination} =~ /^\d+$/) {
                 my $scc = $c->session->{subscriber}{cc};
-                $$_{destination} = '+'.$$_{destination};
+                $$_{destination} =~ s/^\+*/+/;
                 $$_{destination} =~ s/^\+$scc/0/;
             }
         }
@@ -716,9 +720,6 @@ sub update_preferences : Local {
 
             # normalize, so we can do some checks.
             $fw_target =~ s/^sip://i;
-            if($fw_target =~ /^\+?\d+\@[a-z0-9.-]+$/i) {
-                $fw_target =~ s/\@.+$//;
-            }
 
             if($fw_target =~ /^\+?\d+$/) {
                 if($fw_target =~ /^\+[1-9][0-9]+$/) {
@@ -1235,8 +1236,12 @@ sub edit_speed_dial_slots : Local {
                 #delete $c->session->{updateerrmsg};
             } else {
                 $$sdentry{destination} =~ s/^sip://i;
-                $$sdentry{destination} =~ s/\@.*$//
-                    if $$sdentry{destination} =~ /^\+?\d+\@/;
+                if($$sdentry{destination} =~ /^\+?\d+\@/ or $$sdentry{destination} =~ /^\+?\d+$/) {
+                    my $scc = $c->session->{subscriber}{cc};
+                    $$sdentry{destination} =~ s/\@.*$//;
+                    $$sdentry{destination} =~ s/^\+*/+/;
+                    $$sdentry{destination} =~ s/^\+$scc/0/;
+                }
             }
             push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
                                                  number      => $i++,
@@ -1296,8 +1301,20 @@ sub do_edit_speed_dial_slots : Local {
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $add_slot, \$checkadd_slot);
         my $checkadd_destination;
         my $destination;
-        if ($add_destination =~ /^\d+$/) {
-            $destination = 'sip:'. $add_destination .'@'. $c->session->{subscriber}{domain};
+        if ($add_destination =~ /^\+?\d+$/) {
+            if($add_destination =~ /^\+[1-9][0-9]+$/) {
+                $add_destination =~ s/^\+//;
+            } elsif($add_destination =~ /^00[1-9][0-9]+$/) {
+                $add_destination =~ s/^00//;
+            } elsif($add_destination =~ /^0[1-9][0-9]+$/) {
+                $add_destination =~ s/^0/$c->session->{subscriber}{cc}/e;
+            } else {
+                $add_destination = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add_destination;
+            }
+            my $checkresult;
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $add_destination, \$checkresult);
+            $destination = 'sip:'. $add_destination .'@'. $c->session->{subscriber}{domain}
+                if $checkresult;
         } else {
             $destination = $add_destination;
         }
@@ -1356,8 +1373,20 @@ sub do_edit_speed_dial_slots : Local {
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $update_slot, \$checkupdate_slot);
         my $checkupdate_destination;
         my $destination;
-        if ($update_destination =~ /^\d+$/) {
-            $destination = 'sip:'. $update_destination .'@'. $c->session->{subscriber}{domain};
+        if ($update_destination =~ /^\+?\d+$/) {
+            if($update_destination =~ /^\+[1-9][0-9]+$/) {
+                $update_destination =~ s/^\+//;
+            } elsif($update_destination =~ /^00[1-9][0-9]+$/) {
+                $update_destination =~ s/^00//;
+            } elsif($update_destination =~ /^0[1-9][0-9]+$/) {
+                $update_destination =~ s/^0/$c->session->{subscriber}{cc}/e;
+            } else {
+                $update_destination = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $update_destination;
+            }
+            my $checkresult;
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $update_destination, \$checkresult);
+            $destination = 'sip:'. $update_destination .'@'. $c->session->{subscriber}{domain}
+                if $checkresult;
         } else {
             $destination = $update_destination;
         }
@@ -1539,7 +1568,7 @@ sub do_edit_destlist : Local {
     my $add = $c->request->params->{list_add};
     if(defined $add) {
         my $checkresult;
-        if($add =~ /^\d+$/) {
+        if($add =~ /^\+?\d+$/) {
             if($add =~ /^\+[1-9][0-9]+$/) {
                 $add =~ s/^\+//;
             } elsif($add =~ /^00[1-9][0-9]+$/) {
