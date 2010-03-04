@@ -560,16 +560,16 @@ sub preferences : Local {
               $$preferences{$$pref{attribute}} = 'fax2mail';
             } else {
               $$preferences{$$pref{attribute}} =~ s/^sip://i;
-              if($$preferences{$$pref{attribute}} =~ /^\+?\d+\@/) {
-                $$preferences{$$pref{attribute}} =~ s/\@.*$//;
+              if($$preferences{$$pref{attribute}} =~ /^\+?\d+$/) {
+                my $scc = $c->session->{subscriber}{cc};
+                $$preferences{$$pref{attribute}} =~ s/^\+*/+/;
+                $$preferences{$$pref{attribute}} =~ s/^\+$scc/0/;
               }
             }
           }
         } elsif($$pref{attribute} eq 'cli') {
           if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
             $$preferences{$$pref{attribute}} =~ s/^sip://i;
-            $$preferences{$$pref{attribute}} =~ s/\@.*$//
-                if $$preferences{$$pref{attribute}} =~ /^\+?\d+\@/;
           }
         } elsif(!$c->stash->{ncos_levels} and ($$pref{attribute} eq 'ncos' or $$pref{attribute} eq 'adm_ncos')) {
           my $ncoslvl;
@@ -601,9 +601,8 @@ sub preferences : Local {
     if (eval { @$speed_dial_slots }) {
         foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @$speed_dial_slots) {
             $$sdentry{destination} =~ s/^sip://i;
-            if($$sdentry{destination} =~ /^\+?\d+\@/ or $$sdentry{destination} =~ /^\+?\d+$/) {
+            if($$sdentry{destination} =~ /^\+?\d+$/) {
                 my $scc = $c->session->{subscriber}{cc};
-                $$sdentry{destination} =~ s/\@.*$//;
                 $$sdentry{destination} =~ s/^\+*/+/;
                 $$sdentry{destination} =~ s/^\+$scc/0/;
             }
@@ -629,7 +628,7 @@ sub preferences : Local {
        ref $c->session->{subscriber}{fax_preferences}{destinations} eq 'ARRAY')
     {
         for(@{$c->session->{subscriber}{fax_preferences}{destinations}}) {
-            if($$_{destination} =~ /^\d+$/) {
+            if($$_{destination} =~ /^\+?\d+$/) {
                 my $scc = $c->session->{subscriber}{cc};
                 $$_{destination} =~ s/^\+*/+/;
                 $$_{destination} =~ s/^\+$scc/0/;
@@ -723,13 +722,11 @@ sub update_preferences : Local {
 
             if($fw_target =~ /^\+?\d+$/) {
                 if($fw_target =~ /^\+[1-9][0-9]+$/) {
-                    $fw_target = 'sip:'. $fw_target .'@'. $c->session->{subscriber}{domain};
+                    $fw_target =~ s/^\+//;
                 } elsif($fw_target =~ /^00[1-9][0-9]+$/) {
-                    $fw_target =~ s/^00/+/;
-                    $fw_target = 'sip:'. $fw_target .'@'. $c->session->{subscriber}{domain};
+                    $fw_target =~ s/^00//;
                 } elsif($fw_target =~ /^0[1-9][0-9]+$/) {
-                    $fw_target =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
-                    $fw_target = 'sip:'. $fw_target .'@'. $c->session->{subscriber}{domain};
+                    $fw_target =~ s/^0/$c->session->{subscriber}{cc}/e;
                 } else {
                     $messages{$fwtype} = 'Client.Voip.MalformedNumber';
                     $fw_target = $c->request->params->{$fwtype .'_sipuri'};
@@ -762,8 +759,8 @@ sub update_preferences : Local {
     ### outgoing calls ###
 
     $$preferences{cli} = $c->request->params->{cli} or undef;
-    if(defined $$preferences{cli} and $$preferences{cli} =~ /^\d+$/) {
-        $$preferences{cli} = 'sip:'.$$preferences{cli}.'@'.$c->session->{subscriber}{domain};
+    if(defined $$preferences{cli} and $$preferences{cli} =~ /^\+?\d+$/) {
+        $$preferences{cli} =~ s/^\++//;
     }
 
     $$preferences{clir} = $c->request->params->{clir} ? 1 : undef;
@@ -1236,9 +1233,8 @@ sub edit_speed_dial_slots : Local {
                 #delete $c->session->{updateerrmsg};
             } else {
                 $$sdentry{destination} =~ s/^sip://i;
-                if($$sdentry{destination} =~ /^\+?\d+\@/ or $$sdentry{destination} =~ /^\+?\d+$/) {
+                if($$sdentry{destination} =~ /^\+?\d+$/) {
                     my $scc = $c->session->{subscriber}{cc};
-                    $$sdentry{destination} =~ s/\@.*$//;
                     $$sdentry{destination} =~ s/^\+*/+/;
                     $$sdentry{destination} =~ s/^\+$scc/0/;
                 }
@@ -1506,9 +1502,9 @@ sub edit_destlist : Local {
         my $bg = '';
         my $i = 1;
         foreach my $entry (sort { $$a{destination} cmp $$b{destination} } @$destlist) {
-            if($$entry{destination} =~ /^\d+$/) {
+            if($$entry{destination} =~ /^\+?\d+$/) {
                 my $scc = $c->session->{subscriber}{cc};
-                $$entry{destination} = '+'.$$entry{destination};
+                $$entry{destination} =~ s/^\+*/+/;
                 $$entry{destination} =~ s/^\+$scc/0/;
             }
             push @{$c->stash->{list_data}}, { %$entry,
