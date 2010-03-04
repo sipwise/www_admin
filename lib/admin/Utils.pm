@@ -2,9 +2,8 @@ package admin::Utils;
 use strict;
 use warnings;
 
-# Takes a search result as returned by the search_subscribers or
-# search_customers provisioning functions, an offset and a limit and
-# returns an array containing offset values for a pagination link list
+# Takes a search result total count, an offset and a limit and returns
+# an array containing offset values for a pagination link list
 # where each page should list $limit elements.
 # The array will contain at most 11 entries, the first and last offset
 # (0 and n) are always included. Further, the array will contain either:
@@ -15,10 +14,10 @@ use warnings;
 #     * -1 and 8 elements from n-9 .. n-1, if offset >= n-6
 #     * -1, 7 elements from o-3 .. o+3 and -1, elsewise
 sub paginate {
-    my ($c, $subscriber_list, $offset, $limit) = @_;
+    my ($total_count, $offset, $limit) = @_;
     my @pagination;
 
-    foreach my $page (0 .. int(($$subscriber_list{total_count} - 1) / $limit)) {
+    foreach my $page (0 .. int(($total_count - 1) / $limit)) {
         push @pagination, { offset => $page };
     }
     if($#pagination > 10) {

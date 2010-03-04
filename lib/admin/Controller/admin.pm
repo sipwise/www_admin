@@ -209,8 +209,8 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The admin controller is Copyright (c) 2007 Sipwise GmbH, Austria. All
-rights reserved.
+The admin controller is Copyright (c) 2007-2009 Sipwise GmbH, Austria.
+All rights reserved.
 
 =cut
 

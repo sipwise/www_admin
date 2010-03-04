@@ -23,7 +23,7 @@ h3 {
 	top: 20px;
 	left: 250px;
 	text-align: center;
-	width: 400px;
+	width: 500px;
 	font-weight: bold;
 	font-size: 20px;
 }
@@ -37,6 +37,9 @@ h3 {
 	text-align: right;
 }
 
+#contentmenu li.active_menu a {
+	color: #D60808;
+}
 
 /* hmm, menu doesn't extend container height ... */
 #container #content {
@@ -49,6 +52,61 @@ h3 {
 }
 #container #contentplace {
 	margin-left: 230px;
+}
+
+/* submenu below headers in contentplace */
+ul#topsubmenu {
+	float: left;
+	list-style: none;
+	padding: 0;
+	width: 95%;
+	margin: 0px 0px 0px -3px;
+}
+
+#topsubmenu li {
+	float: left;
+	color: #a0b6a0;
+	font-weight: bold;
+	margin: 0;
+}
+
+#topsubmenu li.active_submenu {
+	padding: 0px 10px;
+	border-top: 1px solid #c0d6c0;
+	color: #607660;
+}
+
+#topsubmenu li.inactive_submenu {
+	padding: 0px 10px;
+	border-top: 1px solid #c0d6c0;
+	color: #c0d6c0;
+}
+
+#topsubmenu li.active_submenu a {
+	color: #D60808;
+}
+
+#topsubmenu li.inactive_submenu a {
+	color: #006600;
+}
+
+#topsubmenu a:hover {
+	color: #D60808;
+	text-decoration: none;
+}
+#topsubmenu a:after {
+	content: "" !important;
+}
+
+#topsubmenuhr {
+	float: left;
+	width: 721px;
+	margin-top: 1px;
+	margin-bottom: 20px;
+	border-top: 1px solid #c0d6c0;
+	border-bottom: none;
+	border-left: none;
+	border-right: none;
 }
 
 /* red error messages */
@@ -170,8 +228,9 @@ h3 {
 }
 */
 
-/* sigh, no border for checkboxes */
-#contentplace .checkbox {
+/* sigh, no border for checkboxes and radios */
+#contentplace .checkbox,
+#contentplace .radio {
 	border: none !important;
 }
 
@@ -349,6 +408,7 @@ h3 {
 #contentplace .registered_contacts,
 #contentplace .billing_fees,
 #contentplace .billing_peaktimes,
+#contentplace .numberblocks,
 #contentplace .domains
 {
 	width: 100%;
@@ -368,11 +428,18 @@ h3 {
 	margin-top: 3px;
 }
 #contentplace .search_subscriber input {
-	margin: 3px 0;
+	margin: 4px 0;
 }
 #contentplace .search_subscriber select {
 	min-width: 50px;
 	margin: 3px 0;
+}
+#contentplace .search_subscriber .radio {
+	margin: 6px 0px;
+}
+
+#contentplace .usr_preferences .radio {
+	margin: 2px 0px;
 }
 
 /* increase spacing around list explanation text */

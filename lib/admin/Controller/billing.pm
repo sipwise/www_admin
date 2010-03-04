@@ -386,10 +386,14 @@ sub search_fees : Local {
     my %exact;
 
     if($c->request->params->{use_session}) {
-        %filter = %{ $c->session->{search_filter} };
-        %exact = %{ $c->session->{exact_filter} };
-        $c->stash->{feeerr} = $c->session->{feeerr};
-        delete $c->session->{feeerr};
+        %filter = %{ $c->session->{search_filter} }
+            if defined $c->session->{search_filter};
+        %exact = %{ $c->session->{exact_filter} }
+            if defined $c->session->{exact_filter};
+        if(defined $c->session->{feeerr}) {
+            $c->stash->{feeerr} = $c->session->{feeerr};
+            delete $c->session->{feeerr};
+        }
     } else {
         foreach my $sf (qw(destination zone zone_detail)) {
             if((    defined $c->request->params->{'search_'.$sf}
@@ -441,8 +445,8 @@ sub search_fees : Local {
         $c->stash->{offset} = $offset;
         if($$fee_list{total_count} > @{$$fee_list{fees}}) {
             # paginate!
-            $c->stash->{pagination} = admin::Utils::paginate($c, $fee_list, $offset, $limit);
-            $c->stash->{max_offset} = $#{$c->stash->{pagination}};
+            $c->stash->{pagination} = admin::Utils::paginate($$fee_list{total_count}, $offset, $limit);
+            $c->stash->{max_offset} = ${$c->stash->{pagination}}[-1]{offset};
             if(@{$$fee_list{fees}} == 1) {
                 $c->stash->{last_one} = 1;
             }
@@ -920,8 +924,8 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The billing controller is Copyright (c) 2009 Sipwise GmbH, Austria. All
-rights reserved.
+The billing controller is Copyright (c) 2009-2010 Sipwise GmbH, Austria.
+All rights reserved.
 
 =cut
 

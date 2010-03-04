@@ -32,7 +32,7 @@
             </div>
 -->
             [% IF messages.feefileerr %]<div class="errormsg">[% messages.feefileerr %]</div>[% END %]
-            <input type="checkbox" id="purge_existing" name="purge_existing"
+            <input type="checkbox" class="checkbox" id="purge_existing" name="purge_existing"
                    title="remove all existing fees before creating new ones"
                    [% IF purge_existing %]checked="checked"[% END %] />
             <label for="purge_existing">purge existing fees</label><br />
@@ -50,19 +50,22 @@
             <label class="search_label" for="search_by_destination">Destination:</label>
             <input type="text" id="search_by_destination" name="search_destination" title="SQL wildcards allowed"
                    value="[% search_destination %]" />
-            <input type="checkbox" id="exact_destination" name="exact_destination" [% IF exact_destination %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_destination" name="exact_destination"
+                   [% IF exact_destination %]checked="checked"[% END %] />
             <label for="exact_destination">exact match</label><br />
 
             <label class="search_label" for="search_by_zone">Zone:</label>
             <input type="text" id="search_by_zone" name="search_zone" title="SQL wildcards allowed"
                    value="[% search_zone %]" />
-            <input type="checkbox" id="exact_zone" name="exact_zone" [% IF exact_zone %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_zone" name="exact_zone"
+                   [% IF exact_zone %]checked="checked"[% END %] />
             <label for="exact_zone">exact match</label><br />
 
             <label class="search_label" for="search_by_detail">Zone detail:</label>
             <input type="text" id="search_by_detail" name="search_zone_detail" title="SQL wildcards allowed"
                    value="[% search_zone_detail %]" />
-            <input type="checkbox" id="exact_zone_detail" name="exact_zone_detail" [% IF exact_zone_detail %]checked="checked"[% END %] />
+            <input type="checkbox" class="checkbox" id="exact_zone_detail" name="exact_zone_detail"
+                   [% IF exact_zone_detail %]checked="checked"[% END %] />
             <label for="exact_zone_detail">exact match</label><br />
 
             <input type="submit" value="Search &#187;" class="but" />

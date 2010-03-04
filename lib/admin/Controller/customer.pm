@@ -43,7 +43,8 @@ sub search : Local {
     $offset = 0 if $offset !~ /^\d+$/;
 
     if($c->request->params->{use_session}) {
-        $filter = $c->session->{search_filter};
+        $filter = $c->session->{search_filter}
+            if defined $c->session->{search_filter};
     } else {
         $filter = $c->request->params->{search_string} || '';
         $c->session->{search_filter} = $filter;
@@ -69,8 +70,8 @@ sub search : Local {
         $c->stash->{offset} = $offset;
         if($$customer_list{total_count} > @{$$customer_list{customers}}) {
             # paginate!
-            $c->stash->{pagination} = admin::Utils::paginate($c, $customer_list, $offset, $limit);
-            $c->stash->{max_offset} = $#{$c->stash->{pagination}};
+            $c->stash->{pagination} = admin::Utils::paginate($$customer_list{total_count}, $offset, $limit);
+            $c->stash->{max_offset} = ${$c->stash->{pagination}}[-1]{offset};
         }
     }
 
@@ -406,8 +407,8 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The account controller is Copyright (c) 2007 Sipwise GmbH, Austria. All
-rights reserved.
+The customer controller is Copyright (c) 2007-2010 Sipwise GmbH,
+Austria. All rights reserved.
 
 =cut
 

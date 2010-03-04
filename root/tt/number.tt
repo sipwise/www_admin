@@ -1,0 +1,252 @@
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <h3 id="create_block">Create Number Block</h3>
+
+        <div class="p1">
+          [% IF messages.cblockmsg %]<div class="goodmsg">[% messages.cblockmsg %]</div>[% END %]
+          [% IF messages.cblockerr %]<div class="errormsg">[% messages.cblockerr %]</div>[% END %]
+
+          <form action="/number/do_create_block" method="post">
+            <input type="hidden" name="offset" value="[% offset %]" />
+            <table class="numberblocks">
+                <tr class="table_header">
+                <td style="width:60px;">cc</td>
+                <td style="width:60px;">ac</td>
+                <td style="width:80px;">sn_prefix</td>
+                <td style="width:80px;">sn_length</td>
+                <td class="tdcenter" style="width:100px;">authoritative</td>
+                <td class="tdcenter" style="width:100px;">allocable</td>
+                <td style="width:40px;" />
+                <td style="width:60px;" />
+              </tr>
+              <tr>
+                <td><input type="text" class="irealshort" title="country code, integer"
+                           name="cc" value="[% crefill.cc %]" />
+                </td>
+                <td><input type="text" class="irealshort" title="area code, integer"
+                           name="ac" value="[% crefill.ac %]" />
+                </td>
+                <td><input type="text" class="ishort" title="subscriber number prefix, numeric string"
+                           name="sn_prefix" value="[% crefill.sn_prefix %]" />
+                </td>
+                <td><input type="text" class="irealshort" title="subscriber number length, integer"
+                           name="sn_length" value="[% crefill.data.sn_length %]" />
+                </td>
+                <td class="tdcenter">
+                  <input type="checkbox" class="checkbox" title="check if NGCP is authoritative for this number block"
+                         name="authoritative" [% IF crefill.data.authoritative %]checked="checked"[% END %] />
+                </td>
+                <td class="tdcenter">
+                  <input type="checkbox" class="checkbox" title="check if numbers should be automatically assigned from this number block"
+                         name="allocable" [% IF crefill.data.allocable %]checked="checked"[% END %] />
+                </td>
+                <td>
+                  <div class="postlink">
+                    <label for="blockadd">add</label>
+                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockadd" />
+                  </div>
+                </td>
+                <td />
+              </tr>
+            </table>
+          </form>
+          [% IF crefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+
+        </div>
+      [% END %]
+
+        <h3 id="search">Search Number Blocks</h3>
+
+        <div class="p1">
+          <form action="/number#search" method="post" class="search_subscriber">
+            <input type="hidden" name="offset" value="[% offset %]" />
+
+            <label class="search_label" for="search_by_cc">cc:</label>
+            <input type="text" id="search_by_cc" name="search_cc" title="SQL wildcards allowed"
+                   value="[% search_cc %]" />
+            <input type="checkbox" class="checkbox" id="exact_cc" name="exact_cc" [% IF exact_cc %]checked="checked"[% END %] />
+            <label for="exact_cc">exact match</label><br />
+
+            <label class="search_label" for="search_by_ac">ac:</label>
+            <input type="text" id="search_by_ac" name="search_ac" title="SQL wildcards allowed"
+                   value="[% search_ac %]" />
+            <input type="checkbox" class="checkbox" id="exact_ac" name="exact_ac" [% IF exact_ac %]checked="checked"[% END %] />
+            <label for="exact_ac">exact match</label><br />
+
+            <label class="search_label" for="search_by_sn_prefix">sn_prefix:</label>
+            <input type="text" id="search_by_sn_prefix" name="search_sn_prefix" title="SQL wildcards allowed"
+                   value="[% search_sn_prefix %]" />
+            <input type="checkbox" class="checkbox" id="exact_sn_prefix" name="exact_sn_prefix" [% IF exact_sn_prefix %]checked="checked"[% END %] />
+            <label for="exact_sn_prefix">exact match</label><br />
+
+            <label class="search_label" for="search_by_sn_length">sn_length:</label>
+            <input type="text" id="search_by_sn_length" name="search_sn_length" title="integer number"
+                   value="[% search_sn_length %]" /><br />
+
+            <label class="search_label" for="search_by_authoritative_true">authoritative:</label>
+            <input type="radio" class="radio" id="search_by_authoritative_true" name="search_authoritative"
+                   value="1" [% IF search_authoritative == 1 %]checked="checked"[% END %] />
+            <label for="search_by_authoritative_true">yes</label>
+            <input type="radio" class="radio" id="search_by_authoritative_false" name="search_authoritative"
+                   value="0" [% IF search_authoritative == 0 %]checked="checked"[% END %] />
+            <label for="search_by_authoritative_false">no</label>
+            <input type="radio" class="radio" id="search_by_authoritative_both" name="search_authoritative"
+                   value="" [% IF search_authoritative == "" %]checked="checked"[% END %] />
+            <label for="search_by_authoritative_both">both</label><br />
+
+            <label class="search_label" for="search_by_allocable_true">allocable:</label>
+            <input type="radio" class="radio" id="search_by_allocable_true" name="search_allocable"
+                   value="1" [% IF search_allocable == 1 %]checked="checked"[% END %] />
+            <label for="search_by_allocable_true">yes</label>
+            <input type="radio" class="radio" id="search_by_allocable_false" name="search_allocable"
+                   value="0" [% IF search_allocable == 0 %]checked="checked"[% END %] />
+            <label for="search_by_allocable_false">no</label>
+            <input type="radio" class="radio" id="search_by_allocable_both" name="search_allocable"
+                   value="" [% IF search_allocable == "" %]checked="checked"[% END %] />
+            <label for="search_by_allocable_both">both</label><br />
+
+            <input type="submit" value="Search &#187;" class="but" />
+          </form>
+        </div>
+
+        <h3 id="existing_blocks">Existing Number Blocks</h3>
+
+        <div class="p1">
+          [% IF messages.eblockmsg %]<div class="goodmsg">[% messages.eblockmsg %]</div>[% END %]
+          [% IF messages.eblockerr %]<div class="errormsg">[% messages.eblockerr %]</div>[% END %]
+          [% IF erefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+
+        [% IF blocks %]
+          <table class="numberblocks">
+            <tr class="table_header">
+              <td style="width:60px;">cc</td>
+              <td style="width:60px;">ac</td>
+              <td style="width:80px;">sn_prefix</td>
+              <td style="width:80px;">sn_length</td>
+              <td class="tdcenter" style="width:100px;">authoritative</td>
+              <td class="tdcenter" style="width:100px;">allocable</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% bgflip = 1 %]
+            [% FOREACH block = blocks %]
+              [% id = id + 1 %]
+              [% IF block.cc == edit_cc && block.ac == edit_ac && block.sn_prefix == edit_sn_prefix %]
+              [% IF bgflip %]
+                [% bgflip = 0 %]
+                <tr class="tr_alt">
+              [% ELSE %]
+                [% bgflip = 1 %]
+                <tr>
+              [% END %]
+                  <form action="/number/do_update_block" method="post">
+                    <input type="hidden" name="offset" value="[% offset %]" />
+                    <input type="hidden" name="cc" value="[% block.cc %]" />
+                    <input type="hidden" name="ac" value="[% block.ac %]" />
+                    <input type="hidden" name="sn_prefix" value="[% block.sn_prefix %]" />
+                    <td class="tdkey">[% block.cc %]</td>
+                    <td class="tdkey">[% block.ac %]</td>
+                    <td class="tdkey">[% block.sn_prefix %]</td>
+                    <td class="tdkey">[% block.data.sn_length %]</td>
+                    <td class="tdcenter">
+                      <input type="checkbox" class="checkbox" title="check if NGCP is authoritative for this number block"
+                             name="authoritative" [% IF erefill.data.authoritative %]checked="checked"[% END %] />
+                    </td>
+                    <td class="tdcenter">
+                      <input type="checkbox" class="checkbox" title="check if numbers should be automatically assigned from this number block"
+                             name="allocable" [% IF erefill.data.allocable %]checked="checked"[% END %] />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="blocksave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blocksave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/number?offset=[% offset %]&amp;use_session=1" class="aaction">cancel</a></td>
+                </tr>
+              [% ELSE %]
+              [% IF bgflip %]
+                [% bgflip = 0 %]
+                <tr class="tr_alt">
+              [% ELSE %]
+                [% bgflip = 1 %]
+                <tr>
+              [% END %]
+                  <td>[% block.cc %]</td>
+                  <td>[% block.ac %]</td>
+                  <td>[% block.sn_prefix %]</td>
+                  <td>[% block.data.sn_length %]</td>
+                  <td class="tdcenter">
+                    <input type="checkbox" class="checkbox" title="check if NGCP is authoritative for this number block"
+                           name="authoritative" disabled="disabled" [% IF block.data.authoritative %]checked="checked"[% END %] />
+                  </td>
+                  <td class="tdcenter">
+                    <input type="checkbox" class="checkbox" title="check if numbers should be automatically assigned from this number block"
+                           name="allocable" disabled="disabled" [% IF block.data.allocable %]checked="checked"[% END %] />
+                  </td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/number?edit_cc=[% block.cc %]&amp;edit_ac=[% block.ac %]&amp;edit_sn_prefix=[% block.sn_prefix %]&amp;offset=[% offset %]&amp;use_session=1" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/number/do_delete_block" method="post">
+                    <input type="hidden" name="offset" value="[% offset %]" />
+                    <input type="hidden" name="cc" value="[% block.cc %]" />
+                    <input type="hidden" name="ac" value="[% block.ac %]" />
+                    <input type="hidden" name="sn_prefix" value="[% block.sn_prefix %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="blockdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockdel[% id %]" />
+                      </div>
+                    [% END %]
+                    </td>
+                  </form>
+                </tr>
+              [% END %]
+            [% END %]
+          </table>
+
+          [% IF pagination %]
+          <div class="pagination">
+            <ul>
+              [% IF offset == 0 %]
+                <li class="disablepage">&#171; prev</li>
+              [% ELSE %]
+                <li class="nextpage">
+                  <a href="/number?offset=[% offset - 1 %]&amp;use_session=1#existing_blocks">&#171; prev</a>
+                </li>
+              [% END %]
+              [% FOREACH pagine = pagination %]
+                [% IF pagine.offset == offset %]
+                  <li class="currentpage">
+                    [% pagine.offset + 1 %]
+                  </li>
+                [% ELSIF pagine.offset == -1 %]
+                   ...
+                [% ELSE %]
+                  <li>
+                    <a href="/number?offset=[% pagine.offset %]&amp;use_session=1#existing_blocks">[% pagine.offset + 1 %]</a>
+                  </li>
+                [% END %]
+              [% END %]
+              [% IF offset >= max_offset %]
+                <li class="disablepage">
+                  next &#187;
+                </li>
+              [% ELSE %]
+                <li class="nextpage">
+                  <a href="/number?offset=[% offset + 1 %]&amp;use_session=1#existing_blocks">next &#187;</a>
+                </li>
+              [% END %]
+            </ul>
+          </div>
+          [% END %]
+
+        [% ELSE %]
+          No number blocks found in the database.
+        [% END %]
+        </div>
+

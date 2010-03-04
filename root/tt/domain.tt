@@ -16,7 +16,15 @@
             [% id = 0 %]
             [% FOREACH domain = domains %]
               <tr>
-                <td><a href="/domain/detail?domain=[% domain.domain %]" class="aaction">[% domain.domain %]</a></td>
+                <td>
+                  [% IF Catalyst.config.domain.rewrite_features
+                        || Catalyst.config.domain.vsc_features
+                        || Catalyst.config.domain.audiofile_features %]
+                    <a href="/domain/detail?domain=[% domain.domain %]" class="aaction">[% domain.domain %]</a>
+                  [% ELSE %]
+                    [% domain.domain %]
+                  [% END %]
+                </td>
                 [% IF domain.domain == edit_domain %]
                   <form action="/domain/do_edit_domain" method="post">
                     <input type="hidden" name="domain" value="[% domain.domain %]" />

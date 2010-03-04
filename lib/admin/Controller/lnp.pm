@@ -40,7 +40,6 @@ sub index : Private {
         $self->_do_search_numbers($c, $c->session->{searched_lnp_numbers})
             unless exists $c->session->{lnp_numbers}{numbers};
     }
-    # TODO: paginate!
     if(ref $c->session->{lnp_numbers}{numbers} eq 'ARRAY' and
        @{$c->session->{lnp_numbers}{numbers}})
     {
@@ -48,9 +47,10 @@ sub index : Private {
         $c->stash->{numbers} = $$nums{numbers};
         $c->stash->{num_total_count} = $$nums{total_count};
         if($$nums{total_count} > @{$$nums{numbers}}) {
+            # paginate!
             $c->stash->{pagination} =
-                admin::Utils::paginate($c, $nums, $c->session->{searched_lnp_numbers}{offset}, $c->session->{searched_lnp_numbers}{limit});
-            $c->stash->{max_offset} = $#{$c->stash->{pagination}};
+                admin::Utils::paginate($$nums{total_count}, $c->session->{searched_lnp_numbers}{offset}, $c->session->{searched_lnp_numbers}{limit});
+            $c->stash->{max_offset} = ${$c->stash->{pagination}}[-1]{offset};
             # delete_number will decrease offset if no number remains on current page
             if(@{$$nums{numbers}} == 1) {
                 $c->stash->{last_one} = 1;
@@ -388,7 +388,7 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The billing controller is Copyright (c) 2009 Sipwise GmbH, Austria. All
+The lnp controller is Copyright (c) 2009-2010 Sipwise GmbH, Austria. All
 rights reserved.
 
 =cut

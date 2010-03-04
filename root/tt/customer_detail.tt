@@ -174,7 +174,7 @@
                 <tr>
                   <td class="tdkey">newsletter:</td>
                   <td>
-                    <input type="checkbox" id="cont_newsletter" [% IF ! edit_contact %]class="disabled" disabled="disabled"[% END %]
+                    <input type="checkbox" class="checkbox" id="cont_newsletter" [% IF ! edit_contact %]disabled="disabled"[% END %]
                            name="newsletter" [% IF customer.contact.newsletter %]checked="checked"[% END %] />
                   </td>
                 </tr>
@@ -265,7 +265,7 @@
               <tr>
                 <td class="tdkey">newsletter:</td>
                 <td>
-                  <input type="checkbox" id="comm_newsletter" [% IF ! edit_commercial %]class="disabled" disabled="disabled"[% END %]
+                  <input type="checkbox" class="checkbox" id="comm_newsletter" [% IF ! edit_commercial %]disabled="disabled"[% END %]
                          name="newsletter" [% IF customer.comm_contact.newsletter %]checked="checked"[% END %] />
                 </td>
               </tr>
@@ -349,7 +349,7 @@
               <tr>
                 <td class="tdkey">newsletter:</td>
                 <td>
-                  <input type="checkbox" id="tech_newsletter" [% IF ! edit_technical %]class="disabled" disabled="disabled"[% END %]
+                  <input type="checkbox" class="checkbox" id="tech_newsletter" [% IF ! edit_technical %]disabled="disabled"[% END %]
                          name="newsletter" [% IF customer.tech_contact.newsletter %]checked="checked"[% END %] />
                 </td>
               </tr>

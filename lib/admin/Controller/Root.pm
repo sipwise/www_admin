@@ -40,9 +40,15 @@ sub auto : Private {
 
     if (!$c->user_exists) {
         $c->log->debug('***Root::auto User not found, forwarding to /');
+        $c->session->{unauth_uri} = $c->request->method eq 'GET'
+                                    ? ($c->request->uri =~ m#/logout$# ? undef : $c->request->uri)
+                                    : $c->request->headers->referer;
         $c->response->redirect($c->uri_for('/'));
         return;
     }
+
+    $c->stash->{menu}{active} = $c->request->path;
+    $c->stash->{menu}{active} =~ s#/.*$##;
 
     return 1;
 }
@@ -116,8 +122,8 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The Root controller is Copyright (c) 2007 Sipwise GmbH, Austria. All
-rights reserved.
+The Root controller is Copyright (c) 2007-2010 Sipwise GmbH, Austria.
+All rights reserved.
 
 =cut
 

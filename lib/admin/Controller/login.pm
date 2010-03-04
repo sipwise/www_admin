@@ -31,6 +31,12 @@ sub index : Private {
     if ($username && $password) {
         if($c->model('Provisioning')->login($c, $username, $password)) {
             $c->log->debug('***Login::index login successfull');
+            if($c->session->{unauth_uri}) {
+                $c->log->debug('***Login::index redirecting user to '. $c->session->{unauth_uri});
+                $c->response->redirect($c->session->{unauth_uri});
+                delete $c->session->{unauth_uri};
+                return;
+            }
         }
     } else {
         $c->session->{prov_error} = 'Client.Syntax.LoginMissingPass' unless length $password;
@@ -58,8 +64,8 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The login controller is Copyright (c) 2007 Sipwise GmbH, Austria. All
-rights reserved.
+The login controller is Copyright (c) 2007-2010 Sipwise GmbH, Austria.
+All rights reserved.
 
 =cut
 

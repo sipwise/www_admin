@@ -4,7 +4,7 @@
         </h3>
 
         <div class="actions">
-          <a href="detail?subscriber_id=[% subscriber_id %]&amp;#userprefs" class="aaction">back</a>
+          <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#userprefs" class="aaction">back</a>
         </div>
         <div class="p1">
           <div class="list_explanation">
