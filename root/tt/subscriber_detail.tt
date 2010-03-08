@@ -79,9 +79,11 @@
                 <td class="tdkey">web password:</td>
                 <td>
                 [% IF edit_subscriber %]
-                  <input type="text" name="webpassword" id="edit_webpass" value="[% subscriber.edit_webpass %]" />
+                  <input type="text" name="webpassword" id="edit_webpass" value="[% subscriber.edit_webpass %]"
+                         title="the password used for login at the SOAP and CSC interfaces, string" />
                 [% ELSE %]
                   <input type="text" id="edit_webpass" class="disabled" disabled="disabled"
+                         title="the password used for login at the SOAP and CSC interfaces, string"
                   [% IF show_webpass  && Catalyst.session.admin.show_passwords %]
                     value="[% subscriber.webpassword %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
                   [% ELSE %]
@@ -102,9 +104,12 @@
                 <td class="tdkey">E.164 number:</td>
                 <td>
                 [% IF edit_subscriber %]
-                  <input type="text" name="cc" class="ishort" value="[% subscriber.cc %]" />
-                  <input type="text" name="ac" class="ishort" value="[% subscriber.ac %]" />
-                  <input type="text" name="sn" value="[% subscriber.sn %]" />
+                  <input type="text" name="cc" class="ishort" value="[% subscriber.cc %]"
+                         title="the country code of the E.164 number, integer" />
+                  <input type="text" name="ac" class="ishort" value="[% subscriber.ac %]"
+                         title="the area code of the E.164 number, integer" />
+                  <input type="text" name="sn" value="[% subscriber.sn %]"
+                         title="the subscriber part of the E.164 number, numeric string" />
                 [% ELSE %]
                   <input type="text" class="disabled" disabled="disabled"
                   [% IF subscriber.sn %]
@@ -126,7 +131,8 @@
               <tr>
                 <td class="tdkey">SIP URI:</td>
                 <td>
-                  <input type="text" name="username" value="[% subscriber.username %]" />
+                  <input type="text" name="username" value="[% subscriber.username %]"
+                         title="the local part of the SIP URI, string" />
                   @
                   <select size="1" name="domain">
                   [% FOREACH sdom = domains %]
@@ -140,9 +146,11 @@
                 <td class="tdkey">SIP password:</td>
                 <td>
                 [% IF edit_subscriber %]
-                  <input type="text" name="password" id="edit_pass" value="[% subscriber.edit_pass %]" />
+                  <input type="text" name="password" id="edit_pass" value="[% subscriber.edit_pass %]"
+                         title="the password used for SIP authentication, string" />
                 [% ELSE %]
                   <input type="text" id="edit_pass" class="disabled" disabled="disabled"
+                         title="the password used for SIP authentication, string"
                   [% IF show_pass && Catalyst.session.admin.show_passwords %]
                     value="[% subscriber.password %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
                   [% ELSE %]
@@ -163,6 +171,7 @@
                 <td class="tdkey">administrative:</td>
                 <td>
                   <input type="checkbox" name="admin" class="checkbox" [% IF ! edit_subscriber %]disabled="disabled"[% END %]
+                         title="if checked, the subscriber may create and edit other subscribers in the same VoIP account"
                   [% IF subscriber.admin %]checked="checked"[% END %] />
                 </td>
               </tr>
@@ -170,6 +179,7 @@
                 <td class="tdkey">timezone:</td>
                 <td>
                   <input type="text" name="timezone" [% IF ! edit_subscriber %]class="disabled" disabled="disabled"[% END %]
+                         title="timezone in the form of 'continent/capital', optional"
                     value="[% subscriber.timezone %]" />
                 </td>
               </tr>
