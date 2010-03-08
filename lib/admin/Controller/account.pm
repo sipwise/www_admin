@@ -164,6 +164,17 @@ sub detail : Local {
             or ref $c->session->{voip_account}{subscribers} ne 'ARRAY'
             or $#{$c->session->{voip_account}{subscribers}} == -1;
 
+    foreach my $vas (eval { @{$c->session->{voip_account}{subscribers}} }) {
+        my $regcon;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_registered_contacts',
+                                                            { username => $$vas{username},
+                                                              domain   => $$vas{domain},
+                                                            },
+                                                            \$regcon
+                                                          );
+        $$vas{registered_contacts} = join ", ", map { $$_{user_agent} } @$regcon if eval { @$regcon };
+    }
+
     $c->stash->{account} = $c->session->{voip_account};
     $c->stash->{account}{is_locked} = 1 if $c->session->{voip_account}{status} eq 'locked';
 

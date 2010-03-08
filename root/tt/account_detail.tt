@@ -176,6 +176,11 @@
         <div class="p1">
         [% IF account.subscribers %]
           <table>
+            <tr class="table_header">
+              <td>SIP URI</td>
+              <td>Primary Number</td>
+              <td>Registered Devices</td>
+            </tr>
           [% FOREACH subscriber = account.subscribers %]
             <tr>
               <td>
@@ -187,7 +192,7 @@
               [% END %]
               </td>
               <td>[% IF subscriber.sn %]+[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %][% END %]</td>
-              <td>[% subscriber.uuid %]</td>
+              <td>[% subscriber.registered_contacts %]</td>
             </tr>
           [% END %]
           </table>

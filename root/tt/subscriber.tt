@@ -37,7 +37,11 @@
 
           <div class="p1">
             <table>
-              <tr class="table_header"><td>SIP URI</td><td class="tdcenter">Account ID</td></tr>
+              <tr class="table_header">
+                <td>SIP URI</td>
+                <td class="tdcenter">Account ID</td>
+                <td>Primary Number</td>
+              </tr>
 
             [% FOREACH subscriber = subscriber_list %]
 
@@ -53,6 +57,11 @@
                 <td class="tdcenter">
                   <a href="/account/detail?account_id=[% subscriber.account_id %]">
                     [% subscriber.account_id %]</a>
+                </td>
+                <td>
+                  [% IF subscriber.sn %]
+                    +[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %]
+                  [% END %]
                 </td>
               </tr>
 
