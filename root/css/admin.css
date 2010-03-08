@@ -91,10 +91,11 @@ ul#topsubmenu {
 }
 
 #topsubmenu a:hover {
-	color: #D60808;
+	color: #D60808 !important;
 	text-decoration: none;
 }
 #topsubmenu a:after {
+	margin-left: 0px !important;
 	content: "" !important;
 }
 
@@ -185,6 +186,7 @@ ul#topsubmenu {
 	text-decoration: underline;
 }
 #contentplace .postlink label:after {
+	margin-left: 1px;
 	content: "\bb";
 	font-weight: bold;
 }
@@ -255,11 +257,13 @@ ul#topsubmenu {
 
 /* print ">>" after hyper refs */
 #contentplace a:after {
+	margin-left: 1px;
 	content: "\bb";
 	font-weight: bold;
 }
 /* no ">>" in heading */
 #contentplace h3 a:after {
+	margin-left: 0px;
 	content: "";
 }
 #contentplace a.force_arrows:after {
@@ -278,6 +282,9 @@ ul#topsubmenu {
 #contentplace .aaction {
 	margin: 0 8px 0 0;
 	font-weight: bold;
+}
+#contentplace .actions a#lock:after {
+	content: "\ab";
 }
 
 /* colors for disabled input fields */
@@ -394,6 +401,7 @@ ul#topsubmenu {
 }
 /* no ">>" in pagination next / previous */
 #contentplace .pagination li.nextpage a:after {
+	margin-left: 0px;
 	content: "";
 }
 

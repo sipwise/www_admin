@@ -42,7 +42,7 @@
           [% END %]
         [% ELSE %]
           <script language="JavaScript" src="/js/openclose.js" type="text/javascript"></script>
-          <a href="javascript:;" class="aaction" onclick="javascript:openclose();" onkeypress="javascript:openclose();">lock</a>
+          <a id="lock" href="javascript:;" class="aaction" onclick="javascript:openclose();" onkeypress="javascript:openclose();">lock</a>
           <span id="lock_menu" class="floating" onmouseout="javascript:openclose();">
             <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=none" class="aaction">unlock</a><br />
             <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=foreign" class="aaction">foreign</a><br />

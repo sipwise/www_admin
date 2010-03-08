@@ -111,7 +111,7 @@
           [% IF messages.cadmerr %]<div class="errormsg">[% messages.cadmerr %]</div>[% END %]
 
           <table>
-            <form action="/admin/do_create_admin" method="post">
+            <form autocomplete="off" action="/admin/do_create_admin" method="post">
               <tr>
                 <td>login:</td>
                 <td><input type="text" size="20" name="admin" id="adminaddtxt" value="[% arefill.admin %]" /></td>
