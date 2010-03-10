@@ -56,7 +56,8 @@
                 <td class="tdkey">CustomerID:</td>
                 <td>
                   [% IF edit_account %]
-                    <input type="text" name="customer_id" value="[% account.customer_id %]" />
+                    <input type="text" name="customer_id" value="[% account.customer_id %]"
+                           title="unique ID of the customer the account belongs to, integer, optional" />
                   [% ELSE %]
                     [% IF account.customer_id %]
                     <a href="/customer/detail?customer_id=[% account.customer_id %]">[% account.customer_id %]</a>
@@ -135,7 +136,11 @@
                 <td class="nowrap">&euro; [% account.balance.cash_balance %]</td>
                 <td>
                 [% IF edit_balance %]
-                  <div class="account_add">add <input type="text" name="add_cash" value="[% balanceadd.cash %]" /> Euro</div>
+                  <div class="account_add">
+                    add
+                    <input type="text" name="add_cash" value="[% balanceadd.cash %]"
+                           title="amount of money to add, float" />
+                    Euro</div>
                 [% END %]
                 </td>
               </tr>
@@ -145,7 +150,12 @@
                 <td class="nowrap">[% account.balance.free_time_balance %] s</td>
                 <td>
                 [% IF edit_balance %]
-                  <div class="account_add">add <input type="text" name="add_time" value="[% balanceadd.free_time %]" /> seconds</div>
+                  <div class="account_add">
+                    add
+                    <input type="text" name="add_time" value="[% balanceadd.free_time %]"
+                           title="amount of free time in seconds to add, integer" />
+                    seconds
+                  </div>
                 [% END %]
                 </td>
               </tr>
@@ -176,6 +186,11 @@
         <div class="p1">
         [% IF account.subscribers %]
           <table>
+            <tr class="table_header">
+              <td>SIP URI</td>
+              <td>Primary Number</td>
+              <td>Registered Devices</td>
+            </tr>
           [% FOREACH subscriber = account.subscribers %]
             <tr>
               <td>
@@ -187,7 +202,7 @@
               [% END %]
               </td>
               <td>[% IF subscriber.sn %]+[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %][% END %]</td>
-              <td>[% subscriber.uuid %]</td>
+              <td>[% subscriber.registered_contacts %]</td>
             </tr>
           [% END %]
           </table>

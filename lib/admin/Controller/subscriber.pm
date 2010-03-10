@@ -530,7 +530,6 @@ sub preferences : Local {
 
     if(ref $c->session->{voip_preferences} eq 'ARRAY') {
 
-      my $cftarget;
       my @stashprefs;
 
       foreach my $pref (@{$c->session->{voip_preferences}}) {
@@ -558,18 +557,7 @@ sub preferences : Local {
               $$preferences{$$pref{attribute}} = 'voicebox';
             } elsif($$preferences{$$pref{attribute}} =~ /\@fax2mail\.local$/) {
               $$preferences{$$pref{attribute}} = 'fax2mail';
-            } else {
-              $$preferences{$$pref{attribute}} =~ s/^sip://i;
-              if($$preferences{$$pref{attribute}} =~ /^\+?\d+$/) {
-                my $scc = $c->session->{subscriber}{cc};
-                $$preferences{$$pref{attribute}} =~ s/^\+*/+/;
-                $$preferences{$$pref{attribute}} =~ s/^\+$scc/0/;
-              }
             }
-          }
-        } elsif($$pref{attribute} eq 'cli') {
-          if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
-            $$preferences{$$pref{attribute}} =~ s/^sip://i;
           }
         } elsif(!$c->stash->{ncos_levels} and ($$pref{attribute} eq 'ncos' or $$pref{attribute} eq 'adm_ncos')) {
           my $ncoslvl;
@@ -578,6 +566,8 @@ sub preferences : Local {
                                                               \$ncoslvl
                                                             );
           $c->stash->{ncos_levels} = $ncoslvl if eval { @$ncoslvl };
+        } elsif($$pref{attribute} eq 'block_in_list' or $$pref{attribute} eq 'block_out_list') {
+          eval { @{$$preferences{$$pref{attribute}}} = map { s/^([1-9])/+$1/; $_ } @{$$preferences{$$pref{attribute}}} };
         }
 
         push @stashprefs,
@@ -600,12 +590,6 @@ sub preferences : Local {
     my @used_default_speed_dial_slots = ();
     if (eval { @$speed_dial_slots }) {
         foreach my $sdentry (sort {$a->{id} <=> $b->{id}} @$speed_dial_slots) {
-            $$sdentry{destination} =~ s/^sip://i;
-            if($$sdentry{destination} =~ /^\+?\d+$/) {
-                my $scc = $c->session->{subscriber}{cc};
-                $$sdentry{destination} =~ s/^\+*/+/;
-                $$sdentry{destination} =~ s/^\+$scc/0/;
-            }
             push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
                                                      number      => $i++,
                                                      label       => 'Slot ' . $$sdentry{slot} . ': ' . $$sdentry{destination}
@@ -621,18 +605,6 @@ sub preferences : Local {
                                                      number      => $i++,
                                                      label       => 'Slot ' . $free_slot . ': empty'
                                                    };
-        }
-    }
-
-    if(ref $c->session->{subscriber}{fax_preferences} eq 'HASH' and
-       ref $c->session->{subscriber}{fax_preferences}{destinations} eq 'ARRAY')
-    {
-        for(@{$c->session->{subscriber}{fax_preferences}{destinations}}) {
-            if($$_{destination} =~ /^\+?\d+$/) {
-                my $scc = $c->session->{subscriber}{cc};
-                $$_{destination} =~ s/^\+*/+/;
-                $$_{destination} =~ s/^\+$scc/0/;
-            }
         }
     }
 
@@ -1231,13 +1203,6 @@ sub edit_speed_dial_slots : Local {
                                                                       $c->session->{messages}{updateerr})
                                     : undef;
                 #delete $c->session->{updateerrmsg};
-            } else {
-                $$sdentry{destination} =~ s/^sip://i;
-                if($$sdentry{destination} =~ /^\+?\d+$/) {
-                    my $scc = $c->session->{subscriber}{cc};
-                    $$sdentry{destination} =~ s/^\+*/+/;
-                    $$sdentry{destination} =~ s/^\+$scc/0/;
-                }
             }
             push @{$c->stash->{speed_dial_slots}}, { id          => $$sdentry{id},
                                                  number      => $i++,
@@ -1502,11 +1467,6 @@ sub edit_destlist : Local {
         my $bg = '';
         my $i = 1;
         foreach my $entry (sort { $$a{destination} cmp $$b{destination} } @$destlist) {
-            if($$entry{destination} =~ /^\+?\d+$/) {
-                my $scc = $c->session->{subscriber}{cc};
-                $$entry{destination} =~ s/^\+*/+/;
-                $$entry{destination} =~ s/^\+$scc/0/;
-            }
             push @{$c->stash->{list_data}}, { %$entry,
                                               background => $bg ? '' : 'tr_alt',
                                               id         => $i++,

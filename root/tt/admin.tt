@@ -20,28 +20,33 @@
               <tr>
                 <td>[% admin.login %]</td>
                 [% IF admin.login == edit_admin %]
-                  <form action="/admin/do_edit_admin" method="post">
+                  <form autocomplete="off" action="/admin/do_edit_admin" method="post">
                     <input type="hidden" name="admin" value="[% admin.login %]" />
-                    <td><input type="password" name="password" value="" /></td>
+                    <td><input type="password" name="password" value=""
+                               title="if set, the new login password for the account, string" /></td>
                     <td class="tdcenter">
                       <input type="checkbox" class="checkbox" name="is_master"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
-                             [% IF erefill.is_master or !erefill && admin.is_master %]checked="checked" [% END %] />
+                             [% IF erefill.is_master or !erefill && admin.is_master %]checked="checked" [% END %]
+                             title="if checked, the administrator can create and edit other administrator accounts" />
                     </td>
                     <td class="tdcenter">
                       <input type="checkbox" class="checkbox" name="is_active"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
-                             [% IF erefill.is_active or !erefill && admin.is_active %]checked="checked" [% END %] />
+                             [% IF erefill.is_active or !erefill && admin.is_active %]checked="checked" [% END %]
+                             title="if checked, the administrator account is active and may be used" />
                     </td>
                     <td class="tdcenter">
                       <input type="checkbox" class="checkbox" name="read_only"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
-                             [% IF erefill.read_only or !erefill && admin.read_only %]checked="checked" [% END %] />
+                             [% IF erefill.read_only or !erefill && admin.read_only %]checked="checked" [% END %]
+                             title="if checked, the administrator may not change any data" />
                     </td>
                     <td class="tdcenter">
                       <input type="checkbox" class="checkbox" name="show_passwords"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
-                             [% IF erefill.show_passwords or !erefill && admin.show_passwords %]checked="checked" [% END %] />
+                             [% IF erefill.show_passwords or !erefill && admin.show_passwords %]checked="checked" [% END %]
+                             title="if checked, the new administrator may view subscriber passwords" />
                     </td>
                     <td>
                       <div class="postlink">
@@ -55,19 +60,23 @@
                   <td>********</td>
                   <td class="tdcenter">
                     <input type="checkbox" class="checkbox" disabled="disabled"
-                           [% IF admin.is_master %]checked="checked"[% END %] />
+                           [% IF admin.is_master %]checked="checked"[% END %]
+                           title="if checked, the administrator can create and edit other administrator accounts" />
                   </td>
                   <td class="tdcenter">
                     <input type="checkbox" class="checkbox" disabled="disabled"
-                           [% IF admin.is_active %] checked="checked"[% END %] />
+                           [% IF admin.is_active %] checked="checked"[% END %]
+                           title="if checked, the administrator account is active and may be used" />
                   </td>
                   <td class="tdcenter">
                     <input type="checkbox" class="checkbox" disabled="disabled"
-                           [% IF admin.read_only %] checked="checked"[% END %] />
+                           [% IF admin.read_only %] checked="checked"[% END %]
+                           title="if checked, the administrator may not change any data" />
                   </td>
                   <td class="tdcenter">
                     <input type="checkbox" class="checkbox" disabled="disabled"
-                           [% IF admin.show_passwords %] checked="checked"[% END %] />
+                           [% IF admin.show_passwords %] checked="checked"[% END %]
+                           title="if checked, the new administrator may view subscriber passwords" />
                   </td>
                   <td>
                     [% UNLESS Catalyst.session.admin.read_only && admin.login != Catalyst.session.admin.login %]
@@ -111,41 +120,49 @@
           [% IF messages.cadmerr %]<div class="errormsg">[% messages.cadmerr %]</div>[% END %]
 
           <table>
-            <form action="/admin/do_create_admin" method="post">
+            <form autocomplete="off" action="/admin/do_create_admin" method="post">
               <tr>
                 <td>login:</td>
-                <td><input type="text" size="20" name="admin" id="adminaddtxt" value="[% arefill.admin %]" /></td>
+                <td><input type="text" size="20" name="admin" id="adminaddtxt" value="[% arefill.admin %]"
+                           title="the login username for the new account, string" />
+                </td>
               </tr>
               <tr>
                 <td>password:</td>
-                <td><input type="password" name="password" value="" /></td>
+                <td><input type="password" name="password" value=""
+                           title="the login password for the new account, string" />
+                </td>
               </tr>
               <tr>
                 <td>master:</td>
                 <td>
                   <input type="checkbox" class="checkbox" name="is_master"
-                         [% IF arefill.is_master %]checked="checked"[% END %] />
+                         [% IF arefill.is_master %]checked="checked"[% END %]
+                         title="if checked, the new administrator can create and edit other administrator accounts" />
                 </td>
               </tr>
               <tr>
                 <td>active:</td>
                 <td>
                   <input type="checkbox" class="checkbox" name="is_active"
-                         [% IF arefill.is_active %]checked="checked"[% END %] />
+                         [% IF arefill.is_active %]checked="checked"[% END %]
+                         title="if checked, the new administrator account is active and may be used" />
                 </td>
               </tr>
               <tr>
                 <td>readonly:</td>
                 <td>
                   <input type="checkbox" class="checkbox" name="read_only"
-                         [% IF arefill.read_only %]checked="checked"[% END %] />
+                         [% IF arefill.read_only %]checked="checked"[% END %]
+                         title="if checked, the new administrator may not change any data" />
                 </td>
               </tr>
               <tr>
                 <td>show passwords:</td>
                 <td>
                   <input type="checkbox" class="checkbox" name="show_passwords"
-                         [% IF arefill.show_passwords %]checked="checked"[% END %] />
+                         [% IF arefill.show_passwords %]checked="checked"[% END %]
+                         title="if checked, the new administrator may view subscriber passwords" />
                 </td>
               </tr>
               <tr>
