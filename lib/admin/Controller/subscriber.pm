@@ -733,7 +733,16 @@ sub update_preferences : Local {
 
     $$preferences{cli} = $c->request->params->{cli} or undef;
     if(defined $$preferences{cli} and $$preferences{cli} =~ /^\+?\d+$/) {
-        $$preferences{cli} =~ s/^\++//;
+        if($$preferences{cli} =~ /^\+[1-9][0-9]+$/) {
+        } elsif($$preferences{cli} =~ /^00[1-9][0-9]+$/) {
+            $$preferences{cli} =~ s/^00/+/;
+        } elsif($$preferences{cli} =~ /^0[1-9][0-9]+$/) {
+            $$preferences{cli} =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
+        } elsif($$preferences{cli} =~ /^[1-9][0-9]+$/) {
+            $$preferences{cli} = '+' . $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $$preferences{cli};
+        } else {
+            $messages{cli} = 'Client.Voip.MalformedNumber';
+        }
     }
 
     $$preferences{clir} = $c->request->params->{clir} ? 1 : undef;
