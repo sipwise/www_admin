@@ -1519,7 +1519,7 @@ sub do_edit_destlist : Local {
     }
 
     # input text field to add new entry to destination list
-    # this is also sent by the save link next to entries in edit mode
+    # this is also sent (together with a list_del) by the save link in edit mode
     my $add = $c->request->params->{list_add};
     if(defined $add) {
         my $checkresult;
@@ -1538,7 +1538,6 @@ sub do_edit_destlist : Local {
         }
         unless($checkresult) {
             $messages{msgadd} = 'Client.Voip.MalformedFaxDestination';
-            $c->session->{arefill}{destination} = $add;
         }
         $entry{destination} = $add;
         $entry{filetype} = $c->request->params->{filetype} || 'TIFF';
@@ -1550,7 +1549,12 @@ sub do_edit_destlist : Local {
         my $destlist = $$preferences{$list};
         $destlist = [] unless defined $destlist;
         $destlist = [ $destlist ] unless ref $destlist;
-        $$preferences{$list} = [ @$destlist, \%entry ];
+
+        if(grep { lc $$_{destination} eq lc $add } @$destlist) {
+            $messages{msgadd} = 'Web.Fax.ExistingFaxDestination';
+        } else {
+            $$preferences{$list} = [ @$destlist, \%entry ];
+        }
 
         $c->session->{arefill} = \%entry if keys %messages;
     }
