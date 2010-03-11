@@ -1,6 +1,9 @@
-sipwise-www-admin (2.0.1) UNRELEASED; urgency=medium
+sipwise-www-admin (2.0.1) unstable; urgency=medium
 
- -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 10 Mar 2010 15:15:41 +0100
+  * various number format unifications
+  * some smaller bugfixes
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Thu, 11 Mar 2010 18:32:12 +0100
 
 sipwise-www-admin (2.0.0-1) unstable; urgency=medium
 
