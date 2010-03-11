@@ -694,11 +694,12 @@ sub update_preferences : Local {
 
             if($fw_target =~ /^\+?\d+$/) {
                 if($fw_target =~ /^\+[1-9][0-9]+$/) {
-                    $fw_target =~ s/^\+//;
                 } elsif($fw_target =~ /^00[1-9][0-9]+$/) {
-                    $fw_target =~ s/^00//;
+                    $fw_target =~ s/^00/+/;
                 } elsif($fw_target =~ /^0[1-9][0-9]+$/) {
-                    $fw_target =~ s/^0/$c->session->{subscriber}{cc}/e;
+                    $fw_target =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
+                } elsif($fw_target =~ /^[1-9][0-9]+$/) {
+                    $fw_target = '+' . $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $fw_target;
                 } else {
                     $messages{$fwtype} = 'Client.Voip.MalformedNumber';
                     $fw_target = $c->request->params->{$fwtype .'_sipuri'};
@@ -1264,13 +1265,12 @@ sub do_edit_speed_dial_slots : Local {
         my $destination;
         if ($add_destination =~ /^\+?\d+$/) {
             if($add_destination =~ /^\+[1-9][0-9]+$/) {
-                $add_destination =~ s/^\+//;
             } elsif($add_destination =~ /^00[1-9][0-9]+$/) {
-                $add_destination =~ s/^00//;
+                $add_destination =~ s/^00/+/;
             } elsif($add_destination =~ /^0[1-9][0-9]+$/) {
-                $add_destination =~ s/^0/$c->session->{subscriber}{cc}/e;
-            } else {
-                $add_destination = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add_destination;
+                $add_destination =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
+            } elsif($add_destination =~ /^[1-9][0-9]+$/) {                   
+                $add_destination = '+' . $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add_destination;
             }
             my $checkresult;
             return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $add_destination, \$checkresult);
@@ -1336,13 +1336,12 @@ sub do_edit_speed_dial_slots : Local {
         my $destination;
         if ($update_destination =~ /^\+?\d+$/) {
             if($update_destination =~ /^\+[1-9][0-9]+$/) {
-                $update_destination =~ s/^\+//;
             } elsif($update_destination =~ /^00[1-9][0-9]+$/) {
-                $update_destination =~ s/^00//;
+                $update_destination =~ s/^00/+/;
             } elsif($update_destination =~ /^0[1-9][0-9]+$/) {
-                $update_destination =~ s/^0/$c->session->{subscriber}{cc}/e;
-            } else {
-                $update_destination = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $update_destination;
+                $update_destination =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
+            } elsif($add_destination =~ /^[1-9][0-9]+$/) {
+                $update_destination = '+' . $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $update_destination;
             }
             my $checkresult;
             return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $update_destination, \$checkresult);
@@ -1526,13 +1525,12 @@ sub do_edit_destlist : Local {
         my $checkresult;
         if($add =~ /^\+?\d+$/) {
             if($add =~ /^\+[1-9][0-9]+$/) {
-                $add =~ s/^\+//;
             } elsif($add =~ /^00[1-9][0-9]+$/) {
-                $add =~ s/^00//;
+                $add =~ s/^00/+/;
             } elsif($add =~ /^0[1-9][0-9]+$/) {
-                $add =~ s/^0/$c->session->{subscriber}{cc}/e;
+                $add =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
             } else {
-                $add = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add;
+                $add = '+' . $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add;
             }
           return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $add, \$checkresult);
         } else {
