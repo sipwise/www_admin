@@ -1340,7 +1340,7 @@ sub do_edit_speed_dial_slots : Local {
                 $update_destination =~ s/^00/+/;
             } elsif($update_destination =~ /^0[1-9][0-9]+$/) {
                 $update_destination =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
-            } elsif($add_destination =~ /^[1-9][0-9]+$/) {
+            } elsif($update_destination =~ /^[1-9][0-9]+$/) {
                 $update_destination = '+' . $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $update_destination;
             }
             my $checkresult;
