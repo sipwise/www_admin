@@ -693,16 +693,11 @@ sub update_preferences : Local {
             $fw_target =~ s/^sip://i;
 
             if($fw_target =~ /^\+?\d+$/) {
-                if($fw_target =~ /^\+[1-9][0-9]+$/) {
-                    $fw_target =~ s/^\+//;
-                } elsif($fw_target =~ /^00[1-9][0-9]+$/) {
-                    $fw_target =~ s/^00//;
-                } elsif($fw_target =~ /^0[1-9][0-9]+$/) {
-                    $fw_target =~ s/^0/$c->session->{subscriber}{cc}/e;
-                } else {
-                    $messages{$fwtype} = 'Client.Voip.MalformedNumber';
-                    $fw_target = $c->request->params->{$fwtype .'_sipuri'};
-                }
+                $fw_target = admin::Utils::get_qualified_number_for_subscriber($c, $fw_target);
+                my $checkresult;
+                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $fw_target, \$checkresult);
+                $messages{$fwtype} = 'Client.Voip.MalformedNumber'
+                    unless $checkresult;
             } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+$/i) {
                 $fw_target = 'sip:'. lc $fw_target;
             } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+$/) {
@@ -732,7 +727,11 @@ sub update_preferences : Local {
 
     $$preferences{cli} = $c->request->params->{cli} or undef;
     if(defined $$preferences{cli} and $$preferences{cli} =~ /^\+?\d+$/) {
-        $$preferences{cli} =~ s/^\++//;
+        $$preferences{cli} = admin::Utils::get_qualified_number_for_subscriber($c, $$preferences{cli});
+        my $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $$preferences{cli}, \$checkresult);
+        $messages{cli} = 'Client.Voip.MalformedNumber'
+            unless $checkresult;
     }
 
     $$preferences{clir} = $c->request->params->{clir} ? 1 : undef;
@@ -1263,15 +1262,7 @@ sub do_edit_speed_dial_slots : Local {
         my $checkadd_destination;
         my $destination;
         if ($add_destination =~ /^\+?\d+$/) {
-            if($add_destination =~ /^\+[1-9][0-9]+$/) {
-                $add_destination =~ s/^\+//;
-            } elsif($add_destination =~ /^00[1-9][0-9]+$/) {
-                $add_destination =~ s/^00//;
-            } elsif($add_destination =~ /^0[1-9][0-9]+$/) {
-                $add_destination =~ s/^0/$c->session->{subscriber}{cc}/e;
-            } else {
-                $add_destination = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add_destination;
-            }
+            $add_destination = admin::Utils::get_qualified_number_for_subscriber($c, $add_destination);
             my $checkresult;
             return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $add_destination, \$checkresult);
             $destination = 'sip:'. $add_destination .'@'. $c->session->{subscriber}{domain}
@@ -1335,15 +1326,7 @@ sub do_edit_speed_dial_slots : Local {
         my $checkupdate_destination;
         my $destination;
         if ($update_destination =~ /^\+?\d+$/) {
-            if($update_destination =~ /^\+[1-9][0-9]+$/) {
-                $update_destination =~ s/^\+//;
-            } elsif($update_destination =~ /^00[1-9][0-9]+$/) {
-                $update_destination =~ s/^00//;
-            } elsif($update_destination =~ /^0[1-9][0-9]+$/) {
-                $update_destination =~ s/^0/$c->session->{subscriber}{cc}/e;
-            } else {
-                $update_destination = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $update_destination;
-            }
+            $update_destination = admin::Utils::get_qualified_number_for_subscriber($c, $update_destination);
             my $checkresult;
             return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $update_destination, \$checkresult);
             $destination = 'sip:'. $update_destination .'@'. $c->session->{subscriber}{domain}
@@ -1520,27 +1503,18 @@ sub do_edit_destlist : Local {
     }
 
     # input text field to add new entry to destination list
-    # this is also sent by the save link next to entries in edit mode
+    # this is also sent (together with a list_del) by the save link in edit mode
     my $add = $c->request->params->{list_add};
     if(defined $add) {
         my $checkresult;
         if($add =~ /^\+?\d+$/) {
-            if($add =~ /^\+[1-9][0-9]+$/) {
-                $add =~ s/^\+//;
-            } elsif($add =~ /^00[1-9][0-9]+$/) {
-                $add =~ s/^00//;
-            } elsif($add =~ /^0[1-9][0-9]+$/) {
-                $add =~ s/^0/$c->session->{subscriber}{cc}/e;
-            } else {
-                $add = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add;
-            }
+          $add = admin::Utils::get_qualified_number_for_subscriber($c, $add);
           return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $add, \$checkresult);
         } else {
           return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_email', $add, \$checkresult);
         }
         unless($checkresult) {
             $messages{msgadd} = 'Client.Voip.MalformedFaxDestination';
-            $c->session->{arefill}{destination} = $add;
         }
         $entry{destination} = $add;
         $entry{filetype} = $c->request->params->{filetype} || 'TIFF';
@@ -1552,7 +1526,12 @@ sub do_edit_destlist : Local {
         my $destlist = $$preferences{$list};
         $destlist = [] unless defined $destlist;
         $destlist = [ $destlist ] unless ref $destlist;
-        $$preferences{$list} = [ @$destlist, \%entry ];
+
+        if(grep { lc $$_{destination} eq lc $add } @$destlist) {
+            $messages{msgadd} = 'Web.Fax.ExistingFaxDestination';
+        } else {
+            $$preferences{$list} = [ @$destlist, \%entry ];
+        }
 
         $c->session->{arefill} = \%entry if keys %messages;
     }

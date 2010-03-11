@@ -104,4 +104,19 @@ sub get_contract_contact_form_fields {
     
 }
 
+sub get_qualified_number_for_subscriber {
+    my ($c, $number) = @_;
+
+    if($number =~ /^\+[1-9][0-9]+$/) {
+    } elsif($number =~ /^00[1-9][0-9]+$/) {
+        $number =~ s/^00/+/;
+    } elsif($number =~ /^0[1-9][0-9]+$/) {
+        $number =~ s/^0/'+'.$c->session->{subscriber}{cc}/e;
+    } elsif($number =~ /^[1-9][0-9]+$/) {
+        $number = '+' . $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $number;
+    }
+
+    return $number;
+}
+
 1;

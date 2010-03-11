@@ -381,7 +381,9 @@
           <table class="contracts">
             <tr>
               <td class="table_header">ContractID</td>
+              [% IF Catalyst.config.order_features %]
               <td class="table_header">OrderID</td>
+              [% END %]
               <td class="table_header">Product</td>
               <td class="table_header">status</td>
               <td class="table_header">created</td>
@@ -404,7 +406,9 @@
                 [% contract.id %]
               [% END %]
               </td>
+              [% IF Catalyst.config.order_features %]
               <td>[% contract.order_id %]</td>
+              [% END %]
               <td>
                 [% IF contract.class == 'voip' %]
                   <a href="/account/detail?account_id=[% contract.id %]">
@@ -425,6 +429,8 @@
           </div>
         [% END %]
         </div>
+
+      [% IF Catalyst.config.order_features %]
 
         <h3 id="order">Orders</h3>
 
@@ -496,6 +502,8 @@
           </div>
         [% END %]
         </div>
+
+      [% END %]
 
   [% END %]
 
