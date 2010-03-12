@@ -2,6 +2,10 @@ sipwise-www-admin (2.1.0) UNRELEASED; urgency=medium
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 10 Mar 2010 15:15:41 +0100
 
+sipwise-www-admin (2.0.3) UNRELEASED; urgency=medium
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Fri, 12 Mar 2010 18:09:04 +0100
+
 sipwise-www-admin (2.0.2) unstable; urgency=medium
 
   * LNP number search persistence fixed
