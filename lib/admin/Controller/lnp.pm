@@ -206,10 +206,13 @@ sub search_numbers : Local {
 
     my %filter;
 
-    $filter{lnp_provider_id} = $c->request->params->{search_provid}
-        if $c->request->params->{search_provid};
+    %filter = %{$c->session->{searched_lnp_numbers}}
+        if defined $c->session->{searched_lnp_numbers};
+
+    $filter{lnp_provider_id} = $c->request->params->{search_provid} || undef
+        if defined $c->request->params->{search_provid};
     $filter{number} = $c->request->params->{search_number}
-        if $c->request->params->{search_number};
+        if defined $c->request->params->{search_number};
     $filter{exact_number} = $c->request->params->{exact_number};
     $filter{offset} = $c->request->params->{offset} || 0;
     $filter{limit} = 10;

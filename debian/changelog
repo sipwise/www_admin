@@ -1,6 +1,9 @@
-sipwise-www-admin (2.0.2) UNRELEASED; urgency=medium
+sipwise-www-admin (2.0.2) unstable; urgency=medium
 
- -- Daniel Tiefnig <dtiefnig@sipwise.com>  Thu, 11 Mar 2010 18:32:12 +0100
+  * LNP number search persistence fixed
+  * package files install dirs corrected
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Fri, 12 Mar 2010 18:09:04 +0100
 
 sipwise-www-admin (2.0.1) unstable; urgency=medium
 
