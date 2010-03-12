@@ -37,8 +37,8 @@ install: build
 
 	# Add here commands to install the package into debian/sipwise-www-admin.
 	cp -a lib  debian/sipwise-www-admin/usr/local/admin/
-	cp -a root debian/sipwise-www-admin/usr/local/admin/
-	install -m 644 admin.yml debian/sipwise-www-admin/usr/local/admin/
+	cp -a root debian/sipwise-www-admin/usr/local/admin/lib/admin/
+	install -m 644 admin.yml debian/sipwise-www-admin/usr/local/admin/lib/admin/
 	install -m 644 -D etc/admin.conf debian/sipwise-www-admin/usr/local/etc/admin.conf
 	install -m 644 -D etc/apache.site debian/sipwise-www-admin/usr/share/doc/sipwise-www-admin/apache.site
 	# we don't need admin_create.pl and admin_test.pl:
