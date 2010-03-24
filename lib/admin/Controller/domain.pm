@@ -186,7 +186,10 @@ sub detail : Local {
                                                         \$domain_rw
                                                       );
     $c->stash->{domain} = $domain_rw;
+    $c->stash->{ifeditid} = $c->request->params->{ifeditid};
     $c->stash->{iteditid} = $c->request->params->{iteditid};
+    $c->stash->{ofeditid} = $c->request->params->{ofeditid};
+    $c->stash->{oteditid} = $c->request->params->{oteditid};
 
     my $audio_files;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
@@ -267,13 +270,24 @@ sub create_rewrite : Local {
     my %settings;
 
     my $domain = $c->request->params->{domain};
+    my $direction = $c->request->params->{direction};
+    my $field = $c->request->params->{field};
     my $match_pattern = $c->request->params->{match_pattern};
     my $replace_pattern = $c->request->params->{replace_pattern};
     my $description = $c->request->params->{description};
 
+    my $a = "";
+    if($field eq 'caller') { $a = 'caller'.$a; }
+    elsif($field eq 'callee') { $a = 'callee'.$a; }
+    if($direction eq 'in') { $a = 'i'.$a; }
+    elsif($direction eq 'out') { $a = 'o'.$a; }
+    my $m = $a.'msg'; my $e = $a.'err';
+
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_domain_rewrite',
                                                  { domain => $domain,
+                                                   direction => $direction,
+                                                   field => $field,
                                                    match_pattern => $match_pattern,
                                                    replace_pattern => $replace_pattern,
                                                    description => $description,
@@ -281,20 +295,20 @@ sub create_rewrite : Local {
                                                  undef
                                                ))
         {
-            $messages{icalleemsg} = 'Server.Voip.SavedSettings';
+            $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/detail?domain=$domain");
+            $c->response->redirect("/domain/detail?domain=$domain#$a");
             return;
         }
         else
         {
-            $messages{icalleeerr} = 'Client.Voip.InputErrorFound';
+            $messages{$e} = 'Client.Voip.InputErrorFound';
         }
     } else {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/domain/detail?domain=$domain");
+    $c->response->redirect("/domain/detail?domain=$domain#$a");
     return;
 }
 
@@ -311,10 +325,19 @@ sub edit_rewrite : Local {
     my %settings;
 
     my $domain = $c->request->params->{domain};
+    my $direction = $c->request->params->{direction};
+    my $field = $c->request->params->{field};
     my $rewriteid = $c->request->params->{rewriteid};
     my $match_pattern = $c->request->params->{match_pattern};
     my $replace_pattern = $c->request->params->{replace_pattern};
     my $description = $c->request->params->{description};
+    
+    my $a = "";
+    if($field eq 'caller') { $a = 'caller'.$a; }
+    elsif($field eq 'callee') { $a = 'callee'.$a; }
+    if($direction eq 'in') { $a = 'i'.$a; }
+    elsif($direction eq 'out') { $a = 'o'.$a; }
+    my $m = $a.'msg'; my $e = $a.'err';
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_domain_rewrite',
@@ -322,24 +345,26 @@ sub edit_rewrite : Local {
                                                    match_pattern => $match_pattern,
                                                    replace_pattern => $replace_pattern,
                                                    description => $description,
+                                                   direction => $direction,
+                                                   field => $field,
                                                  },
                                                  undef
                                                ))
         {
-            $messages{icalleemsg} = 'Server.Voip.SavedSettings';
+            $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/detail?domain=$domain");
+            $c->response->redirect("/domain/detail?domain=$domain#$a");
             return;
         }
         else
         {
-            $messages{icalleeerr} = 'Client.Voip.InputErrorFound';
+            $messages{$e} = 'Client.Voip.InputErrorFound';
         }
     } else {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/domain/detail?domain=$domain");
+    $c->response->redirect("/domain/detail?domain=$domain#$a");
     return;
 }
 
@@ -357,6 +382,15 @@ sub delete_rewrite : Local {
 
     my $domain = $c->request->params->{domain};
     my $rewriteid = $c->request->params->{rewriteid};
+    my $direction = $c->request->params->{direction};
+    my $field = $c->request->params->{field};
+    
+    my $a = "";
+    if($field eq 'caller') { $a = 'caller'.$a; }
+    elsif($field eq 'callee') { $a = 'callee'.$a; }
+    if($direction eq 'in') { $a = 'i'.$a; }
+    elsif($direction eq 'out') { $a = 'o'.$a; }
+    my $m = $a.'msg'; my $e = $a.'err';
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_domain_rewrite',
@@ -365,16 +399,16 @@ sub delete_rewrite : Local {
                                                  undef
                                                ))
         {
-            $messages{icalleemsg} = 'Server.Voip.SavedSettings';
+            $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/detail?domain=$domain");
+            $c->response->redirect("/domain/detail?domain=$domain#$a");
             return;
         }
     } else {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/domain/detail?domain=$domain");
+    $c->response->redirect("/domain/detail?domain=$domain#$a");
     return;
 }
 

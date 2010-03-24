@@ -6,6 +6,108 @@
 
       [% IF Catalyst.config.domain.rewrite_features %]
 
+        <h3 id="icaller">Inbound Rewrite Rules for Caller</h3>
+
+        <div class="p1">
+          [% IF messages.icallermsg %]<div class="goodmsg">[% messages.icallermsg %]</div>[% END %]
+          [% IF messages.icallererr %]<div class="errormsg">[% messages.icallererr %]</div>[% END %]
+
+          <table class="domains">
+            <tr class="table_header">
+              <td>Match Pattern</td>
+              <td>Replacement Pattern</td>
+              <td>Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH rule = domain.rewrite_in_caller %]
+              <tr>
+                [% IF rule.id == ifeditid && !Catalyst.session.admin.read_only %]
+                  <form action="/domain/edit_rewrite" method="post">
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <td>
+                      <input type="text" size="15 id="addtxt" title="string, match pattern"
+                             name="match_pattern" value="[% rule.match_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                             name="replace_pattern" value="[% rule.replace_pattern %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
+                             name="description" value="[% rule.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="ifsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ifsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/domain/detail?domain=[% domain.domain %]" class="aaction">cancel</a></td>
+                [% ELSE %]
+                  <td>[% rule.match_pattern %]</td>
+                  <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/domain/detail?domain=[% domain.domain %]&amp;ifeditid=[% rule.id %]" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/domain/delete_rewrite" method="post">
+                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="ifdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ifdel[% id %]" />
+                      </div>
+                    [% END %]
+                  </td>
+                [% END %]  
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+            [% UNLESS Catalyst.session.admin.read_only %]
+              <tr>
+                <form action="/domain/create_rewrite" method="post">
+                  <input type="hidden" name="direction" value="in" />
+                  <input type="hidden" name="field" value="caller" />
+                  <input type="hidden" name="domain" value="[% domain.domain %]" />
+                  <td>
+                    <input type="text" size="15" id="addtxt" title="string, match pattern"
+                           name="match_pattern" value="" />
+                  </td>
+                  <td>
+                    <input type="text" size="15" id="addtxt" title="string, replacement pattern"
+                           name="replace_pattern" value="" />
+                  </td>
+                  <td>
+                    <input type="text" size="15" id="addtxt" title="string, rule description"
+                           name="description" value="" />
+                  </td>
+                  <td>
+                    <div class="postlink">
+                      <label for="ifadd">add</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ifadd" />
+                    </div>
+                  </td>
+                  <td />
+                </form>
+              </tr>
+            [% END %]
+
+          </table>
+        </div>
+
         <h3 id="icallee">Inbound Rewrite Rules for Callee</h3>
 
         <div class="p1">
@@ -21,10 +123,12 @@
               <td style="width:60px;" />
             </tr>
             [% id = 0 %]
-            [% FOREACH rule = domain.rewrites %]
+            [% FOREACH rule = domain.rewrite_in_callee %]
               <tr>
                 [% IF rule.id == iteditid && !Catalyst.session.admin.read_only %]
                   <form action="/domain/edit_rewrite" method="post">
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
                     <input type="hidden" name="domain" value="[% domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <td>
@@ -59,6 +163,8 @@
                   <form action="/domain/delete_rewrite" method="post">
                     <input type="hidden" name="domain" value="[% domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
+                    <input type="hidden" name="direction" value="[% rule.direction %]" />
+                    <input type="hidden" name="field" value="[% rule.field %]" />
                     <td>
                     [% UNLESS Catalyst.session.admin.read_only %]
                       <div class="postlink">
@@ -75,6 +181,8 @@
             [% UNLESS Catalyst.session.admin.read_only %]
               <tr>
                 <form action="/domain/create_rewrite" method="post">
+                  <input type="hidden" name="direction" value="in" />
+                  <input type="hidden" name="field" value="callee" />
                   <input type="hidden" name="domain" value="[% domain.domain %]" />
                   <td>
                     <input type="text" size="15" id="addtxt" title="string, match pattern"
@@ -103,6 +211,7 @@
         </div>
 
       [% END %]
+
 
       [% IF Catalyst.config.domain.audiofile_features %]
 
