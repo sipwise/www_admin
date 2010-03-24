@@ -358,6 +358,7 @@ sub create_peer : Local {
 
     my $grpid = $c->request->params->{grpid};
     my $name = $c->request->params->{name};
+    my $domain = $c->request->params->{domain};
     my $ip = $c->request->params->{ip};
     my $port = $c->request->params->{port};
     my $weight = $c->request->params->{weight};
@@ -373,6 +374,7 @@ sub create_peer : Local {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_host',
                                                  { group_id => $grpid,
 												   name => $name,
+												   domain => $domain,
 												   ip => $ip,
 												   port => $port,
 												   weight => $weight,
@@ -456,6 +458,7 @@ sub edit_peer : Local {
     my $grpid = $c->request->params->{grpid};
     my $peerid = $c->request->params->{peerid};
     my $name = $c->request->params->{name};
+    my $domain = $c->request->params->{domain};
     my $ip = $c->request->params->{ip};
     my $port = $c->request->params->{port};
     my $weight = $c->request->params->{weight};
@@ -468,6 +471,7 @@ sub edit_peer : Local {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_host',
                                                  { id => $peerid,
 												   name => $name,
+												   domain => $domain,
 												   ip => $ip,
 												   port => $port,
 												   weight => $weight,

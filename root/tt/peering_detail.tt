@@ -112,6 +112,7 @@
           <table class="domains">
             <tr class="table_header">
               <td>Name</td>
+              <td>From-Domain</td>
               <td>IP Address</td>
               <td>Port</td>
               <td>Weight</td>
@@ -129,6 +130,10 @@
                     <td>
                       <input type="text" size="15 id="addtxt" title="string, peer name"
                              name="name" value="[% peer.name %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15 id="addtxt" title="string, peer domain"
+                             name="domain" value="[% peer.domain %]" />
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, peer ip address"
@@ -156,6 +161,7 @@
                   <td><a href="/peering/detail?group_id=[% grp.id %]" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td><a href="/peering/rewrite?peer_id=[% peer.id%]" class="aaction">[% peer.name %]</a></td>
+                  <td>[% peer.domain %]</td>
                   <td>[% peer.ip %]</td>
                   <td>[% peer.port %]</td>
                   <td>[% peer.weight %]</td>
@@ -191,6 +197,10 @@
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, peer name"
                              name="name" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, peer domain"
+                             name="domain" value="" />
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, peer ip address"
