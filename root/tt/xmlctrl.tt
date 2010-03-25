@@ -9,6 +9,7 @@
             <tr class="table_header">
               <td>IP</td>
               <td>Port</td>
+              <td>Path</td>
               <td>Roles</td>
               <td>Description</td>
               <td/>
@@ -25,6 +26,9 @@
                       <td><input type="text" title="Port" size="5"
                            name="port" value="[% host.port %]" />
                       </td>
+                      <td><input type="text" title="Port" size="10"
+                           name="path" value="[% host.path %]" />
+                      </td>
                       <td>
                         <select size="[% xmlgroups.size %]" name="groups" multiple="multiple">
                         [% FOREACH grp = xmlgroups %]
@@ -33,7 +37,7 @@
                         </select>
                       </td>
                       <td>
-                        <input type="text" class="ilong" title="free-form description string"
+                        <input type="text" size="20" title="free-form description string"
                          name="description" value="[% host.description %]" />
                       </td>
                     <td>
@@ -52,6 +56,7 @@
                 <tr>
                   <td>[% host.ip %]</a></td>
                   <td>[% host.port %]</td>
+                  <td>[% host.path %]</td>
                   <td>
                       <select size="[% host.groups.size %]" name="groups">
                       [% FOREACH grp = host.groups %]
@@ -97,6 +102,7 @@
               <tr class="table_header">
                 <td>IP</td>
                 <td>Port</td>
+                <td>Path</td>
                 <td>Roles</td>
                 <td>Description</td>
                 <td/>
@@ -108,6 +114,9 @@
                 <td><input type="text" title="Port" size="5"
                            name="port" value="[% crefill.port %]" />
                 </td>
+                <td><input type="text" title="Path" size="10"
+                           name="path" value="[% crefill.path %]" />
+                </td>
                 <td>
                   <select size="[% xmlgroups.size %]" name="groups" multiple="multiple">
                   [% FOREACH grp = xmlgroups %]
@@ -116,7 +125,7 @@
                   </select>
                 </td>
                 <td>
-                  <input type="text" class="ilong" title="free-form description string"
+                  <input type="text" size="20" title="free-form description string"
                          name="description" value="[% crefill.description %]" />
                 </td>
                 <td>

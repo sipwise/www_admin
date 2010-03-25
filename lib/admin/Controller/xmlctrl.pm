@@ -75,6 +75,7 @@ sub do_create_host : Local {
 
     $settings{ip} = $c->request->params->{ip};
     $settings{port} = $c->request->params->{port};
+    $settings{path} = $c->request->params->{path};
     $settings{description} = $c->request->params->{description}
         if length $c->request->params->{description};
     $settings{groups} = $c->request->params->{groups};
@@ -82,7 +83,8 @@ sub do_create_host : Local {
     $messages{chosterr} = 'Client.Voip.InputErrorFound'
       unless(length $settings{ip} && $settings{ip} =~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ &&
              length $settings{port} && $settings{port} =~ /^[0-9]+$/ &&
-             defined $settings{groups}
+             defined $settings{groups} &&
+             defined $settings{path}
       );
 
     unless(keys %messages) {
@@ -120,6 +122,7 @@ sub do_update_host : Local {
     $settings{id} = $c->request->params->{host};
     $settings{ip} = $c->request->params->{ip};
     $settings{port} = $c->request->params->{port};
+    $settings{path} = $c->request->params->{path};
     $settings{description} = $c->request->params->{description}
         if length $c->request->params->{description};
     $settings{groups} = $c->request->params->{groups};
@@ -128,7 +131,8 @@ sub do_update_host : Local {
       unless(length $settings{id} && $settings{id} =~ /^\d+$/ &&
              length $settings{ip} && $settings{ip} =~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ &&
              length $settings{port} && $settings{port} =~ /^[0-9]+$/ &&
-             defined $settings{groups}
+             defined $settings{groups} &&
+             defined $settings{path}
       );
 
     unless(keys %messages) {
