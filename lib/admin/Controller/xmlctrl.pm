@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use base 'Catalyst::Controller';
 use Data::Dumper;
+use UNIVERSAL 'isa';
+
 
 =head1 NAME
 
@@ -78,7 +80,13 @@ sub do_create_host : Local {
     $settings{path} = $c->request->params->{path};
     $settings{description} = $c->request->params->{description}
         if length $c->request->params->{description};
-    $settings{groups} = $c->request->params->{groups};
+
+    unless(isa($c->request->params->{groups}, 'ARRAY')) {
+      my @tmp = ($c->request->params->{groups});
+      $settings{groups} = \@tmp;
+    } else {
+      $settings{groups} = $c->request->params->{groups};
+    }
 
     $messages{chosterr} = 'Client.Voip.InputErrorFound'
       unless(length $settings{ip} && $settings{ip} =~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ &&
@@ -125,7 +133,12 @@ sub do_update_host : Local {
     $settings{path} = $c->request->params->{path};
     $settings{description} = $c->request->params->{description}
         if length $c->request->params->{description};
-    $settings{groups} = $c->request->params->{groups};
+    unless(isa($c->request->params->{groups}, 'ARRAY')) {
+      my @tmp = ($c->request->params->{groups});
+      $settings{groups} = \@tmp;
+    } else {
+      $settings{groups} = $c->request->params->{groups};
+    }
 
     $messages{ehosterr} = 'Client.Voip.InputErrorFound'
       unless(length $settings{id} && $settings{id} =~ /^\d+$/ &&
