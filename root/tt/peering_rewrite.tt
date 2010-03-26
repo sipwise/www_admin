@@ -55,6 +55,7 @@
             <tr class="table_header">
               <td>Match Pattern</td>
               <td>Replacement Pattern</td>
+              <td>Priority</td>
               <td>Description</td>
               <td style="width:40px;" />
               <td style="width:60px;" />
@@ -77,6 +78,10 @@
                              name="replace_pattern" value="[% rule.replace_pattern %]" />
                     </td>
                     <td>
+                      <input type="text" size="5" id="addtxt" title="int, replacement priority"
+                             name="priority" value="[% rule.priority %]" />
+                    </td>
+                    <td>
                       <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
                              name="description" value="[% rule.description %]" />
                     </td>
@@ -91,6 +96,8 @@
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.priority %]</td>
+                  <td>[% rule.priority %]</td>
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
@@ -131,6 +138,10 @@
                              name="replace_pattern" value="" />
                     </td>
                     <td>
+                      <input type="text" size="5" id="addtxt" title="int, replacement priority"
+                             name="priority" value="50" />
+                    </td>
+                    <td>
                       <input type="text" size="15" id="addtxt" title="string, rule description"
                              name="description" value="" />
                     </td>
@@ -160,6 +171,7 @@
             <tr class="table_header">
               <td>Match Pattern</td>
               <td>Replacement Pattern</td>
+              <td>Priority</td>
               <td>Description</td>
               <td style="width:40px;" />
               <td style="width:60px;" />
@@ -182,6 +194,10 @@
                              name="replace_pattern" value="[% rule.replace_pattern %]" />
                     </td>
                     <td>
+                      <input type="text" size="5" id="addtxt" title="int, replacement priority"
+                             name="priority" value="[% rule.priority %]" />
+                    </td>
+                    <td>
                       <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
                              name="description" value="[% rule.description %]" />
                     </td>
@@ -196,6 +212,7 @@
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.priority %]</td>
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
@@ -236,6 +253,10 @@
                              name="replace_pattern" value="" />
                     </td>
                     <td>
+                      <input type="text" size="5" id="addtxt" title="int, replacement priority"
+                             name="priority" value="50" />
+                    </td>
+                    <td>
                       <input type="text" size="15" id="addtxt" title="string, rule description"
                              name="description" value="" />
                     </td>
@@ -264,6 +285,7 @@
             <tr class="table_header">
               <td>Match Pattern</td>
               <td>Replacement Pattern</td>
+              <td>Priority</td>
               <td>Description</td>
               <td style="width:40px;" />
               <td style="width:60px;" />
@@ -286,6 +308,10 @@
                              name="replace_pattern" value="[% rule.replace_pattern %]" />
                     </td>
                     <td>
+                      <input type="text" size="5" id="addtxt" title="int, replacement priority"
+                             name="priority" value="[% rule.priority %]" />
+                    </td>
+                    <td>
                       <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
                              name="description" value="[% rule.description %]" />
                     </td>
@@ -300,6 +326,7 @@
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.priority %]</td>
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
@@ -340,6 +367,10 @@
                              name="replace_pattern" value="" />
                     </td>
                     <td>
+                      <input type="text" size="5" id="addtxt" title="int, replacement priority"
+                             name="priority" value="50" />
+                    </td>
+                    <td>
                       <input type="text" size="15" id="addtxt" title="string, rule description"
                              name="description" value="" />
                     </td>
@@ -368,6 +399,7 @@
             <tr class="table_header">
               <td>Match Pattern</td>
               <td>Replacement Pattern</td>
+              <td>Priority</td>
               <td>Description</td>
               <td style="width:40px;" />
               <td style="width:60px;" />
@@ -390,6 +422,10 @@
                              name="replace_pattern" value="[% rule.replace_pattern %]" />
                     </td>
                     <td>
+                      <input type="text" size="5" id="addtxt" title="int, replacement priority"
+                             name="priority" value="[% rule.priority %]" />
+                    </td>
+                    <td>
                       <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
                              name="description" value="[% rule.description %]" />
                     </td>
@@ -404,6 +440,7 @@
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
+                  <td>[% rule.priority %]</td>
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
@@ -442,6 +479,10 @@
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, replacement pattern"
                              name="replace_pattern" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="5" id="addtxt" title="int, replacement priority"
+                             name="priority" value="50" />
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, rule description"
