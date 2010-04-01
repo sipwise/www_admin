@@ -291,6 +291,17 @@ sub do_edit_bilprof : Local {
         $settings{interval_free_cash} = 0;
     }
 
+    $settings{currency} = $c->request->params->{currency} || '';
+
+    $settings{vat_rate} = $c->request->params->{vat_rate};
+    if(length $settings{vat_rate}) {
+        $messages{vat_rate} = 'Web.Syntax.Numeric'
+            unless $settings{vat_rate} =~ /^\d+$/;
+    } else {
+        $settings{vat_rate} = 0;
+    }
+
+    $settings{vat_included} = $c->request->params->{vat_included} ? 1 : 0;
 
     unless(keys %messages) {
         if($bilprof) {

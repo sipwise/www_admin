@@ -85,6 +85,31 @@
                 </td>
               </tr>
               [% IF messages.free_cash %]<tr><td /><td><div class="errormsg">[% messages.free_cash %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">currency:</td>
+                <td>
+                  <input type="text" name="currency" title="string, will be used on invoices and webinterfaces"
+                         value="[% bilprof.data.currency %]" />
+                  currency symbol or ISO code
+                </td>
+              </tr>
+              [% IF messages.currency %]<tr><td /><td><div class="errormsg">[% messages.currency %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">VAT rate:</td>
+                <td>
+                  <input type="text" name="vat_rate" title="integer, specifying the percentage"
+                         value="[% bilprof.data.vat_rate %]" />
+                  %
+                </td>
+              </tr>
+              [% IF messages.vat_rate %]<tr><td /><td><div class="errormsg">[% messages.vat_rate %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">VAT included:</td>
+                <td>
+                  <input type="checkbox" class="checkbox" name="vat_included" title="check if fees are inclusive VAT"
+                         [% IF bilprof.data.vat_included %]checked="checked"[% END %] />
+                </td>
+              </tr>
             </table>
             <input type="submit" class="but" value="Save &#187;" />
           </form>
