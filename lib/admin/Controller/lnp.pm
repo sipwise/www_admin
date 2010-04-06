@@ -236,8 +236,9 @@ sub do_create_number : Local {
     my %messages;
     my %settings;
 
+    my $ccdp = $c->config->{cc_dial_prefix};
     $settings{number} = $c->request->params->{number};
-    $settings{number} =~ s/^00//;
+    $settings{number} =~ s/^$ccdp//;
     $settings{number} =~ s/^\+//;
     $settings{lnp_provider_id} = $c->request->params->{lnp_provider_id};
     $settings{start} = $c->request->params->{start}
@@ -282,8 +283,9 @@ sub do_update_number : Local {
         return;
     }
 
+    my $ccdp = $c->config->{cc_dial_prefix};
     $settings{number} = $c->request->params->{number};
-    $settings{number} =~ s/^00//;
+    $settings{number} =~ s/^$ccdp//;
     $settings{number} =~ s/^\+//;
     $settings{lnp_provider_id} = $c->request->params->{lnp_provider_id};
     $settings{start} = $c->request->params->{start}

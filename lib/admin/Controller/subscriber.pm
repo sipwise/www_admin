@@ -737,20 +737,40 @@ sub update_preferences : Local {
     $$preferences{clir} = $c->request->params->{clir} ? 1 : undef;
 
     $$preferences{cc} = $c->request->params->{cc} || undef;
-    if(defined $$preferences{cc} and $$preferences{cc} !~ /^[1-9]\d*$/) {
-        $messages{cc} = 'Client.Voip.MalformedCc';
+    if(defined $$preferences{cc}) {
+        my $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
+                                                            $$preferences{cc}, \$checkresult
+                                                          );
+        $messages{cc} = 'Client.Voip.MalformedCc'
+            unless $checkresult;
     }
     $$preferences{ac} = $c->request->params->{ac} || undef;
-    if(defined $$preferences{ac} and $$preferences{ac} !~ /^[1-9]\d*$/) {
-        $messages{ac} = 'Client.Voip.MalformedAc';
+    if(defined $$preferences{ac}) {
+        my $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
+                                                            $$preferences{ac}, \$checkresult
+                                                          );
+        $messages{ac} = 'Client.Voip.MalformedAc'
+            unless $checkresult;
     }
     $$preferences{svc_ac} = $c->request->params->{svc_ac} || undef;
-    if(defined $$preferences{svc_ac} and $$preferences{svc_ac} !~ /^[1-9]\d*$/) {
-        $messages{svc_ac} = 'Client.Voip.MalformedAc';
+    if(defined $$preferences{svc_ac}) {
+        my $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
+                                                            $$preferences{svc_ac}, \$checkresult
+                                                          );
+        $messages{svc_ac} = 'Client.Voip.MalformedAc'
+            unless $checkresult;
     }
     $$preferences{emerg_ac} = $c->request->params->{emerg_ac} || undef;
-    if(defined $$preferences{emerg_ac} and $$preferences{emerg_ac} !~ /^[1-9]\d*$/) {
-        $messages{emerg_ac} = 'Client.Voip.MalformedAc';
+    if(defined $$preferences{emerg_ac}) {
+        my $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
+                                                            $$preferences{emerg_ac}, \$checkresult
+                                                          );
+        $messages{emerg_ac} = 'Client.Voip.MalformedAc'
+            unless $checkresult;
     }
 
     ### malicious call trace ###
@@ -981,13 +1001,17 @@ sub do_edit_list : Local {
     my $add = $c->request->params->{block_add};
     if(defined $add) {
         if($add =~ /^\+?[?*0-9\[\]-]+$/) {
-            if($add =~ /^[1-9\[]/) {
-                $add =~ s/^/$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}/e;
-            } elsif($add =~ /^0[^0]/) {
-                $add =~ s/^0/$c->session->{subscriber}{cc}/e;
+            my $ccdp = $c->config->{cc_dial_prefix};
+            my $acdp = $c->config->{ac_dial_prefix};
+            if($add =~ /^\*/ or $add =~ /^\?/ or $add =~ /^\[/) {
+                # do nothing
+            } elsif($add =~ s/^\+// or $add =~ s/^$ccdp//) {
+                # nothing more to do
+            } elsif($add =~ s/^$acdp//) {
+                $add = $c->session->{subscriber}{cc} . $add;
+            } else {
+                $add = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add;
             }
-            $add =~ s/^\+/00/;
-            $add =~ s/^00+//;
             my $blocklist = $$preferences{$list};
             $blocklist = [] unless defined $blocklist;
             $blocklist = [ $blocklist ] unless ref $blocklist;
@@ -1003,8 +1027,15 @@ sub do_edit_list : Local {
     if(defined $del) {
         my $blocklist = $$preferences{$list};
         if(defined $blocklist) {
-            $del =~ s/^\+//;
-            $del =~ s/^0/$c->session->{subscriber}{cc}/e;
+            my $ccdp = $c->config->{cc_dial_prefix};
+            my $acdp = $c->config->{ac_dial_prefix};
+            if($del =~ /^\*/ or $del =~ /^\?/ or $del =~ /^\[/) {
+                # do nothing
+            } elsif($del =~ s/^\+// or $del =~ s/^$ccdp//) {
+                # nothing more to do
+            } elsif($del =~ s/^$acdp//) {
+                $del = $c->session->{subscriber}{cc} . $del;
+            }
             $blocklist = [ $blocklist ] unless ref $blocklist;
             if($c->request->params->{block_stat}) {
                 $$preferences{$list} = [ grep { $_ ne $del } @$blocklist ];
@@ -1019,8 +1050,15 @@ sub do_edit_list : Local {
     if(defined $act) {
         my $blocklist = $$preferences{$list};
         if(defined $blocklist) {
-            $act =~ s/^\+//;
-            $act =~ s/^0/$c->session->{subscriber}{cc}/e;
+            my $ccdp = $c->config->{cc_dial_prefix};
+            my $acdp = $c->config->{ac_dial_prefix};
+            if($act =~ /^\*/ or $act =~ /^\?/ or $act =~ /^\[/) {
+                # do nothing
+            } elsif($act =~ s/^\+// or $act =~ s/^$ccdp//) {
+                # nothing more to do
+            } elsif($act =~ s/^$acdp//) {
+                $act = $c->session->{subscriber}{cc} . $act;
+            }
             $blocklist = [ $blocklist ] unless ref $blocklist;
             if($c->request->params->{block_stat}) {
                 $$preferences{$list} = [ grep { $_ ne $act } @$blocklist ];
