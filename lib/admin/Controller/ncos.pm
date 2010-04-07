@@ -31,17 +31,17 @@ sub index : Private {
                                                       );
     $c->stash->{levels} = $levels if eval { @$levels };
 
-
-    $c->stash->{edit_level} = $c->request->params->{edit_level};
-
     if(exists $c->session->{crefill}) {
         $c->stash->{crefill} = $c->session->{crefill};
         delete $c->session->{crefill};
     }
+
     if(exists $c->session->{erefill}) {
         $c->stash->{erefill} = $c->session->{erefill};
         delete $c->session->{erefill};
-    } elsif($c->request->params->{edit_level}) {
+
+    } elsif(defined $c->request->params->{edit_level}) {
+        $c->stash->{edit_level} = $c->request->params->{edit_level};
         foreach my $lvl (eval { @$levels }) {
             if($$lvl{level} == $c->request->params->{edit_level}) {
                 $c->stash->{erefill} = $lvl;
