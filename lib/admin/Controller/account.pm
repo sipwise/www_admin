@@ -24,6 +24,11 @@ sub index : Private {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/account.tt';
 
+    if(defined $c->session->{refill_account_id}) {
+        $c->stash->{refill_account_id} = $c->session->{refill_account_id};
+        delete $c->session->{refill_account_id};
+    }
+
     return 1;
 }
 
@@ -55,6 +60,7 @@ sub getbyid : Local {
         $c->session->{messages} = { accsearcherr => 'Client.Syntax.AccountID' };
     }
 
+    $c->session->{refill_account_id} = $account_id;
     $c->response->redirect("/account");
     return;
 }
