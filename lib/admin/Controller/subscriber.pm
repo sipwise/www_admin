@@ -789,6 +789,10 @@ sub update_preferences : Local {
 
     $$preferences{on_preselect} = $c->request->params->{on_preselect};
 
+    ### alternative routing ###
+
+    $$preferences{alternative_route} = $c->request->params->{alternative_route} ? 1 : undef;
+
     ### save settings ###
 
     unless(keys %messages) {

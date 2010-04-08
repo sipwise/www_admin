@@ -60,7 +60,9 @@
                       || preference.key == "clir"
                       || preference.key == "mct"
                       || preference.key == "in_use"
-                      || preference.key == "ignore_allowed_ips" %]
+                      || preference.key == "ignore_allowed_ips"
+                      || preference.key == "alternative_route"
+                %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
                   <td>
