@@ -32,6 +32,7 @@
           [% END %]
           [% IF Catalyst.config.peering_features %]
           <li [% 'class="active_menu"' IF menu.active == "peering" %]><a href="/peering">SIP Peerings</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "xmlctrl" %]><a href="/xmlctrl">XMLRPC Interfaces</a></li>
           [% END %]
         </ul>
 
