@@ -698,7 +698,7 @@ sub update_preferences : Local {
                 return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $fw_target, \$checkresult);
                 $messages{$fwtype} = 'Client.Voip.MalformedNumber'
                     unless $checkresult;
-            } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+$/i) {
+            } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+(:\d{1,5})?$/i) {
                 $fw_target = 'sip:'. lc $fw_target;
             } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+$/) {
                 $fw_target = 'sip:'. lc($fw_target) .'@'. $c->session->{subscriber}{domain};
