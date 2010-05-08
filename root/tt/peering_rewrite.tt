@@ -97,7 +97,6 @@
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
                   <td>[% rule.priority %]</td>
-                  <td>[% rule.priority %]</td>
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
