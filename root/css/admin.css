@@ -43,7 +43,7 @@ h3 {
 
 /* hmm, menu doesn't extend container height ... */
 #container #content {
-	min-height: 570px;
+	min-height: 580px;
 }
 
 /* contentmenu's width and contentplace' margin-left should match */
@@ -407,7 +407,7 @@ ul#topsubmenu {
 
 /* colorful table rows */
 #contentplace .tr_alt {
-	background-color: #ccffcc;
+	background-color: #eeffee;
 }
 
 #contentplace .orders,
@@ -482,4 +482,71 @@ ul#topsubmenu {
 }
 #save_local_ac {
 	margin: 0 0 0 15px;
+}
+
+/* CDR display styles */
+#contentplace .sortcalllist {
+	margin: 0px;
+	padding: 4px 0;
+}
+#contentplace .sortcalllist img {
+	vertical-align: middle;
+	padding: 0 0 2px 10px;
+}
+#contentplace .calllist {
+	width: 100%;
+	margin: 0 0 10px 0;
+	padding: 0px;
+	border: none;
+	border-collapse: collapse;
+	border-top: 1px solid #D0DCDF;
+}
+#contentplace .calllist td {
+	margin: 0px;
+	padding: 3px 5px;
+	vertical-align: top;
+}
+#contentplace .calllist .calllistheader td {
+	padding: 10px 0 3px 0;
+	font-weight: bold;
+}
+#contentplace .calllist .calltype {
+	width: 20px;
+}
+#contentplace .calllist .calltype img {
+	margin: 1px 0 0 0;
+}
+/* #contentplace .calllist .callnumber, */
+#contentplace .calllist .callduration {
+	text-align: right;
+}
+#contentplace .calllist .callfee,
+#contentplace .calllist .calldate {
+	text-align: right;
+	white-space: nowrap;
+}
+
+/* column layout using tables */
+#columns31 {
+	width: 100%;
+}
+#columns31 .column1 {
+	width: 75%;
+	vertical-align: top;
+}
+#columns31 .column2 {
+	width: 25%;
+	border-left: 1px solid #D0DCDF;
+	vertical-align: top;
+}
+
+/* CDR search styles */
+#contentplace h3#search_cdr {
+	margin-top: 1px;
+}
+#contentplace #callsearch select {
+	margin: 2px 0 10px 0;
+}
+#contentplace #callsearch input {
+	margin: 2px 0;
 }

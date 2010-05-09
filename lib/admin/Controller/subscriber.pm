@@ -923,6 +923,176 @@ sub update_voicebox : Local {
     return;
 }
 
+=head2 call_data
+
+Display subscriber call list.
+
+=cut
+
+sub call_data : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_call_data.tt';
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+
+    my @localized_months = ( "foo" );
+
+    my $cts = $c->session->{subscriber}{create_timestamp};
+    if($cts =~ s/^(\d{4}-\d\d)-\d\d \d\d:\d\d:\d\d/$1/) {
+        my ($cyear, $cmonth) = split /-/, $cts;
+        my ($nyear, $nmonth) = (localtime)[5,4];
+        $nyear += 1900;
+        $nmonth++;
+
+        for(1 .. 12) {
+            push @localized_months,
+                $c->model('Provisioning')->localize($c->view($c->config->{view})->
+                                                        config->{VARIABLES}{site_config}{language},
+                                                    sprintf("Web.Months.%02d", $_));
+        }
+
+        my @selectmonths;
+
+        while($cyear < $nyear) {
+            my @yearmon;
+            for($cmonth .. 12) {
+                my $amon = sprintf("%02d", $_);
+                unshift @yearmon, { display => $localized_months[$amon] ." $cyear", link => $cyear.$amon };
+            }
+            unshift @selectmonths, { year => $cyear, months => \@yearmon };
+            $cmonth = 1;
+            $cyear++;
+        }
+
+        my @yearmon;
+        for($cmonth .. $nmonth) {
+            my $amon = sprintf("%02d", $_);
+            unshift @yearmon, { display => $localized_months[$amon] ." $cyear", link => $cyear.$amon };
+        }
+        unshift @selectmonths, { year => $cyear, months => \@yearmon };
+
+        $c->stash->{subscriber}{selectmonths} = \@selectmonths;
+    }
+
+    my $listfilter = $c->request->params->{list_filter};
+    if(defined $listfilter) {
+        if(length $listfilter) {
+            $listfilter =~ s/^\*//;
+            $listfilter =~ s/\*$//;
+            $c->session->{calllist}{filter} = $listfilter;
+        } else {
+            delete $c->session->{calllist}{filter};
+            undef $listfilter;
+        }
+    }
+
+    my @localtime = localtime;
+
+    my ($callmonth, $callyear);
+    my $monthselect = $c->request->params->{listmonth};
+    if(defined $monthselect and $monthselect =~ /^(\d{4})(\d{2})$/) {
+        $callyear = $1;
+        $callmonth = $2;
+        $listfilter = $c->session->{calllist}{filter};
+        delete $c->session->{calllist}{start};
+        delete $c->session->{calllist}{end};
+    } else {
+        $callyear = $localtime[5] + 1900;
+        $callmonth = $localtime[4] + 1;
+        delete $c->session->{calllist}{filter};
+        delete $c->session->{calllist}{start};
+        delete $c->session->{calllist}{end};
+    }
+
+    my $liststart = $c->request->params->{list_start};
+    if(defined $liststart) {
+        if(length $liststart) {
+            $c->stash->{subscriber}{list_start} = $liststart;
+            if($liststart =~ /^\d\d\.\d\d\.\d\d\d\d$/) {
+                $c->session->{calllist}{start} = $liststart;
+            } else {
+                $liststart = $c->session->{calllist}{start};
+                $c->session->{messages}{msgdate} = 'Client.Syntax.Date';
+            }
+        } else {
+            delete $c->session->{calllist}{start};
+            undef $liststart;
+        }
+    } else {
+        $c->stash->{subscriber}{list_start} = $c->session->{calllist}{start};
+    }
+
+    my $listend = $c->request->params->{list_end};
+    if(defined $listend) {
+        if(length $listend) {
+            $c->stash->{subscriber}{list_end} = $listend;
+            if($listend =~ /^\d\d\.\d\d\.\d\d\d\d$/) {
+                $c->session->{calls}{end} = $listend;
+            } else {
+                $listend = $c->session->{calllist}{end};
+                $c->session->{messages}{msgdate} = 'Client.Syntax.Date';
+            }
+        } else {
+            delete $c->session->{calllist}{end};
+            undef $listend;
+        }
+    } else {
+        $c->stash->{subscriber}{list_end} = $c->session->{calllist}{end};
+    }
+
+    my ($sdate, $edate);
+    if(!defined $liststart and !defined $listend) {
+        $sdate = { year => $callyear, month => $callmonth };
+        $edate = { year => $callyear, month => $callmonth };
+        $c->stash->{selected_month} = sprintf "%04d%02d", $callyear, $callmonth;
+    } else {
+        if(defined $liststart) {
+            my ($day, $month, $year) = split /\./, $liststart;
+            $sdate = { year => $year, month => $month, day => $day };
+        }
+        if (defined $listend) {
+            my ($day, $month, $year) = split /\./, $listend;
+            $edate = { year => $year, month => $month, day => $day };
+        }
+    }
+
+    my $calls;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_calls',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain   => $c->session->{subscriber}{domain},
+                                                          filter   => { start_date => $sdate,
+                                                                        end_date   => $edate,
+                                                                      }
+                                                        },
+                                                        \$calls
+                                                      );
+
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_id',
+                                                        { id => $c->session->{subscriber}{account_id} },
+                                                        \$c->session->{voip_account}
+                                                      );
+    if(eval { defined $c->session->{voip_account}{billing_profile} }) {
+        return 1 unless $c->model('Provisioning')->call_prov($c, 'billing', 'get_billing_profile',
+                                                             { handle => $c->session->{voip_account}{billing_profile} },
+                                                             \$c->session->{voip_account}{billing_profile}
+                                                            );
+    }
+
+    $c->stash->{call_list} = admin::Utils::prepare_call_list($c, $calls, $listfilter);
+    $c->stash->{subscriber}{list_filter} = $listfilter if defined $listfilter;
+
+    undef $c->stash->{call_list} unless eval { @{$c->stash->{call_list}} };
+
+    return;
+}
+
+
 sub edit_list : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_edit_list.tt';
