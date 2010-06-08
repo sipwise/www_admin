@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base 'Catalyst::Controller';
 
-my @WEEKDAYS = qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
+my @WEEKDAYS = qw(Monday Tuesday Wednesday Thursday Friday Saturday Sunday);
 
 =head1 NAME
 
