@@ -792,6 +792,7 @@ sub update_preferences : Local {
     ### alternative routing ###
 
     $$preferences{alternative_route} = $c->request->params->{alternative_route} ? 1 : undef;
+    $$preferences{is_external} = $c->request->params->{is_external} ? 1 : undef;
 
     ### save settings ###
 
