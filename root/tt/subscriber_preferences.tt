@@ -9,6 +9,10 @@
           <li>|</li>
           <li class="active_submenu"><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]">Preferences</a></li>
           <li>|</li>
+        [% IF Catalyst.session.admin.call_data %]
+          <li class="inactive_submenu"><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]">CDRs</a></li>
+          <li>|</li>
+        [% END %]
         </ul><br />
         <hr id="topsubmenuhr" />
 
@@ -62,6 +66,7 @@
                       || preference.key == "in_use"
                       || preference.key == "ignore_allowed_ips"
                       || preference.key == "alternative_route"
+                      || preference.key == "is_external"
                 %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
