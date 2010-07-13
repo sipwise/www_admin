@@ -1,5 +1,5 @@
         <h2> Domain
-          <a class="noarrow" href="detail?domain=[% domain.domain %]">[% domain.domain %]</a>
+          <a class="noarrow" href="detail?domain=[% domain.domain.domain %]">[% domain.domain.domain %]</a>
         </h2>
 
         <a href="/domain" class="aaction">back</a>
@@ -28,7 +28,7 @@
                   <form action="/domain/edit_rewrite" method="post">
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
-                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <td>
                       <input type="text" size="15 id="addtxt" title="string, match pattern"
@@ -53,7 +53,7 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/domain/detail?domain=[% domain.domain %]" class="aaction">cancel</a></td>
+                  <td><a href="/domain/detail?domain=[% domain.domain.domain %]" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
@@ -61,11 +61,11 @@
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/domain/detail?domain=[% domain.domain %]&amp;ifeditid=[% rule.id %]" class="aaction">edit</a>
+                    <a href="/domain/detail?domain=[% domain.domain.domain %]&amp;ifeditid=[% rule.id %]" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/domain/delete_rewrite" method="post">
-                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -87,7 +87,7 @@
                 <form action="/domain/create_rewrite" method="post">
                   <input type="hidden" name="direction" value="in" />
                   <input type="hidden" name="field" value="caller" />
-                  <input type="hidden" name="domain" value="[% domain.domain %]" />
+                  <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                   <td>
                     <input type="text" size="15" id="addtxt" title="string, match pattern"
                            name="match_pattern" value="" />
@@ -140,7 +140,7 @@
                   <form action="/domain/edit_rewrite" method="post">
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
-                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <td>
                       <input type="text" size="15 id="addtxt" title="string, match pattern"
@@ -165,7 +165,7 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/domain/detail?domain=[% domain.domain %]" class="aaction">cancel</a></td>
+                  <td><a href="/domain/detail?domain=[% domain.domain.domain %]" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
@@ -173,11 +173,11 @@
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/domain/detail?domain=[% domain.domain %]&amp;iteditid=[% rule.id %]" class="aaction">edit</a>
+                    <a href="/domain/detail?domain=[% domain.domain.domain %]&amp;iteditid=[% rule.id %]" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/domain/delete_rewrite" method="post">
-                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -199,7 +199,7 @@
                 <form action="/domain/create_rewrite" method="post">
                   <input type="hidden" name="direction" value="in" />
                   <input type="hidden" name="field" value="callee" />
-                  <input type="hidden" name="domain" value="[% domain.domain %]" />
+                  <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                   <td>
                     <input type="text" size="15" id="addtxt" title="string, match pattern"
                            name="match_pattern" value="" />
@@ -252,7 +252,7 @@
                   <form action="/domain/edit_rewrite" method="post">
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
-                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <td>
                       <input type="text" size="15 id="addtxt" title="string, match pattern"
@@ -277,7 +277,7 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/domain/detail?domain=[% domain.domain %]" class="aaction">cancel</a></td>
+                  <td><a href="/domain/detail?domain=[% domain.domain.domain %]" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
@@ -285,11 +285,11 @@
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/domain/detail?domain=[% domain.domain %]&amp;ofeditid=[% rule.id %]" class="aaction">edit</a>
+                    <a href="/domain/detail?domain=[% domain.domain.domain %]&amp;ofeditid=[% rule.id %]" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/domain/delete_rewrite" method="post">
-                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -311,7 +311,7 @@
                 <form action="/domain/create_rewrite" method="post">
                   <input type="hidden" name="direction" value="out" />
                   <input type="hidden" name="field" value="caller" />
-                  <input type="hidden" name="domain" value="[% domain.domain %]" />
+                  <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                   <td>
                     <input type="text" size="15" id="addtxt" title="string, match pattern"
                            name="match_pattern" value="" />
@@ -376,7 +376,7 @@
                              title="audio file in wave format" />
                     </td>
                     <td>
-                      <input type="hidden" name="domain" value="[% domain.domain %]" />
+                      <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                       <input type="hidden" name="handle" value="[% audio.handle %]" />
                       <div class="postlink">
                         <label for="audiosave">save</label>
@@ -384,22 +384,22 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/domain/detail?domain=[% domain.domain %]#audio" class="aaction">cancel</a></td>
+                  <td><a href="/domain/detail?domain=[% domain.domain.domain %]#audio" class="aaction">cancel</a></td>
                 </tr>
                 [% IF aerefill && prov_error %]<tr><td colspan="5"><div class="errormsg">[% prov_error %]</div></td></tr>[% END %]
               [% ELSE %]
                 <tr>
                   <td>[% audio.handle %]</td>
                   <td>[% audio.description %]</td>
-                  <td><a href="/domain/listen_audio?domain=[% domain.domain %]&amp;handle=[% audio.handle %]">listen</a></td>
+                  <td><a href="/domain/listen_audio?domain=[% domain.domain.domain %]&amp;handle=[% audio.handle %]">listen</a></td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/domain/detail?domain=[% domain.domain %]&amp;edit_audio=[% audio.handle %]#audio" class="aaction">edit</a>
+                    <a href="/domain/detail?domain=[% domain.domain.domain %]&amp;edit_audio=[% audio.handle %]#audio" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <td>
                     <form action="/domain/do_delete_audio" method="post">
-                      <input type="hidden" name="domain" value="[% domain.domain %]" />
+                      <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                       <input type="hidden" name="handle" value="[% audio.handle %]" />
                       [% UNLESS Catalyst.session.admin.read_only %]
                         <div class="postlink">
@@ -430,7 +430,7 @@
                          title="audio file in wave format" />
                 </td>
                 <td>
-                  <input type="hidden" name="domain" value="[% domain.domain %]" />
+                  <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                   <div class="postlink">
                     <label for="audioadd">add</label>
                     <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="audioadd" />
@@ -488,7 +488,7 @@
                              name="description" value="[% verefill.description %]" />
                     </td>
                     <td>
-                      <input type="hidden" name="domain" value="[% domain.domain %]" />
+                      <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                       <input type="hidden" name="action" value="[% vsc.action %]" />
                       <div class="postlink">
                         <label for="vscsave">save</label>
@@ -496,7 +496,7 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/domain/detail?domain=[% domain.domain %]#vsc" class="aaction">cancel</a></td>
+                  <td><a href="/domain/detail?domain=[% domain.domain.domain %]#vsc" class="aaction">cancel</a></td>
                 </tr>
                 [% IF verefill && prov_error %]<tr><td colspan="5"><div class="errormsg">[% prov_error %]</div></td></tr>[% END %]
               [% ELSE %]
@@ -507,12 +507,12 @@
                   <td>[% vsc.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/domain/detail?domain=[% domain.domain %]&amp;edit_vsc=[% vsc.action %]#vsc" class="aaction">edit</a>
+                    <a href="/domain/detail?domain=[% domain.domain.domain %]&amp;edit_vsc=[% vsc.action %]#vsc" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <td>
                     <form action="/domain/do_delete_vsc" method="post">
-                      <input type="hidden" name="domain" value="[% domain.domain %]" />
+                      <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                       <input type="hidden" name="action" value="[% vsc.action %]" />
                       [% UNLESS Catalyst.session.admin.read_only %]
                         <div class="postlink">
@@ -557,7 +557,7 @@
                            name="description" value="[% vcrefill.data.description %]" />
                   </td>
                   <td>
-                    <input type="hidden" name="domain" value="[% domain.domain %]" />
+                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                     <div class="postlink">
                       <label for="vscadd">add</label>
                       <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="vscadd" />

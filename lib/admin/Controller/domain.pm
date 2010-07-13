@@ -287,12 +287,14 @@ sub create_rewrite : Local {
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_domain_rewrite',
                                                  { domain => $domain,
-                                                   direction => $direction,
-                                                   field => $field,
-                                                   match_pattern => $match_pattern,
-                                                   replace_pattern => $replace_pattern,
-                                                   description => $description,
-                                                   priority => $priority,
+                                                   data   =>  {
+                                                       direction => $direction,
+                                                       field => $field,
+                                                       match_pattern => $match_pattern,
+                                                       replace_pattern => $replace_pattern,
+                                                       description => $description,
+                                                       priority => $priority,
+                                                   },
                                                  },
                                                  undef
                                                ))
@@ -344,13 +346,15 @@ sub edit_rewrite : Local {
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_domain_rewrite',
-                                                 { id => $rewriteid,
-                                                   match_pattern => $match_pattern,
-                                                   replace_pattern => $replace_pattern,
-                                                   description => $description,
-                                                   direction => $direction,
-                                                   field => $field,
-                                                   priority => $priority,
+                                                 { id   => $rewriteid,
+                                                   data => {
+                                                       match_pattern => $match_pattern,
+                                                       replace_pattern => $replace_pattern,
+                                                       description => $description,
+                                                       direction => $direction,
+                                                       field => $field,
+                                                       priority => $priority,
+                                                   },
                                                  },
                                                  undef
                                                ))
