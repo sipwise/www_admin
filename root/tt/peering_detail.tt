@@ -1,6 +1,6 @@
         <h2> SIP Peering Group
-          <a class="noarrow" href="detail?group_id=[% grp.id %]">
-            [% grp.name %]</a>
+          <a class="noarrow" href="detail?group_id=[% grp.group.id %]">
+            [% grp.group.name %]</a>
         </h2>
 
 		<a href="/peering" class="aaction">back</a>
@@ -24,7 +24,7 @@
               <tr>
                 [% IF rule.id == reditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_rule" method="post">
-                    <input type="hidden" name="grpid" value="[% grp.id %]" />
+                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="ruleid" value="[% rule.id %]" />
                     <td>
                       <input type="text" size="15 id="addtxt" title="string, callee prefix"
@@ -32,7 +32,7 @@
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, caller pattern"
-                             name="caller_pattern" value="[% rule.caller_pattern %]" />
+                             name="caller_prefix" value="[% rule.caller_prefix %]" />
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, rule description"
@@ -45,18 +45,18 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/peering/detail?group_id=[% grp.id %]" class="aaction">cancel</a></td>
+                  <td><a href="/peering/detail?group_id=[% grp.group.id %]" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td>[% rule.callee_prefix %]</td>
-                  <td>[% rule.caller_pattern %]</td>
+                  <td>[% rule.caller_prefix %]</td>
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering/detail?group_id=[% grp.id %]&reditid=[% rule.id %]" class="aaction">edit</a>
+                    <a href="/peering/detail?group_id=[% grp.group.id %]&reditid=[% rule.id %]" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/peering/delete_rule" method="post">
-                    <input type="hidden" name="grpid" value="[% grp.id %]" />
+                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="ruleid" value="[% rule.id %]" />
                     <td>
                     [% UNLESS Catalyst.session.admin.read_only %]
@@ -74,14 +74,14 @@
             [% UNLESS Catalyst.session.admin.read_only %]
 			<tr>
                   <form action="/peering/create_rule" method="post">
-                    <input type="hidden" name="grpid" value="[% grp.id %]" />
+                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, callee prefix"
                              name="callee_prefix" value="" />
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, caller pattern"
-                             name="caller_pattern" value="" />
+                             name="caller_prefix" value="" />
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, rule description"
@@ -116,7 +116,6 @@
               <td>IP Address</td>
               <td>Port</td>
               <td>Weight</td>
-              <td>Via Loadbalancer</td>
               <td style="width:40px;" />
               <td style="width:60px;" />
             </tr>
@@ -125,7 +124,7 @@
               <tr>
                 [% IF peer.id == peditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_peer" method="post">
-                    <input type="hidden" name="grpid" value="[% grp.id %]" />
+                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="peerid" value="[% peer.id %]" />
                     <td>
                       <input type="text" size="15 id="addtxt" title="string, peer name"
@@ -147,10 +146,6 @@
                       <input type="text" size="3" id="addtxt" title="int, peer weight (0-255)"
                              name="weight" value="[% peer.weight %]" />
                     </td>
-                    <td class="tdcenter">
-                      <input type="checkbox" class="checkbox" title="check to route via load balancer "
-                             name="via_lb" [% IF peer.via_lb %]checked="checked"[% END %] />
-                    </td>
                     <td>
                       <div class="postlink">
                         <label for="psave[% id %]">save</label>
@@ -158,24 +153,20 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/peering/detail?group_id=[% grp.id %]" class="aaction">cancel</a></td>
+                  <td><a href="/peering/detail?group_id=[% grp.group.id %]" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td><a href="/peering/rewrite?peer_id=[% peer.id%]" class="aaction">[% peer.name %]</a></td>
                   <td>[% peer.domain %]</td>
                   <td>[% peer.ip %]</td>
                   <td>[% peer.port %]</td>
                   <td>[% peer.weight %]</td>
-                  <td class="tdcenter">
-                    <input type="checkbox" class="checkbox" name="via_lb"
-                       [% IF peer.via_lb %]checked="checked"[% END %] disabled="disabled" />
-                  </td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering/detail?group_id=[% grp.id %]&peditid=[% peer.id %]" class="aaction">edit</a>
+                    <a href="/peering/detail?group_id=[% grp.group.id %]&peditid=[% peer.id %]" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/peering/delete_peer" method="post">
-                    <input type="hidden" name="grpid" value="[% grp.id %]" />
+                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="peerid" value="[% peer.id %]" />
                     <td>
                     [% UNLESS Catalyst.session.admin.read_only %]
@@ -193,7 +184,7 @@
             [% UNLESS Catalyst.session.admin.read_only %]
 			<tr>
                   <form action="/peering/create_peer" method="post">
-                    <input type="hidden" name="grpid" value="[% grp.id %]" />
+                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, peer name"
                              name="name" value="" />
@@ -213,10 +204,6 @@
                     <td>
                       <input type="text" size="3" id="addtxt" title="int, peer weight (0-255)"
                              name="weight" value="1" />
-                    </td>
-                    <td class="tdcenter">
-                      <input type="checkbox" class="checkbox" title="check to route via load balancer "
-                             name="via_lb" checked="checked" />
                     </td>
                     <td>
                   		<div class="postlink">

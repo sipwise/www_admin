@@ -159,7 +159,7 @@ sub edit_grp : Local {
     my %messages;
     my %settings;
 
-    $settings{id} = $c->request->params->{grpid};
+    my $grpid = $c->request->params->{grpid};
     $settings{priority} = $c->request->params->{priority};
     $settings{description} = $c->request->params->{grpdesc};
     $settings{peering_contract_id} = $c->request->params->{peering_contract_id} || undef;
@@ -168,7 +168,9 @@ sub edit_grp : Local {
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_group',
-                                                 \%settings,
+                                                 { id   => $grpid,
+                                                   data => \%settings,
+                                                 },
                                                  undef
                                                ))
         {
@@ -213,7 +215,7 @@ sub create_rule : Local {
 
     my $grpid = $c->request->params->{grpid};
     my $callee_prefix = $c->request->params->{callee_prefix};
-    my $caller_pattern = $c->request->params->{caller_pattern};
+    my $caller_prefix = $c->request->params->{caller_prefix};
     my $description = $c->request->params->{description};
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
@@ -222,9 +224,11 @@ sub create_rule : Local {
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_rule',
                                                  { group_id => $grpid,
-												   callee_prefix => $callee_prefix,
-												   caller_pattern => $caller_pattern,
-												   description => $description
+                                                   data     => {
+                                                       callee_prefix  => $callee_prefix,
+                                                       caller_prefix  => $caller_prefix,
+                                                       description    => $description
+                                                   },
                                                  },
                                                  undef
                                                ))
@@ -304,7 +308,7 @@ sub edit_rule : Local {
     my $grpid = $c->request->params->{grpid};
     my $ruleid = $c->request->params->{ruleid};
     my $callee_prefix = $c->request->params->{callee_prefix};
-    my $caller_pattern = $c->request->params->{caller_pattern};
+    my $caller_prefix = $c->request->params->{caller_prefix};
     my $description = $c->request->params->{description};
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
@@ -312,10 +316,12 @@ sub edit_rule : Local {
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_rule',
-                                                 { id => $ruleid,
-												   callee_prefix => $callee_prefix,
-												   caller_pattern => $caller_pattern,
-												   description => $description
+                                                 { id   => $ruleid,
+                                                   data => {
+                                                       callee_prefix => $callee_prefix,
+                                                       caller_prefix => $caller_prefix,
+                                                       description   => $description
+                                                   },
                                                  },
                                                  undef
                                                ))
@@ -362,7 +368,6 @@ sub create_peer : Local {
     my $ip = $c->request->params->{ip};
     my $port = $c->request->params->{port};
     my $weight = $c->request->params->{weight};
-    my $via_lb = defined $c->request->params->{via_lb} ? 1 : 0;
 
 #TODO: add syntax checks here
 
@@ -373,12 +378,13 @@ sub create_peer : Local {
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_host',
                                                  { group_id => $grpid,
-												   name => $name,
-												   domain => $domain,
-												   ip => $ip,
-												   port => $port,
-												   weight => $weight,
-												   via_lb => $via_lb
+                                                   data => {
+                                                       name => $name,
+                                                       domain => $domain,
+                                                       ip => $ip,
+                                                       port => $port,
+                                                       weight => $weight,
+                                                   },
                                                  },
                                                  undef
                                                ))
@@ -462,7 +468,6 @@ sub edit_peer : Local {
     my $ip = $c->request->params->{ip};
     my $port = $c->request->params->{port};
     my $weight = $c->request->params->{weight};
-    my $via_lb = defined $c->request->params->{via_lb} ? 1 : 0;
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
 #        unless $callee_prefix =~ /^[a-zA-Z0-9_\.\-\@\:]+/;
@@ -470,12 +475,13 @@ sub edit_peer : Local {
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_host',
                                                  { id => $peerid,
-												   name => $name,
-												   domain => $domain,
-												   ip => $ip,
-												   port => $port,
-												   weight => $weight,
-												   via_lb => $via_lb
+                                                   data => {
+                                                       name => $name,
+                                                       domain => $domain,
+                                                       ip => $ip,
+                                                       port => $port,
+                                                       weight => $weight,
+                                                   },
                                                  },
                                                  undef
                                                ))
@@ -522,7 +528,7 @@ sub rewrite : Local {
                                                       );
 	my $all_peer_details;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_group_details',
-														{ id => $$peer_details{group_id} },
+														{ id => $$peer_details{peer_host}{group_id} },
                                                         \$all_peer_details
                                                       );
 	my $all_peers = $$all_peer_details{peers};
@@ -578,12 +584,14 @@ sub create_rewrite : Local {
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_rewrite',
                                                  { peer_id => $peerid,
-												   match_pattern => $match_pattern,
-												   replace_pattern => $replace_pattern,
-												   description => $description,
-												   direction => $direction,
-												   field => $field,
-												   priority => $priority,
+                                                   data => {
+                                                       match_pattern => $match_pattern,
+                                                       replace_pattern => $replace_pattern,
+                                                       description => $description,
+                                                       direction => $direction,
+                                                       field => $field,
+                                                       priority => $priority,
+                                                   },
                                                  },
                                                  undef
                                                ))
@@ -691,12 +699,14 @@ sub edit_rewrite : Local {
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_rewrite',
                                                  { id => $rewriteid,
-												   match_pattern => $match_pattern,
-												   replace_pattern => $replace_pattern,
-												   description => $description,
-												   direction => $direction,
-												   field => $field,
-												   priority => $priority,
+                                                   data => {
+                                                       match_pattern => $match_pattern,
+                                                       replace_pattern => $replace_pattern,
+                                                       description => $description,
+                                                       direction => $direction,
+                                                       field => $field,
+                                                       priority => $priority,
+                                                   },
                                                  },
                                                  undef
                                                ))
@@ -741,7 +751,7 @@ sub copy_rewrite : Local {
     my $rpeerid = $c->request->params->{rpeerid};
     my $policy= $c->request->params->{policy};
     my $grpid = $c->request->params->{grpid};
-	my $delete_old = $policy eq "delete" ? 1 : 0;
+    my $delete_existing = $policy eq "delete" ? 1 : 0;
 
 	unless(defined $peerid && defined $rpeerid)
 	{
@@ -751,8 +761,8 @@ sub copy_rewrite : Local {
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'copy_peer_rewrites',
                                                  { from_peer_id => $rpeerid,
-												   to_peer_id => $peerid,
-												   delete_old => $delete_old
+                                                   to_peer_id => $peerid,
+                                                   delete_existing => $delete_existing
                                                  },
                                                  undef
                                                ))
