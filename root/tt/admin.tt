@@ -13,7 +13,7 @@
               <td> r/o </td>
               <td> PW </td>
               <td> CDR </td>
-            [% IF Catalyst.config.lawful_intercept %]
+            [% IF Catalyst.config.li_features %]
               <td> LI </td>
             [% END %]
               <td />
@@ -58,7 +58,7 @@
                              [% IF erefill.call_data or !erefill && admin.call_data %]checked="checked" [% END %]
                              title="if checked, the administrator may view call detail records" />
                     </td>
-                  [% IF Catalyst.config.lawful_intercept %]
+                  [% IF Catalyst.config.li_features %]
                     <td class="tdcenter">
                       <input type="checkbox" class="checkbox" name="lawful_intercept"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
@@ -101,7 +101,7 @@
                            [% IF admin.call_data %] checked="checked"[% END %]
                            title="if checked, the administrator may view call detail records" />
                   </td>
-                [% IF Catalyst.config.lawful_intercept %]
+                [% IF Catalyst.config.li_features %]
                   <td class="tdcenter">
                     <input type="checkbox" class="checkbox" disabled="disabled"
                            [% IF admin.lawful_intercept %] checked="checked"[% END %]
@@ -203,7 +203,7 @@
                          title="if checked, the new administrator may view call detail records" />
                 </td>
               </tr>
-            [% IF Catalyst.config.lawful_intercept %]
+            [% IF Catalyst.config.li_features %]
               <tr>
                 <td>lawful intercepts:</td>
                 <td>

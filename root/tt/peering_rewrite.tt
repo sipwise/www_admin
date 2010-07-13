@@ -1,9 +1,9 @@
         <h2> SIP Peering Rewrite Rules for host 
-          <a class="noarrow" href="rewrite?peer_id=[% peer.id %]">
-            [% peer.name %]</a>
+          <a class="noarrow" href="rewrite?peer_id=[% peer.peer_host.id %]">
+            [% peer.peer_host.name %]</a>
         </h2>
 
-		<a href="detail?group_id=[% peer.group_id %]" class="aaction">back</a>
+		<a href="detail?group_id=[% peer.peer_host.group_id %]" class="aaction">back</a>
 
 		[% IF all_peers.size > 0 %]	
         [% UNLESS Catalyst.session.admin.read_only %]
@@ -14,8 +14,8 @@
 			<table class="domains">
 			<tr>
             <form action="/peering/copy_rewrite" method="post">
-                <input type="hidden" name="peerid" value="[% peer.id %]" />
-                <input type="hidden" name="grpid" value="[% peer.group_id %]" />
+                <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
+                <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
 				<td>
 				Copy rules from peering host 
             	<select title="string, peering host" size="1" name="rpeerid">
@@ -65,7 +65,7 @@
               <tr>
                 [% IF rule.id == ifeditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_rewrite" method="post">
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -92,7 +92,7 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/peering/rewrite?peer_id=[% peer.id %]#icaller" class="aaction">cancel</a></td>
+                  <td><a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]#icaller" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
@@ -100,11 +100,11 @@
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering/rewrite?peer_id=[% peer.id %]&ifeditid=[% rule.id %]#icallee" class="aaction">edit</a>
+                    <a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]&ifeditid=[% rule.id %]#icallee" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/peering/delete_rewrite" method="post">
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -124,8 +124,8 @@
 			<tr>
             [% UNLESS Catalyst.session.admin.read_only %]
                   <form action="/peering/create_rewrite" method="post">
-                    <input type="hidden" name="grpid" value="[% peer.group_id %]" />
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="direction" value="in" />
                     <input type="hidden" name="field" value="caller" />
                     <td>
@@ -180,7 +180,7 @@
               <tr>
                 [% IF rule.id == iteditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_rewrite" method="post">
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -207,7 +207,7 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/peering/rewrite?peer_id=[% peer.id %]#icallee" class="aaction">cancel</a></td>
+                  <td><a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]#icallee" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
@@ -215,11 +215,11 @@
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering/rewrite?peer_id=[% peer.id %]&iteditid=[% rule.id %]#icallee" class="aaction">edit</a>
+                    <a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]&iteditid=[% rule.id %]#icallee" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/peering/delete_rewrite" method="post">
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -239,8 +239,8 @@
             [% UNLESS Catalyst.session.admin.read_only %]
 			<tr>
                   <form action="/peering/create_rewrite" method="post">
-                    <input type="hidden" name="grpid" value="[% peer.group_id %]" />
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="direction" value="in" />
                     <input type="hidden" name="field" value="callee" />
                     <td>
@@ -294,7 +294,7 @@
               <tr>
                 [% IF rule.id == ofeditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_rewrite" method="post">
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -321,7 +321,7 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/peering/rewrite?peer_id=[% peer.id %]#ocaller" class="aaction">cancel</a></td>
+                  <td><a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]#ocaller" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
@@ -329,11 +329,11 @@
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering/rewrite?peer_id=[% peer.id %]&ofeditid=[% rule.id %]#ocaller" class="aaction">edit</a>
+                    <a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]&ofeditid=[% rule.id %]#ocaller" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/peering/delete_rewrite" method="post">
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -353,8 +353,8 @@
             [% UNLESS Catalyst.session.admin.read_only %]
 			<tr>
                   <form action="/peering/create_rewrite" method="post">
-                    <input type="hidden" name="grpid" value="[% peer.group_id %]" />
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="direction" value="out" />
                     <input type="hidden" name="field" value="caller" />
                     <td>
@@ -408,7 +408,7 @@
               <tr>
                 [% IF rule.id == oteditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_rewrite" method="post">
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -435,7 +435,7 @@
                       </div>
                     </td>
                   </form>
-                  <td><a href="/peering/rewrite?peer_id=[% peer.id %]#ocallee" class="aaction">cancel</a></td>
+                  <td><a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]#ocallee" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td>[% rule.match_pattern %]</td>
                   <td>[% rule.replace_pattern %]</td>
@@ -443,11 +443,11 @@
                   <td>[% rule.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering/rewrite?peer_id=[% peer.id %]&oteditid=[% rule.id %]#ocallee" class="aaction">edit</a>
+                    <a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]&oteditid=[% rule.id %]#ocallee" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/peering/delete_rewrite" method="post">
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -467,8 +467,8 @@
             [% UNLESS Catalyst.session.admin.read_only %]
 			<tr>
                   <form action="/peering/create_rewrite" method="post">
-                    <input type="hidden" name="grpid" value="[% peer.group_id %]" />
-                    <input type="hidden" name="peerid" value="[% peer.id %]" />
+                    <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="direction" value="out" />
                     <input type="hidden" name="field" value="callee" />
                     <td>
