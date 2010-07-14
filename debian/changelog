@@ -1,10 +1,14 @@
-sipwise-www-admin (2.1.0) UNRELEASED; urgency=medium
+sipwise-www-admin (2.1.0) unstable; urgency=medium
 
- -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 10 Mar 2010 15:15:41 +0100
+  * per domain caller rewrite rules
+  * peer rewrite rules priorities
+  * xmlrpc dispatcher hosts configuration
+  * call data display for subscribers
+  * normalizing E.164 numbers based on config options
+  * some minor interface bugfixes
+  * some required changes for ossbss 2.1.1
 
-sipwise-www-admin (2.0.3) UNRELEASED; urgency=medium
-
- -- Daniel Tiefnig <dtiefnig@sipwise.com>  Fri, 12 Mar 2010 18:09:04 +0100
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 14 Jul 2010 02:02:17 +0200
 
 sipwise-www-admin (2.0.2) unstable; urgency=medium
 
