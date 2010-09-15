@@ -16,7 +16,7 @@ use XML::Simple;
 
 use Catalyst::Log::Log4perl;
 
-use Catalyst qw/-Debug ConfigLoader Static::Simple Unicode
+use Catalyst qw/ConfigLoader Static::Simple Unicode
                 Authentication Authentication::Store::Minimal Authentication::Credential::Password
                 Session Session::Store::FastMmap Session::State::Cookie
                /;
@@ -42,6 +42,10 @@ if(__PACKAGE__->config->{log4perlconf}) {
   __PACKAGE__->log( Catalyst::Log::Log4perl->new(
       __PACKAGE__->config->{log4perlconf}
   ));
+}
+
+sub debug {
+  return __PACKAGE__->config->{debugging} ? 1 : 0;
 }
 
 # Start the application
