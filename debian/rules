@@ -35,18 +35,18 @@ install: build
 	dh_clean -k
 	dh_installdirs usr/local/admin usr/local/admin/script/
 
-	# Add here commands to install the package into debian/sipwise-www-admin.
-	cp -a lib  debian/sipwise-www-admin/usr/local/admin/
-	cp -a root debian/sipwise-www-admin/usr/local/admin/lib/admin/
-	install -m 644 admin.yml debian/sipwise-www-admin/usr/local/admin/lib/admin/
-	install -m 644 -D etc/admin.conf debian/sipwise-www-admin/usr/local/etc/admin.conf
-	install -m 644 -D etc/apache.site debian/sipwise-www-admin/usr/share/doc/sipwise-www-admin/apache.site
+	# Add here commands to install the package into debian/ngcp-www-admin.
+	cp -a lib  debian/ngcp-www-admin/usr/local/admin/
+	cp -a root debian/ngcp-www-admin/usr/local/admin/lib/admin/
+	install -m 644 admin.yml debian/ngcp-www-admin/usr/local/admin/lib/admin/
+	install -m 644 -D etc/admin.conf debian/ngcp-www-admin/usr/local/etc/admin.conf
+	install -m 644 -D etc/apache.site debian/ngcp-www-admin/usr/share/doc/ngcp-www-admin/apache.site
 	# we don't need admin_create.pl and admin_test.pl:
-	install -m 755 script/admin_cgi.pl     debian/sipwise-www-admin/usr/local/admin/script/
-	install -m 755 script/admin_fastcgi.pl debian/sipwise-www-admin/usr/local/admin/script/
-	install -m 755 script/admin_server.pl  debian/sipwise-www-admin/usr/local/admin/script/
+	install -m 755 script/admin_cgi.pl     debian/ngcp-www-admin/usr/local/admin/script/
+	install -m 755 script/admin_fastcgi.pl debian/ngcp-www-admin/usr/local/admin/script/
+	install -m 755 script/admin_server.pl  debian/ngcp-www-admin/usr/local/admin/script/
 	# make sure we don't have any svn files inside the .deb:
-	find debian/sipwise-www-admin -name \.svn -print0 | xargs -0 rm -rf
+	find debian/ngcp-www-admin -name \.svn -print0 | xargs -0 rm -rf
 
 
 # Build architecture-dependent files here.

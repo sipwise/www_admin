@@ -1,4 +1,4 @@
-Source: sipwise-www-admin
+Source: ngcp-www-admin
 Section: admin
 Priority: extra
 Maintainer: Michael Prokop <mprokop@sipwise.com>
@@ -8,9 +8,9 @@ Homepage: http://sipwise.com/
 Vcs-svn: https://dev.sipwise.com/svn/www_admin
 Vcs-Browser: https://dev.sipwise.com/svn/www_admin
 
-Package: sipwise-www-admin
+Package: ngcp-www-admin
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, sipwise-ossbss-billing (>= 2.1.1), sipwise-ossbss-voip (>= 2.1.1), libcatalyst-perl, libcatalyst-modules-perl, libcatalyst-engine-apache-perl
+Depends: ${shlibs:Depends}, ${misc:Depends}, ngcp-ossbss-billing (>= 2.1.1), ngcp-ossbss-voip (>= 2.1.1), libcatalyst-perl, libcatalyst-modules-perl, libcatalyst-engine-apache-perl
 Description: administration framework to configure the Sipwise NGCP
  This package provides an administration framework which is used to
  configure the Sipwise NGCP.

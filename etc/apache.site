@@ -21,24 +21,24 @@ PerlSwitches -I/usr/local/admin/lib
         </Location>
 
         <Location /SOAP>
-                AuthName "Sipwise NGCP Provisioning"
+                AuthName "ngcp NGCP Provisioning"
                 AuthType Basic
                 AuthUserFile /usr/local/etc/provisioning.htpasswd
                 Require valid-user
 
                 SetHandler perl-script
-                PerlHandler Sipwise::Provisioning::SOAP
+                PerlHandler ngcp::Provisioning::SOAP
         </Location>
 
         <Location /XMLRPC>
-                AuthName "Sipwise NGCP Provisioning"
+                AuthName "ngcp NGCP Provisioning"
                 AuthType Basic
                 AuthUserFile /usr/local/etc/provisioning.htpasswd
                 Require valid-user
 
                 SetHandler perl-script
                 PerlHandler Apache::XMLRPC::Lite
-                PerlSetVar dispatch_to '/usr/local/lib/site_perl/Sipwise/Provisioning/backends'
+                PerlSetVar dispatch_to '/usr/local/lib/site_perl/ngcp/Provisioning/backends'
         </Location>
 
         # requires module dumpio

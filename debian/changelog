@@ -1,4 +1,4 @@
-sipwise-www-admin (2.1.0) unstable; urgency=medium
+ngcp-www-admin (2.1.0) unstable; urgency=medium
 
   * per domain caller rewrite rules
   * peer rewrite rules priorities
@@ -10,31 +10,31 @@ sipwise-www-admin (2.1.0) unstable; urgency=medium
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 14 Jul 2010 02:02:17 +0200
 
-sipwise-www-admin (2.0.3) UNRELEASED; urgency=medium
+ngcp-www-admin (2.0.3) UNRELEASED; urgency=medium
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Fri, 12 Mar 2010 18:09:04 +0100
 
-sipwise-www-admin (2.0.2) unstable; urgency=medium
+ngcp-www-admin (2.0.2) unstable; urgency=medium
 
   * LNP number search persistence fixed
   * package files install dirs corrected
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Fri, 12 Mar 2010 18:09:04 +0100
 
-sipwise-www-admin (2.0.1) unstable; urgency=medium
+ngcp-www-admin (2.0.1) unstable; urgency=medium
 
   * various number format unifications
   * some smaller bugfixes
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Thu, 11 Mar 2010 18:32:12 +0100
 
-sipwise-www-admin (2.0.0-1) unstable; urgency=medium
+ngcp-www-admin (2.0.0-1) unstable; urgency=medium
 
   * dpkg install rules fix
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 10 Mar 2010 15:41:05 +0100
 
-sipwise-www-admin (2.0.0) unstable; urgency=low
+ngcp-www-admin (2.0.0) unstable; urgency=low
 
   * speed dial
   * LNP database handling
@@ -53,7 +53,7 @@ sipwise-www-admin (2.0.0) unstable; urgency=low
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 10 Mar 2010 15:15:41 +0100
 
-sipwise-www-admin (1.2.1) unstable; urgency=low
+ngcp-www-admin (1.2.1) unstable; urgency=low
 
   * allowing direct entry of regex in billing fee destinations
   * now handling domains with local subscribers as "local" domains
@@ -63,7 +63,7 @@ sipwise-www-admin (1.2.1) unstable; urgency=low
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Tue, 09 Jun 2009 05:36:24 +0200
 
-sipwise-www-admin (1.2.0) unstable; urgency=low
+ngcp-www-admin (1.2.0) unstable; urgency=low
 
   * implemented product and billing-profile management
   * implemented billing fees and peaktime management
@@ -73,7 +73,7 @@ sipwise-www-admin (1.2.0) unstable; urgency=low
 
  -- Daniel Tiefnig <dtiefnig@sipwise.com>  Mon, 18 May 2009 02:27:37 +0200
 
-sipwise-www-admin (1.1.4) unstable; urgency=low
+ngcp-www-admin (1.1.4) unstable; urgency=low
 
   * Initial release.
 
