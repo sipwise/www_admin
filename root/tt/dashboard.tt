@@ -1,0 +1,47 @@
+    <script type="text/javascript" src="/js/jsrrd/jsrrd/binaryXHR.js"></script>
+    <script type="text/javascript" src="/js/jsrrd/jsrrd/rrdFile.js"></script>
+    <script type="text/javascript" src="/js/jsrrd/jsrrd/rrdFlotSupport.js"></script>
+    <script type="text/javascript" src="/js/jsrrd/jsrrd/rrdFlot.js"></script>
+    <script type="text/javascript" src="/js/jsrrd/flot/jquery.js"></script>
+    <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.selection.js"></script>
+    
+    <h3 id="title">Dashboard</h1>
+
+    <table>
+      <tr><th>Memory</th><th>Load</th></tr>
+      <tr><td><div id="plot_memory"></div></td><td><div id="plot_load"></div></td></tr>
+    </table>
+
+    <script type="text/javascript">
+
+      function update_fname(rrd_data, args) {
+        var graph_opts={};
+        var ds_graph_opts={};
+        var f=new rrdFlot(args['plot_id'],rrd_data,graph_opts,ds_graph_opts, args['si_suffix']);
+      }
+
+      function update_fname_handler(bf, args) {
+          var rrd_data=undefined;
+          try {
+            var rrd_data=new RRDFile(bf);            
+          } catch(err) {
+            alert("File "+fname+" is not a valid RRD archive!");
+          }
+          if (rrd_data!=undefined) {
+            update_fname(rrd_data, args);
+          }
+      }
+
+      function fname_update(fname, plot_id, si_suffix) {
+        try {
+          FetchBinaryURLAsync(fname, update_fname_handler, {plot_id: plot_id, si_suffix: si_suffix});
+        } catch (err) {
+           alert("Failed loading "+fname+"\n"+err);
+        }
+      }
+
+      fname_update("/rrd/memory-used.rrd", "plot_memory", true);
+      fname_update("/rrd/load.rrd", "plot_load", false);
+
+    </script>
