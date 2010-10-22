@@ -6,11 +6,29 @@
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.js"></script>
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.selection.js"></script>
     
-    <h3 id="title">Dashboard</h1>
+    <h3 id="title">Dashboard</h3>
 
+	<ul id="topsubmenu">
+		<li>|</li>
+		<li class="[% ctx != "system" ? "in" : "" %]active_submenu"><a href="system">System</a></li>
+		<li>|</li>
+		<li class="[% ctx != "voip" ? "in" : "" %]active_submenu"><a href="voip">Signalling Controller</a></li>
+		<li>|</li>
+	</ul><br />
+	<hr id="topsubmenuhr" />
+
+	
     <table>
-      <tr><th>Memory</th><th>Load</th></tr>
-      <tr><td><div id="plot_memory"></div></td><td><div id="plot_load"></div></td></tr>
+      [% even = 0 %]
+      [% FOREACH item IN plotdata %]
+        [% UNLESS even %]<tr>[% END %]
+          <td><span style="font-weight: bold;">[% item.title %]</span>
+            <div id="plot_[% item.name %]"></div>
+          </td>
+        [% IF even %]</tr>[% END %]
+        [% even = !even %]
+      [% END %]
+      [% IF even %]<td></td></tr>[% END %]
     </table>
 
     <script type="text/javascript">
@@ -41,7 +59,8 @@
         }
       }
 
-      fname_update("/rrd/memory-used.rrd", "plot_memory", true);
-      fname_update("/rrd/load.rrd", "plot_load", false);
+      [% FOREACH item IN plotdata %]
+          fname_update("[% item.url %]", "plot_[% item.name %]", [% item.si ? "true" : "false" %]);
+      [% END %]
 
     </script>

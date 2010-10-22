@@ -115,6 +115,8 @@ rrdFlot.prototype.populateRes = function() {
   var nrRRAs=this.rrd_file.getNrRRAs();
   for (var i=0; i<nrRRAs; i++) {
     var rra=this.rrd_file.getRRAInfo(i);
+    if(rra.getCFName() != "AVERAGE")
+        continue;
     var step=rra.getStep();
     var rows=rra.getNrRows();
     var period=step*rows;
