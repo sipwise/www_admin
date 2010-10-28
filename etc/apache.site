@@ -1,15 +1,15 @@
-# should be automatically set in ports.conf
-# Listen 443
-# NameVirtualHost *:443
+[% IF www-admin.apache.port != 443 %]
+Listen 443
+[% END %]
 
-PerlSwitches -I/usr/local/admin/lib
+PerlSwitches -I/usr/share/ngcp-www-admin/lib
 
 <VirtualHost *:443>
-        ServerAdmin support@sipwise.com
-        ServerName YOUR.SERVER
+        ServerAdmin [% www-admin.apache.serveradmin %]
+        ServerName [% www-admin.apache.servername %]
         SSLEngine on
-        SSLCertificateFile /etc/apache2/ssl/YOUR.SERVER.crt
-        SSLCertificateKeyFile /etc/apache2/ssl/YOUR.SERVER.pem
+        SSLCertificateFile [% www-admin.apache.sslcertfile %]
+        SSLCertificateKeyFile [% www-admin.apache.sslcertkeyfile %]
 
         PerlModule Apache2::RequestUtil admin
 
@@ -20,33 +20,12 @@ PerlSwitches -I/usr/local/admin/lib
                 PerlResponseHandler admin
         </Location>
 
-        <Location /SOAP>
-                AuthName "ngcp NGCP Provisioning"
-                AuthType Basic
-                AuthUserFile /usr/local/etc/provisioning.htpasswd
-                Require valid-user
-
-                SetHandler perl-script
-                PerlHandler ngcp::Provisioning::SOAP
-        </Location>
-
-        <Location /XMLRPC>
-                AuthName "ngcp NGCP Provisioning"
-                AuthType Basic
-                AuthUserFile /usr/local/etc/provisioning.htpasswd
-                Require valid-user
-
-                SetHandler perl-script
-                PerlHandler Apache::XMLRPC::Lite
-                PerlSetVar dispatch_to '/usr/local/lib/site_perl/ngcp/Provisioning/backends'
-        </Location>
-
         # requires module dumpio
         # LogLevel debug
         # DumpIOInput Off
         # DumpIOOutput Off
 
-        LogLevel info
-        ErrorLog syslog
-        CustomLog "|/usr/bin/logger -p daemon.info -t oss" combined
+        LogLevel [% www-admin.logging.apache.err.level %]
+        ErrorLog syslog:[% www-admin.logging.apache.err.facility %]
+        CustomLog "|/usr/bin/logger -p [% www-admin.logging.apache.acc.facility %].[% www-admin.logging.apache.acc.level %] -t [% www-admin.logging.apache.acc.identity %]" combined
 </VirtualHost>

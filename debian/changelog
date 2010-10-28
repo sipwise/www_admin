@@ -1,3 +1,13 @@
+ngcp-www-admin (3.0.0) unstable; urgency=low
+
+  * moved framework from /usr/local to /usr/share
+  * created templates for centralized config
+  * renamed packages to comply with our global naming policy
+  * couple of smaller packaging and installer bugfixes
+  * packaging not compatible with last release, forced new major version
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Thu, 28 Oct 2010 15:17:20 +0200
+
 ngcp-www-admin (2.1.0) unstable; urgency=medium
 
   * per domain caller rewrite rules

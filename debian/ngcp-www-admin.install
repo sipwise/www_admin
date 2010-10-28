@@ -1,0 +1,6 @@
+lib         usr/share/ngcp-www-admin/
+root        usr/share/ngcp-www-admin/lib/admin/
+admin.yml   usr/share/ngcp-www-admin/lib/admin/
+script/admin_cgi.pl      usr/share/ngcp-www-admin/script/
+script/admin_fastcgi.pl  usr/share/ngcp-www-admin/script/
+script/admin_server.pl   usr/share/ngcp-www-admin/script/
