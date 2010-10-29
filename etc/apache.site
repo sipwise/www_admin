@@ -1,15 +1,15 @@
-[% IF www-admin.apache.port != 443 %]
+[% IF www_admin.apache.port != 443 %]
 Listen 443
 [% END %]
 
 PerlSwitches -I/usr/share/ngcp-www-admin/lib
 
 <VirtualHost *:443>
-        ServerAdmin [% www-admin.apache.serveradmin %]
-        ServerName [% www-admin.apache.servername %]
+        ServerAdmin [% www_admin.apache.serveradmin %]
+        ServerName [% www_admin.apache.servername %]
         SSLEngine on
-        SSLCertificateFile [% www-admin.apache.sslcertfile %]
-        SSLCertificateKeyFile [% www-admin.apache.sslcertkeyfile %]
+        SSLCertificateFile [% www_admin.apache.sslcertfile %]
+        SSLCertificateKeyFile [% www_admin.apache.sslcertkeyfile %]
 
         PerlModule Apache2::RequestUtil admin
 
@@ -25,7 +25,7 @@ PerlSwitches -I/usr/share/ngcp-www-admin/lib
         # DumpIOInput Off
         # DumpIOOutput Off
 
-        LogLevel [% www-admin.logging.apache.err.level %]
-        ErrorLog syslog:[% www-admin.logging.apache.err.facility %]
-        CustomLog "|/usr/bin/logger -p [% www-admin.logging.apache.acc.facility %].[% www-admin.logging.apache.acc.level %] -t [% www-admin.logging.apache.acc.identity %]" combined
+        LogLevel [% www_admin.logging.apache.err.level %]
+        ErrorLog syslog:[% www_admin.logging.apache.err.facility %]
+        CustomLog "|/usr/bin/logger -p [% www_admin.logging.apache.acc.facility %].[% www_admin.logging.apache.acc.level %] -t [% www_admin.logging.apache.acc.identity %]" combined
 </VirtualHost>
