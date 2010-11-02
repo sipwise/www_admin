@@ -1,5 +1,5 @@
 [% IF www_admin.apache.port != 443 %]
-Listen 443
+Listen [% www_admin.apache.port %]
 [% END %]
 
 PerlSwitches -I/usr/share/ngcp-www-admin/lib
