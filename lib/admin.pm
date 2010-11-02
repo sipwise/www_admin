@@ -34,7 +34,7 @@ our $VERSION = '2';
 
 # load configuration from admin.conf XML
 my $xs = new XML::Simple;
-my $xc = $xs->XMLin( '/usr/local/etc/admin.conf', ForceArray => 0);
+my $xc = $xs->XMLin( '/etc/ngcp-www-admin/admin.conf', ForceArray => 0);
 
 __PACKAGE__->config( authentication => {}, %$xc );
 
