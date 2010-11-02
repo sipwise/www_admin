@@ -4,7 +4,7 @@ Listen [% www_admin.apache.port %]
 
 PerlSwitches -I/usr/share/ngcp-www-admin/lib
 
-<VirtualHost *:443>
+<VirtualHost *:[% www_admin.apache.port %]>
         ServerAdmin [% www_admin.apache.serveradmin %]
         ServerName [% www_admin.apache.servername %]
         SSLEngine on
