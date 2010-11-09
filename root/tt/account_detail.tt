@@ -51,7 +51,7 @@
             <table>
               <tr><td class="tdkey">ContractID:</td><td>[% account.id %]</td></tr>
 
-            [% IF billing_features %]
+            [% IF Catalyst.config.customer_features %]
               <tr>
                 <td class="tdkey">CustomerID:</td>
                 <td>
@@ -65,6 +65,8 @@
                   [% END %]
                 </td>
               </tr>
+            [% END %]
+            [% IF billing_features %]
               <tr>
                 <td class="tdkey">product:</td>
                 <td>

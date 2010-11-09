@@ -14,7 +14,7 @@
       [% IF Catalyst.session.admin %]
         <h3>User Administration</h3>
         <ul>
-          [% IF Catalyst.config.billing_features %]
+          [% IF Catalyst.config.customer_features %]
           <li [% 'class="active_menu"' IF menu.active == "customer" %]><a href="/customer">Customers</a></li>
           [% END %]
           <li [% 'class="active_menu"' IF menu.active == "account" %]><a href="/account">Accounts</a></li>

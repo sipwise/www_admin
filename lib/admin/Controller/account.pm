@@ -85,6 +85,9 @@ sub detail : Local {
         delete $c->session->{voip_account};
         $c->session->{voip_account}{customer_id} = $c->request->params->{customer_id} || undef;
     }
+
+    $c->stash->{edit_account} = $c->request->params->{edit_account};
+
     if($c->config->{billing_features}) {
         if(defined $account_id) {
             return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_balance',
@@ -119,7 +122,6 @@ sub detail : Local {
             delete $c->session->{restore_balance_input};
         }
 
-        $c->stash->{edit_account} = $c->request->params->{edit_account};
         $c->stash->{edit_balance} = $c->request->params->{edit_balance};
 
         # we only use this to fill the drop-down lists
