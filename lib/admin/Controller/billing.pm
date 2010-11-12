@@ -527,6 +527,9 @@ sub set_fees : Local {
             $c->session->{messages} = \%messages;
             $c->response->redirect("/billing/search_fees?bilprof=$bilprof&use_session=1&offset=$offset");
             return;
+        } elsif($c->session->{prov_error} eq 'Client.Fees.DuplicateDestination') {
+            $messages{feeerr} = 'Client.Fees.DuplicateDestination';
+            $c->session->{feeerr}{duplicate} = $c->session->{prov_error_object};
         }
     }
     $c->session->{messages} = \%messages;

@@ -49,11 +49,14 @@ sub call_prov {
     };
 
     if($@) {
-        if(ref $@ eq 'SOAP::Fault') {
-            $c->log->error("***Provisioning::call_prov: $backend\::$function failed: ". $@->faultstring);
-            $c->session->{prov_error} = $@->faultcode;
+        my $perr = $@;
+        if(ref $perr eq 'SOAP::Fault') {
+            $c->log->error("***Provisioning::call_prov: $backend\::$function failed: ". $perr->faultstring);
+            $c->session->{prov_error} = $perr->faultcode;
+            $c->session->{prov_error_object} = $perr->faultdetail->{object}
+                if defined eval { $perr->faultdetail->{object} };
         } else {
-            $c->log->error("***Provisioning::call_prov: $backend\::$function failed: $@");
+            $c->log->error("***Provisioning::call_prov: $backend\::$function failed: $perr");
             $c->session->{prov_error} = 'Server.Internal';
         }
         return;

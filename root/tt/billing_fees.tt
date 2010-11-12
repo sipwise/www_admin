@@ -13,6 +13,10 @@
               [% IF feeerr.line %]
                 at line [% feeerr.line %]
               [% END %]
+              [% IF feeerr.duplicate %]
+                <br />
+                Duplicate destination: [% feeerr.duplicate %]
+              [% END %]
               [% IF messages.feeerrdetail %]
                 <br />
                 [% messages.feeerrdetail %]
