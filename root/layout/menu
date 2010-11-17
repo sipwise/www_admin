@@ -19,9 +19,6 @@
           [% END %]
           <li [% 'class="active_menu"' IF menu.active == "account" %]><a href="/account">Accounts</a></li>
           <li [% 'class="active_menu"' IF menu.active == "subscriber" %]><a href="/subscriber">Subscribers</a></li>
-          [% IF Catalyst.config.li_features %]
-          <li [% 'class="active_menu"' IF menu.active == "intercept" %]><a href="/intercept">Lawful Intercept</a></li>
-          [% END %]
 [%#          <li><a href="/registration">Devices</a></li> %]
 [%#          <li><a href="/registration">Registrations</a></li> %]
         </ul>
