@@ -26,12 +26,14 @@ sub index : Private {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/billing.tt';
 
-    my $products;
-    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_products',
-                                                        undef,
-                                                        \$products
-                                                      );
-    $c->stash->{products} = $products if eval { @$products };
+    if($c->config->{product_features}) {
+        my $products;
+        return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_products',
+                                                            undef,
+                                                            \$products
+                                                          );
+        $c->stash->{products} = $products if eval { @$products };
+    }
 
     my $bilprofs;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profiles',

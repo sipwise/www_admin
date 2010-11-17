@@ -126,15 +126,17 @@ sub detail : Local {
 
         # we only use this to fill the drop-down lists
         if($c->request->params->{edit_account}) {
-            my $products;
-            return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_products',
-                                                                undef,
-                                                                \$products
-                                                              );
-            $c->stash->{products} = [ grep { $$_{data}{class} eq 'voip' }
-                                        sort { $$a{data}{name} cmp $$b{data}{name} }
-                                          eval { @$products }
-                                    ];
+            if($c->config->{product_features}) {
+                my $products;
+                return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_products',
+                                                                    undef,
+                                                                    \$products
+                                                                  );
+                $c->stash->{products} = [ grep { $$_{data}{class} eq 'voip' }
+                                            sort { $$a{data}{name} cmp $$b{data}{name} }
+                                              eval { @$products }
+                                        ];
+            }
             my $billing_profiles;
             return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profiles',
                                                                 undef,

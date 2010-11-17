@@ -1,3 +1,4 @@
+      [% IF Catalyst.config.product_features %]
         <h3 id="product">Products</h3>
 
         [% UNLESS Catalyst.session.admin.read_only %]
@@ -48,6 +49,8 @@
           [% END %]
           </table>
         </div>
+
+      [% END %]
 
         <h3 id="bilprof">Billing Profiles</h3>
 
