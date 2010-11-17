@@ -44,6 +44,11 @@ ngcp-www-admin:
 	dh_install           -p$@ -P$(b)/$@
 	dh_installexamples   -p$@ -P$(b)/$@
 	dh_installman        -p$@ -P$(b)/$@
+	# drop svn files:
+	find $(b) -type d -name \.svn -print0 | xargs -0 rm -rf
+	# install lintian overrides:
+	mkdir -p $(b)/$(@)/usr/share/lintian/overrides/
+	cp -av debian/overrides $(b)/$(@)/usr/share/lintian/overrides/$@
 	dh_link              -p$@ -P$(b)/$@
 	dh_strip             -p$@ -P$(b)/$@
 	dh_compress          -p$@ -P$(b)/$@

@@ -1,0 +1,4 @@
+ngcp-www-admin: executable-not-elf-or-script ./usr/share/ngcp-www-admin/lib/admin/root/tt/subscriber_edit_speeddial.tt
+ngcp-www-admin: executable-not-elf-or-script ./usr/share/ngcp-www-admin/lib/admin/root/tt/contract_detail.tt
+ngcp-www-admin: embedded-javascript-library usr/share/ngcp-www-admin/lib/admin/root/js/jsrrd/flot/jquery.js
+ngcp-www-admin: embedded-javascript-library usr/share/ngcp-www-admin/lib/admin/root/js/jsrrd/flot/jquery.min.js
