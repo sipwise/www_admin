@@ -13,9 +13,6 @@
               <td> r/o </td>
               <td> PW </td>
               <td> CDR </td>
-            [% IF Catalyst.config.li_features %]
-              <td> LI </td>
-            [% END %]
               <td />
               <td />
             </tr>
@@ -58,14 +55,6 @@
                              [% IF erefill.call_data or !erefill && admin.call_data %]checked="checked" [% END %]
                              title="if checked, the administrator may view call detail records" />
                     </td>
-                  [% IF Catalyst.config.li_features %]
-                    <td class="tdcenter">
-                      <input type="checkbox" class="checkbox" name="lawful_intercept"
-                             [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
-                             [% IF erefill.lawful_intercept or !erefill && admin.lawful_intercept %]checked="checked" [% END %]
-                             title="if checked, the administrator may view and set lawful interceptions" />
-                    </td>
-                  [% END %]
                     <td>
                       <div class="postlink">
                         <label for="admsave[% id %]">save</label>
@@ -101,13 +90,6 @@
                            [% IF admin.call_data %] checked="checked"[% END %]
                            title="if checked, the administrator may view call detail records" />
                   </td>
-                [% IF Catalyst.config.li_features %]
-                  <td class="tdcenter">
-                    <input type="checkbox" class="checkbox" disabled="disabled"
-                           [% IF admin.lawful_intercept %] checked="checked"[% END %]
-                           title="if checked, the administrator may view and set lawful interceptions" />
-                  </td>
-                [% END %]
                   <td>
                     [% UNLESS Catalyst.session.admin.read_only && admin.login != Catalyst.session.admin.login %]
                       <a href="/admin?edit_admin=[% admin.login %]" class="aaction">edit</a>
@@ -203,16 +185,6 @@
                          title="if checked, the new administrator may view call detail records" />
                 </td>
               </tr>
-            [% IF Catalyst.config.li_features %]
-              <tr>
-                <td>lawful intercepts:</td>
-                <td>
-                  <input type="checkbox" class="checkbox" name="lawful_intercept"
-                         [% IF arefill.lawful_intercept %]checked="checked"[% END %]
-                         title="if checked, the new administrator may view and set lawful interceptions" />
-                </td>
-              </tr>
-            [% END %]
               <tr>
                 <td>
                   <div class="postlink">
