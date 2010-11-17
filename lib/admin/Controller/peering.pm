@@ -792,7 +792,7 @@ Show SIP peering contract details.
 
 sub contract_detail : Local {
     my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/contract_detail.tt';
+    $c->stash->{template} = 'tt/peering_contract_detail.tt';
 
     my $contract;
     my $contract_id = $c->request->params->{contract_id} || undef;
@@ -864,7 +864,9 @@ sub save_contract : Local {
       foreach my $form_field (@$contract_contact_form_fields) {
 	if (defined $c->request->params->{$form_field->{field}} and length($c->request->params->{$form_field->{field}})) {
 	  $contact{$form_field->{field}} = $c->request->params->{$form_field->{field}};
-	}
+	} else {
+          $contact{$form_field->{field}} = undef;
+        }
       }
     }
     $settings{contact} = \%contact;

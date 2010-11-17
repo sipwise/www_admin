@@ -46,6 +46,7 @@
               </tr>
             [% END %]
             
+            <tr><td colspan="2">Peering contact person or company:</td></tr>
             [% FOREACH contact_form_field = contact_form_fields %]
             <tr>
                 <td class="tdkey">[% contact_form_field.label %]:</td>
