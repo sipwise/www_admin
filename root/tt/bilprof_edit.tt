@@ -34,13 +34,6 @@
                 </td>
               </tr>
               [% IF messages.name %]<tr><td /><td><div class="errormsg">[% messages.name %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">prepaid:</td>
-                <td>
-                  <input type="checkbox" class="checkbox" name="prepaid" title="uncheck for postpaid"
-                         [% IF bilprof.data.prepaid %]checked="checked"[% END %] />
-                </td>
-              </tr>
 <!--
               <tr>
                 <td class="tdkey">interval unit:</td>
