@@ -34,23 +34,6 @@
                 </td>
               </tr>
               [% IF messages.name %]<tr><td /><td><div class="errormsg">[% messages.name %]</div></td></tr>[% END %]
-<!--
-              <tr>
-                <td class="tdkey">interval unit:</td>
-                <td>
-                  <select size="1" name="interval_unit">
-                    <option [% IF bilprof.data.interval_unit == "month" %]selected="selected"[% END %]>month</option>
-                    <option [% IF bilprof.data.interval_unit == "week" %]selected="selected"[% END %]>week</option>
-                  </select>
-                </td>
-              </tr>
-              [% IF messages.unit %]<tr><td /><td><div class="errormsg">[% messages.unit %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">interval count:</td>
-                <td><input type="text" name="interval_count" value="[% bilprof.data.interval_count %]" /></td>
-              </tr>
-              [% IF messages.count %]<tr><td /><td><div class="errormsg">[% messages.count %]</div></td></tr>[% END %]
--->
               <tr>
                 <td class="tdkey">interval charge:</td>
                 <td>
