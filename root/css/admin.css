@@ -416,10 +416,14 @@ ul#topsubmenu {
 #contentplace .registered_contacts,
 #contentplace .billing_fees,
 #contentplace .billing_peaktimes,
-#contentplace .numberblocks,
-#contentplace .domains
+#contentplace .numberblocks
 {
 	width: 100%;
+	border-spacing: 0px;
+}
+
+#contentplace .domains
+{
 	border-spacing: 0px;
 }
 

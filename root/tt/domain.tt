@@ -6,11 +6,7 @@
 
           <table class="domains">
             <tr class="table_header">
-              <td>domain</td>
-              <td class="tdcenter" style="width:40px;" >local</td>
-              <td class="tdcenter" style="width:40px;" >cc</td>
-              <td style="width:150px;" >timezone</td>
-              <td style="width:40px;" />
+              <td style="width:270px;" >domain</td>
               <td style="width:60px;" />
             </tr>
             [% id = 0 %]
@@ -25,63 +21,18 @@
                     [% domain.domain %]
                   [% END %]
                 </td>
-                [% IF domain.domain == edit_domain %]
-                  <form action="/domain/do_edit_domain" method="post">
-                    <input type="hidden" name="domain" value="[% domain.domain %]" />
-                    <td class="tdcenter">
-                      <input type="checkbox" class="checkbox" title="check if domain contains local users"
-                             name="local" [% IF domain.local %]checked="checked"[% END %] />
-                    </td>
-                    <td class="tdcenter"><input class="irealshort" title="integer, country code"
-                        name="cc" value="[% domain.cc %]" /></td>
-                    <td>
-                      <input type="text" class="imedium" title="string, timezone in continent/capital format"
-                             name="timezone" value="[% domain.timezone %]" />
-                    </td>
-                    <td>
-                      <div class="postlink">
-                        <label for="domsave[% id %]">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="domsave[% id %]" />
-                      </div>
-                    </td>
-                  </form>
-                  <td><a href="/domain" class="aaction">cancel</a></td>
-                [% ELSE %]
-                <td class="tdcenter">
-                  <input type="checkbox" class="checkbox" name="local"
-                       [% IF domain.local %]checked="checked"[% END %] disabled="disabled" />
-                </td>
-                <td class="tdcenter">[% domain.cc %]</td>
-                <td>[% domain.timezone %]</td>
                 <td>
                 [% UNLESS Catalyst.session.admin.read_only %]
-                  <a href="/domain?edit_domain=[% domain.domain %]" class="aaction">edit</a>
-                [% END %]
-                </td>
-                <form action="/domain/do_delete_domain" method="post">
-                  <input type="hidden" name="domain" value="[% domain.domain %]" />
-                  <td>
-                  [% UNLESS Catalyst.session.admin.read_only %]
+                  <form action="/domain/do_delete_domain" method="post">
+                    <input type="hidden" name="domain" value="[% domain.domain %]" />
                     <div class="postlink">
                       <label for="domdel[% id %]">delete</label>
                       <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="domdel[% id %]" />
                     </div>
-                  [% END %]
-                  </td>
-                </form>
+                  </form>
                 [% END %]
+                </td>
               </tr>
-              [% IF domain.domain == edit_domain %]
-                [% IF messages.ecc || messages.etimezone %]
-                  <tr><td colspan="6">
-                    <div class="errormsg">
-                      [% messages.ecc %]
-                      [% IF messages.ecc && messages.etimezone %]<br />[% END %]
-                      [% messages.etimezone %]
-                    </div>
-                  </td></tr>
-                [% END %]
-              [% END %]
             [% id = id + 1 %]
             [% END %]
           </table>
@@ -96,32 +47,15 @@
 
           <table class="domains">
             <tr class="table_header">
-              <td>domain</td>
-              <td class="tdcenter" style="width:40px;" >local</td>
-              <td class="tdcenter" style="width:40px;" >cc</td>
-              <td style="width:150px;" >timezone</td>
-              <td style="width:40px;" />
+              <td style="width:270px;" >domain</td>
               <td style="width:60px;" />
             </tr>
             <form action="/domain/do_create_domain" method="post">
               <tr>
                 <td>
-                  <input type="text" size="20" name="domain" title="string, SIP domain"
+                  <input type="text" size="30" name="domain" title="string, SIP domain"
                          id="domainaddtxt" value="[% arefill.domain %]" />
                 </td>
-                <td class="tdcenter">
-                  <input type="checkbox" class="checkbox" title="check if domain contains local users"
-                         name="local" [% IF arefill.local %]checked="checked"[% END %] />
-                </td>
-                <td class="tdcenter">
-                  <input type="text" class="irealshort" title="integer, country code"
-                         name="cc" value="[% arefill.cc %]" />
-                </td>
-                <td>
-                  <input type="text" class="imedium" title="string, timezone in continent/capital format"
-                         name="timezone" value="[% arefill.timezone %]" />
-                </td>
-                <td />
                 <td>
                   <div class="postlink">
                     <label for="domainadd">add</label>
@@ -129,15 +63,6 @@
                   </div>
                 </td>
               </tr>
-              [% IF messages.acc || messages.atimezone %]
-                <tr><td colspan="5">
-                  <div class="errormsg">
-                    [% messages.acc %]
-                    [% IF messages.acc && messages.atimezone %]<br />[% END %]
-                    [% messages.atimezone %]
-                  </div>
-                </td></tr>
-              [% END %]
             </form>
 
           </table>
