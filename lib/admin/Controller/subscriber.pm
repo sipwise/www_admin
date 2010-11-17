@@ -267,13 +267,6 @@ sub update_subscriber : Local {
         $settings{sn} = undef;
     }
 
-    my $timezone = $c->request->params->{timezone};
-    if(length $timezone) {
-        $settings{timezone} = $timezone;
-        $messages{timezone} = 'Client.Syntax.MalformedTimezone'
-            unless $timezone =~ m#^\w+/\w.+$#;
-    }
-
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'billing', ($subscriber_id
                                                                  ? 'update_voip_account_subscriber'

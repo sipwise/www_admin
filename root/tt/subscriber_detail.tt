@@ -183,15 +183,6 @@
                   [% IF subscriber.admin %]checked="checked"[% END %] />
                 </td>
               </tr>
-              <tr>
-                <td class="tdkey">timezone:</td>
-                <td>
-                  <input type="text" name="timezone" [% IF ! edit_subscriber %]class="disabled" disabled="disabled"[% END %]
-                         title="timezone in the form of 'continent/capital', optional"
-                    value="[% subscriber.timezone %]" />
-                </td>
-              </tr>
-              [% IF messages.timezone %]<tr><td /><td><div class="errormsg">[% messages.timezone %]</div></td></tr>[% END %]
               <tr><td class="tdkey">UUID:</td><td>[% subscriber.uuid %]</td></tr>
               <tr><td class="tdkey">created:</td><td>[% subscriber.create_timestamp %]</td></tr>
               <tr><td class="tdkey">modified:</td><td>[% subscriber.modify_timestamp %]</td></tr>
