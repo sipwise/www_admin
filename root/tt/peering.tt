@@ -188,13 +188,6 @@
                   </div>
                 </td>
               </tr>
-              [% IF messages.acc || messages.atimezone %]
-                <tr><td colspan="5">
-                  <div class="errormsg">
-                    [% messages.acc %]
-                  </div>
-                </td></tr>
-              [% END %]
             </form>
 
           </table>
