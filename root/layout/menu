@@ -34,6 +34,9 @@
           [% IF Catalyst.config.peering_features %]
           <li [% 'class="active_menu"' IF menu.active == "peering" %]><a href="/peering">SIP Peerings</a></li>
           [% END %]
+          [% IF Catalyst.config.dashboard.enabled %]
+          <li [% 'class="active_menu"' IF menu.active == "dashboard" %]><a href="/dashboard">Dashboard</a></li>
+          [% END %]
         </ul>
 
         <h3>Number Management</h3>
