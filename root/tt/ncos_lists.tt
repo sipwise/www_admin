@@ -116,6 +116,8 @@
           </form>
         </div>
 
+      [% IF Catalyst.config.lnp_features %]
+
         <h3 id="LNP">LNP Provider List</h3>
 
         <div class="p1">
@@ -214,3 +216,4 @@
             [% IF lcrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
         </div>
 
+      [% END %]

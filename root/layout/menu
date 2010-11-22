@@ -37,8 +37,12 @@
 
         <h3>Number Management</h3>
         <ul>
+          [% IF Catalyst.config.numberblock_features %]
           <li [% 'class="active_menu"' IF menu.active == "number" %]><a href="/number">Number Blocks</a></li>
+          [% END %]
+          [% IF Catalyst.config.lnp_features %]
           <li [% 'class="active_menu"' IF menu.active == "lnp" %]><a href="/lnp">LNP</a></li>
+          [% END %]
           <li [% 'class="active_menu"' IF menu.active == "ncos" %]><a href="/ncos">NCOS</a></li>
         </ul>
       [% END %]
