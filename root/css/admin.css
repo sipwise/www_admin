@@ -416,6 +416,9 @@ ul#topsubmenu {
 #contentplace .registered_contacts,
 #contentplace .billing_fees,
 #contentplace .billing_peaktimes,
+#contentplace .peering_rules,
+#contentplace .peering_servers,
+#contentplace .peering_rw_rules,
 #contentplace .numberblocks
 {
 	width: 100%;

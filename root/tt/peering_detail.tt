@@ -3,15 +3,15 @@
             [% grp.group.name %]</a>
         </h2>
 
-		<a href="/peering" class="aaction">back</a>
+        <a href="/peering" class="aaction">back</a>
 
-		<h3>Peering Rules</h3>
+        <h3>Peering Rules</h3>
 
         <div class="p1">
           [% IF messages.erulmsg %]<div class="goodmsg">[% messages.erulmsg %]</div>[% END %]
           [% IF messages.erulerr %]<div class="errormsg">[% messages.erulerr %]</div>[% END %]
 
-          <table class="domains">
+          <table class="peering_rules">
             <tr class="table_header">
               <td>Callee Prefix</td>
               <td>Caller Pattern</td>
@@ -66,13 +66,13 @@
                       </div>
                     [% END %]
                   </td>
-				[% END %]  
+                [% END %]  
                 </form>
               </tr>
             [% id = id + 1 %]
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
-			<tr>
+            <tr>
                   <form action="/peering/create_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <td>
@@ -88,31 +88,30 @@
                              name="description" value="" />
                     </td>
                     <td>
-                  		<div class="postlink">
-                    		<label for="radd">add</label>
-                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="radd" />
-                  		</div>
+                          <div class="postlink">
+                            <label for="radd">add</label>
+                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="radd" />
+                          </div>
                   </form>
                     </td>
-					<td />
-			</tr>
-			[% END %]
+                    <td />
+            </tr>
+            [% END %]
 
 
 
           </table>
         </div>
 
-		<h3>Peering Servers</h3>
+        <h3>Peering Servers</h3>
 
         <div class="p1">
           [% IF messages.servmsg %]<div class="goodmsg">[% messages.servmsg %]</div>[% END %]
           [% IF messages.serverr %]<div class="errormsg">[% messages.serverr %]</div>[% END %]
 
-          <table class="domains">
+          <table class="peering_servers">
             <tr class="table_header">
               <td>Name</td>
-              <td>From-Domain</td>
               <td>IP Address</td>
               <td>Port</td>
               <td>Weight</td>
@@ -129,10 +128,6 @@
                     <td>
                       <input type="text" size="15 id="addtxt" title="string, peer name"
                              name="name" value="[% peer.name %]" />
-                    </td>
-                    <td>
-                      <input type="text" size="15 id="addtxt" title="string, peer domain"
-                             name="domain" value="[% peer.domain %]" />
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, peer ip address"
@@ -156,7 +151,6 @@
                   <td><a href="/peering/detail?group_id=[% grp.group.id %]" class="aaction">cancel</a></td>
                 [% ELSE %]
                   <td><a href="/peering/rewrite?peer_id=[% peer.id%]" class="aaction">[% peer.name %]</a></td>
-                  <td>[% peer.domain %]</td>
                   <td>[% peer.ip %]</td>
                   <td>[% peer.port %]</td>
                   <td>[% peer.weight %]</td>
@@ -176,22 +170,18 @@
                       </div>
                     [% END %]
                   </td>
-				[% END %]  
+                [% END %]  
                 </form>
               </tr>
             [% id = id + 1 %]
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
-			<tr>
+            <tr>
                   <form action="/peering/create_peer" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, peer name"
                              name="name" value="" />
-                    </td>
-                    <td>
-                      <input type="text" size="15" id="addtxt" title="string, peer domain"
-                             name="domain" value="" />
                     </td>
                     <td>
                       <input type="text" size="15" id="addtxt" title="string, peer ip address"
@@ -206,14 +196,14 @@
                              name="weight" value="1" />
                     </td>
                     <td>
-                  		<div class="postlink">
-                    		<label for="padd">add</label>
-                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="padd" />
-                  		</div>
+                          <div class="postlink">
+                            <label for="padd">add</label>
+                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="padd" />
+                          </div>
                   </form>
                     </td>
-					<td />
-			</tr>
+                    <td />
+            </tr>
             [% END %]
           </table>
         </div>

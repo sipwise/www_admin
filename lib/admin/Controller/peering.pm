@@ -364,7 +364,6 @@ sub create_peer : Local {
 
     my $grpid = $c->request->params->{grpid};
     my $name = $c->request->params->{name};
-    my $domain = $c->request->params->{domain};
     my $ip = $c->request->params->{ip};
     my $port = $c->request->params->{port};
     my $weight = $c->request->params->{weight};
@@ -380,7 +379,6 @@ sub create_peer : Local {
                                                  { group_id => $grpid,
                                                    data => {
                                                        name => $name,
-                                                       domain => $domain,
                                                        ip => $ip,
                                                        port => $port,
                                                        weight => $weight,
@@ -464,7 +462,6 @@ sub edit_peer : Local {
     my $grpid = $c->request->params->{grpid};
     my $peerid = $c->request->params->{peerid};
     my $name = $c->request->params->{name};
-    my $domain = $c->request->params->{domain};
     my $ip = $c->request->params->{ip};
     my $port = $c->request->params->{port};
     my $weight = $c->request->params->{weight};
@@ -477,7 +474,6 @@ sub edit_peer : Local {
                                                  { id => $peerid,
                                                    data => {
                                                        name => $name,
-                                                       domain => $domain,
                                                        ip => $ip,
                                                        port => $port,
                                                        weight => $weight,

@@ -3,55 +3,55 @@
             [% peer.peer_host.name %]</a>
         </h2>
 
-		<a href="detail?group_id=[% peer.peer_host.group_id %]" class="aaction">back</a>
+        <a href="detail?group_id=[% peer.peer_host.group_id %]" class="aaction">back</a>
 
-		[% IF all_peers.size > 0 %]	
+        [% IF all_peers.size > 0 %]    
         [% UNLESS Catalyst.session.admin.read_only %]
-		<h3>Import Rewrite Rules from another host</h3>
+        <h3>Import Rewrite Rules from another host</h3>
         <div class="p1">
           [% IF messages.cpmsg %]<div class="goodmsg">[% messages.cpmsg %]</div>[% END %]
           [% IF messages.cperr %]<div class="errormsg">[% messages.cperr %]</div>[% END %]
-			<table class="domains">
-			<tr>
+            <table class="peering_rw_rules">
+            <tr>
             <form action="/peering/copy_rewrite" method="post">
                 <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                 <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
-				<td>
-				Copy rules from peering host 
-            	<select title="string, peering host" size="1" name="rpeerid">
-            		[% FOREACH cpeer = all_peers %]
-						<option value="[% cpeer.id %]">[% cpeer.name %]</option>
-					[% END %]
-				</select>
-				and
-            	<select title="string, copy policy" size="1" name="policy">
-					<option selected>keep</option>
-					<option>delete</option>
-				</select>
-				existing rewrite rules.
-				</td>
-				<td style="width:40px;">
+                <td>
+                Copy rules from peering host 
+                <select title="string, peering host" size="1" name="rpeerid">
+                    [% FOREACH cpeer = all_peers %]
+                        <option value="[% cpeer.id %]">[% cpeer.name %]</option>
+                    [% END %]
+                </select>
+                and
+                <select title="string, copy policy" size="1" name="policy">
+                    <option selected>keep</option>
+                    <option>delete</option>
+                </select>
+                existing rewrite rules.
+                </td>
+                <td style="width:40px;">
                 <div class="postlink">
-                	<label for="cpapply">apply</label>
+                    <label for="cpapply">apply</label>
                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="cpapply" />
                   </div>
-				</td>
-              	<td style="width:60px;" />
-			</form>
-			</tr>
-			</table>
-		</div>
-		[% END %]
-		[% END %]
+                </td>
+                  <td style="width:60px;" />
+            </form>
+            </tr>
+            </table>
+        </div>
+        [% END %]
+        [% END %]
 
 
-		<h3 id="icaller">Inbound Rewrite Rules for Caller</h3>
+        <h3 id="icaller">Inbound Rewrite Rules for Caller</h3>
 
         <div class="p1">
           [% IF messages.icallermsg %]<div class="goodmsg">[% messages.icallermsg %]</div>[% END %]
           [% IF messages.icallererr %]<div class="errormsg">[% messages.icallererr %]</div>[% END %]
 
-          <table class="domains">
+          <table class="peering_rw_rules">
             <tr class="table_header">
               <td>Match Pattern</td>
               <td>Replacement Pattern</td>
@@ -116,12 +116,12 @@
                       </div>
                     [% END %]
                   </td>
-				[% END %]  
+                [% END %]  
                 </form>
               </tr>
             [% id = id + 1 %]
             [% END %]
-			<tr>
+            <tr>
             [% UNLESS Catalyst.session.admin.read_only %]
                   <form action="/peering/create_rewrite" method="post">
                     <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
@@ -145,14 +145,14 @@
                              name="description" value="" />
                     </td>
                     <td>
-                  		<div class="postlink">
-                    		<label for="radd">add</label>
-                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="radd" />
-                  		</div>
+                          <div class="postlink">
+                            <label for="radd">add</label>
+                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="radd" />
+                          </div>
                   </form>
                     </td>
-					<td />
-			</tr>
+                    <td />
+            </tr>
             [% END %]
 
 
@@ -160,13 +160,13 @@
           </table>
         </div>
 
-		<h3 id="icallee">Inbound Rewrite Rules for Callee</h3>
+        <h3 id="icallee">Inbound Rewrite Rules for Callee</h3>
 
         <div class="p1">
           [% IF messages.icalleemsg %]<div class="goodmsg">[% messages.icalleemsg %]</div>[% END %]
           [% IF messages.icalleeerr %]<div class="errormsg">[% messages.icalleeerr %]</div>[% END %]
 
-          <table class="domains">
+          <table class="peering_rw_rules">
             <tr class="table_header">
               <td>Match Pattern</td>
               <td>Replacement Pattern</td>
@@ -231,13 +231,13 @@
                       </div>
                     [% END %]
                   </td>
-				[% END %]  
+                [% END %]  
                 </form>
               </tr>
             [% id = id + 1 %]
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
-			<tr>
+            <tr>
                   <form action="/peering/create_rewrite" method="post">
                     <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
                     <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
@@ -260,27 +260,27 @@
                              name="description" value="" />
                     </td>
                     <td>
-                  		<div class="postlink">
-                    		<label for="itadd">add</label>
-                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itadd" />
-                  		</div>
+                          <div class="postlink">
+                            <label for="itadd">add</label>
+                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="itadd" />
+                          </div>
                   </form>
                     </td>
-					<td />
-			</tr>
-			[% END %]
+                    <td />
+            </tr>
+            [% END %]
 
 
           </table>
         </div>
 
-		<h3 id="ocaller">Outbound Rewrite Rules for Caller</h3>
+        <h3 id="ocaller">Outbound Rewrite Rules for Caller</h3>
 
         <div class="p1">
           [% IF messages.ocallermsg %]<div class="goodmsg">[% messages.ocallermsg %]</div>[% END %]
           [% IF messages.ocallererr %]<div class="errormsg">[% messages.ocallererr %]</div>[% END %]
 
-          <table class="domains">
+          <table class="peering_rw_rules">
             <tr class="table_header">
               <td>Match Pattern</td>
               <td>Replacement Pattern</td>
@@ -345,13 +345,13 @@
                       </div>
                     [% END %]
                   </td>
-				[% END %]  
+                [% END %]  
                 </form>
               </tr>
             [% id = id + 1 %]
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
-			<tr>
+            <tr>
                   <form action="/peering/create_rewrite" method="post">
                     <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
                     <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
@@ -374,27 +374,27 @@
                              name="description" value="" />
                     </td>
                     <td>
-                  		<div class="postlink">
-                    		<label for="ofadd">add</label>
-                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ofadd" />
-                  		</div>
+                          <div class="postlink">
+                            <label for="ofadd">add</label>
+                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="ofadd" />
+                          </div>
                   </form>
                     </td>
-					<td />
-			</tr>
-			[% END %]
+                    <td />
+            </tr>
+            [% END %]
 
 
           </table>
         </div>
 
-		<h3 id="ocallee">Outbound Rewrite Rules for Callee</h3>
+        <h3 id="ocallee">Outbound Rewrite Rules for Callee</h3>
 
         <div class="p1">
           [% IF messages.ocalleemsg %]<div class="goodmsg">[% messages.ocalleemsg %]</div>[% END %]
           [% IF messages.ocalleeerr %]<div class="errormsg">[% messages.ocalleeerr %]</div>[% END %]
 
-          <table class="domains">
+          <table class="peering_rw_rules">
             <tr class="table_header">
               <td>Match Pattern</td>
               <td>Replacement Pattern</td>
@@ -459,13 +459,13 @@
                       </div>
                     [% END %]
                   </td>
-				[% END %]  
+                [% END %]  
                 </form>
               </tr>
             [% id = id + 1 %]
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
-			<tr>
+            <tr>
                   <form action="/peering/create_rewrite" method="post">
                     <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
                     <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
@@ -488,15 +488,15 @@
                              name="description" value="" />
                     </td>
                     <td>
-                  		<div class="postlink">
-                    		<label for="otadd">add</label>
-                    		<input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="otadd" />
-                  		</div>
+                          <div class="postlink">
+                            <label for="otadd">add</label>
+                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="otadd" />
+                          </div>
                   </form>
                     </td>
-					<td />
-			</tr>
-			[% END %]
+                    <td />
+            </tr>
+            [% END %]
 
 
 
