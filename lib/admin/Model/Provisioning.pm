@@ -8,6 +8,7 @@ use Catalyst::Plugin::Authentication;
 
 use Sipwise::Provisioning::Voip;
 use Sipwise::Provisioning::Billing;
+use Sipwise::Provisioning::System;
 
 =head1 NAME
 
@@ -26,6 +27,7 @@ sub new {
     my $self = {};
     $$self{voip} = Sipwise::Provisioning::Voip->new();
     $$self{billing} = Sipwise::Provisioning::Billing->new();
+    $$self{system} = Sipwise::Provisioning::System->new();
 
     return bless $self, $class;
 }

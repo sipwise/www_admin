@@ -43,14 +43,14 @@ sub system : Local {
     $c->stash->{template} = 'tt/dashboard.tt';
 
     my @plotdata = ();
-    push @plotdata, {name=>"mem", title=>"Memory", 
-        url=>$c->config->{dashboard}{rrd_url_path}."/memory-used.rrd", si=>1};
+    push @plotdata, {name=>"mem", title=>"Free Memory", 
+        url=>"/rrd/get?path=memory/memory-free.rrd", si=>1};
     push @plotdata, {name=>"load", title=>"Load", 
-        url=>$c->config->{dashboard}{rrd_url_path}."/load.rrd", si=>0};
+        url=>"/rrd/get?path=load/load.rrd", si=>0};
     push @plotdata, {name=>"rdisk", title=>"Root Disk", 
-        url=>$c->config->{dashboard}{rrd_url_path}."/df-root.rrd", si=>1};
-    push @plotdata, {name=>"ldisk", title=>"Local Disk", 
-        url=>$c->config->{dashboard}{rrd_url_path}."/df-disk.rrd", si=>1};
+        url=>"/rrd/get?path=df/df-root.rrd", si=>1};
+    push @plotdata, {name=>"ldisk", title=>"Network Traffic", 
+        url=>"/rrd/get?path=interface/if_octets-eth0.rrd", si=>1};
 
     $c->stash->{ctx} = "system";
     $c->stash->{plotdata} = \@plotdata;
@@ -64,13 +64,13 @@ sub voip : Local {
 
     my @plotdata = ();
     push @plotdata, {name=>"sipo", title=>"SIP Option Latency", 
-        url=>$c->config->{dashboard}{rrd_url_path}."/sip_option.rrd", si=>0};
+        url=>"/rrd/get?path=ngcp/sip_option.rrd", si=>0};
     push @plotdata, {name=>"sipr", title=>"SIP Register Latency", 
-        url=>$c->config->{dashboard}{rrd_url_path}."/sip_register.rrd", si=>0};
+        url=>"/rrd/get?path=ngcp/sip_option.rrd", si=>0};
     push @plotdata, {name=>"mysql", title=>"DB Queries/sec", 
-        url=>$c->config->{dashboard}{rrd_url_path}."/mysql.rrd", si=>0};
+        url=>"/rrd/get?path=ngcp/mysql.rrd", si=>0};
     push @plotdata, {name=>"ldisk", title=>"DB MGM Status", 
-        url=>$c->config->{dashboard}{rrd_url_path}."/mysql_mgm.rrd", si=>0};
+        url=>"/rrd/get?path=ngcp/mysql.rrd", si=>0};
 
     $c->stash->{ctx} = "voip";
     $c->stash->{plotdata} = \@plotdata;
