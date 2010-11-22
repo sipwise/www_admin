@@ -5,7 +5,9 @@
         [% IF Catalyst.user_exists %]
           <li>Logged in as <b>[% Catalyst.user.login %]</b></li>
           <li><a href="/logout">&#187; Logout</a></li>
+          [% IF Catalyst.config.dashboard.enabled %]
           <li [% 'class="active_menu"' IF menu.active == "dashboard" %]><a href="/dashboard">Statistics</a></li>
+          [% END %]
         [% ELSE %]
           <li>&nbsp;</li>
           <li>Not logged in</li>
@@ -33,9 +35,6 @@
           [% END %]
           [% IF Catalyst.config.peering_features %]
           <li [% 'class="active_menu"' IF menu.active == "peering" %]><a href="/peering">SIP Peerings</a></li>
-          [% END %]
-          [% IF Catalyst.config.dashboard.enabled %]
-          <li [% 'class="active_menu"' IF menu.active == "dashboard" %]><a href="/dashboard">Dashboard</a></li>
           [% END %]
         </ul>
 
