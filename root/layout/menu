@@ -1,10 +1,11 @@
       <div id="contentmenu">
 
-        <h3 id="first">Authentication</h3>
+        <h3 id="first">Information</h3>
         <ul>
         [% IF Catalyst.user_exists %]
           <li>Logged in as <b>[% Catalyst.user.login %]</b></li>
           <li><a href="/logout">&#187; Logout</a></li>
+          <li [% 'class="active_menu"' IF menu.active == "dashboard" %]><a href="/dashboard">Statistics</a></li>
         [% ELSE %]
           <li>&nbsp;</li>
           <li>Not logged in</li>
