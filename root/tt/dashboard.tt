@@ -24,7 +24,7 @@
       [% FOREACH item IN plotdata %]
         [% UNLESS even %]<tr>[% END %]
           <td><span style="font-weight: bold;">[% item.title %]</span>
-            <div id="plot_[% item.name %]"></div>
+            <div id="plot_[% item.name %]"><div style="margin: 20px;"><img src="/static/images/loader.gif" alt="loading" style="margin-right: 10px;"/>loading...</div></div>
           </td>
         [% IF even %]</tr>[% END %]
         [% even = !even %]
