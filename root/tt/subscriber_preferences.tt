@@ -47,53 +47,6 @@
                     </select>
                   </td>
                 </tr>
-                [% ELSIF preference.key == "on_preselect" %]
-                <tr>
-                  <td class="tdkey">[% preference.key %]:</td>
-                  <td>
-                    <select size="1" name="[% preference.key %]"
-                      [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
-                      <option value="0" [% IF preference.value == 0 %]selected="selected"[% END %]>ignore</option>
-                      <option value="1" [% IF preference.value == 1 %]selected="selected"[% END %]>strip</option>
-                      <option value="2" [% IF preference.value == 2 %]selected="selected"[% END %]>deny</option>
-                    </select>
-                  </td>
-                </tr>
-                [% ELSIF preference.key == "block_in_clir"
-                      || preference.key == "adm_block_in_clir"
-                      || preference.key == "clir"
-                      || preference.key == "mct"
-                      || preference.key == "in_use"
-                      || preference.key == "ignore_allowed_ips"
-                      || preference.key == "alternative_route"
-                      || preference.key == "is_external"
-                %]
-                <tr>
-                  <td class="tdkey">[% preference.key %]:</td>
-                  <td>
-                    <input type="checkbox" name="[% preference.key %]" class="checkbox"
-                      [% IF ! edit_preferences %]disabled="disabled"[% END %]
-                      [% IF preference.value %]checked="checked"[% END %] />
-                  </td>
-                </tr>
-                [% ELSIF preference.key == "prepaid" %]
-                  [% IF Catalyst.config.billing_features %]
-                  <tr>
-                    <td class="tdkey">[% preference.key %]:</td>
-                    <td>
-                      <input type="checkbox" name="[% preference.key %]" class="checkbox"
-                        disabled="disabled" [% IF preference.value %]checked="checked"[% END %] />
-                    </td>
-                  </tr>
-                  [% END %]
-                [% ELSIF preference.key == "has_extension" %]
-                <tr>
-                  <td class="tdkey">[% preference.key %]:</td>
-                  <td>
-                    <input type="checkbox" name="[% preference.key %]" class="checkbox"
-                      disabled="disabled" [% IF preference.value %]checked="checked"[% END %] />
-                  </td>
-                </tr>
                 [% ELSIF preference.key == "cfu"
                       || preference.key == "cfb"
                       || preference.key == "cft"
@@ -136,18 +89,6 @@
                   </td>
                 </tr>
                 [% IF preference.value.error %]<tr><td /><td><div class="errormsg">[% preference.value.error %]</div></td></tr>[% END %]
-                [% ELSIF preference.key == "base_cli"
-                      || preference.key == "extension"
-                      || preference.key == "lock"
-                      || preference.key == "base_user" %]
-                <tr>
-                  <td class="tdkey">[% preference.key %]:</td>
-                  <td>
-                    <input type="text" name="[% preference.key %]"
-                      class="disabled txtpreference" disabled="disabled"
-                      value="[% preference.value %]" />
-                  </td>
-                </tr>
                 [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
@@ -167,6 +108,15 @@
                     [% ELSE %]
                       [% IF edit_preferences %]no NCOS levels defined[% END %]
                     [% END %]
+                  </td>
+                </tr>
+                [% ELSIF preference.data_type == "bool" %]
+                <tr>
+                  <td class="tdkey">[% preference.key %]:</td>
+                  <td>
+                    <input type="checkbox" name="[% preference.key %]" class="checkbox"
+                      [% IF ! edit_preferences %]disabled="disabled"[% END %]
+                      [% IF preference.value %]checked="checked"[% END %] />
                   </td>
                 </tr>
                 [% ELSE %]

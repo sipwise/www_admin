@@ -527,18 +527,8 @@ sub preferences : Local {
 
       foreach my $pref (@{$c->session->{voip_preferences}}) {
 
-        # not a subscriber preference
-        next if $$pref{attribute} eq 'cc';
         # managed separately
         next if $$pref{attribute} eq 'lock';
-
-        # only for extensions enabled systems
-        next if (   $$pref{attribute} eq 'base_cli'
-                 or $$pref{attribute} eq 'base_user'
-                 or $$pref{attribute} eq 'extension'
-                 or $$pref{attribute} eq 'has_extension' )
-                and !$c->config->{extension_features};
-
 
         if($$pref{attribute} eq 'cfu'
            or $$pref{attribute} eq 'cfb'
@@ -546,9 +536,11 @@ sub preferences : Local {
            or $$pref{attribute} eq 'cfna')
         {
           if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
-            if($$preferences{$$pref{attribute}} =~ /\@voicebox\.local$/) {
+            my $vbdom = $c->config->{voicebox_domain};
+            my $fmdom = $c->config->{fax2mail_domain};
+            if($$preferences{$$pref{attribute}} =~ /\@$vbdom$/) {
               $$preferences{$$pref{attribute}} = 'voicebox';
-            } elsif($$preferences{$$pref{attribute}} =~ /\@fax2mail\.local$/) {
+            } elsif($$preferences{$$pref{attribute}} =~ /\@$fmdom$/) {
               $$preferences{$$pref{attribute}} = 'fax2mail';
             }
           }
@@ -565,6 +557,7 @@ sub preferences : Local {
 
         push @stashprefs,
              { key       => $$pref{attribute},
+               data_type => $$pref{data_type},
                value     => $$preferences{$$pref{attribute}},
                max_occur => $$pref{max_occur},
                error     => $c->session->{messages}{$$pref{attribute}}
@@ -634,158 +627,106 @@ sub update_preferences : Local {
     delete $$preferences{base_user};
     delete $$preferences{has_extension};
 
-    ### blocklists ###
+    my $db_prefs;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
+                                                        undef, \$db_prefs
+                                                      );
 
-    my $block_in_mode = $c->request->params->{block_in_mode};
-    if(defined $block_in_mode) {
-        $$preferences{block_in_mode} = $block_in_mode eq 'whitelist' ? 1 : 0;
-    }
-    my $block_out_mode = $c->request->params->{block_out_mode};
-    if(defined $block_out_mode) {
-        $$preferences{block_out_mode} = $block_out_mode eq 'whitelist' ? 1 : 0;
-    }
+    foreach my $db_pref (eval { @$db_prefs }) {
 
-    $$preferences{block_in_clir} = $c->request->params->{block_in_clir} ? 1 : undef;
+        if($$db_pref{attribute} eq 'cfu'
+                or $$db_pref{attribute} eq 'cfb'
+                or $$db_pref{attribute} eq 'cft'
+                or $$db_pref{attribute} eq 'cfna')
+        {
+            my $vbdom = $c->config->{voicebox_domain};
+            my $fmdom = $c->config->{fax2mail_domain};
 
-    my $adm_block_in_mode = $c->request->params->{adm_block_in_mode};
-    if(defined $adm_block_in_mode) {
-        $$preferences{adm_block_in_mode} = $adm_block_in_mode eq 'whitelist' ? 1 : 0;
-    }
-    my $adm_block_out_mode = $c->request->params->{adm_block_out_mode};
-    if(defined $adm_block_out_mode) {
-        $$preferences{adm_block_out_mode} = $adm_block_out_mode eq 'whitelist' ? 1 : 0;
-    }
+            my $fwtype = $$db_pref{attribute};
+            my $fw_target_select = $c->request->params->{$fwtype .'_target'} || 'disable';
 
-    $$preferences{adm_block_in_clir} = $c->request->params->{adm_block_in_clir} ? 1 : undef;
-
-    if(defined $c->request->params->{ncos}) {
-        if(length $c->request->params->{ncos}) {
-            $$preferences{ncos} = $c->request->params->{ncos};
-        } else {
-            $$preferences{ncos} = undef;
-        }
-    }
-
-    if(defined $c->request->params->{adm_ncos}) {
-        if(length $c->request->params->{adm_ncos}) {
-            $$preferences{adm_ncos} = $c->request->params->{adm_ncos};
-        } else {
-            $$preferences{adm_ncos} = undef;
-        }
-    }
-
-    ### call forwarding ###
-    foreach my $fwtype (qw(cfu cfb cft cfna)) {
-        my $fw_target_select = $c->request->params->{$fwtype .'_target'} || 'disable';
-
-        my $fw_target;
-        if($fw_target_select eq 'sipuri') {
-            $fw_target = $c->request->params->{$fwtype .'_sipuri'};
-
-            # normalize, so we can do some checks.
-            $fw_target =~ s/^sip://i;
-
-            if($fw_target =~ /^\+?\d+$/) {
-                $fw_target = admin::Utils::get_qualified_number_for_subscriber($c, $fw_target);
-                my $checkresult;
-                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $fw_target, \$checkresult);
-                $messages{$fwtype} = 'Client.Voip.MalformedNumber'
-                    unless $checkresult;
-            } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+(:\d{1,5})?$/i) {
-                $fw_target = 'sip:'. lc $fw_target;
-            } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+$/) {
-                $fw_target = 'sip:'. lc($fw_target) .'@'. $c->session->{subscriber}{domain};
-            } else {
-                $messages{$fwtype} = 'Client.Voip.MalformedTarget';
+            my $fw_target;
+            if($fw_target_select eq 'sipuri') {
                 $fw_target = $c->request->params->{$fwtype .'_sipuri'};
+
+                # normalize, so we can do some checks.
+                $fw_target =~ s/^sip://i;
+
+                if($fw_target =~ /^\+?\d+$/) {
+                    $fw_target = admin::Utils::get_qualified_number_for_subscriber($c, $fw_target);
+                    my $checkresult;
+                    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $fw_target, \$checkresult);
+                    $messages{$fwtype} = 'Client.Voip.MalformedNumber'
+                        unless $checkresult;
+                } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+(:\d{1,5})?$/i) {
+                    $fw_target = 'sip:'. lc $fw_target;
+                } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+$/) {
+                    $fw_target = 'sip:'. lc($fw_target) .'@'. $c->session->{subscriber}{domain};
+                } else {
+                    $messages{$fwtype} = 'Client.Voip.MalformedTarget';
+                    $fw_target = $c->request->params->{$fwtype .'_sipuri'};
+                }
+            } elsif($fw_target_select eq 'voicebox') {
+                $fw_target = 'sip:vmu'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$vbdom";
+            } elsif($fw_target_select eq 'fax2mail') {
+                $fw_target = 'sip:'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$fmdom";
             }
-        } elsif($fw_target_select eq 'voicebox') {
-            $fw_target = 'sip:vmu'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}.'@voicebox.local';
-        } elsif($fw_target_select eq 'fax2mail') {
-            $fw_target = 'sip:'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}.'@fax2mail.local';
+            $$preferences{$fwtype} = $fw_target;
+        } elsif($$db_pref{attribute} eq 'cli') {
+            $$preferences{cli} = $c->request->params->{cli} or undef;
+            if(defined $$preferences{cli} and $$preferences{cli} =~ /^\+?\d+$/) {
+                $$preferences{cli} = admin::Utils::get_qualified_number_for_subscriber($c, $$preferences{cli});
+                my $checkresult;
+                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $$preferences{cli}, \$checkresult);
+                $messages{cli} = 'Client.Voip.MalformedNumber'
+                    unless $checkresult;
+            }
+        } elsif($$db_pref{attribute} eq 'cc') {
+            $$preferences{$$db_pref{attribute}} = $c->request->params->{$$db_pref{attribute}} || undef;
+            if(defined $$preferences{$$db_pref{attribute}}) {
+                my $checkresult;
+                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
+                                                                    $$preferences{$$db_pref{attribute}}, \$checkresult
+                                                                  );
+                $messages{$$db_pref{attribute}} = 'Client.Voip.MalformedCc'
+                    unless $checkresult;
+            }
+        } elsif($$db_pref{attribute} eq 'ac'
+                or $$db_pref{attribute} eq 'svc_ac'
+                or $$db_pref{attribute} eq 'emerg_ac')
+        {
+            $$preferences{$$db_pref{attribute}} = $c->request->params->{$$db_pref{attribute}} || undef;
+            if(defined $$preferences{$$db_pref{attribute}}) {
+                my $checkresult;
+                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
+                                                                    $$preferences{$$db_pref{attribute}}, \$checkresult
+                                                                  );
+                $messages{$$db_pref{attribute}} = 'Client.Voip.MalformedAc'
+                    unless $checkresult;
+            }
+        } elsif($$db_pref{max_occur} != 1) {
+            # multi-value attributes are handled separately
+        } elsif($$db_pref{data_type} eq 'int' or $$db_pref{data_type} eq 'string') {
+            if(length $c->request->params->{$$db_pref{attribute}}) {
+                $$preferences{$$db_pref{attribute}} = $c->request->params->{$$db_pref{attribute}};
+            } else {
+                $$preferences{$$db_pref{attribute}} = undef;
+            }
+        } elsif($$db_pref{data_type} eq 'bool') {
+            $$preferences{$$db_pref{attribute}} = $c->request->params->{$$db_pref{attribute}} ? 1 : undef;
+        } else {
+            # wtf? ignoring invalid preference
         }
-        $$preferences{$fwtype} = $fw_target;
     }
 
-    $$preferences{ringtimeout} = undef;
-    $$preferences{ringtimeout} = $c->request->params->{ringtimeout} || undef;
-    unless(defined $$preferences{ringtimeout} and $$preferences{ringtimeout} =~ /^\d+$/
-       and $$preferences{ringtimeout} < 301 and $$preferences{ringtimeout} > 4)
-    {
-        $messages{ringtimeout} = 'Client.Voip.MissingRingtimeout'
-            if $$preferences{cft};
+    if($$preferences{cft}) {
+        unless(defined $$preferences{ringtimeout} and $$preferences{ringtimeout} =~ /^\d+$/
+           and $$preferences{ringtimeout} < 301 and $$preferences{ringtimeout} > 4)
+        {
+            $messages{ringtimeout} = 'Client.Voip.MissingRingtimeout';
+        }
     }
 
-    ### outgoing calls ###
-
-    $$preferences{cli} = $c->request->params->{cli} or undef;
-    if(defined $$preferences{cli} and $$preferences{cli} =~ /^\+?\d+$/) {
-        $$preferences{cli} = admin::Utils::get_qualified_number_for_subscriber($c, $$preferences{cli});
-        my $checkresult;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $$preferences{cli}, \$checkresult);
-        $messages{cli} = 'Client.Voip.MalformedNumber'
-            unless $checkresult;
-    }
-
-    $$preferences{clir} = $c->request->params->{clir} ? 1 : undef;
-
-    $$preferences{cc} = $c->request->params->{cc} || undef;
-    if(defined $$preferences{cc}) {
-        my $checkresult;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
-                                                            $$preferences{cc}, \$checkresult
-                                                          );
-        $messages{cc} = 'Client.Voip.MalformedCc'
-            unless $checkresult;
-    }
-    $$preferences{ac} = $c->request->params->{ac} || undef;
-    if(defined $$preferences{ac}) {
-        my $checkresult;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
-                                                            $$preferences{ac}, \$checkresult
-                                                          );
-        $messages{ac} = 'Client.Voip.MalformedAc'
-            unless $checkresult;
-    }
-    $$preferences{svc_ac} = $c->request->params->{svc_ac} || undef;
-    if(defined $$preferences{svc_ac}) {
-        my $checkresult;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
-                                                            $$preferences{svc_ac}, \$checkresult
-                                                          );
-        $messages{svc_ac} = 'Client.Voip.MalformedAc'
-            unless $checkresult;
-    }
-    $$preferences{emerg_ac} = $c->request->params->{emerg_ac} || undef;
-    if(defined $$preferences{emerg_ac}) {
-        my $checkresult;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
-                                                            $$preferences{emerg_ac}, \$checkresult
-                                                          );
-        $messages{emerg_ac} = 'Client.Voip.MalformedAc'
-            unless $checkresult;
-    }
-
-    ### malicious call trace ###
-
-    $$preferences{mct} = $c->request->params->{mct} ? 1 : undef;
-
-    ### subscriber activation flag ###
-
-    $$preferences{in_use} = $c->request->params->{in_use} ? 1 : undef;
-
-    ### allowed IPs override ###
-
-    $$preferences{ignore_allowed_ips} = $c->request->params->{ignore_allowed_ips} ? 1 : undef;
-
-    ### preselection handling ###
-
-    $$preferences{on_preselect} = $c->request->params->{on_preselect};
-
-    ### alternative routing ###
-
-    $$preferences{alternative_route} = $c->request->params->{alternative_route} ? 1 : undef;
-    $$preferences{is_external} = $c->request->params->{is_external} ? 1 : undef;
 
     ### save settings ###
 
