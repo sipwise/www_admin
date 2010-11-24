@@ -67,8 +67,8 @@ sub voip : Local {
         url=>"/rrd/get?path=ngcp/oss_provisioned_subscribers.rrd", si=>0};
     push @plotdata, {name=>"regsubs", title=>"Registered Subscribers", 
         url=>"/rrd/get?path=ngcp/kam_usrloc_regusers.rrd", si=>0};
-    push @plotdata, {name=>"sipo", title=>"SIP Option Latency", 
-        url=>"/rrd/get?path=ngcp/sip_option.rrd", si=>0};
+    push @plotdata, {name=>"actdlg", title=>"Active Calls", 
+        url=>"/rrd/get?path=ngcp/kam_dialog_active.rrd", si=>0};
     push @plotdata, {name=>"sipr", title=>"SIP Register Latency", 
         url=>"/rrd/get?path=ngcp/sip_option.rrd", si=>0};
 
