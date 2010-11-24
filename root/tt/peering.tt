@@ -172,7 +172,6 @@
               [% IF Catalyst.config.billing_features %]
                 <td>
                   <select size="1" name="peering_contract_id">
-                    <option value="0" [% UNLESS garefill.peering_contract_id %]selected="selected"[% END %]>&nbsp;</option>
                     [% FOREACH contract = contracts %]
                       <option value="[% contract.id %]"
                               [% IF garefill.peering_contract_id == contract.id %]selected="selected"[% END %]

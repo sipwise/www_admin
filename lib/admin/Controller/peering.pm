@@ -124,6 +124,8 @@ sub create_grp : Local {
     $settings{description} = $c->request->params->{grpdesc};
     $settings{peering_contract_id} = $c->request->params->{peering_contract_id}
         if $c->request->params->{peering_contract_id};
+    $messages{cpeererr} = 'Client.Voip.NoPeerContract'
+        unless (defined $settings{peering_contract_id} && $settings{peering_contract_id} =~ /^[0-9]+/);
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_group',
