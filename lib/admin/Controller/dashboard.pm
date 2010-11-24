@@ -63,14 +63,14 @@ sub voip : Local {
     $c->stash->{template} = 'tt/dashboard.tt';
 
     my @plotdata = ();
+    push @plotdata, {name=>"provsub", title=>"Provisioned Subscribers", 
+        url=>"/rrd/get?path=ngcp/oss_provisioned_subscribers.rrd", si=>0};
+    push @plotdata, {name=>"regsubs", title=>"Registered Subscribers", 
+        url=>"/rrd/get?path=ngcp/kam_usrloc_regusers.rrd", si=>0};
     push @plotdata, {name=>"sipo", title=>"SIP Option Latency", 
         url=>"/rrd/get?path=ngcp/sip_option.rrd", si=>0};
     push @plotdata, {name=>"sipr", title=>"SIP Register Latency", 
         url=>"/rrd/get?path=ngcp/sip_option.rrd", si=>0};
-    push @plotdata, {name=>"mysql", title=>"DB Queries/sec", 
-        url=>"/rrd/get?path=ngcp/mysql.rrd", si=>0};
-    push @plotdata, {name=>"ldisk", title=>"DB MGM Status", 
-        url=>"/rrd/get?path=ngcp/mysql.rrd", si=>0};
 
     $c->stash->{ctx} = "voip";
     $c->stash->{plotdata} = \@plotdata;
