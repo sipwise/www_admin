@@ -5,104 +5,6 @@
 
         <a href="/peering" class="aaction">back</a>
 
-        <h3>Peering Rules</h3>
-
-        <div class="p1">
-          [% IF messages.erulmsg %]<div class="goodmsg">[% messages.erulmsg %]</div>[% END %]
-          [% IF messages.erulerr %]<div class="errormsg">[% messages.erulerr %]</div>[% END %]
-
-          <table class="peering_rules">
-            <tr class="table_header">
-              <td>Callee Prefix</td>
-              <td>Caller Pattern</td>
-              <td>Description</td>
-              <td style="width:40px;" />
-              <td style="width:60px;" />
-            </tr>
-            [% id = 0 %]
-            [% FOREACH rule = grp.rules %]
-              <tr>
-                [% IF rule.id == reditid && !Catalyst.session.admin.read_only %]
-                  <form action="/peering/edit_rule" method="post">
-                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
-                    <input type="hidden" name="ruleid" value="[% rule.id %]" />
-                    <td>
-                      <input type="text" size="15 id="addtxt" title="string, callee prefix"
-                             name="callee_prefix" value="[% rule.callee_prefix %]" />
-                    </td>
-                    <td>
-                      <input type="text" size="15" id="addtxt" title="string, caller pattern"
-                             name="caller_prefix" value="[% rule.caller_prefix %]" />
-                    </td>
-                    <td>
-                      <input type="text" size="15" id="addtxt" title="string, rule description"
-                             name="description" value="[% rule.description %]" />
-                    </td>
-                    <td>
-                      <div class="postlink">
-                        <label for="rsave[% id %]">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="rsave[% id %]" />
-                      </div>
-                    </td>
-                  </form>
-                  <td><a href="/peering/detail?group_id=[% grp.group.id %]" class="aaction">cancel</a></td>
-                [% ELSE %]
-                  <td>[% rule.callee_prefix %]</td>
-                  <td>[% rule.caller_prefix %]</td>
-                  <td>[% rule.description %]</td>
-                  <td>
-                  [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering/detail?group_id=[% grp.group.id %]&reditid=[% rule.id %]" class="aaction">edit</a>
-                  [% END %]
-                  </td>
-                  <form action="/peering/delete_rule" method="post">
-                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
-                    <input type="hidden" name="ruleid" value="[% rule.id %]" />
-                    <td>
-                    [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink">
-                        <label for="rdel[% id %]">delete</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="rdel[% id %]" />
-                      </div>
-                    [% END %]
-                  </td>
-                [% END %]  
-                </form>
-              </tr>
-            [% id = id + 1 %]
-            [% END %]
-            [% UNLESS Catalyst.session.admin.read_only %]
-            <tr>
-                  <form action="/peering/create_rule" method="post">
-                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
-                    <td>
-                      <input type="text" size="15" id="addtxt" title="string, callee prefix"
-                             name="callee_prefix" value="" />
-                    </td>
-                    <td>
-                      <input type="text" size="15" id="addtxt" title="string, caller pattern"
-                             name="caller_prefix" value="" />
-                    </td>
-                    <td>
-                      <input type="text" size="15" id="addtxt" title="string, rule description"
-                             name="description" value="" />
-                    </td>
-                    <td>
-                          <div class="postlink">
-                            <label for="radd">add</label>
-                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="radd" />
-                          </div>
-                  </form>
-                    </td>
-                    <td />
-            </tr>
-            [% END %]
-
-
-
-          </table>
-        </div>
-
         <h3>Peering Servers</h3>
 
         <div class="p1">
@@ -207,4 +109,104 @@
             [% END %]
           </table>
         </div>
+
+	[% IF grp.peers.size > 0 %]
+
+        <h3>Peering Rules</h3>
+
+        <div class="p1">
+          [% IF messages.erulmsg %]<div class="goodmsg">[% messages.erulmsg %]</div>[% END %]
+          [% IF messages.erulerr %]<div class="errormsg">[% messages.erulerr %]</div>[% END %]
+
+          <table class="peering_rules">
+            <tr class="table_header">
+              <td>Callee Prefix</td>
+              <td>Caller Pattern</td>
+              <td>Description</td>
+              <td style="width:40px;" />
+              <td style="width:60px;" />
+            </tr>
+            [% id = 0 %]
+            [% FOREACH rule = grp.rules %]
+              <tr>
+                [% IF rule.id == reditid && !Catalyst.session.admin.read_only %]
+                  <form action="/peering/edit_rule" method="post">
+                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
+                    <input type="hidden" name="ruleid" value="[% rule.id %]" />
+                    <td>
+                      <input type="text" size="15 id="addtxt" title="string, callee prefix"
+                             name="callee_prefix" value="[% rule.callee_prefix %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, caller pattern"
+                             name="caller_prefix" value="[% rule.caller_prefix %]" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rule description"
+                             name="description" value="[% rule.description %]" />
+                    </td>
+                    <td>
+                      <div class="postlink">
+                        <label for="rsave[% id %]">save</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="rsave[% id %]" />
+                      </div>
+                    </td>
+                  </form>
+                  <td><a href="/peering/detail?group_id=[% grp.group.id %]" class="aaction">cancel</a></td>
+                [% ELSE %]
+                  <td>[% rule.callee_prefix %]</td>
+                  <td>[% rule.caller_prefix %]</td>
+                  <td>[% rule.description %]</td>
+                  <td>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/peering/detail?group_id=[% grp.group.id %]&reditid=[% rule.id %]" class="aaction">edit</a>
+                  [% END %]
+                  </td>
+                  <form action="/peering/delete_rule" method="post">
+                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
+                    <input type="hidden" name="ruleid" value="[% rule.id %]" />
+                    <td>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="postlink">
+                        <label for="rdel[% id %]">delete</label>
+                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="rdel[% id %]" />
+                      </div>
+                    [% END %]
+                  </td>
+                [% END %]  
+                </form>
+              </tr>
+            [% id = id + 1 %]
+            [% END %]
+            [% UNLESS Catalyst.session.admin.read_only %]
+            <tr>
+                  <form action="/peering/create_rule" method="post">
+                    <input type="hidden" name="grpid" value="[% grp.group.id %]" />
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, callee prefix"
+                             name="callee_prefix" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, caller pattern"
+                             name="caller_prefix" value="" />
+                    </td>
+                    <td>
+                      <input type="text" size="15" id="addtxt" title="string, rule description"
+                             name="description" value="" />
+                    </td>
+                    <td>
+                          <div class="postlink">
+                            <label for="radd">add</label>
+                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="radd" />
+                          </div>
+                  </form>
+                    </td>
+                    <td />
+            </tr>
+            [% END %]
+
+          </table>
+        </div>
+
+	[% END %]
 
