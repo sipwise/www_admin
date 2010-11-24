@@ -95,7 +95,7 @@ sub get_contract_contact_form_fields {
     my ($c,$contact) = @_;
 
     return [ { field => 'firstname',
-               label => 'Firtst Name',
+               label => 'First Name',
                value => $contact->{firstname} },
              { field => 'lastname',
                label => 'Last Name',
