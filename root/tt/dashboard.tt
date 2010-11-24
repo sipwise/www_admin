@@ -18,6 +18,7 @@
 	</ul><br />
 	<hr id="topsubmenuhr" />
 
+    <p>Click&amp;Drag on the graphs to zoom individual ranges.</p> 
 	
     <table>
       [% even = 0 %]
