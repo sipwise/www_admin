@@ -143,9 +143,7 @@
                     [% END %]
                     </select>
                   [% ELSE %]
-                  <select size="1" name="[% preference.key %]">
-                    <option />
-                  </select>
+                  <select size="1" name="[% preference.key %]" />
                   [% END %]
                   [% IF ! edit_preferences && ! Catalyst.session.admin.read_only %]
                     &nbsp;
