@@ -42,8 +42,8 @@
                   <td>
                     <select size="1" name="[% preference.key %]"
                       [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
-                      <option [% IF ! preference.value %]selected="selected"[% END %]>blacklist</option>
-                      <option [% IF preference.value %]selected="selected"[% END %]>whitelist</option>
+                      <option value="0" [% IF ! preference.value %]selected="selected"[% END %]>blacklist</option>
+                      <option value="1" [% IF preference.value %]selected="selected"[% END %]>whitelist</option>
                     </select>
                   </td>
                 </tr>
