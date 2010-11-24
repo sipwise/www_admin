@@ -620,13 +620,6 @@ sub update_preferences : Local {
                                                         },
                                                         \$preferences
                                                       );
-    ## remove preferences that can't be changed
-    delete $$preferences{prepaid};
-    delete $$preferences{base_cli};
-    delete $$preferences{extension};
-    delete $$preferences{base_user};
-    delete $$preferences{has_extension};
-
     my $db_prefs;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
                                                         undef, \$db_prefs
