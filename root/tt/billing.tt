@@ -66,7 +66,6 @@
           <table>
           [% IF bilprofs %]
             <tr class="table_header">
-              <td>prepaid</td>
               <td>name</td>
               <td />
               <td />
@@ -76,10 +75,6 @@
             [% id = 0 %]
             [% FOREACH bilprof = bilprofs %]
               <tr>
-                <td class="tdcenter">
-                  <input type="checkbox" class="checkbox" name="prepaid" disabled="disabled"
-                         [% IF bilprof.data.prepaid %]checked="checked"[% END %] />
-                </td>
                 <td>[% bilprof.data.name %]</td>
                 <td>
                 [% UNLESS Catalyst.session.admin.read_only %]
@@ -107,7 +102,7 @@
             [% id = id + 1 %]
             [% END %]
           [% ELSE %]
-            <tr><td colspan="6">No billing profiles found in the database.</td></tr>
+            <tr><td colspan="5">No billing profiles found in the database.</td></tr>
           [% END %]
           </table>
 
