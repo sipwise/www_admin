@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base 'Catalyst::Controller';
 use admin::Utils;
+use HTML::Entities;
 
 =head1 NAME
 
@@ -528,43 +529,44 @@ sub preferences : Local {
       foreach my $pref (@{$c->session->{voip_preferences}}) {
 
         # managed separately
-        next if $$pref{attribute} eq 'lock';
+        next if $$pref{preference} eq 'lock';
 
-        if($$pref{attribute} eq 'cfu'
-           or $$pref{attribute} eq 'cfb'
-           or $$pref{attribute} eq 'cft'
-           or $$pref{attribute} eq 'cfna')
+        if($$pref{preference} eq 'cfu'
+           or $$pref{preference} eq 'cfb'
+           or $$pref{preference} eq 'cft'
+           or $$pref{preference} eq 'cfna')
         {
-          if(defined $$preferences{$$pref{attribute}} and length $$preferences{$$pref{attribute}}) {
+          if(defined $$preferences{$$pref{preference}} and length $$preferences{$$pref{preference}}) {
             my $vbdom = $c->config->{voicebox_domain};
             my $fmdom = $c->config->{fax2mail_domain};
-            if($$preferences{$$pref{attribute}} =~ /\@$vbdom$/) {
-              $$preferences{$$pref{attribute}} = 'voicebox';
-            } elsif($$preferences{$$pref{attribute}} =~ /\@$fmdom$/) {
-              $$preferences{$$pref{attribute}} = 'fax2mail';
+            if($$preferences{$$pref{preference}} =~ /\@$vbdom$/) {
+              $$preferences{$$pref{preference}} = 'voicebox';
+            } elsif($$preferences{$$pref{preference}} =~ /\@$fmdom$/) {
+              $$preferences{$$pref{preference}} = 'fax2mail';
             }
           }
-        } elsif(!$c->stash->{ncos_levels} and ($$pref{attribute} eq 'ncos' or $$pref{attribute} eq 'adm_ncos')) {
+        } elsif(!$c->stash->{ncos_levels} and ($$pref{preference} eq 'ncos' or $$pref{preference} eq 'adm_ncos')) {
           my $ncoslvl;
           return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_ncos_levels',
                                                               undef,
                                                               \$ncoslvl
                                                             );
           $c->stash->{ncos_levels} = $ncoslvl if eval { @$ncoslvl };
-        } elsif($$pref{attribute} eq 'block_in_list' or $$pref{attribute} eq 'block_out_list') {
-          eval { @{$$preferences{$$pref{attribute}}} = map { s/^([1-9])/+$1/; $_ } @{$$preferences{$$pref{attribute}}} };
+        } elsif($$pref{preference} eq 'block_in_list' or $$pref{preference} eq 'block_out_list') {
+          eval { @{$$preferences{$$pref{preference}}} = map { s/^([1-9])/+$1/; $_ } @{$$preferences{$$pref{preference}}} };
         }
 
         push @stashprefs,
-             { key       => $$pref{attribute},
-               data_type => $$pref{data_type},
-               value     => $$preferences{$$pref{attribute}},
-               max_occur => $$pref{max_occur},
-               error     => $c->session->{messages}{$$pref{attribute}}
-                            ? $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                    config->{VARIABLES}{site_config}{language},
-                                                                  $c->session->{messages}{$$pref{attribute}})
-                            : undef,
+             { key         => $$pref{preference},
+               data_type   => $$pref{data_type},
+               value       => $$preferences{$$pref{preference}},
+               max_occur   => $$pref{max_occur},
+               description => encode_entities($$pref{description}),
+               error       => $c->session->{messages}{$$pref{preference}}
+                              ? $c->model('Provisioning')->localize($c->view($c->config->{view})->
+                                                                      config->{VARIABLES}{site_config}{language},
+                                                                    $c->session->{messages}{$$pref{preference}})
+                              : undef,
              };
       }
 
@@ -627,15 +629,17 @@ sub update_preferences : Local {
 
     foreach my $db_pref (eval { @$db_prefs }) {
 
-        if($$db_pref{attribute} eq 'cfu'
-                or $$db_pref{attribute} eq 'cfb'
-                or $$db_pref{attribute} eq 'cft'
-                or $$db_pref{attribute} eq 'cfna')
+        next if $$db_pref{read_only};
+
+        if($$db_pref{preference} eq 'cfu'
+                or $$db_pref{preference} eq 'cfb'
+                or $$db_pref{preference} eq 'cft'
+                or $$db_pref{preference} eq 'cfna')
         {
             my $vbdom = $c->config->{voicebox_domain};
             my $fmdom = $c->config->{fax2mail_domain};
 
-            my $fwtype = $$db_pref{attribute};
+            my $fwtype = $$db_pref{preference};
             my $fw_target_select = $c->request->params->{$fwtype .'_target'} || 'disable';
 
             my $fw_target;
@@ -665,7 +669,7 @@ sub update_preferences : Local {
                 $fw_target = 'sip:'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$fmdom";
             }
             $$preferences{$fwtype} = $fw_target;
-        } elsif($$db_pref{attribute} eq 'cli') {
+        } elsif($$db_pref{preference} eq 'cli') {
             $$preferences{cli} = $c->request->params->{cli} or undef;
             if(defined $$preferences{cli} and $$preferences{cli} =~ /^\+?\d+$/) {
                 $$preferences{cli} = admin::Utils::get_qualified_number_for_subscriber($c, $$preferences{cli});
@@ -674,39 +678,39 @@ sub update_preferences : Local {
                 $messages{cli} = 'Client.Voip.MalformedNumber'
                     unless $checkresult;
             }
-        } elsif($$db_pref{attribute} eq 'cc') {
-            $$preferences{$$db_pref{attribute}} = $c->request->params->{$$db_pref{attribute}} || undef;
-            if(defined $$preferences{$$db_pref{attribute}}) {
+        } elsif($$db_pref{preference} eq 'cc') {
+            $$preferences{$$db_pref{preference}} = $c->request->params->{$$db_pref{preference}} || undef;
+            if(defined $$preferences{$$db_pref{preference}}) {
                 my $checkresult;
                 return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
-                                                                    $$preferences{$$db_pref{attribute}}, \$checkresult
+                                                                    $$preferences{$$db_pref{preference}}, \$checkresult
                                                                   );
-                $messages{$$db_pref{attribute}} = 'Client.Voip.MalformedCc'
+                $messages{$$db_pref{preference}} = 'Client.Voip.MalformedCc'
                     unless $checkresult;
             }
-        } elsif($$db_pref{attribute} eq 'ac'
-                or $$db_pref{attribute} eq 'svc_ac'
-                or $$db_pref{attribute} eq 'emerg_ac')
+        } elsif($$db_pref{preference} eq 'ac'
+                or $$db_pref{preference} eq 'svc_ac'
+                or $$db_pref{preference} eq 'emerg_ac')
         {
-            $$preferences{$$db_pref{attribute}} = $c->request->params->{$$db_pref{attribute}} || undef;
-            if(defined $$preferences{$$db_pref{attribute}}) {
+            $$preferences{$$db_pref{preference}} = $c->request->params->{$$db_pref{preference}} || undef;
+            if(defined $$preferences{$$db_pref{preference}}) {
                 my $checkresult;
                 return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
-                                                                    $$preferences{$$db_pref{attribute}}, \$checkresult
+                                                                    $$preferences{$$db_pref{preference}}, \$checkresult
                                                                   );
-                $messages{$$db_pref{attribute}} = 'Client.Voip.MalformedAc'
+                $messages{$$db_pref{preference}} = 'Client.Voip.MalformedAc'
                     unless $checkresult;
             }
         } elsif($$db_pref{max_occur} != 1) {
-            # multi-value attributes are handled separately
+            # multi-value preferences are handled separately
         } elsif($$db_pref{data_type} eq 'int' or $$db_pref{data_type} eq 'string') {
-            if(length $c->request->params->{$$db_pref{attribute}}) {
-                $$preferences{$$db_pref{attribute}} = $c->request->params->{$$db_pref{attribute}};
+            if(length $c->request->params->{$$db_pref{preference}}) {
+                $$preferences{$$db_pref{preference}} = $c->request->params->{$$db_pref{preference}};
             } else {
-                $$preferences{$$db_pref{attribute}} = undef;
+                $$preferences{$$db_pref{preference}} = undef;
             }
-        } elsif($$db_pref{data_type} eq 'bool') {
-            $$preferences{$$db_pref{attribute}} = $c->request->params->{$$db_pref{attribute}} ? 1 : undef;
+        } elsif($$db_pref{data_type} eq 'boolean') {
+            $$preferences{$$db_pref{preference}} = $c->request->params->{$$db_pref{preference}} ? 1 : undef;
         } else {
             # wtf? ignoring invalid preference
         }

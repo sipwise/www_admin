@@ -38,7 +38,7 @@
                 [% IF preference.key == "block_in_mode" || preference.key == "block_out_mode"
                    || preference.key == "adm_block_in_mode" || preference.key == "adm_block_out_mode" %]
                 <tr>
-                  <td class="tdkey">[% preference.key %]:</td>
+                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
                   <td>
                     <select size="1" name="[% preference.key %]"
                       [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
@@ -52,7 +52,7 @@
                       || preference.key == "cft"
                       || preference.key == "cfna" %]
                 <tr>
-                  <td class="tdkey">[% preference.key %]:</td>
+                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
                   <td>
                   [% IF edit_preferences %]
                     <input type="radio" id="[% preference.key %]disable" value="disable" name="[% preference.key %]_target" class="radio"
@@ -91,7 +91,7 @@
                 [% IF preference.value.error %]<tr><td /><td><div class="errormsg">[% preference.value.error %]</div></td></tr>[% END %]
                 [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
                 <tr>
-                  <td class="tdkey">[% preference.key %]:</td>
+                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
                   <td>
                     [% IF ncos_levels %]
                       <select size="1" name="[% preference.key %]"
@@ -110,9 +110,9 @@
                     [% END %]
                   </td>
                 </tr>
-                [% ELSIF preference.data_type == "bool" %]
+                [% ELSIF preference.data_type == "boolean" %]
                 <tr>
-                  <td class="tdkey">[% preference.key %]:</td>
+                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
                   <td>
                     <input type="checkbox" name="[% preference.key %]" class="checkbox"
                       [% IF ! edit_preferences %]disabled="disabled"[% END %]
@@ -121,7 +121,7 @@
                 </tr>
                 [% ELSE %]
                 <tr>
-                  <td class="tdkey">[% preference.key %]:</td>
+                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
                   <td>
                     <input type="text" name="[% preference.key %]" [% IF ! edit_preferences %]
                       class="disabled txtpreference" disabled="disabled"
@@ -134,7 +134,7 @@
                 [% END %]
               [% ELSE %]
               <tr>
-                <td class="tdkey">[% preference.key %]:</td>
+                <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
                 <td>
                   [% IF preference.value %]
                     <select size="1" name="[% preference.key %]">
