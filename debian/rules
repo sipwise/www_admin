@@ -19,6 +19,8 @@ build-stamp:
 	mkdir -p ce/etc/ngcp-www-admin ce/etc/apache2/sites-available
 	tpage --define PRO=true   etc/admin.conf > pro/etc/ngcp-www-admin/admin.conf.tt2
 	tpage                     etc/admin.conf > ce/etc/ngcp-www-admin/admin.conf.tt2
+	tpage --define PRO=true   etc/admin.conf.services > pro/etc/ngcp-www-admin/admin.conf.services
+	tpage                     etc/admin.conf.services > ce/etc/ngcp-www-admin/admin.conf.services
 	tpage --define PRO=true   etc/apache.site > pro/etc/apache2/sites-available/ngcp-www-admin.tt2
 	tpage                     etc/apache.site > ce/etc/apache2/sites-available/ngcp-www-admin.tt2
 	touch $@
