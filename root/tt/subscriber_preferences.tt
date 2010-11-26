@@ -57,7 +57,7 @@
                   [% IF edit_preferences %]
                     <input type="radio" id="[% preference.key %]disable" value="disable" name="[% preference.key %]_target" class="radio"
                            [% IF preference.value == "" && ! preference.error %]checked="checked"[% END %] />
-                    <label for="[% preference.key %]disable">disable</label>
+                    <label for="[% preference.key %]disable">Disabled</label>
                     <br clear="all" />
                     [% IF Catalyst.config.voicemail_features %]
                     <input type="radio" id="[% preference.key %]voicebox" value="voicebox" name="[% preference.key %]_target" class="radio"
@@ -71,16 +71,25 @@
                     <label for="[% preference.key %]faxserver">Fax2Mail</label>
                     <br clear="all" />
                     [% END %]
+                    [% IF Catalyst.config.conference_features %]
+                    <input type="radio" id="[% preference.key %]conference" value="conference" name="[% preference.key %]_target" class="radio"
+                           [% IF preference.value == "conference" %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]conference">Conference room</label>
+                    <br clear="all" />
+                    [% END %]
                     <input type="radio" id="[% preference.key %]sipuri" value="sipuri" name="[% preference.key %]_target" class="radio"
-                           [% IF (preference.value || preference.error) && preference.value != "voicebox" && preference.value != "fax2mail" %]checked="checked"[% END %] />
-                    <label for="[% preference.key %]sipuri">number or SIP-URI:</label>
+                           [% IF (preference.value || preference.error)
+                                 && preference.value != "voicebox" && preference.value != "fax2mail" && preference.value != "conference" %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
                     <input type="text" id="[% preference.key %]sipuritxt" name="[% preference.key %]_sipuri" size="25"
-                           value="[% preference.value UNLESS preference.value == "voicebox" OR preference.value == "fax2mail" %]" />
+                           value="[% preference.value UNLESS preference.value == "voicebox" OR preference.value == "fax2mail" OR preference.value == "conference" %]" />
                   [% ELSE %]
                     [% IF preference.value == "voicebox" %]
                       Voicebox
                     [% ELSIF preference.value == "fax2mail" %]
                       Fax2Mail
+                    [% ELSIF preference.value == "conference" %]
+                      Conference room
                     [% ELSE %]
                       <input type="text" size="25" value="[% preference.value %]"
                              class="disabled txtpreference" disabled="disabled" />

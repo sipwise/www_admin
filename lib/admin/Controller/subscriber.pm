@@ -539,10 +539,13 @@ sub preferences : Local {
           if(defined $$preferences{$$pref{preference}} and length $$preferences{$$pref{preference}}) {
             my $vbdom = $c->config->{voicebox_domain};
             my $fmdom = $c->config->{fax2mail_domain};
+            my $confdom = $c->config->{conference_domain};
             if($$preferences{$$pref{preference}} =~ /\@$vbdom$/) {
               $$preferences{$$pref{preference}} = 'voicebox';
             } elsif($$preferences{$$pref{preference}} =~ /\@$fmdom$/) {
               $$preferences{$$pref{preference}} = 'fax2mail';
+            } elsif($$preferences{$$pref{preference}} =~ /\@$confdom$/) {
+              $$preferences{$$pref{preference}} = 'conference';
             }
           }
         } elsif(!$c->stash->{ncos_levels} and ($$pref{preference} eq 'ncos' or $$pref{preference} eq 'adm_ncos')) {
@@ -638,6 +641,7 @@ sub update_preferences : Local {
         {
             my $vbdom = $c->config->{voicebox_domain};
             my $fmdom = $c->config->{fax2mail_domain};
+            my $confdom = $c->config->{conference_domain};
 
             my $fwtype = $$db_pref{preference};
             my $fw_target_select = $c->request->params->{$fwtype .'_target'} || 'disable';
@@ -667,6 +671,8 @@ sub update_preferences : Local {
                 $fw_target = 'sip:vmu'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$vbdom";
             } elsif($fw_target_select eq 'fax2mail') {
                 $fw_target = 'sip:'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$fmdom";
+            } elsif($fw_target_select eq 'conference') {
+                $fw_target = 'sip:conf='.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$confdom";
             }
             $$preferences{$fwtype} = $fw_target;
         } elsif($$db_pref{preference} eq 'cli') {
