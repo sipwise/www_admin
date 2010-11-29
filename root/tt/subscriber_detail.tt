@@ -107,6 +107,7 @@
                 [% END %]
                 </td>
               </tr>
+              [% IF messages.webpassword %]<tr><td /><td><div class="errormsg">[% messages.webpassword %]</div></td></tr>[% END %]
 
               <tr>
                 <td class="tdkey">E.164 number:</td>
