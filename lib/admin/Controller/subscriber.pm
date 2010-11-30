@@ -205,7 +205,7 @@ sub update_subscriber : Local {
         my $checkresult;
         $c->session->{subscriber}{account_id} = $c->request->params->{account_id};
 
-        $c->session->{subscriber}{username} = $settings{webusername} = $c->request->params->{username};
+        $c->session->{subscriber}{username} = $c->request->params->{username};
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_username',
                                                             $c->session->{subscriber}{username}, \$checkresult
                                                           );
@@ -234,6 +234,18 @@ sub update_subscriber : Local {
             $messages{webpassword} = 'Client.Voip.PassLength';
         }
     }
+
+    $settings{webusername} = $c->request->params->{webusername};
+    if(length $settings{webusername}) {
+        my $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_username',
+                                                            $settings{webusername}, \$checkresult
+                                                          );
+        $messages{webusername} = 'Client.Syntax.MalformedUsername' unless($checkresult);
+    } else {
+        $settings{webusername} = $c->session->{subscriber}{username};
+    }
+
 
     my $cc = $c->request->params->{cc};
     my $ac = $c->request->params->{ac};

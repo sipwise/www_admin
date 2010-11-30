@@ -82,7 +82,19 @@
                 </td>
               </tr>
 
-              <tr><td class="tdkey">web user:</td><td>[% subscriber.webusername %]</td></tr>
+              <tr>
+                <td class="tdkey">web user:</td>
+                <td>
+                [% IF edit_subscriber %]
+                  <input type="text" name="webusername" value="[% subscriber.webusername %]"
+                         title="the username (without domain) used for login at the SOAP and CSC interfaces, string" />
+                  [% IF subscriber.domain %]@[% subscriber.domain %][% END %]
+                [% ELSE %]
+                  [% subscriber.webusername %]@[% subscriber.domain %]
+                [% END %]
+                </td>
+              </tr>
+              [% IF messages.webusername %]<tr><td /><td><div class="errormsg">[% messages.webusername %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">web password:</td>
                 <td>
