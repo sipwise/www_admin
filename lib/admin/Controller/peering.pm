@@ -984,7 +984,8 @@ Provisioning model, Sipwise::Provisioning::Billing, Catalyst
 =head1 COPYRIGHT
 
 The peering controller is Copyright (c) 2009-2010 Sipwise GmbH, Austria.
-All rights reserved.
+You should have received a copy of the licences terms together with the
+software.
 
 =cut
 

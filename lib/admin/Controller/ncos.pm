@@ -505,8 +505,9 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The ncos controller is Copyright (c) 2009 Sipwise GmbH, Austria. All
-rights reserved.
+The ncos controller is Copyright (c) 2009-2010 Sipwise GmbH, Austria.
+You should have received a copy of the licences terms together with the
+software.
 
 =cut
 

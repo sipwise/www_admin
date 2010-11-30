@@ -940,7 +940,8 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 =head1 COPYRIGHT
 
 The billing controller is Copyright (c) 2009-2010 Sipwise GmbH, Austria.
-All rights reserved.
+You should have received a copy of the licences terms together with the
+software.
 
 =cut
 

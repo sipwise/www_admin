@@ -393,8 +393,9 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The lnp controller is Copyright (c) 2009-2010 Sipwise GmbH, Austria. All
-rights reserved.
+The lnp controller is Copyright (c) 2009-2010 Sipwise GmbH, Austria. You
+should have received a copy of the licences terms together with the 
+software.
 
 =cut
 

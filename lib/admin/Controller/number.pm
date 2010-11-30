@@ -275,8 +275,9 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The number controller is Copyright (c) 2010 Sipwise GmbH, Austria. All
-rights reserved.
+The number controller is Copyright (c) 2010 Sipwise GmbH, Austria. You
+should have received a copy of the licences terms together with the
+software.
 
 =cut
 

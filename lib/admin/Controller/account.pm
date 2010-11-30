@@ -422,8 +422,9 @@ Daniel Tiefnig <dtiefnig@sipwise.com>
 
 =head1 COPYRIGHT
 
-The account controller is Copyright (c) 2007-2009 Sipwise GmbH, Austria.
-All rights reserved.
+The account controller is Copyright (c) 2007-2010 Sipwise GmbH, Austria.
+You should have received a copy of the licences terms together with the
+software.
 
 =cut
 
