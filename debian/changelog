@@ -5,8 +5,12 @@ ngcp-www-admin (3.0.0) unstable; urgency=low
   * renamed packages to comply with our global naming policy
   * couple of smaller packaging and installer bugfixes
   * packaging not compatible with last release, forced new major version
+  * even more optional forms, displayed or hidden based on configuration
+  * added dashboard with statistics
+  * implemented automatic handling of new provisioning.voip_preferences
+  * GPLv3+ licensing!
 
- -- Daniel Tiefnig <dtiefnig@sipwise.com>  Thu, 28 Oct 2010 15:17:20 +0200
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 01 Dec 2010 23:35:21 +0100
 
 ngcp-www-admin (2.1.0) unstable; urgency=medium
 
