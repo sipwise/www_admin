@@ -56,9 +56,38 @@ sub index : Private {
     return 1;
 }
 
+=head2 edit_admin
+
+Show edit form for an administrator.
+
+=cut
+
+sub edit_admin : Local {
+    my ( $self, $c ) = @_;
+
+    $c->stash->{template} = 'tt/admin_edit.tt';
+
+    my $edit_admin = $c->request->params->{edit_admin};
+    $c->stash->{edit_admin} = $edit_admin if defined $edit_admin;
+
+    if(ref $c->session->{restore_admin_input} eq 'HASH') {
+        $c->stash->{admin} = $c->session->{restore_admin_input};
+        delete $c->session->{restore_admin_input};
+    } elsif(defined $edit_admin) {
+        return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_admin',
+                                                            { login => $edit_admin },
+                                                            \$c->stash->{admin}
+                                                          );
+    } else {
+        $c->stash->{admin} = $c->config->{default_admin_settings};
+    }
+
+    return 1;
+}
+
 =head2 do_edit_admin 
 
-Change settings for an admin.
+Change settings for an admin or create a new one.
 
 =cut
 
@@ -68,41 +97,63 @@ sub do_edit_admin : Local {
     my %messages;
     my %settings;
 
-    my $admin = $c->request->params->{admin};
+    my $admin = $c->request->params->{admin};  # new admin
+    my $edit_admin = $c->request->params->{edit_admin};  # existing admin
+
+    if(defined $admin) {
+      $messages{elogin} = 'Client.Syntax.MalformedLogin'
+          unless $admin =~ /^\w+$/;
+    }
 
     $settings{password} = $c->request->params->{password};
     if(defined $settings{password} and length $settings{password}) {
         $messages{epass} = 'Client.Voip.PassLength'
             unless length $settings{password} >= 6;
+        my $password2 = $c->request->params->{password2};
+        if(defined $password2 and length $password2) {
+            $messages{epass2} = 'Client.Voip.PassLength'
+                unless length $password2 >= 6;
+            $messages{epass2} = 'Client.Voip.PassNoMatch'
+                unless $settings{password} eq $password2;
+        } else {
+            $messages{epass2} = 'Client.Voip.MissingPass2';
+        }
     } else {
         delete $settings{password};
+        $messages{epass} = 'Client.Voip.PassLength'
+            unless defined $edit_admin;
     }
 
     $settings{is_master} = $c->request->params->{is_master} ? 1 : 0
-        unless $admin eq $c->session->{admin}{login};
+        unless $edit_admin eq $c->session->{admin}{login};
     $settings{is_active} = $c->request->params->{is_active} ? 1 : 0
-        unless $admin eq $c->session->{admin}{login};
+        unless $edit_admin eq $c->session->{admin}{login};
     $settings{read_only} = $c->request->params->{read_only} ? 1 : 0
-        unless $admin eq $c->session->{admin}{login};
+        unless $edit_admin eq $c->session->{admin}{login};
     $settings{show_passwords} = $c->request->params->{show_passwords} ? 1 : 0
-        unless $admin eq $c->session->{admin}{login};
+        unless $edit_admin eq $c->session->{admin}{login};
     $settings{call_data} = $c->request->params->{call_data} ? 1 : 0
-        unless $admin eq $c->session->{admin}{login};
+        unless $edit_admin eq $c->session->{admin}{login};
     $settings{lawful_intercept} = $c->request->params->{lawful_intercept} ? 1 : 0
-        unless $admin eq $c->session->{admin}{login};
+        unless $edit_admin eq $c->session->{admin}{login};
 
     unless(keys %messages) {
         if(keys %settings) {
-            if($c->model('Provisioning')->call_prov( $c, 'billing', 'update_admin',
-                                                     { login => $admin,
+            if($c->model('Provisioning')->call_prov( $c, 'billing',
+                                                     (defined $edit_admin ? 'update_admin'
+                                                                          : 'create_admin'
+                                                     ),
+                                                     { login => (defined $edit_admin ? $edit_admin
+                                                                                     : $admin),
                                                        data   => { %settings },
                                                      },
                                                      undef
                                                    ))
             {
                 $c->session->{admin}{password} = $settings{password}
-                    if exists $settings{password} and $admin eq $c->session->{admin}{login};
-                $messages{eadmmsg} = 'Server.Voip.SavedSettings';
+                    if exists $settings{password} and $edit_admin eq $c->session->{admin}{login};
+                $messages{admmsg} = defined $edit_admin ? 'Server.Voip.SavedSettings'
+                                                        : 'Web.Admin.Created';
                 $c->session->{messages} = \%messages;
                 $c->response->redirect("/admin");
                 return;
@@ -117,59 +168,9 @@ sub do_edit_admin : Local {
     }
 
     $c->session->{messages} = \%messages;
-    $c->session->{restore_admedit_input} = \%settings;
-    $c->response->redirect("/admin?edit_admin=$admin");
-    return;
-}
-
-=head2 do_create_admin 
-
-Create a new admin.
-
-=cut
-
-sub do_create_admin : Local {
-    my ( $self, $c ) = @_;
-
-    my %messages;
-    my %settings;
-
-    my $admin = $c->request->params->{admin};
-    $messages{alogin} = 'Client.Syntax.MalformedLogin'
-        unless $admin =~ /^\w+$/;
-
-    $settings{password} = $c->request->params->{password};
-    $messages{apass} = 'Client.Voip.PassLength'
-        unless length $settings{password} >= 6;
-
-    $settings{is_master} = $c->request->params->{is_master} ? 1 : 0;
-    $settings{is_active} = $c->request->params->{is_active} ? 1 : 0;
-    $settings{read_only} = $c->request->params->{read_only} ? 1 : 0;
-    $settings{show_passwords} = $c->request->params->{show_passwords} ? 1 : 0;
-    $settings{call_data} = $c->request->params->{call_data} ? 1 : 0;
-    $settings{lawful_intercept} = $c->request->params->{lawful_intercept} ? 1 : 0;
-
-    unless(keys %messages) {
-        if($c->model('Provisioning')->call_prov( $c, 'billing', 'create_admin',
-                                                 { login => $admin,
-                                                   data   => \%settings,
-                                                 },
-                                                 undef
-                                               ))
-        {
-            $messages{cadmmsg} = 'Web.Admin.Created';
-            $c->session->{messages} = \%messages;
-            $c->response->redirect("/admin");
-            return;
-        }
-    } else {
-        $messages{cadmerr} = 'Client.Voip.InputErrorFound';
-    }
-
-    $c->session->{messages} = \%messages;
-    $c->session->{restore_admadd_input} = \%settings;
-    $c->session->{restore_admadd_input}{admin} = $admin;
-    $c->response->redirect("/admin");
+    $settings{admin} = $admin if defined $admin;
+    $c->session->{restore_admin_input} = \%settings;
+    $c->response->redirect(defined $edit_admin ? "/admin/edit_admin?edit_admin=$edit_admin" : "/admin/edit_admin");
     return;
 }
 
@@ -188,7 +189,7 @@ sub do_delete_admin : Local {
                                              undef
                                            ))
     {
-        $c->session->{messages}{eadmmsg} = 'Web.Admin.Deleted';
+        $c->session->{messages}{admmsg} = 'Web.Admin.Deleted';
         $c->response->redirect("/admin");
         return;
     }

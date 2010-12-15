@@ -1,0 +1,87 @@
+        <h3>[% IF edit_admin %]Edit[% ELSE %]Create[% END %] Administrator Account</h3>
+
+        <div class="actions">
+          <a href="/admin" class="aaction">cancel</a>
+        </div>
+        <div class="p1">
+          [% IF messages.admerr %]<div class="errormsg">[% messages.admerr %]</div>[% END %]
+
+          <table>
+            <form autocomplete="off" action="/admin/do_edit_admin" method="post">
+              <tr title="the login username for the admin">
+                <td class="tdkey">login:</td>
+                <td style="width: 100%;">
+                [% IF edit_admin %]
+                  <b>[% edit_admin %]</b>
+                  <input type="hidden" name="edit_admin" value="[% edit_admin %]" />
+                [% ELSE %]
+                  <input type="text" size="20" name="admin" id="adminaddtxt" value="[% admin.admin %]" />
+                [% END %]
+                </td>
+              </tr>
+              [% IF messages.elogin %]
+                <tr><td colspan="2"><div class="errormsg">[% messages.elogin %]</div></td></tr>
+              [% END %]
+              <tr title="the login password for the admin">
+                <td class="tdkey">password:</td>
+                <td><input type="password" name="password" value="" /></td>
+              </tr>
+              [% IF messages.epass %]
+                <tr><td colspan="2"><div class="errormsg">[% messages.epass %]</div></td></tr>
+              [% END %]
+              <tr title="enter the login password a second time to detect typing errors">
+                <td class="tdkey">repeat password:</td>
+                <td><input type="password" name="password2" value="" /></td>
+              </tr>
+              [% IF messages.epass2 %]
+                <tr><td colspan="2"><div class="errormsg">[% messages.epass2 %]</div></td></tr>
+              [% END %]
+              <tr title="if checked, the administrator can create and edit other administrator accounts">
+                <td class="tdkey">master:</td>
+                <td>
+                  <input type="checkbox" class="checkbox" name="is_master"
+                         [% IF admin.is_master %]checked="checked"[% END %]
+                         [% IF edit_admin == Catalyst.session.admin.login %]disabled="disabled"[% END %] />
+                </td>
+              </tr>
+              <tr title="if checked, the administrator account is active and may be used">
+                <td class="tdkey">active:</td>
+                <td>
+                  <input type="checkbox" class="checkbox" name="is_active"
+                         [% IF admin.is_active %]checked="checked"[% END %]
+                         [% IF edit_admin == Catalyst.session.admin.login %]disabled="disabled"[% END %] />
+                </td>
+              </tr>
+              <tr title="if checked, the administrator may not change any data">
+                <td class="tdkey">readonly:</td>
+                <td>
+                  <input type="checkbox" class="checkbox" name="read_only"
+                         [% IF admin.read_only %]checked="checked"[% END %]
+                         [% IF edit_admin == Catalyst.session.admin.login %]disabled="disabled"[% END %] />
+                </td>
+              </tr>
+              <tr title="if checked, the administrator may view subscriber passwords">
+                <td class="tdkey">show passwords:</td>
+                <td>
+                  <input type="checkbox" class="checkbox" name="show_passwords"
+                         [% IF admin.show_passwords %]checked="checked"[% END %]
+                         [% IF edit_admin == Catalyst.session.admin.login %]disabled="disabled"[% END %] />
+                </td>
+              </tr>
+              <tr title="if checked, the administrator may view call detail records">
+                <td class="tdkey">show CDR data:</td>
+                <td>
+                  <input type="checkbox" class="checkbox" name="call_data"
+                         [% IF admin.call_data %]checked="checked"[% END %]
+                         [% IF edit_admin == Catalyst.session.admin.login %]disabled="disabled"[% END %] />
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <input type="submit" class="but" value="Save &#187;" />
+                </td>
+              </tr>
+            </form>
+          </table>
+        </div>
+
