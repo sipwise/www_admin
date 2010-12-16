@@ -1,3 +1,9 @@
+ngcp-www-admin (3.0.0-1) unstable; urgency=low
+
+  * copyright files are now included in the package correctly
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Thu, 16 Dec 2010 13:19:48 +0100
+
 ngcp-www-admin (3.0.0) unstable; urgency=low
 
   * moved framework from /usr/local to /usr/share
