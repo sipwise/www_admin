@@ -794,6 +794,11 @@ sub update_preferences : Local {
     $$preferences{alternative_route} = $c->request->params->{alternative_route} ? 1 : undef;
     $$preferences{is_external} = $c->request->params->{is_external} ? 1 : undef;
 
+    ### block out override ###
+
+    $$preferences{block_out_override_pin} = $c->request->params->{block_out_override_pin} || undef;
+    $$preferences{adm_block_out_override_pin} = $c->request->params->{adm_block_out_override_pin} || undef;
+
     ### save settings ###
 
     unless(keys %messages) {
