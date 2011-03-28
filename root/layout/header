@@ -1,9 +1,42 @@
+
 <!-- BEGIN layout/header -->
-    <div id="header">
-      <div id="sipwise_logo">
-        <a href="http://sipwise.com/"><img src="/static/images/sipwise_logo_96.png" alt="Sipwise GmbH, Austria" /></a>
+    <div id="header" class="span-24 last">
+      <div class="span-12 append-5">
+        <h1>Sipwise NGCP Administration Interface</h1>
       </div>
-      <div id="heading">Sipwise NGCP Administration Interface</div>
+      [% IF Catalyst.user_exists %]
+      <div class="span-4 ui-state-default ui-corner-all">
+        <span class="ui-icon ui-icon-person"></span>
+        <span>[% Catalyst.user.login %]</span>
+      </div>
+      <div class="span-2 last ui-state-default ui-corner-all">
+        <a href="/logout">
+          <span class="ui-icon ui-icon-locked"></span>
+          <span>logout</span>
+        </a>
+      </div>
+      [% ELSE %]
+      <div class="span-4 ui-state-default ui-corner-all">
+        <span class="ui-icon ui-icon-key"></span>
+        <span>not logged in</span>
+      </div>
+      <div class="span-2 last ui-state-default ui-corner-all">
+        <a href="/">
+          <span class="ui-icon ui-icon-unlocked"></span>
+          <span>login</span>
+        </a>
+      </div>
+      [% END %]
     </div>
 
+
+[% IF false %]
+      <h1 id="admin-header">
+        <a href="http://sipwise.com/">
+          <img id="header-image" src="/static/images/sipwise_logo_96.png" alt="Sipwise GmbH, Austria" />
+        </a>
+        <span>Sipwise NGCP Administration Interface</span>
+      </h1>
+[% END %]
 <!-- END layout/header -->
+

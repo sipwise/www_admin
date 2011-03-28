@@ -1,81 +1,110 @@
-        <h3>Search subscribers</h3>
-        <div class="p1">
-          <form action="/subscriber/search" method="post" class="search_subscriber">
-
-            <label class="search_label" for="search_by_username">Username:</label>
-            <input type="text" id="search_by_username" name="search_username" value="[% search_username %]"
+        <h3>Find Subscribers</h3>
+          <form action="/subscriber/search" method="post" class="inline">
+            <div class="span-3">
+              <label class="search_label" for="search_by_username">Username:</label>
+            </div>
+            <div class="span-5">
+              <input type="text" id="search_by_username" name="search_username" value="[% search_username %]"
                    title="search by the local part of the SIP URI, wildcards allowed" />
-            <input type="checkbox" class="checkbox" id="exact_username" name="exact_username" [% IF exact_username %]checked="checked"[% END %]
+            </div>
+            <div class="span-3 last">
+              <input type="checkbox" class="checkbox" id="exact_username" name="exact_username" [% IF exact_username %]checked="checked"[% END %]
                    title="if checked, the search string will not be surrounded by wildcards" />
-            <label for="exact_username">exact match</label><br />
+            <label for="exact_username">exact match</label>
+            </div>
+            <br/>
 
-            <label class="search_label" for="search_by_domain">Domain:</label>
-            <input type="text" id="search_by_domain" name="search_domain" value="[% search_domain %]"
+            <div class="span-3">
+              <label class="search_label" for="search_by_domain">Domain:</label>
+            </div>
+            <div class="span-5">
+              <input type="text" id="search_by_domain" name="search_domain" value="[% search_domain %]"
                    title="search by the domain of the SIP URI, wildcards allowed" />
-            <input type="checkbox" class="checkbox" id="exact_domain" name="exact_domain" [% IF exact_domain %]checked="checked"[% END %]
+            </div>
+            <div class="span-3 last">
+              <input type="checkbox" class="checkbox" id="exact_domain" name="exact_domain" [% IF exact_domain %]checked="checked"[% END %]
                    title="if checked, the search string will not be surrounded by wildcards" />
-            <label for="exact_domain">exact match</label><br />
+              <label for="exact_domain">exact match</label>
+            </div>
+            <br/>
 
-            <label class="search_label" for="search_by_number">E.164 number:</label>
-            <input type="text" id="search_by_number" name="search_number" value="[% search_number %]"
-                   title="search by the E.164 numbers, wildcards allowed" />
-            <input type="checkbox" class="checkbox" id="exact_number" name="exact_number" [% IF exact_number %]checked="checked"[% END %]
-                   title="if checked, the search string will not be surrounded by wildcards" />
-            <label for="exact_number">exact match</label><br />
-
-            <label class="search_label" for="search_by_uuid">UUID:</label>
-            <input type="text" id="search_by_uuid" name="search_uuid" value="[% search_uuid %]"
-                   title="search by the UUID, wildcards allowed" />
-            <input type="checkbox" class="checkbox" id="exact_uuid" name="exact_uuid" [% IF exact_uuid %]checked="checked"[% END %]
-                   title="if checked, the search string will not be surrounded by wildcards" />
-            <label for="exact_uuid">exact match</label><br />
-
-            <div class="topbottomspace">
-              <input type="checkbox" class="checkbox" id="include_terminated" name="terminated" [% IF terminated %]checked="checked"[% END %]
-                     title="if checked, the search result will include terminated subscribers" />
-              <label for="include_terminated">include terminated subscribers</label><br />
+            <div class="span-3">
+              <label class="search_label" for="search_by_number">E.164 number:</label>
             </div>
 
-            <input type="submit" value="Search &#187;" class="but" />
+            <div class="span-5">
+              <input type="text" id="search_by_number" name="search_number" value="[% search_number %]"
+                   title="search by the E.164 numbers, wildcards allowed" />
+            </div>
+            <div class="span-3 last">
+              <input type="checkbox" class="checkbox" id="exact_number" name="exact_number" [% IF exact_number %]checked="checked"[% END %]
+                   title="if checked, the search string will not be surrounded by wildcards" />
+              <label for="exact_number">exact match</label>
+            </div>
+            <br/>
+
+            <div class="span-3">
+              <label class="search_label" for="search_by_uuid">UUID:</label>
+            </div>
+            <div class="span-5">
+              <input type="text" id="search_by_uuid" name="search_uuid" value="[% search_uuid %]"
+                   title="search by the UUID, wildcards allowed" />
+            </div>
+            <div class="span-3 last">
+              <input type="checkbox" class="checkbox" id="exact_uuid" name="exact_uuid" [% IF exact_uuid %]checked="checked"[% END %]
+                   title="if checked, the search string will not be surrounded by wildcards" />
+              <label for="exact_uuid">exact match</label>
+            </div>
+            <br/>
+
+            <div class="span-6 append-5 last">
+              <input type="checkbox" class="checkbox" id="include_terminated" name="terminated" [% IF terminated %]checked="checked"[% END %]
+                     title="if checked, the search result will include terminated subscribers" />
+                <label for="include_terminated">include terminated subscribers</label><br />
+            </div>
+            <br/>
+
+            <div class="span-1 append-10 last">
+              <button name="submit" class="button-search">Search</button>
+            </div>
+            <br/>
           </form>
-        </div>
 
         [% IF subscriber_list %]
 
           <h3>Subscribers</h3>
 
-          <div class="p1">
-            <table>
-              <tr class="table_header">
-                <td>SIP URI</td>
-                <td class="tdcenter">Account ID</td>
-                <td>Primary Number</td>
-              </tr>
+            <ul class="cleanlist">
+              <li class="ui-state-default">
+                <div class="span-6">SIP URI</div>
+                <div class="span-2">Account ID</div>
+                <div class="span-6 last">Primary Number</div>
+              </li>
 
             [% FOREACH subscriber = subscriber_list %]
 
-              <tr>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-6">
                 [% IF subscriber.subscriber_id %]
                   <a href="/subscriber/detail?subscriber_id=[% subscriber.subscriber_id %]">
                     [% subscriber.username %]@[% subscriber.domain %]</a>
                 [% ELSE %]
                   [% subscriber.username %]@[% subscriber.domain %]
                 [% END %]
-                </td>
-                <td class="tdcenter">
+                </div>
+                <div class="span-2">
                   <a href="/account/detail?account_id=[% subscriber.account_id %]">
                     [% subscriber.account_id %]</a>
-                </td>
-                <td>
+                </div>
+                <div class="span-6 last">
                   [% IF subscriber.sn %]
                     +[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %]
                   [% END %]
-                </td>
-              </tr>
+                </div>
+              </li>
 
             [% END %]
-            </table>
+            </ul>
 
             [% IF pagination %]
             <div class="pagination">
@@ -113,13 +142,15 @@
             </div>
             [% END %]
 
-          </div>
 
         [% ELSIF searched %]
 
-          <div class="p1">
+        <div class="hspace-20"></div>
+        <ul class="cleanlist">
+          <li class="ui-state-default"><div>
             No matching subscribers found.
-          </div>
+          </div></li>
+        </ul>
 
         [% END %]
 

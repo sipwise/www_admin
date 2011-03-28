@@ -7,11 +7,11 @@
           </h3>
         [% END %]
 
-      [% IF messages.newmsg %]<div class="goodmsg">[% messages.newmsg %]</div>[% END %]
+      [% IF messages.newmsg %]<div class="success">[% messages.newmsg %]</div>[% END %]
       [% IF messages.newerr %]<div class="errmsg">[% messages.newerr %]</div>[% END %]
 
       [% UNLESS Catalyst.session.admin.read_only || new_customer %]
-        <div class="actions">
+        <div class="actions ui-corner-all">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_customer=1" class="aaction">edit</a>
         [% IF edit_customer %]
           <a href="detail?customer_id=[% customer.id %]" class="aaction">cancel</a>
@@ -28,8 +28,8 @@
       [% END %]
 
           <div class="p1">
-            [% IF messages.custmsg %]<div class="goodmsg">[% messages.custmsg %]</div>[% END %]
-            [% IF messages.custerr %]<div class="errormsg">[% messages.custerr %]</div>[% END %]
+            [% IF messages.custmsg %]<div class="success">[% messages.custmsg %]</div>[% END %]
+            [% IF messages.custerr %]<div class="error">[% messages.custerr %]</div>[% END %]
               <input type="hidden" name="customer_id" value="[% customer.id %]" />
               <table>
                 <tr><td class="tdkey">CustomerID:</td><td>[% customer.id %]</td></tr>
@@ -38,7 +38,7 @@
                   <td>
                   <input type="text" id="shopuser" [% IF ! edit_customer %]class="disabled" disabled="disabled"[% END %]
                          name="shopuser" value="[% customer.shopuser %]" />
-                  [% IF messages.username %]<div class="errormsg">[% messages.username %]</div>[% END %]
+                  [% IF messages.username %]<div class="error">[% messages.username %]</div>[% END %]
                   </td>
                 </tr>
                 <tr>
@@ -61,14 +61,14 @@
                       [% END %]
                     [% END %]
                   [% END %]
-                  [% IF messages.password %]<div class="errormsg">[% messages.password %]</div>[% END %]
+                  [% IF messages.password %]<div class="error">[% messages.password %]</div>[% END %]
                   </td>
                 </tr>
                 <tr><td class="tdkey">created:</td><td>[% customer.create_timestamp %]</td></tr>
                 <tr><td class="tdkey">modified:</td><td>[% customer.modify_timestamp %]</td></tr>
               </table>
               [% IF edit_customer && ! new_customer %]
-                <input type="submit" class="but" value="Save &#187;" />
+                <input type="submit" class="but ui-corner-all" value="Save &#187;" />
               [% END %]
           </div>
         [% UNLESS new_customer %]
@@ -78,7 +78,7 @@
         <h3 id="contact">Contact</h3>
 
       [% UNLESS Catalyst.session.admin.read_only || new_customer %]
-        <div class="actions">
+        <div class="actions ui-corner-all">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_contact=1#contact" class="aaction">edit</a>
           [% IF edit_contact %]
           <a href="detail?customer_id=[% customer.id %]#contact" class="aaction">cancel</a>
@@ -91,8 +91,8 @@
         [% END %]
 
           <div class="p1">
-            [% IF messages.contmsg %]<div class="goodmsg">[% messages.contmsg %]</div>[% END %]
-            [% IF messages.conterr %]<div class="errormsg">[% messages.conterr %]</div>[% END %]
+            [% IF messages.contmsg %]<div class="success">[% messages.contmsg %]</div>[% END %]
+            [% IF messages.conterr %]<div class="error">[% messages.conterr %]</div>[% END %]
               <input type="hidden" name="ctype" value="contact" />
               <input type="hidden" name="customer_id" value="[% customer.id %]" />
               <table>
@@ -188,12 +188,12 @@
                 </tr>
               </table>
             [% IF edit_contact && ! new_customer %]
-              <input type="submit" class="but" value="Save &#187;" />
+              <input type="submit" class="but ui-corner-all" value="Save &#187;" />
             [% END %]
           </div>
 
         [% IF new_customer %]
-          <input type="submit" class="but" value="Save &#187;" />
+          <input type="submit" class="but ui-corner-all" value="Save &#187;" />
         [% END %]
 
         </form>
@@ -203,7 +203,7 @@
         <h3 id="commercial">Commercial Contact</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <div class="actions">
+        <div class="actions ui-corner-all">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_commercial=1#commercial" class="aaction">edit</a>
           [% IF edit_commercial %]
           <a href="detail?customer_id=[% customer.id %]#commercial" class="aaction">cancel</a>
@@ -212,8 +212,8 @@
       [% END %]
 
         <div class="p1">
-          [% IF messages.commmsg %]<div class="goodmsg">[% messages.commmsg %]</div>[% END %]
-          [% IF messages.commerr %]<div class="errormsg">[% messages.commerr %]</div>[% END %]
+          [% IF messages.commmsg %]<div class="success">[% messages.commmsg %]</div>[% END %]
+          [% IF messages.commerr %]<div class="error">[% messages.commerr %]</div>[% END %]
           <form action="update_contact#commercial" method="post">
             <input type="hidden" name="ctype" value="comm_contact" />
             <input type="hidden" name="customer_id" value="[% customer.id %]" />
@@ -279,7 +279,7 @@
               </tr>
             </table>
           [% IF edit_commercial %]
-            <input type="submit" class="but" value="Save &#187;" />
+            <input type="submit" class="but ui-corner-all" value="Save &#187;" />
           [% END %]
           </form>
         </div>
@@ -287,7 +287,7 @@
         <h3 id="technical">Technical Contact</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <div class="actions">
+        <div class="actions ui-corner-all">
           <a href="detail?customer_id=[% customer.id %]&amp;edit_technical=1#technical" class="aaction">edit</a>
           [% IF edit_technical %]
           <a href="detail?customer_id=[% customer.id %]#technical" class="aaction">cancel</a>
@@ -296,8 +296,8 @@
       [% END %]
 
         <div class="p1">
-          [% IF messages.techmsg %]<div class="goodmsg">[% messages.techmsg %]</div>[% END %]
-          [% IF messages.techerr %]<div class="errormsg">[% messages.techerr %]</div>[% END %]
+          [% IF messages.techmsg %]<div class="success">[% messages.techmsg %]</div>[% END %]
+          [% IF messages.techerr %]<div class="error">[% messages.techerr %]</div>[% END %]
           <form action="update_contact#technical" method="post">
             <input type="hidden" name="ctype" value="tech_contact" />
             <input type="hidden" name="customer_id" value="[% customer.id %]" />
@@ -363,7 +363,7 @@
               </tr>
             </table>
           [% IF edit_technical %]
-            <input type="submit" class="but" value="Save &#187;" />
+            <input type="submit" class="but ui-corner-all" value="Save &#187;" />
           [% END %]
           </form>
         </div>
@@ -371,7 +371,7 @@
         <h3 id="contract">Contracts</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <div class="actions">
+        <div class="actions ui-corner-all">
             <a href="/account/detail?edit_account=1&customer_id=[% customer.id %]" class="aaction">create new</a>
         </div>
       [% END %]

@@ -1,209 +1,191 @@
         <h3>Manage Administrator Accounts</h3>
 
-        <div class="p1">
-          [% IF messages.eadmmsg %]<div class="goodmsg">[% messages.eadmmsg %]</div>[% END %]
-          [% IF messages.eadmerr %]<div class="errormsg">[% messages.eadmerr %]</div>[% END %]
+          [% IF messages.eadmmsg %]<div class="success">[% messages.eadmmsg %]</div>[% END %]
+          [% IF messages.eadmerr %]<div class="error">[% messages.eadmerr %]</div>[% END %]
 
-          <table>
-            <tr class="table_header">
-              <td>login</td>
-              <td>password</td>
-              <td>master</td>
-              <td>active</td>
-              <td> r/o </td>
-              <td> PW </td>
-              <td> CDR </td>
-              <td />
-              <td />
-            </tr>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-5">Login</div>
+              <div class="span-5">Password</div>
+              <div class="span-1">MST</div>
+              <div class="span-1">ACT</div>
+              <div class="span-1">R/O</div>
+              <div class="span-1">PWD</div>
+              <div class="span-1 append-2 last">CDR</div>
+            </li>
             [% id = 0 %]
             [% FOREACH admin = admins %]
-              <tr>
-                <td>[% admin.login %]</td>
+              <li class="ui-state-default">
+                <div class="span-5">[% admin.login %]</div>
                 [% IF admin.login == edit_admin %]
                   <form autocomplete="off" action="/admin/do_edit_admin" method="post">
                     <input type="hidden" name="admin" value="[% admin.login %]" />
-                    <td><input type="password" name="password" value=""
-                               title="if set, the new login password for the account, string" /></td>
-                    <td class="tdcenter">
+                    <div class="span-5"><input type="password" name="password" value=""
+                               title="if set, the new login password for the account, string" size="20"/></div>
+                    <div class="span-1">
                       <input type="checkbox" class="checkbox" name="is_master"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
                              [% IF erefill.is_master or !erefill && admin.is_master %]checked="checked" [% END %]
                              title="if checked, the administrator can create and edit other administrator accounts" />
-                    </td>
-                    <td class="tdcenter">
+                    </div>
+                    <div class="span-1">
                       <input type="checkbox" class="checkbox" name="is_active"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
                              [% IF erefill.is_active or !erefill && admin.is_active %]checked="checked" [% END %]
                              title="if checked, the administrator account is active and may be used" />
-                    </td>
-                    <td class="tdcenter">
+                    </div>
+                    <div class="span-1">
                       <input type="checkbox" class="checkbox" name="read_only"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
                              [% IF erefill.read_only or !erefill && admin.read_only %]checked="checked" [% END %]
                              title="if checked, the administrator may not change any data" />
-                    </td>
-                    <td class="tdcenter">
+                    </div>
+                    <div class="span-1">
                       <input type="checkbox" class="checkbox" name="show_passwords"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
                              [% IF erefill.show_passwords or !erefill && admin.show_passwords %]checked="checked" [% END %]
                              title="if checked, the administrator may view subscriber passwords" />
-                    </td>
-                    <td class="tdcenter">
+                    </div>
+                    <div class="span-1">
                       <input type="checkbox" class="checkbox" name="call_data"
                              [% IF admin.login == Catalyst.session.admin.login %]disabled="disabled"[% END %]
                              [% IF erefill.call_data or !erefill && admin.call_data %]checked="checked" [% END %]
                              title="if checked, the administrator may view call detail records" />
-                    </td>
-                    <td>
-                      <div class="postlink">
-                        <label for="admsave[% id %]">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="admsave[% id %]" />
-                      </div>
-                    </td>
+                    </div>
+                    <div class="span-1">
+                        <button class="button-save" id="admsave[% id %]">Save</button>
+                    </div>
                   </form>
-                  <td><a href="/admin" class="aaction">cancel</a></td>
+                  <div class="prepend-1 span-1 last"><a href="/admin"><span class="button-cancel">Cancel</span></a></div>
                 [% ELSE %]
-                  <td>********</td>
-                  <td class="tdcenter">
+                  <div class="span-5">********</div>
+                  <div class="span-1">
                     <input type="checkbox" class="checkbox" disabled="disabled"
                            [% IF admin.is_master %]checked="checked"[% END %]
                            title="if checked, the administrator can create and edit other administrator accounts" />
-                  </td>
-                  <td class="tdcenter">
+                  </div>
+                  <div class="span-1">
                     <input type="checkbox" class="checkbox" disabled="disabled"
                            [% IF admin.is_active %] checked="checked"[% END %]
                            title="if checked, the administrator account is active and may be used" />
-                  </td>
-                  <td class="tdcenter">
+                  </div>
+                  <div class="span-1">
                     <input type="checkbox" class="checkbox" disabled="disabled"
                            [% IF admin.read_only %] checked="checked"[% END %]
                            title="if checked, the administrator may not change any data" />
-                  </td>
-                  <td class="tdcenter">
+                  </div>
+                  <div class="span-1">
                     <input type="checkbox" class="checkbox" disabled="disabled"
                            [% IF admin.show_passwords %] checked="checked"[% END %]
                            title="if checked, the administrator may view subscriber passwords" />
-                  </td>
-                  <td class="tdcenter">
+                  </div>
+                  <div class="span-1">
                     <input type="checkbox" class="checkbox" disabled="disabled"
                            [% IF admin.call_data %] checked="checked"[% END %]
                            title="if checked, the administrator may view call detail records" />
-                  </td>
-                  <td>
+                  </div>
+                  <div class="span-1">
                     [% UNLESS Catalyst.session.admin.read_only && admin.login != Catalyst.session.admin.login %]
-                      <a href="/admin?edit_admin=[% admin.login %]" class="aaction">edit</a>
+                      <a href="/admin?edit_admin=[% admin.login %]"><span class="button-edit">Edit</span></a>
                     [% END %]
-                  </td>
+                  </div>
+                  <div class="prepend-1 span-1 last">
                   [% IF admin.login != Catalyst.session.admin.login && ! Catalyst.session.admin.read_only %]
                     <form action="/admin/do_delete_admin" method="post">
-                      <td>
                         <input type="hidden" name="admin" value="[% admin.login %]" />
-                        <div class="postlink">
-                          <label for="admdel[% id %]">delete</label>
-                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="admdel[% id %]" />
-                        </div>
-                      </td>
+                          <button class="button-delete" id="admdel[% id %]">Delete</button>
                     </form>
-                  [% ELSE %]
-                    <td />
                   [% END %]
+                  </div>
                 [% END %]
-              </tr>
+              </li>
               [% IF admin.login == edit_admin %]
                 [% IF messages.epass %]
-                  <tr><td colspan="5">
-                    <div class="errormsg">
+                  <li>
+                    <div class="error">
                       [% messages.epass %]
                     </div>
-                  </td></tr>
+                  </li>
                 [% END %]
               [% END %]
             [% id = id + 1 %]
             [% END %]
-          </table>
-        </div>
+          </ul>
 
       [% IF ! Catalyst.session.admin.read_only && (Catalyst.session.admin.is_master || Catalyst.session.admin.is_superuser) %]
+        <div class="hspace-20"></div>
         <h3>Create Administrator Account</h3>
 
-        <div class="p1">
-          [% IF messages.cadmmsg %]<div class="goodmsg">[% messages.cadmmsg %]</div>[% END %]
-          [% IF messages.cadmerr %]<div class="errormsg">[% messages.cadmerr %]</div>[% END %]
+          [% IF messages.cadmmsg %]<div class="success">[% messages.cadmmsg %]</div>[% END %]
+          [% IF messages.cadmerr %]<div class="error">[% messages.cadmerr %]</div>[% END %]
 
-          <table>
+          <ul class="cleanlist">
             <form autocomplete="off" action="/admin/do_create_admin" method="post">
-              <tr>
-                <td>login:</td>
-                <td><input type="text" size="20" name="admin" id="adminaddtxt" value="[% arefill.admin %]"
+              <li class="ui-state-default">
+                <div class="span-5">Login:</div>
+                <div class="span-10 last"><input type="text" size="20" name="admin" id="adminaddtxt" value="[% arefill.admin %]"
                            title="the login username for the new account, string" />
-                </td>
-              </tr>
-              <tr>
-                <td>password:</td>
-                <td><input type="password" name="password" value=""
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-5">Password:</div>
+                <div class="span-10 last"><input type="password" name="password" value=""
                            title="the login password for the new account, string" />
-                </td>
-              </tr>
-              <tr>
-                <td>master:</td>
-                <td>
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-5">Master:</div>
+                <div class="span-10 last">
                   <input type="checkbox" class="checkbox" name="is_master"
                          [% IF arefill.is_master %]checked="checked"[% END %]
                          title="if checked, the new administrator can create and edit other administrator accounts" />
-                </td>
-              </tr>
-              <tr>
-                <td>active:</td>
-                <td>
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-5">Active:</div>
+                <div class="span-10 last">
                   <input type="checkbox" class="checkbox" name="is_active"
                          [% IF arefill.is_active %]checked="checked"[% END %]
                          title="if checked, the new administrator account is active and may be used" />
-                </td>
-              </tr>
-              <tr>
-                <td>readonly:</td>
-                <td>
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-5">Read-Only:</div>
+                <div class="span-10 last">
                   <input type="checkbox" class="checkbox" name="read_only"
                          [% IF arefill.read_only %]checked="checked"[% END %]
                          title="if checked, the new administrator may not change any data" />
-                </td>
-              </tr>
-              <tr>
-                <td>show passwords:</td>
-                <td>
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-5">Show Passwords:</div>
+                <div class="span-10 last">
                   <input type="checkbox" class="checkbox" name="show_passwords"
                          [% IF arefill.show_passwords %]checked="checked"[% END %]
                          title="if checked, the new administrator may view subscriber passwords" />
-                </td>
-              </tr>
-              <tr>
-                <td>show CDR data:</td>
-                <td>
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-5">Show CDR Data:</div>
+                <div class="span-10 last">
                   <input type="checkbox" class="checkbox" name="call_data"
                          [% IF arefill.call_data %]checked="checked"[% END %]
                          title="if checked, the new administrator may view call detail records" />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="postlink">
-                    <label for="adminadd">Add</label>
-                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="adminadd" />
-                  </div>
-                </td>
-              </tr>
-              [% IF messages.alogin || messages.apass %]
-                <tr><td colspan="2">
-                  <div class="errormsg">
+                </div>
+              </li>
+            </ul>
+            <div class="hspace-20"></div>
+            <div class="span-15 last">
+              <button class="button-add" id="adminadd">Add</button>
+            </div>
+            [% IF messages.alogin || messages.apass %]
+              <div class="error">
                     [% messages.alogin %]
                     [% IF messages.alogin && messages.apass %]<br />[% END %]
                     [% messages.apass %]
-                  </div>
-                </td></tr>
-              [% END %]
+              </div>
+            [% END %]
             </form>
           </table>
-        </div>
       [% END %]
 

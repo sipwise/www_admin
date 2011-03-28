@@ -1,6 +1,6 @@
         <h2>NCOS Level <a href="/ncos/lists?level=[% level.level %]">[% level.level %]</a></h2>
 
-        <div class="actions">
+        <div class="actions ui-corner-all">
           <a href="/ncos" class="aaction">back</a>
         </div>
         <br />
@@ -15,8 +15,8 @@
         <h3 id="pattern">Number Patterns</h3>
 
         <div class="p1">
-          [% IF messages.patmsg %]<div class="goodmsg">[% messages.patmsg %]</div>[% END %]
-          [% IF messages.paterr %]<div class="errormsg">[% messages.paterr %]</div>[% END %]
+          [% IF messages.patmsg %]<div class="success">[% messages.patmsg %]</div>[% END %]
+          [% IF messages.paterr %]<div class="error">[% messages.paterr %]</div>[% END %]
 
           <table class="ncospatterns">
             <tr class="table_header">
@@ -42,7 +42,7 @@
                              name="description" value="[% perefill.description %]" />
                     </td>
                     <td>
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="patsave">save</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="patsave" />
                       </div>
@@ -51,9 +51,9 @@
                   <td><a href="/ncos/lists?level=[% level.level %]" class="aaction">cancel</a></td>
                 </tr>
                 [% IF messages.epat %]
-                  <tr><td colspan="5"><div class="errormsg">[% messages.epat %]</div></td></tr>
+                  <tr><td colspan="5"><div class="error">[% messages.epat %]</div></td></tr>
                 [% END %]
-                [% IF perefill && prov_error %]<tr><td colspan="5"><div class="errormsg">[% prov_error %]</div></td></tr>[% END %]
+                [% IF perefill && prov_error %]<tr><td colspan="5"><div class="error">[% prov_error %]</div></td></tr>[% END %]
               [% ELSE %]
                 <tr>
                   <td>[% pattern.pattern %]</td>
@@ -68,7 +68,7 @@
                     <input type="hidden" name="pattern" value="[% pattern.pattern %]" />
                     <td>
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="patdel[% id %]">delete</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="patdel[% id %]" />
                       </div>
@@ -90,7 +90,7 @@
                          name="description" value="[% pcrefill.description %]" />
                 </td>
                 <td>
-                  <div class="postlink">
+                  <div class="postlink ui-corner-all">
                     <label for="patadd">add</label>
                     <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="patadd" />
                   </div>
@@ -99,17 +99,17 @@
               <td />
             </tr>
           </table>
-            [% IF messages.cpat %]<div class="errormsg">[% messages.cpat %]</div>[% END %]
-            [% IF pcrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+            [% IF messages.cpat %]<div class="error">[% messages.cpat %]</div>[% END %]
+            [% IF pcrefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
         </div>
         <div class="p1">
-          [% IF messages.lacmsg %]<div class="goodmsg">[% messages.lacmsg %]</div>[% END %]
-          [% IF messages.lacerr %]<div class="errormsg">[% messages.lacerr %]</div>[% END %]
+          [% IF messages.lacmsg %]<div class="success">[% messages.lacmsg %]</div>[% END %]
+          [% IF messages.lacerr %]<div class="error">[% messages.lacerr %]</div>[% END %]
           <form action="/ncos/save_local_ac" method="post">
             <input type="hidden" name="level" value="[% level.level %]" />
             <input type="checkbox" class="checkbox" id="local_ac" name="local_ac" [% IF level.local_ac %]checked="checked"[% END %] />
             <label for="local_ac">include local area code in list</label>
-            <span id="save_local_ac" class="postlink">
+            <span id="save_local_ac" class="postlink ui-corner-all">
               <label for="lacsave">save</label>
               <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lacsave" />
             </span>
@@ -121,8 +121,8 @@
         <h3 id="LNP">LNP Provider List</h3>
 
         <div class="p1">
-          [% IF messages.lnpmsg %]<div class="goodmsg">[% messages.lnpmsg %]</div>[% END %]
-          [% IF messages.lnperr %]<div class="errormsg">[% messages.lnperr %]</div>[% END %]
+          [% IF messages.lnpmsg %]<div class="success">[% messages.lnpmsg %]</div>[% END %]
+          [% IF messages.lnperr %]<div class="error">[% messages.lnperr %]</div>[% END %]
 
           <table class="ncoslnp">
             <tr class="table_header">
@@ -145,7 +145,7 @@
                              name="description" value="[% lerefill.description %]" />
                     </td>
                     <td>
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="lnpsave">save</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lnpsave" />
                       </div>
@@ -154,9 +154,9 @@
                   <td><a href="/ncos/lists?level=[% level.level %]#LNP" class="aaction">cancel</a></td>
                 </tr>
                 [% IF messages.elnp %]
-                  <tr><td colspan="5"><div class="errormsg">[% messages.elnp %]</div></td></tr>
+                  <tr><td colspan="5"><div class="error">[% messages.elnp %]</div></td></tr>
                 [% END %]
-                [% IF lerefill && prov_error %]<tr><td colspan="5"><div class="errormsg">[% prov_error %]</div></td></tr>[% END %]
+                [% IF lerefill && prov_error %]<tr><td colspan="5"><div class="error">[% prov_error %]</div></td></tr>[% END %]
               [% ELSE %]
                 <tr>
                   <td>[% lnpid.lnp_provider %]</td>
@@ -171,7 +171,7 @@
                     <input type="hidden" name="lnp_provider_id" value="[% lnpid.lnp_provider_id %]" />
                     <td>
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="lnpdel[% id %]">delete</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lnpdel[% id %]" />
                       </div>
@@ -200,7 +200,7 @@
                            name="description" value="[% lcrefill.description %]" />
                   </td>
                   <td>
-                    <div class="postlink">
+                    <div class="postlink ui-corner-all">
                       <label for="lnpadd">add</label>
                       <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lnpadd" />
                     </div>
@@ -212,8 +212,8 @@
               <tr><td colspan="5" class="tdcenter">No unused LNP providers found.</td></tr>
             [% END %]
           </table>
-            [% IF messages.clnp %]<div class="errormsg">[% messages.clnp %]</div>[% END %]
-            [% IF lcrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+            [% IF messages.clnp %]<div class="error">[% messages.clnp %]</div>[% END %]
+            [% IF lcrefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
         </div>
 
       [% END %]

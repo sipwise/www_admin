@@ -3,13 +3,11 @@
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
 
-        <div class="actions">
-          <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#userprefs" class="aaction">back</a>
-        </div>
-        <div class="p1">
-          [% IF messages.nummsg %]<div class="goodmsg">[% messages.nummsg %]</div>[% END %]
-          [% IF messages.numerr %]<div class="errormsg">[% messages.numerr %]</div>[% END %]
+          <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#userprefs"><span class="button-back">Back</span></a>
+          [% IF messages.nummsg %]<div class="success">[% messages.nummsg %]</div>[% END %]
+          [% IF messages.numerr %]<div class="error">[% messages.numerr %]</div>[% END %]
 
+          <div class="hspace-20"></div>
           <div class="list_explanation">
           [% IF list_name == 'block_in_list' || list_name == 'adm_block_in_list' %]
             [% IF list_mode %]
@@ -47,60 +45,45 @@
           [% END %]
           </div>
 
-          <table>
+          <ul class="cleanlist">
             [% FOREACH blockentry = list_data %]
-              <tr class="[% blockentry.background %]">
-                <td [% IF blockentry.active == 0 %]class="listentry_disabled"[% END %]> [% blockentry.number %] </td>
+              <li class="ui-state-default">
+                <div class="span-14[% IF blockentry.active == 0 %] listentry_disabled[% END %]"> [% blockentry.number %] </div>
                 <form action="do_edit_list" method="post">
-                  <td >
+                  <div class="span-1">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     <input type="hidden" name="block_del" value="[% blockentry.number %]" />
                     <input type="hidden" name="block_stat" value="[% blockentry.active %]" />
-                    <div class="postlink">
-                      <label for="listdel[% blockentry.id %]">delete</label>
-                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="listdel[% blockentry.id %]" />
-                    </div>
-                  </td>
+                    <button class="button-delete" id="listdel[% blockentry.id %]">Delete</button>
+                  </div>
                 </form>
                 <form action="do_edit_list" method="post">
-                  <td>
+                  <div class="span-1 last">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     [% IF    blockentry.active  == 1 %]
                       <input type="hidden" name="block_act" value="[% blockentry.number %]" />
                       <input type="hidden" name="block_stat" value="1" />
-                      <div class="postlink">
-                        <label for="blockact[% blockentry.id %]">deactivate</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockact[% blockentry.id %]" />
-                      </div>
+                      <button class="button-deactivate" id="blockact[% blockentry.id %]">Deactivate</button>
                     [% ELSIF blockentry.active  == 0 %]
                       <input type="hidden" name="block_act" value="[% blockentry.number %]" />
                       <input type="hidden" name="block_stat" value="0" />
-                      <div class="postlink">
-                        <label for="blockact[% blockentry.id %]">activate</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockact[% blockentry.id %]" />
-                      </div>
+                      <button class="button-activate" id="blockact[% blockentry.id %]">Activate</button>
                     [% END %]
-                  </td>
+                  </div>
                 </form>
-              </tr>
+              </li>
             [% END %]
-          </table>
+          </ul>
 
-          <br />
-
+          <div class="hspace-20"></div>
           <form action="/subscriber/do_edit_list" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
             <input type="hidden" name="list_name" value="[% list_name %]" />
             <label for="blockaddtxt">New entry:</label><br />
-            <div class="postlink">
               <input type="text" size="20" name="block_add" id="blockaddtxt" value="[% blockaddtxt %]" /> &nbsp;
-              <label for="blockadd">Add entry</label>
-              <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockadd" />
-              [% IF messages.msgadd %]<div class="errormsg">[% messages.msgadd %]</div>[% END %]
-            </div><br clear="all" />
+              <button class="button-add" id="blockadd">Add</button>
+              [% IF messages.msgadd %]<div class="error">[% messages.msgadd %]</div>[% END %]
+            <br clear="all" />
           </form>
-
-        </div>
-

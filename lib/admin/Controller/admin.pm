@@ -188,7 +188,7 @@ sub do_delete_admin : Local {
                                              undef
                                            ))
     {
-        $c->session->{messages}{eadmmsg} = 'Web.Admin.Deleted';
+        $c->session->{messages}{admmsg} = 'Web.Admin.Deleted';
         $c->response->redirect("/admin");
         return;
     }

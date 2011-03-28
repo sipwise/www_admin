@@ -4,7 +4,7 @@
         <h3>Create New Product</h3>
         [% END %]
 
-        <div class="actions">
+        <div class="actions ui-corner-all">
           <a href="/billing" class="aaction">cancel</a>
         </div>
 
@@ -25,7 +25,7 @@
                 </td>
                 [% END %]
               </tr>
-              [% IF messages.handle %]<tr><td /><td><div class="errormsg">[% messages.handle %]</div></td></tr>[% END %]
+              [% IF messages.handle %]<tr><td /><td><div class="error">[% messages.handle %]</div></td></tr>[% END %]
 <!--
               <tr>
                 <td class="tdkey">class:</td>
@@ -37,7 +37,7 @@
                   </select>
                 </td>
               </tr>
-              [% IF messages.class %]<tr><td /><td><div class="errormsg">[% messages.class %]</div></td></tr>[% END %]
+              [% IF messages.class %]<tr><td /><td><div class="error">[% messages.class %]</div></td></tr>[% END %]
 -->
               <tr>
                 <td class="tdkey">name:</td>
@@ -47,7 +47,7 @@
                   human readable product name
                 </td>
               </tr>
-              [% IF messages.name %]<tr><td /><td><div class="errormsg">[% messages.name %]</div></td></tr>[% END %]
+              [% IF messages.name %]<tr><td /><td><div class="error">[% messages.name %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">on sale:</td>
                 <td>
@@ -55,7 +55,7 @@
                          [% IF product.data.on_sale %]checked="checked"[% END %] />
                 </td>
               </tr>
-              [% IF messages.on_sale %]<tr><td /><td><div class="errormsg">[% messages.on_sale %]</div></td></tr>[% END %]
+              [% IF messages.on_sale %]<tr><td /><td><div class="error">[% messages.on_sale %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">price:</td>
                 <td>
@@ -64,7 +64,7 @@
                   selling or setup fee
                 </td>
               </tr>
-              [% IF messages.price %]<tr><td /><td><div class="errormsg">[% messages.price %]</div></td></tr>[% END %]
+              [% IF messages.price %]<tr><td /><td><div class="error">[% messages.price %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">weight:</td>
                 <td>
@@ -73,7 +73,7 @@
                   weight for shipping
                 </td>
               </tr>
-              [% IF messages.weight %]<tr><td /><td><div class="errormsg">[% messages.weight %]</div></td></tr>[% END %]
+              [% IF messages.weight %]<tr><td /><td><div class="error">[% messages.weight %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">billing_profile:</td>
                 <td>
@@ -86,7 +86,7 @@
                 </td>
               </tr>
             </table>
-            <input type="submit" class="but" value="Save &#187;" />
+            <input type="submit" class="but ui-corner-all" value="Save &#187;" />
           </form>
         </div>
 

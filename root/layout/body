@@ -1,15 +1,15 @@
-  <div id="container">
+  <div class="container">
 
 [% PROCESS layout/header %]
-
-    <div id="content">
-
 [% PROCESS layout/menu %]
 
+    <div class="span-17 last content" id="content">
+
+
       <div id="contentplace">
-        [% IF prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
-        [% IF messages.topmsg %]<div class="goodmsg">[% messages.topmsg %]</div>[% END %]
-        [% IF messages.toperr %]<div class="errormsg">[% messages.toperr %]</div>[% END %]
+        [% IF prov_error %]<div class="error">[% prov_error %]</div>[% END %]
+        [% IF messages.topmsg %]<div class="success">[% messages.topmsg %]</div>[% END %]
+        [% IF messages.toperr %]<div class="error">[% messages.toperr %]</div>[% END %]
 
 [% content %]
       </div>

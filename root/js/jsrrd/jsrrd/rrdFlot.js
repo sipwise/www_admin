@@ -83,8 +83,8 @@ rrdFlot.prototype.createHTML = function() {
   var cellGraph=rowGraph.insertCell(-1);
   cellGraph.colSpan=3;
   var elGraph=document.createElement("Div");
-  elGraph.style.width="300px";
-  elGraph.style.height="170px";
+  elGraph.style.width="670px";
+  elGraph.style.height="200px";
   elGraph.id=this.graph_id;
   cellGraph.appendChild(elGraph);
 
@@ -99,7 +99,7 @@ rrdFlot.prototype.createHTML = function() {
   var cellScale=rowScale.insertCell(-1);
   cellScale.colSpan=2;
   var elScale=document.createElement("Div");
-  elScale.style.width="300px";
+  elScale.style.width="670px";
   elScale.style.height="80px";
   elScale.id=this.scale_id;
   cellScale.appendChild(elScale);
@@ -218,7 +218,7 @@ rrdFlot.prototype.bindFlotGraph = function(flot_obj) {
   fmt_cb = this.si_suffix ? suffixFormatter : null;
 
   var graph_options = {
-    legend: {show:false, position:"nw",noColumns:3},
+    legend: {show:false, position:"nw",noColumns:5, backgroundOpacity: 0.5 },
     lines: {show:true},
     xaxis: { mode: "time" },
     yaxis: { autoscaleMargin: 0.20, tickFormatter: fmt_cb },

@@ -6,9 +6,19 @@
 
   <title>[% template.title or site_config.title %]</title>
 
-  [% FOREACH css_file = site_config.css %]
-    <link rel="stylesheet" type="text/css" href="[% css_file %]" />
-  [% END %]
+  <!-- JQuery-UI -->
+  <link rel="stylesheet" type="text/css" href="/css/south-street/jquery-ui-1.8.7.custom.css" />
+  <link rel="stylesheet" type="text/css" href="/css/smooth/jquery-ui-1.8.7.custom.css" />
+  <script type="text/javascript" src="/js/jquery-1.4.4.min.js"></script>
+  <script type="text/javascript" src="/js/jquery-ui-1.8.7.custom.min.js"></script>
+  <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+  
+  <!-- Blueprint -->
+  <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print" />	
+  <!--[if lt IE 8]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection" /><![endif]-->
+
+  <link rel="stylesheet" type="text/css" href="/css/admin.css" media="screen, projection" />
 
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="content-language" content="[% site_config.language %]" />
@@ -18,6 +28,77 @@
   <meta name="Company" content="[% site_config.company.name %]" />
   <meta name="keywords" content="" />
   <meta name="Language" content="[% site_config.language_string %]" />
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+
+      var drawer = $.cookie('menustate');
+      if(drawer === undefined) {
+        drawer = 0;
+      }
+
+      $("#contentmenu").accordion({ 
+        header: "h3", 
+        autoHeight: false,
+        navigation: true,
+        alwaysOpen: false,
+        collapsible: false,
+        active: parseInt(drawer),
+        icons: { 'header': 'ui-icon-plus', 'headerSelected': 'ui-icon-minus' },
+        change: function(event,ui) {
+          var index = jQuery(this).find("h3").index(ui.newHeader[0]);
+          if(index > -1) {
+            $.cookie('menustate', index, { path: '/', expires: 2});
+          }
+        },
+      });
+
+      $("#search_from").datepicker({
+        dateFormat: 'dd.mm.yy',
+      });
+      $("#search_to").datepicker({
+        dateFormat: 'dd.mm.yy',
+      });
+
+
+      [% 
+         buttons = [
+           { name = "add", icon="plusthick" },
+           { name = "delete", icon="trash" },
+           { name = "cancel", icon="cancel" },
+           { name = "edit", icon="wrench" },
+           { name = "save", icon="check" },
+           { name = "back", icon="arrowthick-1-w" },
+           { name = "lock", icon="locked" },
+           { name = "lock-sub", icon="locked", subicon="triangle-1-s" },
+           { name = "unlock", icon="unlocked" },
+           { name = "terminate", icon="closethick" },
+           { name = "search", icon="search" },
+           { name = "show", icon="zoomin" },
+           { name = "hide", icon="zoomout" },
+           { name = "activate", icon="plus" },
+           { name = "deactivate", icon="minus" },
+           { name = "listen", icon="video" },
+           { name = "clock", icon="clock" },
+           { name = "cart", icon="cart" },
+           { name = "browse", icon="folder-open" },
+         ]
+      %]
+      [% FOREACH b = buttons %]
+        $(".button-[% b.name %]").button({
+          icons: {
+            primary: "ui-icon-[% b.icon %]",
+            [% IF b.subicon %]
+            secondary: "ui-icon-[% b.subicon %]",
+            [% END %]
+          },
+          text: false
+        });
+      [% END %]
+    });
+
+
+  </script>
 
 </head>
 

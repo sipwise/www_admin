@@ -3,11 +3,11 @@
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
 
-        <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#audio" class="aaction">back</a>
+        <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#audio"><span class="button-back">Back</span></a>
 
         <div class="p1">
-          [% IF messages.audiomsg %]<div class="goodmsg">[% messages.audiomsg %]</div>[% END %]
-          [% IF messages.audioerr %]<div class="errormsg">[% messages.audioerr %]</div>[% END %]
+          [% IF messages.audiomsg %]<div class="success">[% messages.audiomsg %]</div>[% END %]
+          [% IF messages.audioerr %]<div class="error">[% messages.audioerr %]</div>[% END %]
 
           <table class="audiofiles">
             <tr class="table_header">
@@ -35,23 +35,20 @@
                     <td>
                       <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                       <input type="hidden" name="handle" value="[% audio.handle %]" />
-                      <div class="postlink">
-                        <label for="audiosave">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="audiosave" />
-                      </div>
+                      <button class="button-save" id="audiosave">Save</button>
                     </td>
                   </form>
-                  <td><a href="/subscriber/edit_audio_files?subscriber_id=[% subscriber_id %]" class="aaction">cancel</a></td>
+                  <td><a href="/subscriber/edit_audio_files?subscriber_id=[% subscriber_id %]"><span class="button-cancel">Cancel</span></a></td>
                 </tr>
-                [% IF aerefill && prov_error %]<tr><td colspan="5"><div class="errormsg">[% prov_error %]</div></td></tr>[% END %]
+                [% IF aerefill && prov_error %]<tr><td colspan="5"><div class="error">[% prov_error %]</div></td></tr>[% END %]
               [% ELSE %]
                 <tr>
                   <td>[% audio.handle %]</td>
                   <td>[% audio.description %]</td>
-                  <td><a href="/subscriber/listen_audio?subscriber_id=[% subscriber_id %]&amp;handle=[% audio.handle %]">listen</a></td>
+                  <td><a href="/subscriber/listen_audio?subscriber_id=[% subscriber_id %]&amp;handle=[% audio.handle %]"><span class="button-listen">Listen</span></a></td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/subscriber/edit_audio_files?subscriber_id=[% subscriber_id %]&amp;edit_audio=[% audio.handle %]" class="aaction">edit</a>
+                    <a href="/subscriber/edit_audio_files?subscriber_id=[% subscriber_id %]&amp;edit_audio=[% audio.handle %]"><span class="button-edit">Edit</span></a>
                   [% END %]
                   </td>
                   <td>
@@ -59,10 +56,7 @@
                       <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                       <input type="hidden" name="handle" value="[% audio.handle %]" />
                       [% UNLESS Catalyst.session.admin.read_only %]
-                        <div class="postlink">
-                          <label for="audiodel[% id %]">delete</label>
-                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="audiodel[% id %]" />
-                        </div>
+                        <button class="button-delete" id="audiodel[% id %]">Delete</button>
                       [% END %]
                     </form>
                   </td>
@@ -85,15 +79,12 @@
                 </td>
                 <td>
                   <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
-                  <div class="postlink">
-                    <label for="audioadd">add</label>
-                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="audioadd" />
-                  </div>
+                  <button class="button-add" id="audioadd">Add</button>
                 </td>
               </form>
               <td />
             </tr>
           </table>
-          [% IF acrefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          [% IF acrefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
         </div>
 

@@ -539,10 +539,7 @@ sub rewrite : Local {
 
     $c->stash->{peer} = $peer_details;
     $c->stash->{all_peers} = \@final_peers;
-	$c->stash->{ifeditid} = $c->request->params->{ifeditid};
-	$c->stash->{iteditid} = $c->request->params->{iteditid};
-	$c->stash->{ofeditid} = $c->request->params->{ofeditid};
-	$c->stash->{oteditid} = $c->request->params->{oteditid};
+    $c->stash->{editid} = $c->request->params->{editid};
 
     return 1;
 }
@@ -616,6 +613,51 @@ sub create_rewrite : Local {
     $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
     return;
 }
+
+=head2 update_rewrite_priority
+
+Updates the priority of rewrite rules upon re-order
+
+=cut
+
+sub update_rewrite_priority : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    my $prio = 999;
+
+    my $rules = $c->request->params->{'rule[]'};
+
+    foreach my $rule_id(@$rules)
+    {
+       my $rule = undef;
+       $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_rewrite',
+           { id => $rule_id },
+           \$rule
+       );
+       $c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_rewrite',
+           { id   => $rule_id,
+             data => {
+               match_pattern => $rule->{match_pattern},
+               replace_pattern => $rule->{replace_pattern},
+               description => $rule->{description},
+               direction => $rule->{direction},
+               field => $rule->{field},
+               priority => $prio,
+             },
+           },
+           undef
+        );
+        $prio-- if($prio > 1);
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/");
+    return;
+}
+
 
 =head2 delete_rewrite
 

@@ -1,8 +1,8 @@
         <h3 id="provider">LNP Providers</h3>
 
         <div class="p1">
-          [% IF messages.provmsg %]<div class="goodmsg">[% messages.provmsg %]</div>[% END %]
-          [% IF messages.proverr %]<div class="errormsg">[% messages.proverr %]</div>[% END %]
+          [% IF messages.provmsg %]<div class="success">[% messages.provmsg %]</div>[% END %]
+          [% IF messages.proverr %]<div class="error">[% messages.proverr %]</div>[% END %]
           <table>
             <tr class="table_header">
               <td>ID</td>
@@ -21,7 +21,7 @@
                     </td>
                     <td>
                       <input type="hidden" name="id" value="[% provider.id %]" />
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="listedit[% provider.id %]">save</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif"
                                alt="" id="listedit[% provider.id %]" />
@@ -31,7 +31,7 @@
                   </form>
                 </tr>
                 [% IF messages.peditnamsg %]
-                <tr><td colspan="4"><div class="errormsg">[% messages.peditnamsg %]</div></td></tr>
+                <tr><td colspan="4"><div class="error">[% messages.peditnamsg %]</div></td></tr>
                 [% END %]
               [% ELSE %]
                 <tr>
@@ -46,7 +46,7 @@
                   [% UNLESS Catalyst.session.admin.read_only %]
                     <form action="/lnp/do_delete_provider" method="post">
                       <input type="hidden" name="id" value="[% provider.id %]" />
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="provdel[% provider.id %]">delete</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif"
                                alt="" id="provdel[% provider.id %]" />
@@ -68,7 +68,7 @@
                          value="[% parefill.name %]" />
                 </td>
                 <td>
-                  <div class="postlink">
+                  <div class="postlink ui-corner-all">
                     <label for="listpadd">add</label>
                     <input type="image" class="hidden" src="/static/images/dot_trans.gif"
                            alt="" id="listpadd" />
@@ -78,16 +78,16 @@
               </form>
             </tr>
           </table>
-          [% IF messages.paddidmsg %]<div class="errormsg">[% messages.paddidmsg %]</div>[% END %]
-          [% IF messages.paddnamsg %]<div class="errormsg">[% messages.paddnamsg %]</div>[% END %]
+          [% IF messages.paddidmsg %]<div class="error">[% messages.paddidmsg %]</div>[% END %]
+          [% IF messages.paddnamsg %]<div class="error">[% messages.paddnamsg %]</div>[% END %]
         </div> 
 
         [% UNLESS Catalyst.session.admin.read_only %]
         <h3 id="create_number">Add Ported Number</h3>
 
         <div class="p1">
-          [% IF messages.cnumsg %]<div class="goodmsg">[% messages.cnumsg %]</div>[% END %]
-          [% IF narefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          [% IF messages.cnumsg %]<div class="success">[% messages.cnumsg %]</div>[% END %]
+          [% IF narefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
           <form action="/lnp/do_create_number" method="post" class="search_subscriber">
             <label class="search_label" for="numaddnum">Number:</label>
             <input type="text" name="number" id="numaddnum" value="[% narefill.number %]"
@@ -106,7 +106,7 @@
             <label class="search_label" for="numaddend">End:</label>
             <input type="text" id="numaddend" name="end" value="[% narefill.end %]"
                    title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" /><br />
-            <input type="submit" value="Add &#187;" class="but" />
+            <input type="submit" value="Add &#187;" class="but ui-corner-all" />
           </form>
         </div>
         [% END %]
@@ -131,7 +131,7 @@
                    [% IF searched_numbers.exact_number %]checked="checked"[% END %] />
             <label for="exact_number">exact match</label><br />
 
-            <input type="submit" value="Search &#187;" class="but" />
+            <input type="submit" value="Search &#187;" class="but ui-corner-all" />
           </form>
         </div>
 
@@ -139,7 +139,7 @@
         <h3 id="stored_numbers">Found Ported Numbers</h3>
 
         <div class="p1">
-          [% IF messages.enumsg %]<div class="goodmsg">[% messages.enumsg %]</div>[% END %]
+          [% IF messages.enumsg %]<div class="success">[% messages.enumsg %]</div>[% END %]
           <table width="100%" style="border-spacing: 0px">
             <tr class="table_header">
               <td>number</td>
@@ -180,7 +180,7 @@
                   </td>
                   <td>
                     <input type="hidden" name="id" value="[% number.id %]" />
-                    <div class="postlink">
+                    <div class="postlink ui-corner-all">
                       <label for="numedit[% number.id %]">save</label>
                       <input type="image" class="hidden" src="/static/images/dot_trans.gif"
                              alt="" id="numedit[% number.id %]" />
@@ -196,7 +196,7 @@
                 [% ELSE %]
                   <tr class="tr_alt">
                 [% END %]
-                  <td colspan="6"><div class="errormsg">[% prov_error %]</div></td>
+                  <td colspan="6"><div class="error">[% prov_error %]</div></td>
                 </tr>
                 [% END %]
               </form>
@@ -222,7 +222,7 @@
                       <input type="hidden" name="id" value="[% number.id %]" />
                       <input type="hidden" name="last_one" value="[% last_one %]" />
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="numdel[% number.id %]">delete</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif"
                                alt="" id="numdel[% number.id %]" />

@@ -1,277 +1,178 @@
-/*
- * Relative size definitions like "large" ,"0.8em", etc.
- * don't work very well 'cross different browsers.
- * Allthought it is recommended to use them, they don't
- * give useable results.
- */
-body {
-	font: 14px Trebuchet MS, Lucida Sans Unicode, Arial, sans-serif !important;
-	/* hover effects for IE6 */
-	behavior:url("/css/csshover.htc");
-}
-h3 {
-	font-size: 18px !important;
+#header {
+  background-color: #459E00;
+  height: 50px;
+  margin-bottom: 20px;
 }
 
-#header #sipwise_logo {
-	margin: 3px;
-	width: 200px;
+#header h1 {
+  font-size: 24px;
+  color: #fff;
+  padding: 13px 0 13px 13px;
 }
 
-#header #heading {
-	position: absolute;
-	top: 20px;
-	left: 250px;
-	text-align: center;
-	width: 500px;
-	font-weight: bold;
-	font-size: 20px;
+#header .ui-corner-all {
+  margin: 13px 10px 13px 0;
+  border-color: #fff;
 }
 
-#header #client_logo {
-	position: absolute;
-	top: 2px;
-	right: 2px;
-	margin: 3px;
-	width: 200px;
-	text-align: right;
+#header span {
+  display: inline;
+  float: left;
+  margin-right: 5px;
+}
+
+#footer {
+  margin: 25px 0 0 0;
+  padding: 5px 0 5px 0;
+}
+
+#footer a, #footer p {
+  color: #bbb;
+  text-decoration: none;
+  text-align: center;
+}
+
+#footer a:hover {
+  text-decoration: underline;
 }
 
 #contentmenu li.active_menu a {
-	color: #D60808;
+  color: red;
 }
 
-/* hmm, menu doesn't extend container height ... */
-#container #content {
-	min-height: 580px;
+#content{
+  min-height: 350px;
 }
 
-/* contentmenu's width and contentplace' margin-left should match */
-#container #contentmenu {
-	width: 230px;
-}
-#container #contentplace {
-	margin-left: 230px;
+#content h3 {
+  margin-top: 30px;
 }
 
-/* submenu below headers in contentplace */
-ul#topsubmenu {
-	float: left;
-	list-style: none;
-	padding: 0;
-	width: 95%;
-	margin: 0px 0px 0px -3px;
+a, a:visited, a:link,
+.content .ui-state-default a, .content .ui-state-default a:visited, 
+.content .ui-state-default a:link {
+  color: #459E00;
+  text-decoration: none;
 }
 
-#topsubmenu li {
-	float: left;
-	color: #a0b6a0;
-	font-weight: bold;
-	margin: 0;
+a:hover {
+  color: #54c000;
+  text-decoration: none;
 }
 
-#topsubmenu li.active_submenu {
-	padding: 0px 10px;
-	border-top: 1px solid #c0d6c0;
-	color: #607660;
+.content .ui-sortable {
+  cursor: move;
 }
 
-#topsubmenu li.inactive_submenu {
-	padding: 0px 10px;
-	border-top: 1px solid #c0d6c0;
-	color: #c0d6c0;
+.content li.ui-state-default {
+  height: 26px;
 }
 
-#topsubmenu li.active_submenu a {
-	color: #D60808;
+.content li.ui-state-default div {
+  margin: 3px auto 3px auto;
+  height: 20px;
 }
 
-#topsubmenu li.inactive_submenu a {
-	color: #006600;
+.content .ui-button-icon-only .ui-button-text, 
+.content .ui-button-icons-only .ui-button-text {
+  padding: 0;
+  height: 20px;
+}
+.content .ui-button-icon-only { 
+  width: 20px; 
 }
 
-#topsubmenu a:hover {
-	color: #D60808 !important;
-	text-decoration: none;
-}
-#topsubmenu a:after {
-	margin-left: 0px !important;
-	content: "" !important;
-}
-
-#topsubmenuhr {
-	float: left;
-	width: 721px;
-	margin-top: 1px;
-	margin-bottom: 20px;
-	border-top: 1px solid #c0d6c0;
-	border-bottom: none;
-	border-left: none;
-	border-right: none;
-}
-
-/* red error messages */
-.errormsg {
-	width: auto;
-	margin: 0;
-	padding: 5px;
-	font-weight: bold;
-	color: #FF1010;
-}
-/* green success messages */
-.goodmsg {
-	width: auto;
-	margin: 0;
-	padding: 5px;
-	font-weight: bold;
-	color: #10BB40;
-}
-/* highlight text */
-.alert {
-	width: auto;
-	margin: 0;
-	padding: 0;
-	font-weight: bold;
-	color: #FF1010;
-}
-
-/* increase vertical spacing in tables */
-#contentplace td {
-	padding: 3px 5px 3px 5px;
-}
-#contentplace .inc_vspace td {
-	padding: 3px 10px 3px 10px;
-}
-
-/* some table alignment aliases */
-#contentplace .tdcenter {
-	text-align: center;
-}
-
-#contentplace .tdmiddle {
-	vertical-align: top;
-}
-
-#contentplace .tdkey {
-	font-weight: bold;
-	white-space: nowrap;
-	vertical-align: top;
-}
-
-#contentplace .table_header {
-	font-weight: bold;
-	white-space: nowrap;
-}
-.bottom {
-	vertical-align: bottom;
-}
-.header_rate_interval {
-	margin-left: 25px;
-	margin-right: -25px;
-}
-
-#contentplace .nowrap {
-	white-space: nowrap;
-}
-
-/* format links and images in post div's */
-#contentplace .postlink label {
-	font-weight: bold;
-	cursor: pointer;
-	color: #006600;
-	text-decoration: none;
-}
-#contentplace .postlink label:hover {
-	color: #D60808;
-	text-decoration: underline;
-}
-#contentplace .postlink label:after {
-	margin-left: 1px;
-	content: "\bb";
-	font-weight: bold;
-}
-#contentplace .postlink .hidden {
-	position: absolute;
-	top: -90000px;
-	left: -90000px;
-}
-
-/*
- * use smaller font for input elements (textfields)
- * and select boxes
- */
-#container #contentplace input {
-	font-size: 11px;
-	padding: 2px 2px 2px 3px;
-	border: 1px solid #606060;
-}
-
-/*
- * input type="file" can't be themed, so we use some magic
- */
-/*
-#container #contentplace div.fileinputs {
-	position: relative;
-	margin-left: 100px;
-}
-#container #contentplace div.fakefile {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	z-index: 1;
-}
-#container #contentplace input.file {
-	position: relative;
-	text-align: right;
-	-moz-opacity:0 ;
-	filter:alpha(opacity: 0);
-	opacity: 0;
-	z-index: 2;
-}
+.p1 {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: 10px 0 20px 0;
+/* foo
+  display: block;
+  float: left;
 */
-
-/* sigh, no border for checkboxes and radios */
-#contentplace .checkbox,
-#contentplace .radio {
-	border: none !important;
 }
 
-#contentplace .table input {
-	margin: -2px 0 -2px 0;
+/* disable alternating colors in tables */
+tbody tr:nth-child(2n) td,
+tbody tr.even td {
+/*
+  background: none repeat scroll 0 0 #b5ff7c;
+*/
+  background: none;
 }
 
-#contentplace select {
-	font-size: 11px;
-	border: 1px solid #606060;
+.nobg tbody tr:nth-child(2n) td,
+.nobg tbody tr.even td {
+  background: none;
 }
 
-/* use smaller font for buttons */
-#contentplace .but {
-	font-size: 11px;
-	text-align: center;
-	border: 1px solid #606060;
-	background-color: #e0e0e0;
-	padding: 2px !important;
-	margin: 3px 0 5px 0;
+.nobg td {
+  float: left !important;
 }
 
-/* print ">>" after hyper refs */
-#contentplace a:after {
-	margin-left: 1px;
-	content: "\bb";
-	font-weight: bold;
+/* sub menu */
+
+#topsubmenu {
+  padding: 0;
+  width: 100%;
+  overflow: hidden;
+  background: transparent;
 }
-/* no ">>" in heading */
-#contentplace h3 a:after {
-	margin-left: 0px;
-	content: "";
+
+.topsubmenu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-#contentplace a.force_arrows:after {
-	content: "\bb";
-	font-weight: bold;
+
+.topsubmenu li {
+  display: inline;
+  margin: 0 2px 0 0;
+  padding: 0;
 }
-#contentplace .p1 h3 {
-	margin: 10px 0px;
+
+.topsubmenu a {
+  float: left;
+  color: white;
+  background-color: #459E00;
+  margin: 0 2px 0 0;
+  padding: 0 0 1px 3px;
+  text-decoration: none;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.topsubmenu a span {
+  float: left;
+  display: block;
+  background: transparent;
+  padding: 7px 9px 3px 6px;
+  cursor: pointer;
+}
+
+.topsubmenu a span {
+float: none;
+}
+
+
+.topsubmenu a:hover, .topsubmenu li.selected a {
+  background-color: #54c000;
+  color: white;
+}
+
+.topsubmenu a:hover span {
+  background-color: transparent;
+}
+
+.topsubmenudivider {
+  clear: both;
+  padding: 0;
+  width: 100%;
+  height: 2px;
+  line-height: 2px;
+  background-color: #54c000;
+  border#top: 1px solid #fff;
+  margin-bottom: 20px;
 }
 
 /* specify position of edit/lock/delete action links */
@@ -283,256 +184,88 @@ ul#topsubmenu {
 	margin: 0 8px 0 0;
 	font-weight: bold;
 }
-#contentplace .actions a#lock:after {
-	content: "\ab";
-}
-
-/* colors for disabled input fields */
-#contentplace .disabled {
-	color: #808080;
-	background-color: #f4f4f4;
-}
-
-#contentplace .txtpreference {
-	width: 160px;
-}
-
-/* customize login form */
-#login {
-	border: none;
-	margin: 0 0 0 10px;
-}
-#login label {
-	font-weight: bold;
-}
-#login_user, #login_pass {
-	font-size: 11px;
-	margin: 3px 0 5px 0;
-	padding: 3px;
-	width: 120px;
-}
-
-/* decrease input text field for password and start / stop times*/
-#edit_pass, #edit_webpass,
-#contentplace input.peaktime {
-	width: 95px;
-}
-
-/* increase input text fields */
-.ilong {
-	width: 300px;
-}
-
-/* decrease input text fields */
-.imedium {
-	width: 140px;
-}
-
-/* decrease input text fields  for LNP number edit */
-.ilnpnumedit {
-	margin: 0 -2px 0 -6px;
-	width: 115px;
-}
-.ilnpproedit {
-	margin: 0 -4px 0 -2px;
-	width: 145px;
-}
-.ilnptimedit {
-	margin: 0 -2px;
-	width: 135px;
-}
-
-.ihandle {
-	width: 90px;
-}
-.iaudiodesc {
-	width: 240px;
-}
-
-/* decrease input text fields for ac */
-.ishort {
-	width: 50px;
-}
-
-/* decrease input text fields for cc */
-.irealshort {
-	width: 30px;
-}
-
-/* increase spacing between password and show/hide href */
-#contentplace .apass {
-	vertical-align: middle;
-	margin: 0 0 0 5px;
-}
-
-/* increase spacing between amount and add textfield in
- * account balance edit
- */
-#contentplace .account_add {
-	margin: 0 0 0 15px;
-}
-/* decrease input text field for amounts */
-#contentplace .account_add input {
-	width: 50px;
-}
 
 /* floating menu for subscriber lock */
 #contentplace .floating {
 	z-index: 100;
 	display: none;
 	position: absolute;
-	top: 20px;
-	left: 50px;
+	top: 255px;
+	left: 343px;
 	border: 1px solid #006600;
 	background-color: #DDFFDD;
 	padding: 3px 10px 3px 5px;
 }
-#contentplace .menu_foo {
-	z-index: 200;
-	overflow: auto;
-	margin: 0;
-	width: 200px;
-	height: 200px;
+
+#contentplace input, #contentplace select {
+  border: 1px solid  #ddddd;
+  margin: 0; 
 }
 
-/* correct margin for active paginations */
-.pagination li.currentpage, .pagination li.disablepage {
-	margin: 0 5px 0 0;
-}
-/* no ">>" in pagination next / previous */
-#contentplace .pagination li.nextpage a:after {
-	margin-left: 0px;
-	content: "";
-}
-
-/* colorful table rows */
-#contentplace .tr_alt {
-	background-color: #eeffee;
-}
-
-#contentplace .orders,
-#contentplace .contracts,
-#contentplace .order_payments,
-#contentplace .registered_contacts,
-#contentplace .billing_fees,
-#contentplace .billing_peaktimes,
-#contentplace .peering_rules,
-#contentplace .peering_servers,
-#contentplace .peering_rw_rules,
-#contentplace .numberblocks
-{
-	width: 100%;
-	border-spacing: 0px;
-}
-
-#contentplace .domains
-{
-	border-spacing: 0px;
-}
-
-#contentplace .table_name {
-	font-weight: bold;
-	white-space: nowrap;
+#contentplace .but, #contentplace .postlink, 
+#contentplace .actions/*, #contentplace .aaction */ {
+	font-size: 11px;
 	text-align: center;
-}
-
-/* align search labels and text fields */
-#contentplace .search_subscriber .search_label {
-	float: left;
-	min-width: 100px;
-	margin-top: 3px;
-}
-#contentplace .search_subscriber input {
-	margin: 4px 0;
-}
-#contentplace .search_subscriber select {
-	min-width: 50px;
-	margin: 3px 0;
-}
-#contentplace .search_subscriber .radio {
-	margin: 6px 0px;
-}
-
-#contentplace .usr_preferences .radio {
-	margin: 2px 0px;
-}
-
-/* increase spacing around list explanation text */
-#contentplace .list_explanation {
-	margin-bottom: 10px;
-}
-
-/* strikeout deactivated entries in list edit */
-#contentplace .listentry_disabled {
-	text-decoration: line-through;
-}
-
-#contentplace form.peakedit {
-	float: left;
-	margin-right: 10px;
-}
-
-#contentplace .reducespace {
-	margin-bottom: -10px;
-}
-
-#contentplace .padding6 {
-	padding: 6px;
-}
-
-.topbottomspace {
-	margin: 5px 0;
-}
-
-#local_ac {
-	margin: 5px 0 7px 10px;
-}
-#save_local_ac {
-	margin: 0 0 0 15px;
-}
-
-/* CDR display styles */
-#contentplace .sortcalllist {
-	margin: 0px;
-	padding: 4px 0;
-}
-#contentplace .sortcalllist img {
-	vertical-align: middle;
-	padding: 0 0 2px 10px;
-}
-#contentplace .calllist {
-	width: 100%;
-	margin: 0 0 10px 0;
-	padding: 0px;
-	border: none;
-	border-collapse: collapse;
-	border-top: 1px solid #D0DCDF;
-}
-#contentplace .calllist td {
-	margin: 0px;
-	padding: 3px 5px;
-	vertical-align: top;
-}
-#contentplace .calllist .calllistheader td {
-	padding: 10px 0 3px 0;
+	border: 1px solid  #459E00;
+	color: #fff;
 	font-weight: bold;
-}
-#contentplace .calllist .calltype {
-	width: 20px;
-}
-#contentplace .calllist .calltype img {
-	margin: 1px 0 0 0;
-}
-/* #contentplace .calllist .callnumber, */
-#contentplace .calllist .callduration {
-	text-align: right;
-}
-#contentplace .calllist .callfee,
-#contentplace .calllist .calldate {
-	text-align: right;
+	background-color: #459E00;
+	padding: 2px !important;
+	margin: 3px 0 5px 0;
+	width: 70px;
 	white-space: nowrap;
 }
+#contentplace .actions a, #contentplace .actions a:hover,
+#contentplace .aaction a, #contentplace .aaction a:hover,
+#contentplace .postlink a, #contentplace .postlink a:hover
+{
+	color: #fff;
+	text-decoration: none;
+}
 
+#contentplace .inlinecontainer {
+  height: 10px;
+}
+
+
+#contentplace .inlinecontainer .inline {
+  display: block;
+  float: left;
+  margin-right: 10px;
+}
+
+/*
+.button-add, .button-del, .button-cancel, 
+.button-edit, .button-save, .button-back,
+.button-lock, .button-unlock, .button-terminate {
+  margin: 3px 0 3px 0;
+}
+
+button.button-add, button.button-del, button.button-cancel, 
+button.button-edit, button.button-save, button.button-back,
+button.button-lock, button.button-unlock, button.button-terminate {
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+*/
+
+ul.cleanlist {
+  list-style: none;
+}
+ul.cleanlist li {
+  list-style-type: none;
+  list-style-position: inside;
+  float: left;  
+  width: 100%;
+  margin-bottom: 1px;
+  padding: 3px;
+}
+
+.listentry_disabled {
+  text-decoration: line-through;
+}
+
+/* TODO: remove table */
 /* column layout using tables */
 #columns31 {
 	width: 100%;
@@ -556,4 +289,24 @@ ul#topsubmenu {
 }
 #contentplace #callsearch input {
 	margin: 2px 0;
+}
+
+.pagination li.currentpage, .pagination li.disablepage {
+	margin: 0 5px 0 0;
+}
+
+#contentplace .pagination li.nextpage a:after {
+	margin-left: 0px;
+	content: "";
+}
+
+.hspace-20 {
+  margin: 10px 0 10px 0;
+  width: 100%;
+  float: left;
+  display: block;
+}
+
+.ishort {
+  width: 70px;
 }
