@@ -2,23 +2,19 @@
           <a class="noarrow" href="detail?subscriber_id=[% subscriber.subscriber_id %]">
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
-
-        <ul id="topsubmenu">
-          <li>|</li>
-          <li class="inactive_submenu"><a href="detail?subscriber_id=[% subscriber.subscriber_id %]">User</a></li>
-          <li>|</li>
-          <li class="inactive_submenu"><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]">Preferences</a></li>
-          <li>|</li>
+        
+        <div class="topsubmenu">
+        <ul>
+          <li><a href="detail?subscriber_id=[% subscriber.subscriber_id %]"><span>User</span></a></li>
+          <li><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]"><span>Preferences</span></a></li>
         [% IF Catalyst.session.admin.call_data %]
-          <li class="active_submenu"><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]">CDRs</a></li>
-          <li>|</li>
+          <li class="selected"><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]"><span>CDRs</span></a></li>
         [% END %]
-        </ul><br />
-        <hr id="topsubmenuhr" />
+        </ul>
+        </div>
+        <div class="topsubmenudivider"> </div>
 
         <h3 id="calldata">Call Data</h3>
-
-        <div class="p1">
 
           <table id="columns31">
           <tr>
@@ -81,27 +77,22 @@
                   [% END %]
                 [% END %]
               </select><br />
-              <label for="search_from">or from (DD.MM.YYYY)</label><br />
+              <label for="search_from">or from</label><br />
               <input type="text" id="search_from" name="list_start" size="10" value="[% subscriber.list_start %]" /><br />
-              <label for="search_to">and to (DD.MM.YYYY)</label><br />
+              <label for="search_to">and to</label><br />
               <input type="text" id="search_to" name="list_end" size="10" value="[% subscriber.list_end %]"/><br />
 
-              <div id="errormsg"><p>[% messages.msgdate %]</p></div>
+              <div id="error"><p>[% messages.msgdate %]</p></div>
 
               <label for="search_filter">search term</label><br />
               <input type="text" id="search_filter" name="list_filter" size="15" value="[% subscriber.list_filter %]" />
               <br />
               <br />
 
-              <div class="postlink">
-                <label for="calllist_apply_filter">apply filter</label><br />
-                <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="calllist_apply_filter" />
-              </div>
+              <button class="button-search" id="calllist_apply_filter">Search</button>
 
             </form>
           </td>
           </tr>
           </table>
-
-        </div>
 

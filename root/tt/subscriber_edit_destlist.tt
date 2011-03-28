@@ -3,9 +3,7 @@
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
 
-        <div class="actions">
-          <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#faxprefs" class="aaction">back</a>
-        </div>
+        <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#faxprefs"><span class="button-back">Back</span></a>
         <div class="p1">
           <div class="list_explanation">
             The fax messages and/or notifications will be distributed to the following list of email addresses and phone numbers.
@@ -55,22 +53,14 @@
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     <input type="hidden" name="list_del" value="[% listentry.destination %]" />
                     <input type="hidden" name="list_add" value="[% listentry.destination %]" />
-                    <div class="postlink">
-                      <label for="listedit[% listentry.id %]">save</label>
-                      <input type="image" class="hidden" src="/static/images/dot_trans.gif"
-                             alt="" id="listedit[% listentry.id %]" />
-                    </div>
+                    <button class="button-add" id="listedit[% listentry.id %]">Add</button>
                   </td>
                 </form>
                 <form action="edit_destlist" method="post">
                   <td>
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
-                    <div class="postlink">
-                      <label for="listdel[% listentry.id %]">cancel</label>
-                      <input type="image" class="hidden" src="/static/images/dot_trans.gif"
-                             alt="" id="listdel[% listentry.id %]" />
-                    </div>
+                    <button class="button-delete" id="listdel[% listentry.id %]">Delete</button>
                   </td>
                 </form>
               </tr>
@@ -91,11 +81,7 @@
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     <input type="hidden" name="list_edit" value="[% listentry.destination %]" />
-                    <div class="postlink">
-                      <label for="listedit[% listentry.id %]">edit</label>
-                      <input type="image" class="hidden" src="/static/images/dot_trans.gif"
-                             alt="" id="listedit[% listentry.id %]" />
-                    </div>
+                    <button class="button-edit" id="listedit[% listentry.id %]">Edit</button>
                   </td>
                 </form>
                 <form action="do_edit_destlist" method="post">
@@ -103,11 +89,7 @@
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     <input type="hidden" name="list_del" value="[% listentry.destination %]" />
-                    <div class="postlink">
-                      <label for="listdel[% listentry.id %]">delete</label>
-                      <input type="image" class="hidden" src="/static/images/dot_trans.gif"
-                             alt="" id="listdel[% listentry.id %]" />
-                    </div>
+                    <button class="button-delete" id="listdel[% listentry.id %]">Delete</button>
                   </td>
                 </form>
               </tr>
@@ -157,15 +139,13 @@
                          [% IF arefill.status %]checked="checked"[% END %] />
                 </td>
                 <td colspan="2">
-                  <div class="postlink">
-                    <label for="listadd">Add entry</label>
-                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="listadd" />
+                    <button class="button-add" id="listadd">Add</button>
                   </div>
                 </td>
               </form>
             </tr>
           </table>
-          [% IF messages.msgadd %]<div class="errormsg">[% messages.msgadd %]</div>[% END %]
+          [% IF messages.msgadd %]<div class="error">[% messages.msgadd %]</div>[% END %]
 
         </div>
 

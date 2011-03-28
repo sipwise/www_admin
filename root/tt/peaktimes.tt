@@ -19,7 +19,7 @@
               [% IF weekday.ranges %]
                 [% id = 0 %]
                 [% FOREACH range = weekday.ranges %]
-                <div class="postlink">
+                <div class="postlink ui-corner-all">
                   <form action="/billing/do_edit_peaktime" method="post" class="peakedit">
                     <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
                     <input type="hidden" name="weekday" value="[% wd %]" />
@@ -29,37 +29,32 @@
                            value="[% range.restore_start || range.start %]" /> -
                     <input type="text" class="peaktime" name="end" title="hh:mm:ss"
                            value="[% range.restore_end || range.end %]" />
-                    <label for="peaksave[% id %]">save</label>
-                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksave[% id %]" />
+                    <button class="button-edit" id="peaksave[% id %]">Edit</button>
                   </form>
                   <form action="/billing/do_edit_peaktime" method="post">
                     <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
                     <input type="hidden" name="weekday" value="[% wd %]" />
                     <input type="hidden" name="startold" value="[% range.start %]" />
                     <input type="hidden" name="endold" value="[% range.end %]" />
-                    <label for="peakdel[% id %]">delete</label>
-                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peakdel[% id %]" />
+                    <button class="button-delete" id="peakdel[% id %]">Delete</button>
                   </form><br clear="all" class="reducespace" />
                 </div>
                 [% id = id + 1 %]
                 [% END %]
               [% END %]
                 <form action="/billing/do_edit_peaktime" method="post">
-                  <div class="postlink">
                     <input type="hidden" name="weekday" value="[% wd %]" />
                     <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
                     <input type="text" class="peaktime" name="start" title="hh:mm:ss"
                            value="[% newrange.start %]" /> -
                     <input type="text" class="peaktime" name="end" title="hh:mm:ss"
                            value="[% newrange.end %]" />
-                    <label for="peaksavenew">save</label>
-                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksavenew" />
-                  </div>
+                    <button class="button-save" id="peaksavenew">Save</button>
                 </form>
-                [% IF messages.epeakmsg %]<div class="goodmsg">[% messages.epeakmsg %]</div>[% END %]
-                [% IF messages.epeakerr %]<div class="errormsg">[% messages.epeakerr %]</div>[% END %]
+                [% IF messages.epeakmsg %]<div class="success">[% messages.epeakmsg %]</div>[% END %]
+                [% IF messages.epeakerr %]<div class="error">[% messages.epeakerr %]</div>[% END %]
               </td>
-              <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]" class="aaction">exit</a></td>
+              <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]"><span class="button-cancel">Cancel</span></a></td>
             [% ELSE %]
               <td>
               [% IF weekday.ranges %]
@@ -71,7 +66,7 @@
               [% END %]
               </td>
               [% UNLESS Catalyst.session.admin.read_only %]
-              <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;edit_weekday=[% wd %]" class="aaction">edit</a></td>
+              <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;edit_weekday=[% wd %]"><span class="button-edit">Edit</span></a></td>
               [% ELSE %]
               <td />
               [% END %]
@@ -109,25 +104,18 @@
                              value="[% newrange.end %]" />
                     </td>
                     <td>
-                      <div class="postlink">
-                        <label for="peaksavenew">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksavenew" />
+                        <button class="button-save" id="peaksavenew">Save</button>
                         &nbsp;
-                        <a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]#special"
-                           class="aaction">cancel</a>
-                      </div>
+                        <a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]#special"><span class="button-cancel">Cancel</span></a>
                     </td>
                   </tr>
                 </table>
               </form>
-              [% IF messages.epeakmsg %]<div class="goodmsg">[% messages.epeakmsg %]</div>[% END %]
-              [% IF messages.epeakerr %]<div class="errormsg">[% messages.epeakerr %]</div>[% END %]
+              [% IF messages.epeakmsg %]<div class="success">[% messages.epeakmsg %]</div>[% END %]
+              [% IF messages.epeakerr %]<div class="error">[% messages.epeakerr %]</div>[% END %]
             </div>
           [% ELSE %]
-            <div class="actions">
-              <a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]&amp;edit_date=new#special"
-                 class="aaction">add new date</a>
-            </div>
+              <a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]&amp;edit_date=new#special"><span class="button-add">Add</span></a>
           [% END %]
         [% END %]
 
@@ -168,7 +156,6 @@
                     [% IF date.ranges %]
                       [% id = 0 %]
                       [% FOREACH range = date.ranges %]
-                      <div class="postlink">
                         <form action="/billing/do_edit_peaktime" method="post" class="peakedit">
                           <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
                           <input type="hidden" name="show_year" value="[% show_year %]" />
@@ -179,8 +166,7 @@
                                  value="[% range.restore_start || range.start %]" /> -
                           <input type="text" class="peaktime" name="end" title="hh:mm:ss"
                                  value="[% range.restore_end || range.end %]" />
-                          <label for="peaksave[% id %]">save</label>
-                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksave[% id %]" />
+                          <button class="button-save" id="peaksave[% id %]">Save</button>
                         </form>
                         <form action="/billing/do_edit_peaktime" method="post">
                           <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
@@ -188,15 +174,12 @@
                           <input type="hidden" name="date" value="[% date.date %]" />
                           <input type="hidden" name="startold" value="[% range.start %]" />
                           <input type="hidden" name="endold" value="[% range.end %]" />
-                          <label for="peakdel[% id %]">delete</label>
-                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peakdel[% id %]" />
+                          <button class="button-delete" id="peakdel[% id %]">Delete</button>
                         </form><br clear="all" class="reducespace" />
-                      </div>
                       [% id = id + 1 %]
                       [% END %]
                     [% END %]
                       <form action="/billing/do_edit_peaktime" method="post">
-                        <div class="postlink">
                           <input type="hidden" name="show_year" value="[% show_year %]" />
                           <input type="hidden" name="date" value="[% date.date %]" />
                           <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
@@ -204,14 +187,12 @@
                                  value="[% newrange.start %]" /> -
                           <input type="text" class="peaktime" name="end" title="hh:mm:ss"
                                  value="[% newrange.end %]" />
-                          <label for="peaksavenew">save</label>
-                          <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="peaksavenew" />
-                        </div>
+                          <button class="button-save" id="peaksavenew">Save</button>
                       </form>
-                      [% IF messages.epeakmsg %]<div class="goodmsg">[% messages.epeakmsg %]</div>[% END %]
-                      [% IF messages.epeakerr %]<div class="errormsg">[% messages.epeakerr %]</div>[% END %]
+                      [% IF messages.epeakmsg %]<div class="success">[% messages.epeakmsg %]</div>[% END %]
+                      [% IF messages.epeakerr %]<div class="error">[% messages.epeakerr %]</div>[% END %]
                     </td>
-                    <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]#special" class="aaction">exit</a></td>
+                    <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]#special"><span class="button-cancel">Cancel</span></a></td>
                   [% ELSE %]
                     <td>
                     [% IF date.ranges %]
@@ -223,7 +204,7 @@
                     [% END %]
                     </td>
                     [% UNLESS Catalyst.session.admin.read_only %]
-                    <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]&amp;edit_date=[% date.date %]" class="aaction">edit</a></td>
+                    <td><a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]&amp;show_year=[% show_year %]&amp;edit_date=[% date.date %]"><span class="button-edit">Edit</span></a></td>
                     [% ELSE %]
                     <td />
                     [% END %]

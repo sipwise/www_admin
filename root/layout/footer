@@ -1,7 +1,9 @@
 <!-- BEGIN layout/footer -->
-    <div id="footer">
-      NGCP www_admin version [% Catalyst.VERSION %] -
-      Copyright 2007-2010 Sipwise GmbH, Austria.<br />
-      <a href="http://sipwise.com/">www.sipwise.com</a>
+    <div id="footer" class="span-24 last">
+      <p>
+        NGCP www_admin version [% Catalyst.VERSION %] -
+        Copyright 2007-2011 Sipwise GmbH, Austria.<br />
+        <a href="http://sipwise.com/">www.sipwise.com</a>
+      </p>
     </div>
 <!-- END layout/footer -->

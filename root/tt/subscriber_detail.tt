@@ -4,53 +4,48 @@
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
 
-        <ul id="topsubmenu">
-          <li>|</li>
-          <li class="active_submenu"><a href="detail?subscriber_id=[% subscriber.subscriber_id %]">User</a></li>
-          <li>|</li>
-          <li class="inactive_submenu"><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]">Preferences</a></li>
-          <li>|</li>
+        <div class="topsubmenu">
+        <ul>
+          <li class="selected"><a href="detail?subscriber_id=[% subscriber.subscriber_id %]"><span>User</span></a></li>
+          <li><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]"><span>Preferences</span></a></li>
         [% IF Catalyst.session.admin.call_data %]
-          <li class="inactive_submenu"><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]">CDRs</a></li>
-          <li>|</li>
+          <li><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]"><span>CDRs</span></a></li>
         [% END %]
-        </ul><br />
-        <hr id="topsubmenuhr" />
+        </ul>
+        </div>
+        <div class="topsubmenudivider"> </div>
 
         [% ELSE %]
         <h3>Create New Subscriber</h3>
 
-        <ul id="topsubmenu">
-          <li>|</li>
-          <li class="active_submenu">User</li>
-          <li>|</li>
-          <li class="inactive_submenu">Preferences</li>
-          <li>|</li>
+        <div class="topsubmenu">
+        <ul>
+          <li class="selected"><a href="#"><span>User</span></a></li>
+          <li><a href="#"><span>Preferences</span></a></li>
         [% IF Catalyst.session.admin.call_data %]
-          <li class="inactive_submenu">CDRs</li>
-          <li>|</li>
+          <li><a href="#"><span>CDRs</span></a></li>
         [% END %]
-        </ul><br />
-        <hr id="topsubmenuhr" />
+        </ul>
+        </div>
+        <div class="topsubmenudivider"> </div>
 
         [% END %]
 
         <h3 id="master">Master Data</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <div class="actions">
-        [% IF subscriber.subscriber_id %]
-          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_subscriber=1" class="aaction">edit</a>
+        [% IF subscriber.subscriber_id && !edit_subscriber %]
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_subscriber=1"><span class="button-edit">Edit</span></a>
         [% END %]
         [% IF edit_subscriber %]
           [% IF subscriber.subscriber_id %]
-          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]" class="aaction">cancel</a>
+          <a href="detail?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-cancel">Cancel</span></a>
           [% ELSE %]
-          <a href="/account/detail?account_id=[% account_id %]" class="aaction">cancel</a>
+          <a href="/account/detail?account_id=[% account_id %]"><span class="cancel">Cancel</span></a>
           [% END %]
         [% ELSE %]
           <script language="JavaScript" src="/js/openclose.js" type="text/javascript"></script>
-          <a id="lock" href="javascript:;" class="aaction" onclick="javascript:openclose();" onkeypress="javascript:openclose();">lock</a>
+          <a id="lock" href="javascript:;" onclick="javascript:openclose();" onkeypress="javascript:openclose();"><span class="button-lock-sub">Lock</span></a>
           <span id="lock_menu" class="floating" onmouseout="javascript:openclose();">
             <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=none" class="aaction">unlock</a><br />
             <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=foreign" class="aaction">foreign</a><br />
@@ -58,33 +53,25 @@
             <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=incoming" class="aaction">incoming and outgoing</a><br />
             <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=global" class="aaction">global</a><br />
           </span>
-          <a href="terminate?subscriber_id=[% subscriber.subscriber_id %]" class="aaction">terminate</a>
+          <a href="terminate?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-terminate">Terminate</span></a>
         [% END %]
-        </div>
       [% END %]
 
-        <div class="p1">
         [% IF subscriber.is_locked %]
           <div class="alert">[% subscriber.is_locked %]</div>
         [% END %]
-          [% IF messages.submsg %]<div class="goodmsg">[% messages.submsg %]</div>[% END %]
-          [% IF messages.suberr %]<div class="errormsg">[% messages.suberr %]</div>[% END %]
+          [% IF messages.submsg %]<div class="success">[% messages.submsg %]</div>[% END %]
+          [% IF messages.suberr %]<div class="error">[% messages.suberr %]</div>[% END %]
           <form action="update_subscriber" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
             <input type="hidden" name="account_id" value="[% account_id %]" />
-            <table class="table">
-              <tr><td class="tdkey">SubscriberID:</td><td>[% subscriber.subscriber_id %]</td></tr>
-              <tr>
-                <td class="tdkey">ContractID:</td>
-                <td>
-                  <a href="/account/detail?account_id=[% subscriber.account_id || account_id %]">
-                    [% subscriber.account_id || account_id %]</a>
-                </td>
-              </tr>
-
-              <tr>
-                <td class="tdkey">web user:</td>
-                <td>
+            <div class="hspace-20"></div>
+            <ul class="cleanlist">
+              <li class="ui-state-default"><div class="span-6">Subscriber ID:</div><div class="span-10 last">[% subscriber.subscriber_id %]</div></li>
+              <li class="ui-state-default"><div class="span-6">Contract ID:</div><div class="span-10 last"><a href="/account/detail?account_id=[% subscriber.account_id || account_id %]">[% subscriber.account_id || account_id %]</a></div></li>
+              <li class="ui-state-default">
+                <div class="span-6">Web User:</div>
+                <div class="span-10 last">
                 [% IF edit_subscriber %]
                   <input type="text" name="webusername" value="[% subscriber.webusername %]"
                          title="the username (without domain) used for login at the SOAP and CSC interfaces, string" />
@@ -92,66 +79,67 @@
                 [% ELSE %]
                   [% subscriber.webusername %]@[% subscriber.domain %]
                 [% END %]
-                </td>
-              </tr>
-              [% IF messages.webusername %]<tr><td /><td><div class="errormsg">[% messages.webusername %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">web password:</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.webusername %]<div class="error">[% messages.webusername %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-6">Web Password:</div>
+                <div class="span-9">
                 [% IF edit_subscriber %]
                   <input type="text" name="webpassword" id="edit_webpass" value="[% subscriber.edit_webpass %]"
                          title="the password used for login at the SOAP and CSC interfaces, string" />
                 [% ELSE %]
-                  <input type="text" id="edit_webpass" class="disabled" disabled="disabled"
-                         title="the password used for login at the SOAP and CSC interfaces, string"
                   [% IF show_webpass  && Catalyst.session.admin.show_passwords %]
-                    value="[% subscriber.webpassword %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
+                    [% subscriber.webpassword %]</div><div class="span-1 last"><a href="?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-hide">Hide</span></a></div>
                   [% ELSE %]
                     [% IF subscriber.webpassword %]
-                      value="********" />
+                      ********</div><div class="span-1 last">
                       [% IF Catalyst.session.admin.show_passwords %]
-                        <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_webpass=1" class="apass">Show</a>
+                        <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_webpass=1"><span class="button-show">Show</span></a>
                       [% END %]
+                      </div>
                     [% ELSE %]
-                      value="" />
+                      </div>
                     [% END %]
                   [% END %]
                 [% END %]
-                </td>
-              </tr>
-              [% IF messages.webpassword %]<tr><td /><td><div class="errormsg">[% messages.webpassword %]</div></td></tr>[% END %]
-
-              <tr>
-                <td class="tdkey">E.164 number:</td>
-                <td>
+              </li>
+              [% IF messages.webpassword %]<div class="error">[% messages.webpassword %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-6">E.164 Number:</div>
                 [% IF edit_subscriber %]
+                  <div class="span-2">
                   <input type="text" name="cc" class="ishort" value="[% subscriber.cc %]"
                          title="the country code of the E.164 number, integer" />
+                  </div>
+                  <div class="span-2">
                   <input type="text" name="ac" class="ishort" value="[% subscriber.ac %]"
                          title="the area code of the E.164 number, integer" />
+                  </div>
+                  <div class="span-6 last">
                   <input type="text" name="sn" value="[% subscriber.sn %]"
                          title="the subscriber part of the E.164 number, numeric string" />
+                  </div>
                 [% ELSE %]
-                  <input type="text" class="disabled" disabled="disabled"
+                  <div class="span-10 last">
                   [% IF subscriber.sn %]
-                    value="+[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %]" />
+                    +[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %]
                   [% ELSE %]
-                    value="" />
                   [% END %]
+                  </div>
                 [% END %]
-                </td>
-              </tr>
-              [% IF messages.number %]<tr><td /><td><div class="errormsg">[% messages.number %]</div></td></tr>[% END %]
-              [% IF messages.number_cc %]<tr><td /><td><div class="errormsg">[% messages.number_cc %]</div></td></tr>[% END %]
-              [% IF messages.number_ac %]<tr><td /><td><div class="errormsg">[% messages.number_ac %]</div></td></tr>[% END %]
-              [% IF messages.number_sn %]<tr><td /><td><div class="errormsg">[% messages.number_sn %]</div></td></tr>[% END %]
+              </li>
+              [% IF messages.number %]<div class="error">[% messages.number %]</div>[% END %]
+              [% IF messages.number_cc %]<div class="error">[% messages.number_cc %]</div>[% END %]
+              [% IF messages.number_ac %]<div class="error">[% messages.number_ac %]</div>[% END %]
+              [% IF messages.number_sn %]<div class="error">[% messages.number_sn %]</div>[% END %]
 
               [% IF subscriber.subscriber_id %]
-              <tr><td class="tdkey">SIP URI:</td><td>[% subscriber.username %]@[% subscriber.domain %]</td></tr>
+              <li class="ui-state-default"><div class="span-6">SIP URI:</div><div class="span-10 last">[% subscriber.username %]@[% subscriber.domain %]</div></li>
               [% ELSE %]
-              <tr>
-                <td class="tdkey">SIP URI:</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-6">SIP URI:</div>
+                <div class="span-10 last">
                   <input type="text" name="username" value="[% subscriber.username %]"
                          title="the local part of the SIP URI, string" />
                   @
@@ -160,90 +148,80 @@
                     <option>[% sdom.domain %]</option>
                   [% END %]
                   </select>
-                </td>
-              </tr>
+                </div>
+              </li>
               [% END %]
-              <tr>
-                <td class="tdkey">SIP password:</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-6">SIP password:</div>
                 [% IF edit_subscriber %]
-                  <input type="text" name="password" id="edit_pass" value="[% subscriber.edit_pass %]"
+                  <div class="span-10 last">
+                    <input type="text" name="password" id="edit_pass" value="[% subscriber.edit_pass %]"
                          title="the password used for SIP authentication, string" />
+                  </div>
                 [% ELSE %]
-                  <input type="text" id="edit_pass" class="disabled" disabled="disabled"
-                         title="the password used for SIP authentication, string"
-                  [% IF show_pass && Catalyst.session.admin.show_passwords %]
-                    value="[% subscriber.password %]" /> <a href="?subscriber_id=[% subscriber.subscriber_id %]" class="apass">Hide</a>
+                  <div class="span-9">
+                    [% IF show_pass && Catalyst.session.admin.show_passwords %]
+                    [% subscriber.password %]</div><div class="span-1 last"><a href="?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-hide">Hide</span></a></div>
                   [% ELSE %]
                     [% IF subscriber.password %]
-                      value="********" />
+                      ********</div><div class="span-1 last">
                       [% IF Catalyst.session.admin.show_passwords %]
-                        <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_pass=1" class="apass">Show</a>
-                      [% END %]
+                        <a href="?subscriber_id=[% subscriber.subscriber_id %]&amp;show_pass=1"><span class="button-show">Show</span></a>
+                      [% END %]</div>
                     [% ELSE %]
-                      value="" />
+                      </div>
                     [% END %]
                   [% END %]
                 [% END %]
-                </td>
-              </tr>
-              [% IF messages.password %]<tr><td /><td><div class="errormsg">[% messages.password %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">administrative:</td>
-                <td>
+              </li>
+              [% IF messages.password %]<div class="error">[% messages.password %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-6">Administrative:</div>
+                <div class="span-10 last">
                   <input type="checkbox" name="admin" class="checkbox" [% IF ! edit_subscriber %]disabled="disabled"[% END %]
                          title="if checked, the subscriber may create and edit other subscribers in the same VoIP account"
                   [% IF subscriber.admin %]checked="checked"[% END %] />
-                </td>
-              </tr>
-              <tr><td class="tdkey">UUID:</td><td>[% subscriber.uuid %]</td></tr>
-              <tr><td class="tdkey">created:</td><td>[% subscriber.create_timestamp %]</td></tr>
-              <tr><td class="tdkey">modified:</td><td>[% subscriber.modify_timestamp %]</td></tr>
-            </table>
-
+                </div>
+              </li>
+              <li class="ui-state-default"><div class="span-6">UUID:</div><div class="span-10 last">[% subscriber.uuid %]</div></li>
+              <li class="ui-state-default"><div class="span-6">Created:</div><div class="span-10 last">[% subscriber.create_timestamp %]</div></li>
+              <li class="ui-state-default"><div class="span-6">Modified:</div><div class="span-10 last">[% subscriber.modify_timestamp %]</div></li>
+          </ul>
           [% IF edit_subscriber %]
-            <input type="submit" class="but" value="Save &#187;" />
+            <div class="hspace-20"></div>
+            <button name="submit" class="button-save">Save</button>
           [% END %]
           </form>
-        </div>
 
         [% IF subscriber.subscriber_id %]
 
+        <div class="hspace-20"></div>
         <h3 id="activeregs">Active Registrations</h3>
 
-        [% IF messages.contmsg %]<div class="goodmsg">[% messages.contmsg %]</div>[% END %]
+        [% IF messages.contmsg %]<div class="success">[% messages.contmsg %]</div>[% END %]
 
-        <div class="p1">
+          <ul class="cleanlist">
           [% IF subscriber.registered_contacts.0 %]
-            <table class="registered_contacts">
-              [% bgflip = 1 %]
+              <li class="ui-state-default">
+                <div class="span-5">User Agent</div>
+                <div class="span-5">Contact</div>
+                <div class="span-1">NAT</div>
+                <div class="span-4 append-1 last">Expires</div>
+              </li>
+
               [% FOREACH regcon = subscriber.registered_contacts %]
-                <tr [% IF bgflip %]class="tr_alt"[% END %]>
-                  <td class="tdkey">User Agent:</td><td>[% regcon.user_agent %]</td>
-                </tr>
-                <tr [% IF bgflip %]class="tr_alt"[% END %]>
-                  <td class="tdkey">Contact:</td><td>[% regcon.contact %]</td>
-                </tr>
-                <tr [% IF bgflip %]class="tr_alt"[% END %]>
-                  <td class="tdkey">NAT detected:</td><td>[% IF regcon.nat %]yes[% ELSE %]no[% END %]</td>
-                </tr>
-                <tr [% IF bgflip %]class="tr_alt"[% END %]>
-                  <td class="tdkey">Expires:</td>
-                  <td>[% regcon.expires %] &nbsp;
-                      <a href="expire?subscriber_id=[% subscriber.subscriber_id %]&amp;contact_id=[% regcon.id %]">expire now</a>
-                  </td>
-                </tr>
-                [% IF bgflip %]
-                  [% bgflip = 0 %]
-                [% ELSE %]
-                  [% bgflip = 1 %]
-                [% END %]
+                <li class="ui-state-default">
+                  <div class="span-5"> [% regcon.user_agent %]</div>
+                  <div class="span-5">[% regcon.contact %]</div>
+                  <div class="span-1">[% IF regcon.nat %]yes[% ELSE %]no[% END %]</div>
+                  <div class="span-4">[% regcon.expires %]</div>
+                  <div class="span-1 last"><a href="expire?subscriber_id=[% subscriber.subscriber_id %]&amp;contact_id=[% regcon.id %]"><span class="button-delete">Expire Now</span></a></div>
+                </li>
               [% END %]
-            </table>
           [% ELSE %]
-            <b>none</b>
+            <li class="ui-state-default"><div>None</div></li>
           [% END %]
-        </div>
+          </ul>
 
         [% END %]
 

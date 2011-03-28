@@ -3,210 +3,187 @@
             [% grp.group.name %]</a>
         </h2>
 
-        <a href="/peering" class="aaction">back</a>
+          <a href="/peering"><span class="button-back">Back</span></a>
 
         <h3>Peering Servers</h3>
 
-        <div class="p1">
-          [% IF messages.servmsg %]<div class="goodmsg">[% messages.servmsg %]</div>[% END %]
-          [% IF messages.serverr %]<div class="errormsg">[% messages.serverr %]</div>[% END %]
+          [% IF messages.servmsg %]<div class="success">[% messages.servmsg %]</div>[% END %]
+          [% IF messages.serverr %]<div class="error">[% messages.serverr %]</div>[% END %]
 
-          <table class="peering_servers">
-            <tr class="table_header">
-              <td>Name</td>
-              <td>IP Address</td>
-              <td>Port</td>
-              <td>Weight</td>
-              <td style="width:40px;" />
-              <td style="width:60px;" />
-            </tr>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-4">Name</div>
+              <div class="span-4">IP Address</div>
+              <div class="span-3">Port</div>
+              <div class="span-3 last">Weight</div>
+            </li>
             [% id = 0 %]
             [% FOREACH peer = grp.peers %]
-              <tr>
+              <li class="ui-state-default">
                 [% IF peer.id == peditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_peer" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="peerid" value="[% peer.id %]" />
-                    <td>
+                    <div class="span-4">
                       <input type="text" size="15 id="addtxt" title="string, peer name"
                              name="name" value="[% peer.name %]" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-4">
                       <input type="text" size="15" id="addtxt" title="string, peer ip address"
                              name="ip" value="[% peer.ip %]" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-3">
                       <input type="text" size="5" id="addtxt" title="int, peer port (1-65535)"
                              name="port" value="[% peer.port %]" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-3 append-1">
                       <input type="text" size="3" id="addtxt" title="int, peer weight (0-255)"
                              name="weight" value="[% peer.weight %]" />
-                    </td>
-                    <td>
-                      <div class="postlink">
-                        <label for="psave[% id %]">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="psave[% id %]" />
-                      </div>
-                    </td>
+                    </div>
+                    <div class="span-1">
+                        <button id="psave[% id %]" class="button-save">Save</button>
+                    </div>
                   </form>
-                  <td><a href="/peering/detail?group_id=[% grp.group.id %]" class="aaction">cancel</a></td>
+                  <div class="span-1 last">
+                     <a href="/peering/detail?group_id=[% grp.group.id %]"><span class="button-cancel">Cancel</span></a>
+                  </div>
                 [% ELSE %]
-                  <td><a href="/peering/rewrite?peer_id=[% peer.id%]" class="aaction">[% peer.name %]</a></td>
-                  <td>[% peer.ip %]</td>
-                  <td>[% peer.port %]</td>
-                  <td>[% peer.weight %]</td>
-                  <td>
+                  <div class="span-4"><a href="/peering/rewrite?peer_id=[% peer.id%]" class="aaction">[% peer.name %]</a></div>
+                  <div class="span-4">[% peer.ip %]</div>
+                  <div class="span-3">[% peer.port %]</div>
+                  <div class="span-3 append-1">[% peer.weight %]</div>
+                  <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering/detail?group_id=[% grp.group.id %]&peditid=[% peer.id %]" class="aaction">edit</a>
+                      <a href="/peering/detail?group_id=[% grp.group.id %]&peditid=[% peer.id %]"><span class="button-edit">Edit</span></a>
                   [% END %]
-                  </td>
+                  </div>
                   <form action="/peering/delete_peer" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="peerid" value="[% peer.id %]" />
-                    <td>
+                    <div class="span-1 last">
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink">
-                        <label for="pdel[% id %]">delete</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="pdel[% id %]" />
-                      </div>
+                        <button class="button-delete" id="pdel[% id %]">Delete</button>
                     [% END %]
-                  </td>
+                  </div>
                 [% END %]  
                 </form>
-              </tr>
+              </li>
             [% id = id + 1 %]
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
-            <tr>
+            <li class="ui-state-default">
                   <form action="/peering/create_peer" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
-                    <td>
+                    <div class="span-4">
                       <input type="text" size="15" id="addtxt" title="string, peer name"
                              name="name" value="" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-4">
                       <input type="text" size="15" id="addtxt" title="string, peer ip address"
                              name="ip" value="" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-3">
                       <input type="text" size="5" id="addtxt" title="int, peer port (1-65535)"
                              name="port" value="5060" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-3 append-1">
                       <input type="text" size="3" id="addtxt" title="int, peer weight (0-255)"
                              name="weight" value="1" />
-                    </td>
-                    <td>
-                          <div class="postlink">
-                            <label for="padd">add</label>
-                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="padd" />
-                          </div>
+                    </div>
+                    <div class="span-1 append-1 last">
+                            <button class="button-add" id="padd">Add</button>
+                    </div>
                   </form>
-                    </td>
-                    <td />
-            </tr>
+            </li>
             [% END %]
-          </table>
-        </div>
+          </ul>
 
 	[% IF grp.peers.size > 0 %]
 
+        <div class="hspace-20"></div>
         <h3>Peering Rules</h3>
 
-        <div class="p1">
-          [% IF messages.erulmsg %]<div class="goodmsg">[% messages.erulmsg %]</div>[% END %]
-          [% IF messages.erulerr %]<div class="errormsg">[% messages.erulerr %]</div>[% END %]
+          [% IF messages.erulmsg %]<div class="success">[% messages.erulmsg %]</div>[% END %]
+          [% IF messages.erulerr %]<div class="error">[% messages.erulerr %]</div>[% END %]
 
-          <table class="peering_rules">
-            <tr class="table_header">
-              <td>Callee Prefix</td>
-              <td>Caller Pattern</td>
-              <td>Description</td>
-              <td style="width:40px;" />
-              <td style="width:60px;" />
-            </tr>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-4">Callee Prefix</div>
+              <div class="span-4">Caller Pattern</div>
+              <div class="span-4 last">Description</div>
+            </li>
             [% id = 0 %]
             [% FOREACH rule = grp.rules %]
-              <tr>
+              <li class="ui-state-default">
                 [% IF rule.id == reditid && !Catalyst.session.admin.read_only %]
                   <form action="/peering/edit_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="ruleid" value="[% rule.id %]" />
-                    <td>
+                    <div class="span-4">
                       <input type="text" size="15 id="addtxt" title="string, callee prefix"
                              name="callee_prefix" value="[% rule.callee_prefix %]" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-4">
                       <input type="text" size="15" id="addtxt" title="string, caller pattern"
                              name="caller_prefix" value="[% rule.caller_prefix %]" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-4 append-3">
                       <input type="text" size="15" id="addtxt" title="string, rule description"
                              name="description" value="[% rule.description %]" />
-                    </td>
-                    <td>
-                      <div class="postlink">
-                        <label for="rsave[% id %]">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="rsave[% id %]" />
-                      </div>
-                    </td>
+                    </div>
+                    <div class="span-1">
+                        <button class="button-save" id="rsave[% id %]">Save</button>
+                    </div>
                   </form>
-                  <td><a href="/peering/detail?group_id=[% grp.group.id %]" class="aaction">cancel</a></td>
+                  <div class="span-1 last">
+                      <a href="/peering/detail?group_id=[% grp.group.id %]"><span class="button-cancel">Cancel</span></a>
+                  </div>
                 [% ELSE %]
-                  <td>[% rule.callee_prefix %]</td>
-                  <td>[% rule.caller_prefix %]</td>
-                  <td>[% rule.description %]</td>
-                  <td>
+                  <div class="span-4">[% rule.callee_prefix %]</div>
+                  <div class="span-4">[% rule.caller_prefix %]</div>
+                  <div class="span-4 append-3">[% rule.description %]</div>
+                  <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering/detail?group_id=[% grp.group.id %]&reditid=[% rule.id %]" class="aaction">edit</a>
+                      <a href="/peering/detail?group_id=[% grp.group.id %]&reditid=[% rule.id %]"><span class="button-edit">Edit</span></a>
                   [% END %]
-                  </td>
+                  </div>
                   <form action="/peering/delete_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="ruleid" value="[% rule.id %]" />
-                    <td>
+                    <div class="span-1 last">
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink">
-                        <label for="rdel[% id %]">delete</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="rdel[% id %]" />
-                      </div>
+                      <button class="button-delete" id="rdel[% id %]">Delete</button>
                     [% END %]
-                  </td>
+                  </div>
                 [% END %]  
                 </form>
-              </tr>
+              </li>
             [% id = id + 1 %]
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
-            <tr>
+            <li class="ui-state-default">
                   <form action="/peering/create_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
-                    <td>
+                    <div class="span-4">
                       <input type="text" size="15" id="addtxt" title="string, callee prefix"
                              name="callee_prefix" value="" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-4">
                       <input type="text" size="15" id="addtxt" title="string, caller pattern"
                              name="caller_prefix" value="" />
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-4 append-3">
                       <input type="text" size="15" id="addtxt" title="string, rule description"
                              name="description" value="" />
-                    </td>
-                    <td>
-                          <div class="postlink">
-                            <label for="radd">add</label>
-                            <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="radd" />
-                          </div>
+                    </div>
+                    <div class="span-1 last">
+                            <button class="button-add" id="radd">Add</button>
+                    </div>
                   </form>
-                    </td>
-                    <td />
-            </tr>
+            </li>
             [% END %]
 
-          </table>
-        </div>
+          </ul>
 
 	[% END %]
 

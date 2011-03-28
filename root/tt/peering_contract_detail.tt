@@ -5,31 +5,32 @@
         [% END %]
 
         [% UNLESS contract.terminate_timestamp || Catalyst.session.admin.read_only %]
-          <div class="actions">
-          <a href="/peering" class="aaction">back</a>
+        <div class="inlinecontainer">
+          <a href="/peering"><span class="button-back">Back</span></a>
           [% IF edit_contract %]
             [% IF contract.id %]
-              <a href="terminate_contract?contract_id=[% contract.id %]" class="aaction">terminate</a>
-              <a href="delete_contract?contract_id=[% contract.id %]" class="aaction">delete</a>
+              <a href="terminate_contract?contract_id=[% contract.id %]"><span class="button-terminate">Terminate</span></a>
+              <a href="delete_contract?contract_id=[% contract.id %]"><span class="button-delete">Delete</span></a>
             [% END %]
           [% END %]          
-          </div>
+        </div>
         [% END %]
-        <div class="p1">
 
-          [% IF messages.conmsg %]<div class="goodmsg">[% messages.conmsg %]</div>[% END %]
-          [% IF messages.conerr %]<div class="errormsg">[% messages.conerr %]</div>[% END %]
+          [% IF messages.conmsg %]<div class="success">[% messages.conmsg %]</div>[% END %]
+          [% IF messages.conerr %]<div class="error">[% messages.conerr %]</div>[% END %]
+
+          <div class="hspace-20"></div>
           <form action="save_contract" method="post">
             <input type="hidden" name="contract_id" value="[% contract.id %]" />
-            <table>
+            <ul class="cleanlist">
             [% IF contract.id %]
-              <tr><td class="tdkey">ContractID:</td><td>[% contract.id %]</td></tr>
+              <li class="ui-state-default"><div class="span-5">Contract ID:</div><div class="span-10 last">[% contract.id %]</div></li>
             [% END %]
 
             [% IF billing_features %]
-              <tr>
-                <td class="tdkey">billing profile:</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-5">Billing Profile:</div>
+                <div class="span-10 last">
                 [% IF edit_contract %]
                   <select size="1" name="billing_profile">
                   [% FOREACH profile = billing_profiles %]
@@ -42,34 +43,34 @@
                 [% ELSE %]
                   [% contract.billing_profile_name %]
                 [% END %]
-                </td>
-              </tr>
+                </div>
+              </li>
             [% END %]
             
-            <tr><td colspan="2">Peering contact person or company:</td></tr>
+            <li class="ui-state-default"><div class="span-14 last">Peering contact person or company:</div></li>
             [% FOREACH contact_form_field = contact_form_fields %]
-            <tr>
-                <td class="tdkey">[% contact_form_field.label %]:</td>
-                <td>
+            <li class="ui-state-default">
+                <div class="prepend-1 span-4">[% contact_form_field.label %]:</div>
+                <div class="span-10 last">
                   [% IF edit_contract %]
                     <input type="text" name="[% contact_form_field.field %]" value="[% contact_form_field.value %]" />
                   [% ELSE %]
                     [% contact_form_field.value %]
                   [% END %]  
-                </td>
-              </tr>
+                </div>
+              </li>
             [% END %]
 
             [% IF contract.id %]
-              <tr><td class="tdkey">created:</td><td>[% contract.create_timestamp %]</td></tr>
-              <tr><td class="tdkey">modified:</td><td>[% contract.modify_timestamp %]</td></tr>
+              <li class="ui-state-default"><div class="span-5">Created:</div><div class="span-10 last">[% contract.create_timestamp %]</div></li>
+              <li class="ui-state-default"><div class="span-5">Modified:</div><div class="span-10 last">[% contract.modify_timestamp %]</div></li>
               [% IF contract.terminate_timestamp %]
-              <tr><td class="tdkey">terminated:</td><td><div class="alert">[% contract.terminate_timestamp %]</div></td></tr>
+              <li class="ui-state-default"><div class="span-5">Terminated:</div><div class="span-10 last"><div class="alert">[% contract.terminate_timestamp %]</div></div></li>
               [% END %]
             [% END %]
-            </table>
+            </ul>
             [% IF edit_contract %]
-              <input type="submit" class="but" value="Save &#187;" />
+              <div class="hspace-20"></div>
+              <button name="submit" class="button-save">Save</button>
             [% END %]
           </form>
-        </div>

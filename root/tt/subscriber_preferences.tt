@@ -3,57 +3,54 @@
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
 
-        <ul id="topsubmenu">
-          <li>|</li>
-          <li class="inactive_submenu"><a href="detail?subscriber_id=[% subscriber.subscriber_id %]">User</a></li>
-          <li>|</li>
-          <li class="active_submenu"><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]">Preferences</a></li>
-          <li>|</li>
+        <div class="topsubmenu">
+        <ul>
+          <li><a href="detail?subscriber_id=[% subscriber.subscriber_id %]"><span>User</span></a></li>
+          <li class="selected"><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]"><span>Preferences</span></a></li>
         [% IF Catalyst.session.admin.call_data %]
-          <li class="inactive_submenu"><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]">CDRs</a></li>
-          <li>|</li>
+          <li><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]"><span>CDRs</span></a></li>
         [% END %]
-        </ul><br />
-        <hr id="topsubmenuhr" />
+        </ul>
+        </div>
+        <div class="topsubmenudivider"> </div>
 
         <h3 id="userprefs">User Preferences</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <div class="actions">
-          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_preferences=1#userprefs" class="aaction">edit</a>
           [% IF edit_preferences %]
-          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#userprefs" class="aaction">cancel</a>
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#userprefs"><span class="button-cancel">Cancel</span></a>
+          [% ELSE %]
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_preferences=1#userprefs"><span class="button-edit">Edit</span></a>
           [% END %]
-        </div>
       [% END %]
-        <div class="p1">
-          [% IF messages.prefmsg %]<div class="goodmsg">[% messages.prefmsg %]</div>[% END %]
-          [% IF messages.preferr %]<div class="errormsg">[% messages.preferr %]</div>[% END %]
-          [% IF edit_preferences && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          [% IF messages.prefmsg %]<div class="success">[% messages.prefmsg %]</div>[% END %]
+          [% IF messages.preferr %]<div class="error">[% messages.preferr %]</div>[% END %]
+          [% IF edit_preferences && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
             <form action="update_preferences" method="post">
               <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
-              <table class="usr_preferences">
+              <div class="hspace-20"></div>
+              <ul class="cleanlist">
             [% FOREACH preference = subscriber.preferences_array %]
               [% IF preference.max_occur == 1 %]
                 [% IF preference.key == "block_in_mode" || preference.key == "block_out_mode"
                    || preference.key == "adm_block_in_mode" || preference.key == "adm_block_out_mode" %]
-                <tr>
-                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
-                  <td>
+                <li class="ui-state-default">
+                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                  <div class="span-10 last">
                     <select size="1" name="[% preference.key %]"
                       [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
                       <option value="0" [% IF ! preference.value %]selected="selected"[% END %]>blacklist</option>
                       <option value="1" [% IF preference.value %]selected="selected"[% END %]>whitelist</option>
                     </select>
-                  </td>
-                </tr>
+                  </div>
+                </li>
                 [% ELSIF preference.key == "cfu"
                       || preference.key == "cfb"
                       || preference.key == "cft"
                       || preference.key == "cfna" %]
-                <tr>
-                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
-                  <td>
+                <li class="ui-state-default">
+                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                  <div class="span-10 last">
                   [% IF edit_preferences %]
                     <input type="radio" id="[% preference.key %]disable" value="disable" name="[% preference.key %]_target" class="radio"
                            [% IF preference.value == "" && ! preference.error %]checked="checked"[% END %] />
@@ -95,13 +92,13 @@
                              class="disabled txtpreference" disabled="disabled" />
                     [% END %]
                   [% END %]
-                  </td>
-                </tr>
-                [% IF preference.value.error %]<tr><td /><td><div class="errormsg">[% preference.value.error %]</div></td></tr>[% END %]
+                  </div>
+                </li>
+                [% IF preference.value.error %]<div class="error">[% preference.value.error %]</div>[% END %]
                 [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
-                <tr>
-                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
-                  <td>
+                <li class="ui-state-default">
+                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                  <div class="span-10 last">
                     [% IF ncos_levels %]
                       <select size="1" name="[% preference.key %]"
                               [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
@@ -117,34 +114,34 @@
                     [% ELSE %]
                       [% IF edit_preferences %]no NCOS levels defined[% END %]
                     [% END %]
-                  </td>
-                </tr>
+                  </div>
+                </li>
                 [% ELSIF preference.data_type == "boolean" %]
-                <tr>
-                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
-                  <td>
+                <li class="ui-state-default">
+                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                  <div class="span-10 last">
                     <input type="checkbox" name="[% preference.key %]" class="checkbox"
                       [% IF ! edit_preferences %]disabled="disabled"[% END %]
                       [% IF preference.value %]checked="checked"[% END %] />
-                  </td>
-                </tr>
+                  </div>
+                </li>
                 [% ELSE %]
-                <tr>
-                  <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
-                  <td>
+                <li class="ui-state-default">
+                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                  <div class="span-10 last">
                     <input type="text" name="[% preference.key %]" [% IF ! edit_preferences %]
                       class="disabled txtpreference" disabled="disabled"
                       [% ELSE %]
                       class="txtpreference"
                       [% END %]
                       value="[% preference.value %]" />
-                  </td>
-                </tr>
+                  </div>
+                </li>
                 [% END %]
               [% ELSE %]
-              <tr>
-                <td class="tdkey" title="[% preference.description %]">[% preference.key %]:</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-9">
                   [% IF preference.value %]
                     <select size="1" name="[% preference.key %]">
                     [% FOREACH pref_entry = preference.value %]
@@ -152,197 +149,191 @@
                     [% END %]
                     </select>
                   [% ELSE %]
-                  <select size="1" name="[% preference.key %]" />
+                  <select size="1" name="[% preference.key %]"></select>
                   [% END %]
+                </div>
+                <div class="span-1 last">
                   [% IF ! edit_preferences && ! Catalyst.session.admin.read_only %]
-                    &nbsp;
                     [% IF preference.key == "allowed_ips" || preference.key == "man_allowed_ips" %]
-                      <a href="edit_iplist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
-                         class="aaction">edit list</a>
+                      <a href="edit_iplist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
                     [% ELSE %]
-                      <a href="edit_list?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"
-                         class="aaction">edit list</a>
+                      <a href="edit_list?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
                     [% END %]
                   [% END %]
-                </td>
-              </tr>
+                </div>
+              </li>
               [% END %]
-              [% IF preference.error %]<tr><td /><td><div class="errormsg">[% preference.error %]</div></td></tr>[% END %]
+              [% IF preference.error %]<div class="error">[% preference.error %]</div>[% END %]
             [% END %]
-            </table>
+            </ul>
           [% IF edit_preferences %]
-            <input type="submit" class="but" value="Save &#187;" />
+            <div class="hspace-20"></div>
+            <button name="submit" class="button-save">Save</button>
           [% END %]
           </form>
-        </div>
 
+        <div class="hspace-20"></div>
         <h3 id="reminder">Reminder Calls</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <div class="actions">
-          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_reminder=1#reminder" class="aaction">edit</a>
           [% IF edit_reminder %]
-          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#reminder" class="aaction">cancel</a>
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#reminder"><span class="button-cancel">Cancel</span></a>
+          [% ELSE %]
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_reminder=1#reminder"><span class="button-edit">Edit</span></a>
           [% END %]
-        </div>
       [% END %]
-        <div class="p1">
-          [% IF messages.remmsg %]<div class="goodmsg">[% messages.remmsg %]</div>[% END %]
-          [% IF messages.remerr %]<div class="errormsg">[% messages.remerr %]</div>[% END %]
-          [% IF edit_reminder && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          [% IF messages.remmsg %]<div class="success">[% messages.remmsg %]</div>[% END %]
+          [% IF messages.remerr %]<div class="error">[% messages.remerr %]</div>[% END %]
+          [% IF edit_reminder && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
           <form action="update_reminder" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
-            <table>
-              <tr>
-                <td class="tdkey">Time:</td>
-                <td>
+            <ul class="cleanlist">
+              <li class="ui-state-default">
+                <div class="span-4">Time:</div>
+                <div class="span-10 last">
                   <input type="text" name="time" [% IF ! edit_reminder %]class="disabled" disabled="disabled"[% END %]
                          title="time for the reminder call, in hh:mm format - no seconds"
                          value="[% subscriber.reminder.time %]" />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">Recurrence:</td>
-                <td>
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-4">Recurrence:</div>
+                <div class="span-10 last">
                   <select size="1" name="recur" [% IF ! edit_reminder %]class="disabled" disabled="disabled"[% END %]
                           title="never: does not recur; weekdays: Monday to Saturday; always: every day">
                     <option [% 'selected="selected"' IF subscriber.reminder.recur == "never" %]>never</option>
                     <option [% 'selected="selected"' IF subscriber.reminder.recur == "weekdays" %]>weekdays</option>
                     <option [% 'selected="selected"' IF subscriber.reminder.recur == "always" %]>always</option>
                   </select>
-                </td>
-              </tr>
-            </table>
+                </div>
+              </li>
+            </ul>
           [% IF edit_reminder %]
-            <input type="submit" class="but" value="Save &#187;" />
+            <div class="hspace-20"></div>
+            <button name="submit" class="button-save">Save</button>
           [% END %]
           </form>
-        </div>
 
+        <div class="hspace-20"></div>
         <h3 id="speeddial">Speed Dial</h3>
-        <div class="p1">
-          <table>
-            <tr>
-              <td class="tdkey">Speed dial slots:</td>
-              <td>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-4">Speed dial slots:</div>
+              <div class="span-11">
                 <select size="1" name="speed_dial_slots">
                 [% FOREACH sdslot = speed_dial_slots %]
                     <option>[% sdslot.label %]</option>
                 [% END %]
                 </select>
+              </div>
+              <div class="span-1 last">
                 [% UNLESS Catalyst.session.admin.read_only %]
-                    &nbsp;
-                    <a href="edit_speed_dial_slots?subscriber_id=[% subscriber.subscriber_id %]&amp;"
-                       class="aaction">edit list</a>
+                    <a href="edit_speed_dial_slots?subscriber_id=[% subscriber.subscriber_id %]&amp;"><span class="button-edit">Edit List</span></a>
                 [% END %]
-              </td>
-            </tr>
-          </table>
-        </div>
+              </div>
+            </li>
+          </ul>
 
       [% IF Catalyst.config.subscriber.audiofile_features %]
 
+        <div class="hspace-20"></div>
         <h3 id="audio">Audio Files</h3>
-        <div class="p1">
-          <table>
-            <tr>
-              <td class="tdkey">Existing audio files:</td>
-              <td>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-4">Existing audio files:</div>
+              <div class="span-11">
                 <select size="1" name="audio_files">
                 [% FOREACH audio = subscriber.audio_files %]
                     <option>[% audio.handle %]</option>
                 [% END %]
                 </select>
+              </div>
+              <div class="span-1 last">
                 [% UNLESS Catalyst.session.admin.read_only %]
-                    &nbsp;
-                    <a href="edit_audio_files?subscriber_id=[% subscriber.subscriber_id %]"
-                       class="aaction">edit list</a>
+                    <a href="edit_audio_files?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-edit">Edit</span></a>
                 [% END %]
-              </td>
-            </tr>
-          </table>
+              </div>
+            </li>
+          </ul>
         </div>
 
     [% END %]
 
     [% IF subscriber.voicebox_preferences %]
 
+        <div class="hspace-20"></div>
         <h3 id="vboxprefs">Voicebox Preferences</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <div class="actions">
-          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_voicebox=1#vboxprefs" class="aaction">edit</a>
           [% IF edit_voicebox %]
-          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#vboxprefs" class="aaction">cancel</a>
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#vboxprefs"><span class="button-cancel">Cancel</span></a>
+          [% ELSE %]
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_voicebox=1#vboxprefs"><span class="button-edit">Edit</span></a>
           [% END %]
-        </div>
       [% END %]
-        <div class="p1">
-          [% IF messages.vboxmsg %]<div class="goodmsg">[% messages.vboxmsg %]</div>[% END %]
-          [% IF messages.vboxerr %]<div class="errormsg">[% messages.vboxerr %]</div>[% END %]
-          [% IF edit_voicebox && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          [% IF messages.vboxmsg %]<div class="success">[% messages.vboxmsg %]</div>[% END %]
+          [% IF messages.vboxerr %]<div class="error">[% messages.vboxerr %]</div>[% END %]
+          [% IF edit_voicebox && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
           <form action="update_voicebox" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
-            <table>
-              <tr>
-                <td class="tdkey">PIN:</td>
-                <td>
+            <ul class="cleanlist">
+              <li class="ui-state-default">
+                <div class="span-4">PIN:</div>
+                <div class="span-10 last">
                   <input type="text" name="password" [% IF ! edit_voicebox %]class="disabled" disabled="disabled"[% END %]
                          title="numeric password for the voicebox, usually 4 digits"
                     value="[% subscriber.voicebox_preferences.password %]" />
-                </td>
-              </tr>
-              [% IF messages.vpin %]<tr><td /><td><div class="errormsg">[% messages.vpin %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">E-Mail:</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.vpin %]<div class="error">[% messages.vpin %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-4">E-Mail:</div>
+                <div class="span-10 last">
                   <input type="text" name="email" [% IF ! edit_voicebox %]class="disabled" disabled="disabled"[% END %]
                          title="email address where notifications will be sent"
                     value="[% subscriber.voicebox_preferences.email %]" />
-                </td>
-              </tr>
-              [% IF messages.vemail %]<tr><td /><td><div class="errormsg">[% messages.vemail %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">Attach WAV:</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.vemail %]<div class="error">[% messages.vemail %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-4">Attach WAV:</div>
+                <div class="span-10 last">
                   <input type="checkbox" name="attach" class="checkbox" [% IF ! edit_voicebox %]disabled="disabled"[% END %]
                          title="if checked, the recording will be attached to the email"
                     [% IF subscriber.voicebox_preferences.attach %]checked="checked"[% END %] />
-                </td>
-              </tr>
-              <tr>
-                <td class="tdkey">Delete WAV:</td>
-                <td>
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-4">Delete WAV:</div>
+                <div class="span-10 last">
                   <input type="checkbox" name="delete" class="checkbox" [% IF ! edit_voicebox %]disabled="disabled"[% END %]
                          title="if checked, the recording will be removed after it has been sent vial email"
                     [% IF subscriber.voicebox_preferences.delete %]checked="checked"[% END %] />
-                </td>
-              </tr>
-            </table>
+                </div>
+              </li>
+            </ul>
           [% IF edit_voicebox %]
-            <input type="submit" class="but" value="Save &#187;" />
+            <div class="hspace-20"></div>
+            <button name="submit" class="button-save">Save</button>
           [% END %]
           </form>
-        </div>
 
     [% END %]
 
     [% IF subscriber.fax_preferences %]
 
+        <div class="hspace-20"></div>
         <h3 id="faxprefs">Fax Preferences</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <div class="actions">
-          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_fax=1#faxprefs" class="aaction">edit</a>
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_fax=1#faxprefs"><span class="button-edit">Edit</span></a>
           [% IF edit_fax %]
-          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#faxprefs" class="aaction">cancel</a>
+          <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#faxprefs"><span class="button-cancel">Cancel</span></a>
           [% END %]
-        </div>
       [% END %]
-        <div class="p1">
-          [% IF messages.faxmsg %]<div class="goodmsg">[% messages.faxmsg %]</div>[% END %]
-          [% IF messages.faxerr %]<div class="errormsg">[% messages.faxerr %]</div>[% END %]
-          [% IF edit_fax && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          [% IF messages.faxmsg %]<div class="success">[% messages.faxmsg %]</div>[% END %]
+          [% IF messages.faxerr %]<div class="error">[% messages.faxerr %]</div>[% END %]
+          [% IF edit_fax && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
           <form action="update_fax" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
             <table>
@@ -354,7 +345,7 @@
                     value="[% subscriber.fax_preferences.name %]" />
                 </td>
               </tr>
-              [% IF messages.faxname %]<tr><td /><td><div class="errormsg">[% messages.faxname %]</div></td></tr>[% END %]
+              [% IF messages.faxname %]<tr><td /><td><div class="error">[% messages.faxname %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">password:</td>
                 <td>
@@ -379,7 +370,7 @@
                 [% END %]
                 </td>
               </tr>
-              [% IF messages.faxpass %]<tr><td /><td><div class="errormsg">[% messages.faxpass %]</div></td></tr>[% END %]
+              [% IF messages.faxpass %]<tr><td /><td><div class="error">[% messages.faxpass %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">active:</td>
                 <td>
@@ -420,17 +411,15 @@
                   [% END %]
                   [% IF ! edit_fax && ! Catalyst.session.admin.read_only %]
                     &nbsp;
-                      <a href="edit_destlist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=destinations"
-                         class="aaction">edit list</a>
+                      <a href="edit_destlist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=destinations"><span class="button-edit">Edit List</span></a>
                   [% END %]
                 </td>
               </tr>
             </table>
           [% IF edit_fax %]
-            <input type="submit" class="but" value="Save &#187;" />
+            <button name="submit" class="button-save">Save</button>
           [% END %]
           </form>
-        </div>
 
     [% END %]
 

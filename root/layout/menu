@@ -1,53 +1,58 @@
-      <div id="contentmenu">
-
-        <h3 id="first">Information</h3>
-        <ul>
-        [% IF Catalyst.user_exists %]
-          <li>Logged in as <b>[% Catalyst.user.login %]</b></li>
-          <li><a href="/logout">&#187; Logout</a></li>
-          [% IF Catalyst.config.dashboard.enabled %]
-          <li [% 'class="active_menu"' IF menu.active == "dashboard" %]><a href="/dashboard">Statistics</a></li>
-          [% END %]
-        [% ELSE %]
-          <li>&nbsp;</li>
-          <li>Not logged in</li>
-        [% END %]
-        </ul>
+      <div id="contentmenu" class="span-6 append-1">
 
       [% IF Catalyst.session.admin %]
-        <h3>User Administration</h3>
-        <ul>
-          [% IF Catalyst.config.customer_features %]
-          <li [% 'class="active_menu"' IF menu.active == "customer" %]><a href="/customer">Customers</a></li>
-          [% END %]
-          <li [% 'class="active_menu"' IF menu.active == "account" %]><a href="/account">Accounts</a></li>
-          <li [% 'class="active_menu"' IF menu.active == "subscriber" %]><a href="/subscriber">Subscribers</a></li>
-[%#          <li><a href="/registration">Devices</a></li> %]
-[%#          <li><a href="/registration">Registrations</a></li> %]
-        </ul>
+        <div>
+          <h3><a href="#">Information</a></h3>
+          <ul>
+            <li [% 'class="active_menu"' IF menu.active == "root" %]><a href="/">Home</a></li>
+            [% IF Catalyst.config.dashboard.enabled %]
+            <li [% 'class="active_menu"' IF menu.active == "dashboard" %]><a href="/dashboard">Statistics</a></li>
+            [% END %]
+          </ul>
+        </div>
 
-        <h3>System Administration</h3>
-        <ul>
-          <li [% 'class="active_menu"' IF menu.active == "domain" %]><a href="/domain">Domains</a></li>
-          <li [% 'class="active_menu"' IF menu.active == "admin" %]><a href="/admin">Administrators</a></li>
-          [% IF Catalyst.config.billing_features %]
-          <li [% 'class="active_menu"' IF menu.active == "billing" %]><a href="/billing">Billing</a></li>
-          [% END %]
-          [% IF Catalyst.config.peering_features %]
-          <li [% 'class="active_menu"' IF menu.active == "peering" %]><a href="/peering">SIP Peerings</a></li>
-          [% END %]
-        </ul>
+        <div>
+          <h3><a href="#">User Administration</a></h3>
+          <ul>
+            [% IF Catalyst.config.customer_features %]
+            <li [% 'class="active_menu"' IF menu.active == "customer" %]><a href="/customer">Customers</a></li>
+            [% END %]
+            <li [% 'class="active_menu"' IF menu.active == "account" %]><a href="/account">Accounts</a></li>
+            <li [% 'class="active_menu"' IF menu.active == "subscriber" %]><a href="/subscriber">Subscribers</a></li>
+[%#           <li><a href="/registration">Devices</a></li> %]
+[%#           <li><a href="/registration">Registrations</a></li> %]
+          </ul>
+        </div>
 
-        <h3>Number Management</h3>
-        <ul>
-          [% IF Catalyst.config.numberblock_features %]
-          <li [% 'class="active_menu"' IF menu.active == "number" %]><a href="/number">Number Blocks</a></li>
-          [% END %]
-          [% IF Catalyst.config.lnp_features %]
-          <li [% 'class="active_menu"' IF menu.active == "lnp" %]><a href="/lnp">LNP</a></li>
-          [% END %]
-          <li [% 'class="active_menu"' IF menu.active == "ncos" %]><a href="/ncos">NCOS</a></li>
-        </ul>
+        <div>
+          <h3><a href="#">System Administration</a></h3>
+          <ul>
+            <li [% 'class="active_menu"' IF menu.active == "domain" %]><a href="/domain">Domains</a></li>
+            <li [% 'class="active_menu"' IF menu.active == "admin" %]><a href="/admin">Administrators</a></li>
+            [% IF Catalyst.config.billing_features %]
+            <li [% 'class="active_menu"' IF menu.active == "billing" %]><a href="/billing">Billing</a></li>
+            [% END %]
+            [% IF Catalyst.config.peering_features %]
+            <li [% 'class="active_menu"' IF menu.active == "peering" %]><a href="/peering">SIP Peerings</a></li>
+            [% END %]
+          </ul>
+        </div>
+
+        <div>
+          <h3><a href="#">Number Management</a></h3>
+          <ul>
+            [% IF Catalyst.config.numberblock_features %]
+            <li [% 'class="active_menu"' IF menu.active == "number" %]><a href="/number">Number Blocks</a></li>
+            [% END %]
+            [% IF Catalyst.config.lnp_features %]
+            <li [% 'class="active_menu"' IF menu.active == "lnp" %]><a href="/lnp">LNP</a></li>
+            [% END %]
+            <li [% 'class="active_menu"' IF menu.active == "ncos" %]><a href="/ncos">NCOS</a></li>
+          </ul>
+        </div>
+
+      [% ELSE %]
+      &nbsp;
       [% END %]
 
       </div>

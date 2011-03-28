@@ -3,71 +3,48 @@
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
 
-        <div class="actions">
-          <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#speeddial" class="aaction">back</a>
-        </div>
-        <div class="p1">
-          [% IF messages.nummsg %]<div class="goodmsg">[% messages.nummsg %]</div>[% END %]
-          [% IF messages.numerr %]<div class="errormsg">[% messages.numerr %]</div>[% END %]
-          <div class="list_explanation">
-              [% IF speed_dial_slots %]
-                The following speed dial vertical service codes (slots) are defined:<br />
-              [% ELSE %]
-                No speed dial vertical service codes (slots) defined yet.<br />
-              [% END %]
-           </div>
+        <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#speeddial"><span class="button-back">Back</span></a>
+          [% IF messages.nummsg %]<div class="success">[% messages.nummsg %]</div>[% END %]
+          [% IF messages.numerr %]<div class="error">[% messages.numerr %]</div>[% END %]
+          <div class="hspace-20"></div>
+          <ul class="cleanlist">
            [% IF speed_dial_slots %]
-          <table>
-            <tr class="table_header">
-              <td>VSC</td>
-              <td>destination</td>
-              <td />
-              <td />
-              <td />
-            </tr>
+            <li class="ui-state-default">
+              <div class="span-2">VSC</div>
+              <div class="span-5 append-8 last">Destination</div>
+            </li>
             [% FOREACH sdentry = speed_dial_slots %]
-              <tr class="[% sdentry.background %]">
-                <td >[% sdentry.slot %]</td>
+              <li class="ui-state-default">
+                <div class="span-2">[% sdentry.slot %]</div>
                 <form action="/subscriber/do_edit_speed_dial_slots" method="post">
-                  <td>
+                  <div class="span-5">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="update_id" value="[% sdentry.id %]" />
                     <input type="hidden" name="slot" value="[% sdentry.slot %]" />
-                    <div class="postlink">
-                      <input type="text" size="20" name="destination" id="destinationtxt" value="[% sdentry.destination %]" /> &nbsp;
-                      <label for="listupdate[% sdentry.id %]">update</label>
-                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="listupdate[% sdentry.id %]" />
-                    </div>
-                  </td>
+                    <input type="text" size="20" name="destination" id="destinationtxt" value="[% sdentry.destination %]" />
+                  </div>
+                  <div class="span-1 append-7">
+                      <button class="button-save" id="listupdate[% sdentry.id %]">Update</button>
+                  </div>
                 </form>
                 <form action="/subscriber/do_edit_speed_dial_slots" method="post">
-                  [% IF sdentry.error %]
-                    <td>
-                  [% ELSE %]
-                    <td colspan="2">
-                  [% END %]
+                  <div class="span-1 last">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="delete_id" value="[% sdentry.id %]" />
-                    <div class="postlink">
-                      <label for="listdel[% sdentry.id %]">delete</label>
-                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="listdel[% sdentry.id %]" />
-                    </div>
-                  </td>
+                    <button class="button-delete" id="listdel[% sdentry.id %]">Delete</button>
+                  </div>
                 </form>
-                [% IF sdentry.error %]<td><div class="errormsg">[% sdentry.error %]</div></td>[% END %]
-              </tr>
+                [% IF sdentry.error %]</li><li><div class="error">[% sdentry.error %]</div>[% END %]
+              </li>
             [% END %]
-          </table>
           [% END %]
 
-          <br />
-          
+          <li class="ui-state-default">
           [% IF free_speed_dial_slots %]
           <form action="/subscriber/do_edit_speed_dial_slots" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
-            <label for="addslot">New entry:</label><br />
-            <div class="postlink">
-              VSC:&nbsp;<select size="1" name="add_slot" id="addslot">
+            <div class="span-2">
+              <select size="1" name="add_slot" id="addslot">
                 [% FOREACH sdslot = free_speed_dial_slots %]
                     [% IF sdslot.slot == addslottxt %]
                          <option selected>[% sdslot.slot %]</option>
@@ -76,14 +53,19 @@
                     [% END %]
                 [% END %]
               </select>
-              Destination:&nbsp;<input type="text" size="20" name="add_destination" id="adddestination" value="[% adddestinationtxt %]" /> &nbsp;
-              <label for="sdadd">Add entry</label>
-              <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="sdadd" />
-              [% IF messages.msgadd %]<div class="errormsg">[% messages.msgadd %]</div>[% END %]
-            </div><br clear="all" />
+            </div>
+            <div class="span-5">
+              <input type="text" size="20" name="add_destination" id="adddestination" value="[% adddestinationtxt %]" />
+            </div>
+            <div class="span-1 append-7 last">
+              <button class="button-add" id="sdadd">Add</button>
+            </div>
+              [% IF messages.msgadd %]<div class="error">[% messages.msgadd %]</div>[% END %]
           </form>
           [% ELSE %]
-            All allowed speed dial vertical service codes in use. Please delete or modify the exisitng ones.
+            <div class="span-15" last">
+              All allowed speed dial vertical service codes in use.
+            </div>
           [% END %]
-
-        </div>
+          </li>
+          </ul>

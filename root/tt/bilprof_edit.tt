@@ -4,9 +4,7 @@
         <h3>Create New Billing Profile</h3>
         [% END %]
 
-        <div class="actions">
-          <a href="/billing#bilprof" class="aaction">cancel</a>
-        </div>
+        <a href="/billing#bilprof"><span class="button-cancel">Cancel</span></a>
 
         <div class="p1">
           <form action="do_edit_bilprof" method="post">
@@ -24,7 +22,7 @@
                 </td>
                 [% END %]
               </tr>
-              [% IF messages.handle %]<tr><td /><td><div class="errormsg">[% messages.handle %]</div></td></tr>[% END %]
+              [% IF messages.handle %]<tr><td /><td><div class="error">[% messages.handle %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">name:</td>
                 <td>
@@ -33,7 +31,7 @@
                   human readable profile name
                 </td>
               </tr>
-              [% IF messages.name %]<tr><td /><td><div class="errormsg">[% messages.name %]</div></td></tr>[% END %]
+              [% IF messages.name %]<tr><td /><td><div class="error">[% messages.name %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">interval charge:</td>
                 <td>
@@ -42,7 +40,7 @@
                   base fee charged per billing interval
                 </td>
               </tr>
-              [% IF messages.charge %]<tr><td /><td><div class="errormsg">[% messages.charge %]</div></td></tr>[% END %]
+              [% IF messages.charge %]<tr><td /><td><div class="error">[% messages.charge %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">interval free time:</td>
                 <td>
@@ -51,7 +49,7 @@
                   included time per billing interval
                 </td>
               </tr>
-              [% IF messages.free_time %]<tr><td /><td><div class="errormsg">[% messages.free_time %]</div></td></tr>[% END %]
+              [% IF messages.free_time %]<tr><td /><td><div class="error">[% messages.free_time %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">interval free cash:</td>
                 <td>
@@ -60,7 +58,7 @@
                   included money per billing interval
                 </td>
               </tr>
-              [% IF messages.free_cash %]<tr><td /><td><div class="errormsg">[% messages.free_cash %]</div></td></tr>[% END %]
+              [% IF messages.free_cash %]<tr><td /><td><div class="error">[% messages.free_cash %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">currency:</td>
                 <td>
@@ -69,7 +67,7 @@
                   currency symbol or ISO code
                 </td>
               </tr>
-              [% IF messages.currency %]<tr><td /><td><div class="errormsg">[% messages.currency %]</div></td></tr>[% END %]
+              [% IF messages.currency %]<tr><td /><td><div class="error">[% messages.currency %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">VAT rate:</td>
                 <td>
@@ -78,7 +76,7 @@
                   %
                 </td>
               </tr>
-              [% IF messages.vat_rate %]<tr><td /><td><div class="errormsg">[% messages.vat_rate %]</div></td></tr>[% END %]
+              [% IF messages.vat_rate %]<tr><td /><td><div class="error">[% messages.vat_rate %]</div></td></tr>[% END %]
               <tr>
                 <td class="tdkey">VAT included:</td>
                 <td>
@@ -87,7 +85,7 @@
                 </td>
               </tr>
             </table>
-            <input type="submit" class="but" value="Save &#187;" />
+            <button name="submit" class="button-save">Save</button>
           </form>
         </div>
 

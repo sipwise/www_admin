@@ -2,18 +2,18 @@
         <div class="p1">
           <form action="/customer/getbyid" method="GET">
             <input type="text" id="customer_id" name="customer_id" value="[% customer_id %]" />
-            <input type="submit" value="Get &#187;" class="but" />
+            <input type="submit" value="Get &#187;" class="but ui-corner-all" />
           </form>
-          [% IF messages.accgeterr %]<div class="errormsg">[% messages.accgeterr %]</div>[% END %]
+          [% IF messages.accgeterr %]<div class="error">[% messages.accgeterr %]</div>[% END %]
         </div>
 
         <h3>Search by contacts</h3>
         <div class="p1">
           <form action="/customer/search" method="post">
             <input type="text" id="search_string" name="search_string" value="[% search_string %]" />
-            <input type="submit" value="Search &#187;" class="but" />
+            <input type="submit" value="Search &#187;" class="but ui-corner-all" />
           </form>
-          [% IF messages.accsearcherr %]<div class="errormsg">[% messages.accsearcherr %]</div>[% END %]
+          [% IF messages.accsearcherr %]<div class="error">[% messages.accsearcherr %]</div>[% END %]
         </div>
 
         [% UNLESS Catalyst.session.admin.read_only %]

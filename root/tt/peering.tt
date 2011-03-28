@@ -3,68 +3,68 @@
         <h3 id="contract">SIP Peering Contracts</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <div class="actions">
-          <a href="/peering/contract_detail?edit_contract=1" class="aaction">create new</a>
-        </div>
+        <a href="/peering/contract_detail?edit_contract=1"><span class="button-add">Add</span></a>
       [% END %]
 
-        <div class="p1">
+        <div class="hspace-20"></div>
         [% IF contracts %]
-          <table class="contracts">
-            <tr>
-              <td class="table_header">ContractID</td>
-              <td class="table_header">Billing Profile</td>
-	      <td class="table_header">Contact</td>
-              <td class="table_header">created</td>
-	      <td style="width:40px;" />
-            </tr>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-2">Contract ID</div>
+              <div class="span-4">Billing Profile</div>
+	      <div class="span-4">Contact</div>
+              <div class="span-4 last">Created</div>
+            </li>
 	    [% FOREACH contract = contracts %]
-            <tr class="[% sdentry.background %]">
-              <td>[% contract.id %]</td>
-              <td>[% contract.billing_profile_name%]</td>
-	      <td>[% contract.short_contact %]</td>
-              <td>[% contract.create_timestamp %]</td>
+            <li class="ui-state-default">
+              <div class="span-2">[% contract.id %]</div>
+              <div class="span-4">[% contract.billing_profile_name%]</div>
+	      <div class="span-4">[% contract.short_contact %]</div>
+              <div class="span-4 append-1">[% contract.create_timestamp %]</div>
+              <div class="span-1 last">
               [% UNLESS Catalyst.session.admin.read_only %]
-                <td><a href="/peering/contract_detail?edit_contract=1&amp;contract_id=[% contract.id %]" class="aaction">edit</a></td>
+                <a href="/peering/contract_detail?edit_contract=1&amp;contract_id=[% contract.id %]"><span class="button-edit">Edit</span></a>
               [% END %]
-            </tr>
+              </div>
+            </li>
 	    [% END %]
-          </table>
+          </ul>
         [% ELSE %]
           <div>
             No sip peering contracts created yet.
           </div>
         [% END %]
-        </div>
 
       [% END %]
 
+        <div class="hspace-20"></div>
         <h3 id="groups">SIP Peering Groups</h3>
 
-        <div class="p1">
-          [% IF messages.epeermsg %]<div class="goodmsg">[% messages.epeermsg %]</div>[% END %]
-          [% IF messages.epeererr %]<div class="errormsg">[% messages.epeererr %]</div>[% END %]
+          [% IF messages.epeermsg %]<div class="success">[% messages.epeermsg %]</div>[% END %]
+          [% IF messages.epeererr %]<div class="error">[% messages.epeererr %]</div>[% END %]
+          [% IF messages.cpeermsg %]<div class="success">[% messages.cpeermsg %]</div>[% END %]
+          [% IF messages.cpeererr %]<div class="error">[% messages.cpeererr %]</div>[% END %]
           
 	  [% IF peer_groups %]
-          <table class="domains">
-            <tr class="table_header">
-              <td>Name</td>
-              <td>Priority</td>
-              <td>Description</td>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-5">Name</div>
+              <div class="span-2">Priority</div>
+              <div class="span-5">Description</div>
+              <div class="span-2 last">
               [% IF Catalyst.config.billing_features %]
-                <td>Peering Contract</td>
+                Contract ID
               [% END %]
-              <td style="width:40px;" />
-              <td style="width:60px;" />
-            </tr>
+              </div>
+            </li>
             [% id = 0 %]
             [% FOREACH grp = peer_groups %]
-              <tr>
+              <li class="ui-state-default">
                 [% IF grp.id == editid %]
-                  <td>[% grp.name %]</td>
+                  <div class="span-5">[% grp.name %]</div>
                   <form action="/peering/edit_grp" method="post">
                     <input type="hidden" name="grpid" value="[% grp.id %]" />
-                    <td>
+                    <div class="span-2">
                       <select title="string, priority" size="1" name="priority">
 					  	[% count = 1 %]
 						[% WHILE count < 10 %]
@@ -72,13 +72,13 @@
 					  		[% count = count + 1 %]
 						[% END %]
 					  </select>
-                    </td>
-                    <td>
+                    </div>
+                    <div class="span-5">
                       <input type="text" id="addtxt" title="string, description of group"
                              name="grpdesc" value="[% grp.description %]" />
-                    </td>
-                  [% IF Catalyst.config.billing_features %]
-                    <td>
+                    </div>
+                    <div class="span-2">
+                    [% IF Catalyst.config.billing_features %]
                       <select size="1" name="peering_contract_id">
                         <option value="0" [% UNLESS grp.peering_contract_id %]selected="selected"[% END %]>&nbsp;</option>
                         [% FOREACH contract = contracts %]
@@ -87,76 +87,53 @@
                                  >[% contract.id %]</option>
                         [% END %]
                       </select>
-                    </td>
-                  [% END %]
-                    <td>
-                      <div class="postlink">
-                        <label for="grpsave[% id %]">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="grpsave[% id %]" />
-                      </div>
-                    </td>
+                    [% END %]
+                    </div>
+                    <div class="prepend-1 span-1">
+                        <button class="button-save" id="grpsave[% id %]">Save</button>
+                    </div>
                   </form>
-                  <td><a href="/peering" class="aaction">cancel</a></td>
+                  <div class="span-1 last">
+                      <a href="/peering"><span class="button-cancel">Cancel</span></a>
+                  </div>
                 [% ELSE %]
-                  <td><a href="/peering/detail?group_id=[%grp.id%]" class="aaction">[% grp.name %]</a></td>
-                  <td>[% grp.priority %]</td>
-                  <td>[% grp.description %]</td>
+                  <div class="span-5"><a href="/peering/detail?group_id=[%grp.id%]">[% grp.name %]</a></div>
+                  <div class="span-2">[% grp.priority %]</div>
+                  <div class="span-5">[% grp.description %]</div>
+                  <div class="span-2">
                   [% IF Catalyst.config.billing_features %]
-                    <td>[% grp.peering_contract_id %]</td>
+                    [% grp.peering_contract_id %]
                   [% END %]
-                  <td>
+                  </div>
+                  <div class="prepend-1 span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/peering?editid=[% grp.id %]" class="aaction">edit</a>
+                    <a href="/peering?editid=[% grp.id %]"><span class="button-edit">Edit</span></a>
                   [% END %]
-                  </td>
+                  </div>
                   <form action="/peering/delete_grp" method="post">
                     <input type="hidden" name="grpid" value="[% grp.id %]" />
-                    <td>
+                    <div class="span-1 last">
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink">
-                        <label for="grpdel[% id %]">delete</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="grpdel[% id %]" />
-                      </div>
+                        <button class="button-delete" id="grpdel[% id %]">Delete</button>
                     [% END %]
-                  </td>
-				[% END %]  
+                    </div>
+		[% END %]  
                 </form>
-              </tr>
+              </li>
             [% id = id + 1 %]
             [% END %]
-          </table>
-	[% ELSE %]
-          <div>
-            No sip peering groups defined yet.
-          </div>
+          </ul>
         [% END %]
-        </div>
 
       [% UNLESS Catalyst.session.admin.read_only %]
-        <h3 id="create_group">Create Peering Group</h3>
-
-        <div class="p1">
-          [% IF messages.cpeermsg %]<div class="goodmsg">[% messages.cpeermsg %]</div>[% END %]
-          [% IF messages.cpeererr %]<div class="errormsg">[% messages.cpeererr %]</div>[% END %]
-
-          <table class="domains">
-            <tr class="table_header">
-              <td>Name</td>
-              <td>Priority</td>
-              <td>Description</td>
-              [% IF Catalyst.config.billing_features %]
-                <td>Peering Contract</td>
-              [% END %]
-              <td style="width:40px;" />
-              <td style="width:60px;" />
-            </tr>
+          <ul class="cleanlist">
             <form action="/peering/create_grp" method="post">
-              <tr>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-5">
                   <input type="text" size="20" name="grpname" title="string, name of group"
                          id="addtxt" value="[% garefill.name %]" />
-                </td>
-                <td>
+                </div>
+                <div class="span-2">
                   <select title="string, priority" size="1" name="priority">
                     [% count = 1 %]
                     [% WHILE count < 10 %]
@@ -164,13 +141,13 @@
                       [% count = count + 1 %]
                     [% END %]
                   </select>
-                </td>
-                <td>
+                </div>
+                <div class="span-5">
                   <input type="text" size="20" name="grpdesc" title="string, description of group"
                          id="addtxt" value="[% garefill.description %]" />
-                </td>
+                </div>
+                <div class="span-2">
               [% IF Catalyst.config.billing_features %]
-                <td>
                   <select size="1" name="peering_contract_id">
                     [% FOREACH contract = contracts %]
                       <option value="[% contract.id %]"
@@ -178,20 +155,16 @@
                              >[% contract.id %]</option>
                     [% END %]
                   </select>
-                </td>
               [% END %]
-                <td>
-                  <div class="postlink">
-                    <label for="grpadd">add</label>
-                    <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="grpadd" />
-                  </div>
-                </td>
-              </tr>
+                </div>
+                <div class="prepend-1 span-1 last">
+                    <button class="button-add" id="grpadd">Add</button>
+                </div>
+              </li>
             </form>
 
-          </table>
+          </ul>
 
-        </div>
       [% END %]
 
 

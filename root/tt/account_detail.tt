@@ -8,53 +8,51 @@
         [% END %]
 
         [% UNLESS account.terminate_timestamp || Catalyst.session.admin.read_only %]
-          <div class="actions">
-          [% IF billing_features %]
-            <a href="detail?account_id=[% account.id %]&amp;edit_account=1" class="aaction">edit</a>
+          [% IF billing_features && !edit_account %]
+            <a href="detail?account_id=[% account.id %]&amp;edit_account=1" class="aaction"><span class="button-edit">Edit</span></a>
           [% END %]
           [% IF edit_account %]
             [% IF account.id %]
-            <a href="detail?account_id=[% account.id %]" class="aaction">cancel</a>
+            <a href="detail?account_id=[% account.id %]"><span class="button-cancel">Cancel</span></a>
             [% ELSE %]
               [% IF account.customer_id %]
-                <a href="/customer/detail?customer_id=[% account.customer_id %]#contract" class="aaction">cancel</a>
+                <a href="/customer/detail?customer_id=[% account.customer_id %]#contract"><span class="button-cancel">Cancel</span></a>
               [% ELSE %]
-                <a href="/account" class="aaction">cancel</a>
+                <a href="/account"><span class="button-cancel">Cancel</span></a>
               [% END %]
             [% END %]
           [% ELSE %]
             [% IF account.status == "pending" %]
-              <a href="activate?account_id=[% account.id %]" class="aaction">activate</a>
+              <a href="activate?account_id=[% account.id %]"><span class="button-save">Activate</span></a>
             [% ELSE %]
               [% IF account.is_locked %]
-              <a href="lock?account_id=[% account.id %]&amp;lock=none" class="aaction">unlock</a>
+              <a href="lock?account_id=[% account.id %]&amp;lock=none"><span class="button-unlock">Unlock</span></a>
               [% ELSE %]
-              <a href="lock?account_id=[% account.id %]&amp;lock=global" class="aaction">lock</a>
+              <a href="lock?account_id=[% account.id %]&amp;lock=global"><span class="button-lock">Lock</span></a>
               [% END %]
-              <a href="terminate?account_id=[% account.id %]" class="aaction">terminate</a>
-              <a href="delete?account_id=[% account.id %]" class="aaction">delete</a>
+              <a href="terminate?account_id=[% account.id %]"><span class="button-terminate">Terminate</span></a>
+              <a href="delete?account_id=[% account.id %]"><span class="button-delete">Delete</span></a>
             [% END %]
           [% END %]
-          </div>
         [% END %]
-        <div class="p1">
         [% IF account.is_locked %]
           <div class="alert">Account is locked!</div>
         [% END %]
         [% IF account.status == "pending" %]
           <div class="alert">Account is in pending state!</div>
         [% END %]
-          [% IF messages.accmsg %]<div class="goodmsg">[% messages.accmsg %]</div>[% END %]
-          [% IF messages.accerr %]<div class="errormsg">[% messages.accerr %]</div>[% END %]
+          <div class="hspace-20"></div>
+          [% IF messages.accmsg %]<div class="success">[% messages.accmsg %]</div>[% END %]
+          [% IF messages.accerr %]<div class="error">[% messages.accerr %]</div>[% END %]
           <form action="save_account" method="post">
             <input type="hidden" name="account_id" value="[% account.id %]" />
-            <table>
-              <tr><td class="tdkey">ContractID:</td><td>[% account.id %]</td></tr>
+            <ul class="cleanlist">
+              <li class="ui-state-default"><div class="span-3">Contract ID:</div><div class="span-7 last">[% account.id %]</div></li>
 
             [% IF Catalyst.config.customer_features %]
-              <tr>
-                <td class="tdkey">CustomerID:</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-3">Customer ID:</div>
+                <div class="span-7 last">
                   [% IF edit_account %]
                     <input type="text" name="customer_id" value="[% account.customer_id %]"
                            title="unique ID of the customer the account belongs to, integer, optional" />
@@ -63,15 +61,15 @@
                     <a href="/customer/detail?customer_id=[% account.customer_id %]">[% account.customer_id %]</a>
                     [% END %]
                   [% END %]
-                </td>
-              </tr>
+                </div>
+              </li>
             [% END %]
 
             [% IF billing_features %]
               [% IF Catalyst.config.product_features %]
-              <tr>
-                <td class="tdkey">product:</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-3">Product:</div>
+                <div class="span-7 last">
                 [% IF edit_account %]
                   <select size="1" name="product">
                   [% FOREACH product = products %]
@@ -84,13 +82,13 @@
                 [% ELSE %]
                   [% account.product_name %]
                 [% END %]
-                </td>
-              </tr>
+                </div>
+              </li>
               [% END %]
 
-              <tr>
-                <td class="tdkey">billing profile:</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-3">Billing Profile:</div>
+                <div class="span-7 last">
                 [% IF edit_account %]
                   <select size="1" name="billing_profile">
                   [% FOREACH profile = billing_profiles %]
@@ -103,121 +101,119 @@
                 [% ELSE %]
                   [% account.billing_profile_name %]
                 [% END %]
-                </td>
-              </tr>
+                </div>
+              </li>
             [% END %]
 
-              <tr><td class="tdkey">created:</td><td>[% account.create_timestamp %]</td></tr>
-              <tr><td class="tdkey">modified:</td><td>[% account.modify_timestamp %]</td></tr>
+              <li class="ui-state-default"><div class="span-3">Created:</div><div class="span-7 last">[% account.create_timestamp %]</div></li>
+              <li class="ui-state-default"><div class="span-3">Modified:</div><div class="span-7 last">[% account.modify_timestamp %]</div></li>
               [% IF account.terminate_timestamp %]
-              <tr><td class="tdkey">terminated:</td><td><div class="alert">[% account.terminate_timestamp %]</div></td></tr>
+              <li class="ui-state-default"><div class="span-3">Terminated:</div><div class="span-7 last">[% account.terminate_timestamp %]</div></li>
               [% END %]
-            </table>
+            </ul>
             [% IF edit_account %]
-              <input type="submit" class="but" value="Save &#187;" />
+              <div class="hspace-20"></div>
+              <button name="submit" class="button-save">Save</button>
             [% END %]
           </form>
-        </div>
 
       [% IF billing_features  && account.id %]
+        <div class="hspace-20"></div>
         <h3>Account Balance</h3>
 
         [% UNLESS account.terminate_timestamp || Catalyst.session.admin.read_only || edit_account %]
-        <div class="actions">
-          <a href="detail?account_id=[% account.id %]&amp;edit_balance=1" class="aaction">edit</a>
           [% IF edit_balance %]
-          <a href="detail?account_id=[% account.id %]" class="aaction">cancel</a>
+          <a href="detail?account_id=[% account.id %]"><span class="button-cancel">Cancel</span></a>
+          [% ELSE %]
+          <a href="detail?account_id=[% account.id %]&amp;edit_balance=1"><span class="button-edit">Edit</span></a>
           [% END %]
-        </div>
         [% END %]
-        <div class="p1">
-          [% IF messages.balmsg %]<div class="goodmsg">[% messages.balmsg %]</div>[% END %]
-          [% IF messages.balerr %]<div class="errormsg">[% messages.balerr %]</div>[% END %]
-          Current totals
+          [% IF messages.balmsg %]<div class="success">[% messages.balmsg %]</div>[% END %]
+          [% IF messages.balerr %]<div class="error">[% messages.balerr %]</div>[% END %]
+          <div class="hspace-20"></div>
+          <ul class="cleanlist">
+          <li class="ui-state-default"><div class="span-15">Current totals</div></li>
           <form action="update_balance" method="post">
             <input type="hidden" name="account_id" value="[% account.id %]" />
-            <table>
-              <tr>
-                <td class="tdkey">cash:</td>
-                <td class="nowrap">&euro; [% account.balance.cash_balance %]</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="prepend-1 span-3">Cash:</div>
+                <div class="span-3">&euro; [% account.balance.cash_balance %]</div>
+                <div class="span-8 last">
                 [% IF edit_balance %]
-                  <div class="account_add">
                     add
                     <input type="text" name="add_cash" value="[% balanceadd.cash %]"
                            title="amount of money to add, float" />
-                    Euro</div>
+                    Euro
                 [% END %]
-                </td>
-              </tr>
-              [% IF messages.addcash %]<tr><td /><td /><td><div class="errormsg">[% messages.addcash %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">free time:</td>
-                <td class="nowrap">[% account.balance.free_time_balance %] s</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.addcash %]<div class="error">[% messages.addcash %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="prepend-1 span-3">Free time:</div>
+                <div class="span-3">[% account.balance.free_time_balance %] s</div>
+                <div class="span-8 last">
                 [% IF edit_balance %]
-                  <div class="account_add">
                     add
                     <input type="text" name="add_time" value="[% balanceadd.free_time %]"
                            title="amount of free time in seconds to add, integer" />
                     seconds
-                  </div>
                 [% END %]
-                </td>
-              </tr>
-              [% IF messages.addtime %]<tr><td /><td /><td><div class="errormsg">[% messages.addtime %]</div></td></tr>[% END %]
-            </table>
+                </div>
+              </li>
+              [% IF messages.addtime %]<div class="error">[% messages.addtime %]</div>[% END %]
+            </ul>
           [% IF edit_balance %]
-            <input type="submit" class="but" value="Save &#187;" />
+            <div class="hspace-20"></div>
+            <button name="submit" class="button-save">Save</button>
           [% END %]
           </form>
-        </div>
-        <div class="p1">
-          Spent this billing interval
-          <table>
-            <tr><td class="tdkey">cash:</td><td>&euro; [% account.balance.cash_balance_interval %]</td></tr>
-            <tr><td class="tdkey">free time:</td><td>[% account.balance.free_time_balance_interval %] s</td></tr>
-          </table>
-        </div>
+
+          <div class="hspace-20"></div>
+          <ul class="cleanlist">
+            <li class="ui-state-default"><div span="15 last">Spent this billing interval</div></li>
+            <li class="ui-state-default">
+              <div class="prepend-1 span-3">Cash:</div><div class="span-12 last">&euro; [% account.balance.cash_balance_interval %]</div>
+            </li>
+            <li class="ui-state-default"><div class="prepend-1 span-3">Free time:</div><div class="span-12 last">[% account.balance.free_time_balance_interval %] s</div>
+            </li>
+          </ul>
       [% END %]
 
       [% IF account.id %]
+        <div class="hspace-20"></div>
         <h3>Subscribers</h3>
 
         [% UNLESS Catalyst.session.admin.read_only || edit_account %]
-        <div class="actions">
-            <a href="/subscriber/detail?account_id=[% account.id %]&amp;new=1" class="aaction">create new</a>
-        </div>
+            <a href="/subscriber/detail?account_id=[% account.id %]&amp;new=1"><span class="button-add">Create</span></a>
         [% END %]
-        <div class="p1">
+        <div class="hspace-20"></div>
+        <ul class="cleanlist">
         [% IF account.subscribers %]
-          <table>
-            <tr class="table_header">
-              <td>SIP URI</td>
-              <td>Primary Number</td>
-              <td>Registered Devices</td>
-            </tr>
+            <li class="ui-state-default">
+              <div class="span-6">SIP URI</div>
+              <div class="span-4">Primary Number</div>
+              <div class="span-6 last">Registered Devices</div>
+            </li>
           [% FOREACH subscriber = account.subscribers %]
-            <tr>
-              <td>
+            <li class="ui-state-default">
+              <div class="span-6">
               [% IF subscriber.subscriber_id %]
                 <a href="/subscriber/detail?subscriber_id=[% subscriber.subscriber_id %]">
                   [% subscriber.username %]@[% subscriber.domain %]</a>
               [% ELSE %]
                 [% subscriber.username %]@[% subscriber.domain %]
               [% END %]
-              </td>
-              <td>[% IF subscriber.sn %]+[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %][% END %]</td>
-              <td>[% subscriber.registered_contacts %]</td>
-            </tr>
+              </div>
+              <div class="span-4">[% IF subscriber.sn %]+[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %][% END %]</div>
+              <div class="span-6 last">[% subscriber.registered_contacts %]</div>
+            </li>
           [% END %]
-          </table>
         [% ELSE %]
-          <div>
+          <li class="ui-state-default"><div>
             This account does not have any subscribers yet.
-          </div>
+          </div></li>
         [% END %]
-        </div>
+        </ul>
 
       [% END %]
 

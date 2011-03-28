@@ -7,9 +7,9 @@
           <form action="/billing/set_fees" method="post" enctype="multipart/form-data" class="search_subscriber">
             <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
             <input type="hidden" name="offset" value="[% offset %]" />
-            [% IF messages.feemsg %]<div class="goodmsg">[% messages.feemsg %]</div>[% END %]
+            [% IF messages.feemsg %]<div class="success">[% messages.feemsg %]</div>[% END %]
             [% IF messages.feeerr %]
-              <div class="errormsg">[% messages.feeerr %]
+              <div class="error">[% messages.feeerr %]
               [% IF feeerr.line %]
                 at line [% feeerr.line %]
               [% END %]
@@ -31,16 +31,16 @@
               <input type="file" class="file" id="upload_fees" name="upload_fees"
                      title="CSV field order: [% field_order %]" /> <br />
 <!--              <div class="fakefile">
-                <input type="text" /> <a href="" class="aaction">browse...</a>
+                <input type="text" /><a href=""><span class="button-browse">Browse...</span></a>
               </div>
             </div>
 -->
-            [% IF messages.feefileerr %]<div class="errormsg">[% messages.feefileerr %]</div>[% END %]
+            [% IF messages.feefileerr %]<div class="error">[% messages.feefileerr %]</div>[% END %]
             <input type="checkbox" class="checkbox" id="purge_existing" name="purge_existing"
                    title="remove all existing fees before creating new ones"
                    [% IF purge_existing %]checked="checked"[% END %] />
             <label for="purge_existing">purge existing fees</label><br />
-            <input type="submit" value="Upload &#187;" class="but" />
+            <button name="submit" class="button-add">Upload</button>
           </form>
         </div>
       [% END %]
@@ -72,22 +72,20 @@
                    [% IF exact_zone_detail %]checked="checked"[% END %] />
             <label for="exact_zone_detail">exact match</label><br />
 
-            <input type="submit" value="Search &#187;" class="but" />
+            <button name="submit" class="button-search">Search</button>
           </form>
         </div>
 
         <h3 id="stored">Stored Billing Fees</h3>
 
         [% UNLESS Catalyst.session.admin.read_only %]
-          <div class="actions">
-            <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;offset=[% offset %]" class="aaction">create new entry</a>
-          </div>
+            <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;offset=[% offset %]"><span class="button-add">Add</span></a>
         [% END %]
 
         [% IF fee_list %]
 
           <div class="p1">
-            [% IF messages.stfeemsg %]<div class="goodmsg">[% messages.stfeemsg %]</div>[% END %]
+            [% IF messages.stfeemsg %]<div class="success">[% messages.stfeemsg %]</div>[% END %]
             <table class="billing_fees">
               <tr class="table_header bottom">
                 <td>destination</td>
@@ -111,12 +109,10 @@
                 <td>[% fee.zone_detail %]</td>
               [% UNLESS Catalyst.session.admin.read_only %]
                 <td>
-                  <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.destination %]&amp;offset=[% offset %]"
-                     class="aaction">edit</a>
+                  <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.destination %]&amp;offset=[% offset %]"><span class="button-edit">Edit</span></a>
                 </td>
                 <td>
-                  <a href="/billing/do_delete_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.destination %]&amp;offset=[% offset %][% IF last_one %]&amp;last_one=1[% END %]"
-                     class="aaction">delete</a>
+                  <a href="/billing/do_delete_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.destination %]&amp;offset=[% offset %][% IF last_one %]&amp;last_one=1[% END %]"><span class="button-delete">Delete</span></a>
                 </td>
               [% ELSE %]
                 <td />

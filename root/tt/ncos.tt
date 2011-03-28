@@ -1,8 +1,8 @@
         <h3>Existing NCOS Levels</h3>
 
         <div class="p1">
-          [% IF messages.elvlmsg %]<div class="goodmsg">[% messages.elvlmsg %]</div>[% END %]
-          [% IF messages.elvlerr %]<div class="errormsg">[% messages.elvlerr %]</div>[% END %]
+          [% IF messages.elvlmsg %]<div class="success">[% messages.elvlmsg %]</div>[% END %]
+          [% IF messages.elvlerr %]<div class="error">[% messages.elvlerr %]</div>[% END %]
 
         [% IF levels %]
           <table class="ncoslevels">
@@ -34,7 +34,7 @@
                              name="description" value="[% erefill.description %]" />
                     </td>
                     <td>
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="lvlsave[% level.level %]">save</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lvlsave[% level.level %]" />
                       </div>
@@ -43,7 +43,7 @@
                   <td><a href="/ncos" class="aaction">cancel</a></td>
                 </tr>
                 [% IF messages.elvl %]
-                  <tr><td colspan="5"><div class="errormsg">[% messages.elvl %]</div></td></tr>
+                  <tr><td colspan="5"><div class="error">[% messages.elvl %]</div></td></tr>
                 [% END %]
               [% ELSE %]
                 <tr>
@@ -59,7 +59,7 @@
                     <input type="hidden" name="level" value="[% level.level %]" />
                     <td>
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="lvldel[% level.level %]">delete</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lvldel[% level.level %]" />
                       </div>
@@ -79,8 +79,8 @@
         <h3 id="create_level">Create NCOS Level</h3>
 
         <div class="p1">
-          [% IF messages.clvlmsg %]<div class="goodmsg">[% messages.clvlmsg %]</div>[% END %]
-          [% IF messages.clvlerr %]<div class="errormsg">[% messages.clvlerr %]</div>[% END %]
+          [% IF messages.clvlmsg %]<div class="success">[% messages.clvlmsg %]</div>[% END %]
+          [% IF messages.clvlerr %]<div class="error">[% messages.clvlerr %]</div>[% END %]
 
           <form action="/ncos/do_create_level" method="post">
             <table class="ncoslevels">
@@ -110,7 +110,7 @@
                          name="description" value="[% crefill.description %]" />
                 </td>
                 <td>
-                  <div class="postlink">
+                  <div class="postlink ui-corner-all">
                     <label for="lvladd">add</label>
                     <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lvladd" />
                   </div>
@@ -119,7 +119,7 @@
               </tr>
             </table>
           </form>
-          [% IF crefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          [% IF crefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
 
         </div>
       [% END %]

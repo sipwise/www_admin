@@ -2,8 +2,8 @@
         <h3 id="create_block">Create Number Block</h3>
 
         <div class="p1">
-          [% IF messages.cblockmsg %]<div class="goodmsg">[% messages.cblockmsg %]</div>[% END %]
-          [% IF messages.cblockerr %]<div class="errormsg">[% messages.cblockerr %]</div>[% END %]
+          [% IF messages.cblockmsg %]<div class="success">[% messages.cblockmsg %]</div>[% END %]
+          [% IF messages.cblockerr %]<div class="error">[% messages.cblockerr %]</div>[% END %]
 
           <form action="/number/do_create_block" method="post">
             <input type="hidden" name="offset" value="[% offset %]" />
@@ -40,7 +40,7 @@
                          name="allocable" [% IF crefill.data.allocable %]checked="checked"[% END %] />
                 </td>
                 <td>
-                  <div class="postlink">
+                  <div class="postlink ui-corner-all">
                     <label for="blockadd">add</label>
                     <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockadd" />
                   </div>
@@ -49,7 +49,7 @@
               </tr>
             </table>
           </form>
-          [% IF crefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          [% IF crefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
 
         </div>
       [% END %]
@@ -104,16 +104,16 @@
                    value="" [% IF search_allocable == "" %]checked="checked"[% END %] />
             <label for="search_by_allocable_both">both</label><br />
 
-            <input type="submit" value="Search &#187;" class="but" />
+            <input type="submit" value="Search &#187;" class="but ui-corner-all" />
           </form>
         </div>
 
         <h3 id="existing_blocks">Existing Number Blocks</h3>
 
         <div class="p1">
-          [% IF messages.eblockmsg %]<div class="goodmsg">[% messages.eblockmsg %]</div>[% END %]
-          [% IF messages.eblockerr %]<div class="errormsg">[% messages.eblockerr %]</div>[% END %]
-          [% IF erefill && prov_error %]<div class="errormsg">[% prov_error %]</div>[% END %]
+          [% IF messages.eblockmsg %]<div class="success">[% messages.eblockmsg %]</div>[% END %]
+          [% IF messages.eblockerr %]<div class="error">[% messages.eblockerr %]</div>[% END %]
+          [% IF erefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
 
         [% IF blocks %]
           <table class="numberblocks">
@@ -157,7 +157,7 @@
                              name="allocable" [% IF erefill.data.allocable %]checked="checked"[% END %] />
                     </td>
                     <td>
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="blocksave[% id %]">save</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blocksave[% id %]" />
                       </div>
@@ -197,7 +197,7 @@
                     <input type="hidden" name="sn_prefix" value="[% block.sn_prefix %]" />
                     <td>
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink">
+                      <div class="postlink ui-corner-all">
                         <label for="blockdel[% id %]">delete</label>
                         <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="blockdel[% id %]" />
                       </div>
