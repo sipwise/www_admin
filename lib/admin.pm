@@ -36,7 +36,15 @@ our $VERSION = '3';
 my $xs = new XML::Simple;
 my $xc = $xs->XMLin( '/etc/ngcp-www-admin/admin.conf', ForceArray => 0);
 
-__PACKAGE__->config( authentication => {}, %$xc );
+__PACKAGE__->config( 'Plugin::Authentication' => {
+        default_realm => 'default',
+        default => {
+                credential => {
+                },
+                store => {
+                }
+        },
+});
 
 if(__PACKAGE__->config->{log4perlconf}) {
   __PACKAGE__->log( Catalyst::Log::Log4perl->new(
