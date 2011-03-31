@@ -50,7 +50,7 @@ sub end : ActionClass('RenderView') {
         return 1;
     }
 
-    $c->stash->{current_view} = 'TT';
+    $c->stash->{current_view} = 'Sipwise';
     unless($c->response->{status} =~ /^3/) { # only if not a redirect
         if(exists $c->session->{prov_error}) {
             $c->session->{messages}{prov_error} = $c->session->{prov_error};

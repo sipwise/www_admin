@@ -1,6 +1,7 @@
 package admin::View::Binary;
 
 use strict;
+use base 'Catalyst::View';
 
 =head1 NAME
 
