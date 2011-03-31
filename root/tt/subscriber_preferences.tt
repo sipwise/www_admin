@@ -48,7 +48,7 @@
                       || preference.key == "cfb"
                       || preference.key == "cft"
                       || preference.key == "cfna" %]
-                <li class="ui-state-default">
+                <li class="ui-state-default high">
                   <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
                   <div class="span-10 last">
                   [% IF edit_preferences %]

@@ -68,9 +68,17 @@ a:hover {
   height: 26px;
 }
 
+.content li.ui-state-default.high {
+  height: 91px;
+}
+
 .content li.ui-state-default div {
   margin: 3px auto 3px auto;
   height: 20px;
+}
+
+.content li.ui-state-default div label {
+  font-weight: normal;
 }
 
 .content .ui-button-icon-only .ui-button-text, 
