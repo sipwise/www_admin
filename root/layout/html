@@ -10,6 +10,7 @@
   <link rel="stylesheet" type="text/css" href="/css/south-street/jquery-ui-1.8.7.custom.css" />
   <link rel="stylesheet" type="text/css" href="/css/smooth/jquery-ui-1.8.7.custom.css" />
   <script type="text/javascript" src="/js/jquery-1.4.4.min.js"></script>
+  <script type="text/javascript" src="/js/jquery.tools.min.js"></script>
   <script type="text/javascript" src="/js/jquery-ui-1.8.7.custom.min.js"></script>
   <script type="text/javascript" src="/js/jquery.cookie.js"></script>
   
@@ -52,6 +53,8 @@
           }
         },
       });
+
+      $(".help[title]").tooltip();
 
       $("#search_from").datepicker({
         dateFormat: 'dd.mm.yy',

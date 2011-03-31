@@ -35,7 +35,8 @@
                 [% IF preference.key == "block_in_mode" || preference.key == "block_out_mode"
                    || preference.key == "adm_block_in_mode" || preference.key == "adm_block_out_mode" %]
                 <li class="ui-state-default">
-                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
                   <div class="span-10 last">
                     <select size="1" name="[% preference.key %]"
                       [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
@@ -48,8 +49,9 @@
                       || preference.key == "cfb"
                       || preference.key == "cft"
                       || preference.key == "cfna" %]
-                <li class="ui-state-default high">
-                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                <li class="ui-state-default [% IF edit_preferences %]high[% END %]">
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
                   <div class="span-10 last">
                   [% IF edit_preferences %]
                     <input type="radio" id="[% preference.key %]disable" value="disable" name="[% preference.key %]_target" class="radio"
@@ -97,7 +99,8 @@
                 [% IF preference.value.error %]<div class="error">[% preference.value.error %]</div>[% END %]
                 [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
                 <li class="ui-state-default">
-                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
                   <div class="span-10 last">
                     [% IF ncos_levels %]
                       <select size="1" name="[% preference.key %]"
@@ -118,7 +121,8 @@
                 </li>
                 [% ELSIF preference.data_type == "boolean" %]
                 <li class="ui-state-default">
-                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
                   <div class="span-10 last">
                     <input type="checkbox" name="[% preference.key %]" class="checkbox"
                       [% IF ! edit_preferences %]disabled="disabled"[% END %]
@@ -127,7 +131,8 @@
                 </li>
                 [% ELSE %]
                 <li class="ui-state-default">
-                  <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
                   <div class="span-10 last">
                     <input type="text" name="[% preference.key %]" [% IF ! edit_preferences %]
                       class="disabled txtpreference" disabled="disabled"
@@ -140,7 +145,8 @@
                 [% END %]
               [% ELSE %]
               <li class="ui-state-default">
-                <div class="span-6" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
                 <div class="span-9">
                   [% IF preference.value %]
                     <select size="1" name="[% preference.key %]">
