@@ -121,7 +121,7 @@ sub index : Private {
     } elsif($c->request->params->{edit_cc}) {
         foreach my $block (eval { @{$$blocks{number_blocks}} }) {
             if($$block{cc} == $c->stash->{edit_cc}
-               and $$block{ac} == $c->stash->{edit_ac}
+               and $$block{ac} eq $c->stash->{edit_ac}
                and $$block{sn_prefix} eq $c->stash->{edit_sn_prefix})
             {
                 $c->stash->{erefill} = $block;
@@ -193,7 +193,7 @@ sub do_update_block : Local {
     $settings{cc} = $c->request->params->{cc};
     $settings{ac} = $c->request->params->{ac};
     $settings{sn_prefix} = $c->request->params->{sn_prefix};
-    unless(length $settings{cc} and length $settings{ac}) {
+    unless(length $settings{cc} and defined $settings{ac} and defined $settings{sn_prefix}) {
         $c->response->redirect("/number");
         return;
     }
@@ -238,7 +238,7 @@ sub do_delete_block : Local {
     $settings{cc} = $c->request->params->{cc};
     $settings{ac} = $c->request->params->{ac};
     $settings{sn_prefix} = $c->request->params->{sn_prefix};
-    unless(length $settings{cc} and length $settings{ac}) {
+    unless(length $settings{cc} and defined $settings{ac} and defined $settings{sn_prefix}) {
         $c->response->redirect("/number");
         return;
     }

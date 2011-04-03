@@ -254,26 +254,22 @@ sub update_subscriber : Local {
         $settings{cc} = $cc;
         $settings{ac} = $ac;
         $settings{sn} = $sn;
-        unless(length $cc and length $ac and length $sn) {
-            $messages{number} = 'Client.Voip.MissingNumberPart';
-        } else {
-            my $checkresult;
-            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
-                                                                $cc, \$checkresult
-                                                              );
-            $messages{number_cc} = 'Client.Voip.MalformedCc'
-                unless $checkresult;
-            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
-                                                                $ac, \$checkresult
-                                                              );
-            $messages{number_ac} = 'Client.Voip.MalformedAc'
-                unless $checkresult;
-            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sn',
-                                                                $sn, \$checkresult
-                                                              );
-            $messages{number_sn} = 'Client.Voip.MalformedSn'
-                unless $checkresult;
-        }
+        my $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
+                                                            $cc, \$checkresult
+                                                          );
+        $messages{number_cc} = 'Client.Voip.MalformedCc'
+            unless $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
+                                                            $ac, \$checkresult
+                                                          );
+        $messages{number_ac} = 'Client.Voip.MalformedAc'
+            unless $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sn',
+                                                            $sn, \$checkresult
+                                                          );
+        $messages{number_sn} = 'Client.Voip.MalformedSn'
+            unless $checkresult;
     } else {
         $settings{cc} = undef;
         $settings{ac} = undef;
