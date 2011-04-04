@@ -5,87 +5,99 @@
         [% END %]
 
         <a href="/billing#bilprof"><span class="button-cancel">Cancel</span></a>
+        <div class="hspace-20"></div>
 
-        <div class="p1">
           <form action="do_edit_bilprof" method="post">
           <input type="hidden" name="bilprof" value="[% handle %]" />
-            <table>
-              <tr>
-                <td class="tdkey">handle:</td>
+            <ul class="cleanlist">
+              <li class="ui-state-default">
+                <div class="span-3">Handle:</div>
+                <div class="span-6">
                 [% IF handle %]
-                <td>[% bilprof.handle %]</td>
+                [% bilprof.handle %]</div><div class="span-6 last">&nbsp;</div>
                 [% ELSE %]
-                <td>
                   <input type="text" name="handle" title="alphanumeric characters and underscore only"
                          value="[% bilprof.handle %]" />
-                  unique identifier string
-                </td>
+                  </div><div class="span-6 last">unique identifier string</div>
                 [% END %]
-              </tr>
-              [% IF messages.handle %]<tr><td /><td><div class="error">[% messages.handle %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">name:</td>
-                <td>
+              </li>
+              [% IF messages.handle %]<div class="error">[% messages.handle %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-3">Name:</div>
+                <div class="span-6">
                   <input type="text" name="name" title="free-form string"
                          value="[% bilprof.data.name %]" />
+                </div>
+                <div class="span-6 last">
                   human readable profile name
-                </td>
-              </tr>
-              [% IF messages.name %]<tr><td /><td><div class="error">[% messages.name %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">interval charge:</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.name %]<div class="error">[% messages.name %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-3">Interval Charge:</div>
+                <div class="span-6">
                   <input type="text" name="interval_charge" title="float, specifying Euro"
                          value="[% bilprof.data.interval_charge %]" />
+                </div>
+                <div class="span-6 last">
                   base fee charged per billing interval
-                </td>
-              </tr>
-              [% IF messages.charge %]<tr><td /><td><div class="error">[% messages.charge %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">interval free time:</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.charge %]<div class="error">[% messages.charge %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-3">Interval Free Time:</div>
+                <div class="span-6">
                   <input type="text" name="interval_free_time" title="integer, specifying seconds"
                          value="[% bilprof.data.interval_free_time %]" />
+                </div>
+                <div class="span-6 last">
                   included time per billing interval
-                </td>
-              </tr>
-              [% IF messages.free_time %]<tr><td /><td><div class="error">[% messages.free_time %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">interval free cash:</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.free_time %]<div class="error">[% messages.free_time %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-3">Interval Free Cash:</div>
+                <div class="span-6">
                   <input type="text" name="interval_free_cash" title="float, specifying Euro"
                          value="[% bilprof.data.interval_free_cash %]" />
+                </div>
+                <div class="span-6 last">
                   included money per billing interval
-                </td>
-              </tr>
-              [% IF messages.free_cash %]<tr><td /><td><div class="error">[% messages.free_cash %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">currency:</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.free_cash %]<div class="error">[% messages.free_cash %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-3">Currency:</div>
+                <div class="span-6">
                   <input type="text" name="currency" title="string, will be used on invoices and webinterfaces"
                          value="[% bilprof.data.currency %]" />
+                </div>
+                <div class="span-6 last">
                   currency symbol or ISO code
-                </td>
-              </tr>
-              [% IF messages.currency %]<tr><td /><td><div class="error">[% messages.currency %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">VAT rate:</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.currency %]<div class="error">[% messages.currency %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-3">VAT Rate:</div>
+                <div class="span-6">
                   <input type="text" name="vat_rate" title="integer, specifying the percentage"
                          value="[% bilprof.data.vat_rate %]" />
+                </div>
+                <div class="span-6 last">
                   %
-                </td>
-              </tr>
-              [% IF messages.vat_rate %]<tr><td /><td><div class="error">[% messages.vat_rate %]</div></td></tr>[% END %]
-              <tr>
-                <td class="tdkey">VAT included:</td>
-                <td>
+                </div>
+              </li>
+              [% IF messages.vat_rate %]<div class="error">[% messages.vat_rate %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-3">VAT Included:</div>
+                <div class="span-6">
                   <input type="checkbox" class="checkbox" name="vat_included" title="check if fees are inclusive VAT"
                          [% IF bilprof.data.vat_included %]checked="checked"[% END %] />
-                </td>
-              </tr>
-            </table>
+                </div>
+                <div class="span-6 last">&nbsp;</div>
+              </li>
+            </ul>
+            <div class="hspace-20"></div>
             <button name="submit" class="button-save">Save</button>
           </form>
-        </div>
 

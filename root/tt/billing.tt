@@ -5,46 +5,41 @@
             <a href="/billing/edit_product"><span class="button-add">Add</span></a>
         [% END %]
 
-        <div class="p1">
           [% IF messages.prodmsg %]<div class="success">[% messages.prodmsg %]</div>[% END %]
-          <table>
           [% IF products %]
-            <tr class="table_header">
-              <td>on sale</td>
-              <td>name</td>
-              <td />
-              <td />
-            </tr>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-5">On Sale</div>
+              <div class="span-5">Name</div>
+              <div class="span-2">&nbsp;</div>
+              <div class="span-2 last">&nbsp;</div>
+            </li>
             [% id = 0 %]
             [% FOREACH product = products %]
-              <tr>
-                <td class="tdcenter">
-                  <input type="checkbox" class="checkbox" name="on_sale" disabled="disabled"
-                         [% IF product.data.on_sale %]checked="checked"[% END %] />
-                </td>
-                <td>[% product.data.name %]</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-5"><input type="checkbox" class="checkbox" name="on_sale" disabled="disabled" [% IF product.data.on_sale %]checked="checked"[% END %] /></div>
+                <div class="span-5">[% product.data.name %]</div>
+                <div class="span-2">
                 [% UNLESS Catalyst.session.admin.read_only %]
                   <a href="/billing/edit_product?product=[% product.handle %]"><span class="button-edit">Edit</span></a>
+                [% ELSE %]&nbsp;
                 [% END %]
-                </td>
+                </div>
+                <div class="span-2 last">
                 <form action="/billing/do_delete_product" method="post">
                   <input type="hidden" name="product" value="[% product.handle %]" />
-                  <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
                       <button class="button-delete" id="prodel[% id %]">Delete</button>
                   [% END %]
-                  </td>
                 </form>
-              </tr>
+                </div>
+              </li>
             [% id = id + 1 %]
             [% END %]
+            </ul>
           [% ELSE %]
-            <tr><td colspan="4">No products found in the database.</td></tr>
+            <div>No products found in the database.</div>
           [% END %]
-          </table>
-        </div>
-
       [% END %]
 
         <h3 id="bilprof">Billing Profiles</h3>
@@ -52,49 +47,45 @@
         [% UNLESS Catalyst.session.admin.read_only %]
             <a href="/billing/edit_bilprof"><span class="button-add">Add</span></a>
         [% END %]
+        <div class="hspace-20"></div>
 
-        <div class="p1">
-          [% IF messages.profmsg %]<div class="success">[% messages.profmsg %]</div>[% END %]
+        [% IF messages.profmsg %]<div class="success">[% messages.profmsg %]</div>[% END %]
 
-          <table>
           [% IF bilprofs %]
-            <tr class="table_header">
-              <td>name</td>
-              <td />
-              <td />
-              <td />
-              <td />
-            </tr>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-17 last">Name</div>
+            </li>
             [% id = 0 %]
             [% FOREACH bilprof = bilprofs %]
-              <tr>
-                <td>[% bilprof.data.name %]</td>
-                <td>
+              <li class="ui-state-default">
+                <div class="span-9">[% bilprof.data.name %]</div>
+                <div class="span-2">
                 [% UNLESS Catalyst.session.admin.read_only %]
                   <a href="/billing/edit_bilprof?bilprof=[% bilprof.handle %]"><span class="button-edit">Edit</span></a>
+                [% ELSE %]&nbsp;
                 [% END %]
-                </td>
+                </div>
                 <form action="/billing/do_delete_bilprof" method="post">
                   <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
-                  <td>
+                  <div class="span-2">
                   [% UNLESS Catalyst.session.admin.read_only %]
                       <button class="button-delete" id="bildel[% id %]">Delete</button>
+                  [% ELSE %]&nbsp;
                   [% END %]
-                  </td>
+                  </div>
                 </form>
-                <td>
+                <div class="span-2">
                   <a href="/billing/search_fees?bilprof=[% bilprof.handle %]"><span class="button-cart">Edit Fees</span></a>
-                </td>
-                <td>
+                </div>
+                <div class="span-2 last">
                   <a href="/billing/show_peaktimes?bilprof=[% bilprof.handle %]"><span class="button-clock">Edit Peak Times</span></a>
-                </td>
-              </tr>
+                </div>
+              </li>
             [% id = id + 1 %]
             [% END %]
+            </ul>
           [% ELSE %]
-            <tr><td colspan="5">No billing profiles found in the database.</td></tr>
+            <div>No billing profiles found in the database.</div>
           [% END %]
-          </table>
-
-        </div>
 
