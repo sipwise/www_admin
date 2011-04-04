@@ -488,7 +488,7 @@ sub preferences : Local {
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
                                                         undef, \$db_prefs
                                                       );
-    $c->session->{voip_preferences} = $db_prefs if eval { @$db_prefs };
+    $c->session->{voip_preferences} = [ grep { $$_{usr_pref} } @$db_prefs ] if eval { @$db_prefs };
 
     ### restore data entered by the user ###
 
@@ -640,6 +640,7 @@ sub update_preferences : Local {
 
     foreach my $db_pref (eval { @$db_prefs }) {
 
+        next unless $$db_pref{usr_pref};
         next if $$db_pref{read_only};
 
         if($$db_pref{preference} eq 'cfu'
