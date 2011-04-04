@@ -37,6 +37,7 @@
 
       [% END %]
 
+        [% IF contracts %]
         <div class="hspace-20"></div>
         <h3 id="groups">SIP Peering Groups</h3>
 
@@ -45,7 +46,6 @@
           [% IF messages.cpeermsg %]<div class="success">[% messages.cpeermsg %]</div>[% END %]
           [% IF messages.cpeererr %]<div class="error">[% messages.cpeererr %]</div>[% END %]
           
-	  [% IF peer_groups %]
           <ul class="cleanlist">
             <li class="ui-state-default">
               <div class="span-5">Name</div>
@@ -122,11 +122,8 @@
               </li>
             [% id = id + 1 %]
             [% END %]
-          </ul>
-        [% END %]
 
       [% UNLESS Catalyst.session.admin.read_only %]
-          <ul class="cleanlist">
             <form action="/peering/create_grp" method="post">
               <li class="ui-state-default">
                 <div class="span-5">
@@ -165,6 +162,7 @@
 
           </ul>
 
+      [% END %]
       [% END %]
 
 
