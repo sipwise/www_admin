@@ -1,3 +1,11 @@
+ngcp-www-admin (3.1.0) UNRELEASED; urgency=low
+
+  * new interface design with jquery
+  * ported to Debian squeeze
+  * support for domain and peer preferences
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Thu, 14 Apr 2011 18:50:59 +0200
+
 ngcp-www-admin (3.0.0-1) unstable; urgency=low
 
   * copyright files are now included in the package correctly
