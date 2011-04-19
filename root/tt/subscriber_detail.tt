@@ -41,7 +41,7 @@
           [% IF subscriber.subscriber_id %]
           <a href="detail?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-cancel">Cancel</span></a>
           [% ELSE %]
-          <a href="/account/detail?account_id=[% account_id %]"><span class="cancel">Cancel</span></a>
+          <a href="/account/detail?account_id=[% account_id %]"><span class="button-cancel">Cancel</span></a>
           [% END %]
         [% ELSE %]
           <script language="JavaScript" src="/js/openclose.js" type="text/javascript"></script>
