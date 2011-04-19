@@ -1,10 +1,10 @@
-ngcp-www-admin (3.1.0) UNRELEASED; urgency=low
+ngcp-www-admin (3.1.0+svn4705) unstable; urgency=low
 
   * new interface design with jquery
   * ported to Debian squeeze
   * support for domain and peer preferences
 
- -- Daniel Tiefnig <dtiefnig@sipwise.com>  Thu, 14 Apr 2011 18:50:59 +0200
+ -- Andreas Granig <agranig@sipwise.com>  Tue, 19 Apr 2011 13:27:26 +0200
 
 ngcp-www-admin (3.0.0-1) unstable; urgency=low
 

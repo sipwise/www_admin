@@ -34,15 +34,14 @@
         [% IF all_peers.size > 0 %]    
         [% UNLESS Catalyst.session.admin.read_only %]
         <h3>Import Rewrite Rules from another host</h3>
-        <div class="p1">
           [% IF messages.cpmsg %]<div class="success">[% messages.cpmsg %]</div>[% END %]
           [% IF messages.cperr %]<div class="error">[% messages.cperr %]</div>[% END %]
-            <table class="peering_rw_rules">
-            <tr>
+        <ul class="cleanlist">
+          <li class="ui-state-default">
             <form action="/peering/copy_rewrite" method="post">
+              <div class="span-13">
                 <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                 <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
-                <td>
                 Copy rules from peering host 
                 <select title="string, peering host" size="1" name="rpeerid">
                     [% FOREACH cpeer = all_peers %]
@@ -55,18 +54,14 @@
                     <option>delete</option>
                 </select>
                 existing rewrite rules.
-                </td>
-                <td style="width:40px;">
-                <div class="postlink ui-corner-all">
-                    <label for="cpapply">apply</label>
-                   <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="cpapply" />
-                  </div>
-                </td>
-                  <td style="width:60px;" />
+              </div>
+              <div class="span-1 last">
+                   <button id="cpapply" class="button-save">Apply</button>
+              </div>
             </form>
-            </tr>
-            </table>
-        </div>
+          </li>
+        </ul>
+        <div class="hspace-20"></div>
         [% END %]
         [% END %]
 
