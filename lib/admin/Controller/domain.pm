@@ -98,15 +98,15 @@ sub do_delete_domain : Local {
     return;
 }
 
-=head2 detail
+=head2 rewrite
 
-Show details for a given domain: rewrite rules
+Show rewrite rule details for a given domain.
 
 =cut
 
-sub detail : Local {
+sub rewrite : Local {
     my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/domain_detail.tt';
+    $c->stash->{template} = 'tt/domain_rewrite.tt';
 
     my $domain = $c->request->params->{domain};
 
@@ -117,69 +117,6 @@ sub detail : Local {
                                                       );
     $c->stash->{domain} = $domain_rw;
     $c->stash->{editid} = $c->request->params->{editid};
-
-    my $audio_files;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
-                                                        { domain => $domain },
-                                                        \$audio_files
-                                                      );
-    $c->stash->{audio_files} = $audio_files if eval { @$audio_files };
-
-    $c->stash->{edit_audio} = $c->request->params->{edit_audio};
-    $c->stash->{delete_audio} = $c->request->params->{daf};
-
-    if(exists $c->session->{acrefill}) {
-        $c->stash->{acrefill} = $c->session->{acrefill};
-        delete $c->session->{acrefill};
-    }
-    if(exists $c->session->{aerefill}) {
-        $c->stash->{aerefill} = $c->session->{aerefill};
-        delete $c->session->{aerefill};
-    } elsif($c->request->params->{edit_audio}) {
-        foreach my $audio (eval { @$audio_files }) {
-            if($$audio{handle} eq $c->request->params->{edit_audio}) {
-                $c->stash->{aerefill} = $audio;
-                last;
-            }
-        }
-    }
-
-    my $vscs;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_domain_vscs',
-                                                        { domain => $domain },
-                                                        \$vscs
-                                                      );
-    $c->stash->{vscs} = $vscs if eval { @$vscs };
-
-    my $vsc_actions;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_vsc_actions',
-                                                        { },
-                                                        \$vsc_actions
-                                                      );
-    @$vsc_actions = grep { my $tmp = $_;
-                                      ! grep { $$_{action} eq $tmp }
-                                             eval { @$vscs }
-                                    }
-                                    eval { @$vsc_actions };
-    $c->stash->{vsc_actions} = $vsc_actions if @$vsc_actions;
-
-    $c->stash->{edit_vsc} = $c->request->params->{edit_vsc};
-
-    if(exists $c->session->{vcrefill}) {
-        $c->stash->{vcrefill} = $c->session->{vcrefill};
-        delete $c->session->{vcrefill};
-    }
-    if(exists $c->session->{verefill}) {
-        $c->stash->{verefill} = $c->session->{verefill};
-        delete $c->session->{verefill};
-    } elsif($c->request->params->{edit_vsc}) {
-        foreach my $vsc (eval { @$vscs }) {
-            if($$vsc{action} eq $c->request->params->{edit_vsc}) {
-                $c->stash->{verefill} = $vsc;
-                last;
-            }
-        }
-    }
 
     return 1;
 }
@@ -228,7 +165,7 @@ sub create_rewrite : Local {
         {
             $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/detail?domain=$domain#$a");
+            $c->response->redirect("/domain/rewrite?domain=$domain#$a");
             return;
         }
         else
@@ -239,7 +176,7 @@ sub create_rewrite : Local {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/domain/detail?domain=$domain#$a");
+    $c->response->redirect("/domain/rewrite?domain=$domain#$a");
     return;
 }
 
@@ -288,7 +225,7 @@ sub edit_rewrite : Local {
         {
             $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/detail?domain=$domain#$a");
+            $c->response->redirect("/domain/rewrite?domain=$domain#$a");
             return;
         }
         else
@@ -299,7 +236,7 @@ sub edit_rewrite : Local {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/domain/detail?domain=$domain#$a");
+    $c->response->redirect("/domain/rewrite?domain=$domain#$a");
     return;
 }
 
@@ -380,15 +317,58 @@ sub delete_rewrite : Local {
         {
             $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/detail?domain=$domain#$a");
+            $c->response->redirect("/domain/rewrite?domain=$domain#$a");
             return;
         }
     } else {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/domain/detail?domain=$domain#$a");
+    $c->response->redirect("/domain/rewrite?domain=$domain#$a");
     return;
+}
+
+=head2 audio
+
+Show audio file details for a given domain.
+
+=cut
+
+sub audio : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/domain_audio.tt';
+
+    my $domain = $c->request->params->{domain};
+
+    $c->stash->{domain} = $domain;
+
+    my $audio_files;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
+                                                        { domain => $domain },
+                                                        \$audio_files
+                                                      );
+    $c->stash->{audio_files} = $audio_files if eval { @$audio_files };
+
+    $c->stash->{edit_audio} = $c->request->params->{edit_audio};
+    $c->stash->{delete_audio} = $c->request->params->{daf};
+
+    if(exists $c->session->{acrefill}) {
+        $c->stash->{acrefill} = $c->session->{acrefill};
+        delete $c->session->{acrefill};
+    }
+    if(exists $c->session->{aerefill}) {
+        $c->stash->{aerefill} = $c->session->{aerefill};
+        delete $c->session->{aerefill};
+    } elsif($c->request->params->{edit_audio}) {
+        foreach my $audio (eval { @$audio_files }) {
+            if($$audio{handle} eq $c->request->params->{edit_audio}) {
+                $c->stash->{aerefill} = $audio;
+                last;
+            }
+        }
+    }
+
+    return 1;
 }
 
 =head2 do_create_audio
@@ -421,7 +401,7 @@ sub do_create_audio : Local {
         {
             $messages{audiomsg} = 'Web.AudioFile.Created';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+            $c->response->redirect("/domain/audio?domain=$settings{domain}");
             return;
         }
     }
@@ -429,7 +409,7 @@ sub do_create_audio : Local {
     $messages{audioerr} = 'Client.Voip.InputErrorFound';
     $c->session->{messages} = \%messages;
     $c->session->{acrefill} = \%settings;
-    $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+    $c->response->redirect("/domain/audio?domain=$settings{domain}");
     return;
 }
 
@@ -452,7 +432,7 @@ sub do_update_audio : Local {
     }
     $settings{handle} = $c->request->params->{handle};
     unless(length $settings{handle}) {
-        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        $c->response->redirect("/domain/audio?domain=$settings{domain}");
         return;
     }
     $settings{data}{description} = $c->request->params->{description};
@@ -465,14 +445,14 @@ sub do_update_audio : Local {
     {
         $messages{audiomsg} = 'Web.AudioFile.Updated';
         $c->session->{messages} = \%messages;
-        $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+        $c->response->redirect("/domain/audio?domain=$settings{domain}");
         return;
     }
 
     $messages{audioerr} = 'Client.Voip.InputErrorFound';
     $c->session->{messages} = \%messages;
     $c->session->{aerefill} = $settings{data};
-    $c->response->redirect("/domain/detail?domain=$settings{domain}&amp;edit_audio=$settings{handle}#audio");
+    $c->response->redirect("/domain/audio?domain=$settings{domain}&amp;edit_audio=$settings{handle}");
     return;
 }
 
@@ -494,7 +474,7 @@ sub do_delete_audio : Local {
     }
     $settings{handle} = $c->request->params->{handle};
     unless(length $settings{handle}) {
-        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        $c->response->redirect("/domain/audio?domain=$settings{domain}");
         return;
     }
 
@@ -503,11 +483,11 @@ sub do_delete_audio : Local {
                                              undef))
     {
         $c->session->{messages} = { audiomsg => 'Web.AudioFile.Deleted' };
-        $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+        $c->response->redirect("/domain/audio?domain=$settings{domain}");
         return;
     }
 
-    $c->response->redirect("/domain/detail?domain=$settings{domain}&amp;daf=$settings{handle}#audio");
+    $c->response->redirect("/domain/audio?domain=$settings{domain}&amp;daf=$settings{handle}");
     return;
 }
 
@@ -529,7 +509,7 @@ sub listen_audio : Local {
     }
     $settings{handle} = $c->request->params->{handle};
     unless(length $settings{handle}) {
-        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        $c->response->redirect("/domain/audio?domain=$settings{domain}");
         return;
     }
 
@@ -544,8 +524,69 @@ sub listen_audio : Local {
         return;
     }
 
-    $c->response->redirect("/domain/detail?domain=$settings{domain}#audio");
+    $c->response->redirect("/domain/audio?domain=$settings{domain}");
     return;
+}
+
+=head2 vsc
+
+Show VSC details for a given domain.
+
+=cut
+
+sub vsc : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/domain_vsc.tt';
+
+    my $domain = $c->request->params->{domain};
+
+    $c->stash->{domain} = $domain;
+
+    my $audio_files;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
+                                                        { domain => $domain },
+                                                        \$audio_files
+                                                      );
+    $c->stash->{audio_files} = $audio_files if eval { @$audio_files };
+
+    my $vscs;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_domain_vscs',
+                                                        { domain => $domain },
+                                                        \$vscs
+                                                      );
+    $c->stash->{vscs} = $vscs if eval { @$vscs };
+
+    my $vsc_actions;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_vsc_actions',
+                                                        { },
+                                                        \$vsc_actions
+                                                      );
+    @$vsc_actions = grep { my $tmp = $_;
+                                      ! grep { $$_{action} eq $tmp }
+                                             eval { @$vscs }
+                                    }
+                                    eval { @$vsc_actions };
+    $c->stash->{vsc_actions} = $vsc_actions if @$vsc_actions;
+
+    $c->stash->{edit_vsc} = $c->request->params->{edit_vsc};
+
+    if(exists $c->session->{vcrefill}) {
+        $c->stash->{vcrefill} = $c->session->{vcrefill};
+        delete $c->session->{vcrefill};
+    }
+    if(exists $c->session->{verefill}) {
+        $c->stash->{verefill} = $c->session->{verefill};
+        delete $c->session->{verefill};
+    } elsif($c->request->params->{edit_vsc}) {
+        foreach my $vsc (eval { @$vscs }) {
+            if($$vsc{action} eq $c->request->params->{edit_vsc}) {
+                $c->stash->{verefill} = $vsc;
+                last;
+            }
+        }
+    }
+
+    return 1;
 }
 
 =head2 do_create_vsc
@@ -578,14 +619,14 @@ sub do_create_vsc : Local {
     {
         $messages{vscmsg} = 'Web.VSC.Created';
         $c->session->{messages} = \%messages;
-        $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
+        $c->response->redirect("/domain/vsc?domain=$settings{domain}");
         return;
     }
 
     $messages{vscerr} = 'Client.Voip.InputErrorFound';
     $c->session->{messages} = \%messages;
     $c->session->{vcrefill} = \%settings;
-    $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
+    $c->response->redirect("/domain/vsc?domain=$settings{domain}");
     return;
 }
 
@@ -608,7 +649,7 @@ sub do_update_vsc : Local {
     }
     $settings{action} = $c->request->params->{action};
     unless(length $settings{action}) {
-        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        $c->response->redirect("/domain/vsc?domain=$settings{domain}");
         return;
     }
     $settings{data}{digits} = length $c->request->params->{digits}
@@ -624,14 +665,14 @@ sub do_update_vsc : Local {
     {
         $messages{vscmsg} = 'Web.VSC.Updated';
         $c->session->{messages} = \%messages;
-        $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
+        $c->response->redirect("/domain/vsc?domain=$settings{domain}");
         return;
     }
 
     $messages{vscerr} = 'Client.Voip.InputErrorFound';
     $c->session->{messages} = \%messages;
     $c->session->{verefill} = $settings{data};
-    $c->response->redirect("/domain/detail?domain=$settings{domain}&amp;edit_vsc=$settings{action}#vsc");
+    $c->response->redirect("/domain/vsc?domain=$settings{domain}&amp;edit_vsc=$settings{action}");
     return;
 }
 
@@ -653,7 +694,7 @@ sub do_delete_vsc : Local {
     }
     $settings{action} = $c->request->params->{action};
     unless(length $settings{action}) {
-        $c->response->redirect("/domain/detail?domain=$settings{domain}");
+        $c->response->redirect("/domain/vsc?domain=$settings{domain}");
         return;
     }
 
@@ -662,11 +703,11 @@ sub do_delete_vsc : Local {
                                              undef))
     {
         $c->session->{messages} = { vscmsg => 'Web.VSC.Deleted' };
-        $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
+        $c->response->redirect("/domain/vsc?domain=$settings{domain}");
         return;
     }
 
-    $c->response->redirect("/domain/detail?domain=$settings{domain}#vsc");
+    $c->response->redirect("/domain/vsc?domain=$settings{domain}");
     return;
 }
 
