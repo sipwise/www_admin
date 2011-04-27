@@ -22,7 +22,7 @@
   });
 </script>
 
-        <h2> Domain [% domain %] </h2>
+        <h2> Domain [% domain.domain.domain %] </h2>
 
 <!--       <a href="/domain"><span class="button-back">Back</span></a>  -->
 
