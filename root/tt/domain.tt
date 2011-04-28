@@ -13,6 +13,8 @@
                 <div class="span-10 append-5">
                   [% IF Catalyst.config.domain.rewrite_features %]
                     <a href="/domain/rewrite?domain=[% domain.domain %]">[% domain.domain %]</a>
+                  [% ELSIF Catalyst.config.domain.preference_features %]
+                    <a href="/domain/preferences?domain=[% domain.domain %]">[% domain.domain %]</a>
                   [% ELSIF Catalyst.config.domain.audiofile_features %]
                     <a href="/domain/audio?domain=[% domain.domain %]">[% domain.domain %]</a>
                   [% ELSIF Catalyst.config.domain.vsc_features %]

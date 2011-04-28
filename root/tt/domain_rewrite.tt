@@ -31,6 +31,9 @@
         [% IF Catalyst.config.domain.rewrite_features %]
           <li class="selected"><a href="rewrite?domain=[% domain.domain.domain %]"><span>Rewrite Rules</span></a></li>
         [% END %]
+        [% IF Catalyst.config.domain.preference_features %]
+          <li><a href="preferences?domain=[% domain.domain.domain %]"><span>Preferences</span></a></li>
+        [% END %]
         [% IF Catalyst.config.domain.audiofile_features %]
           <li><a href="audio?domain=[% domain.domain.domain %]"><span>Announcements</span></a></li>
         [% END %]

@@ -1,0 +1,187 @@
+
+        <h2> Domain [% domain %] </h2>
+
+<!--       <a href="/domain"><span class="button-back">Back</span></a>  -->
+
+      <div class="topsubmenu">
+        <ul>
+        [% IF Catalyst.config.domain.rewrite_features %]
+          <li><a href="rewrite?domain=[% domain %]"><span>Rewrite Rules</span></a></li>
+        [% END %]
+        [% IF Catalyst.config.domain.preference_features %]
+          <li class="selected"><a href="preferences?domain=[% domain %]"><span>Preferences</span></a></li>
+        [% END %]
+        [% IF Catalyst.config.domain.audiofile_features %]
+          <li><a href="audio?domain=[% domain %]"><span>Announcements</span></a></li>
+        [% END %]
+        [% IF Catalyst.config.domain.vsc_features %]
+          <li><a href="vsc?domain=[% domain %]"><span>VSCs</span></a></li>
+        [% END %]
+        </ul>
+      </div>
+      <div class="topsubmenudivider"> </div>
+
+        <h3 id="domainprefs">Domain Preferences</h3>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+          [% IF edit_preferences %]
+          <a href="preferences?domain=[% domain %]"><span class="button-cancel">Cancel</span></a>
+          [% ELSE %]
+          <a href="preferences?domain=[% domain %]&amp;edit_preferences=1"><span class="button-edit">Edit</span></a>
+          [% END %]
+      [% END %]
+          [% IF messages.prefmsg %]<div class="success">[% messages.prefmsg %]</div>[% END %]
+          [% IF messages.preferr %]<div class="error">[% messages.preferr %]</div>[% END %]
+          [% IF edit_preferences && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
+            <form action="update_preferences" method="post">
+              <input type="hidden" name="domain" value="[% domain %]" />
+              <div class="hspace-20"></div>
+              <ul class="cleanlist">
+            [% FOREACH preference = preferences_array %]
+              [% IF preference.max_occur == 1 %]
+                [% IF preference.key == "block_in_mode" || preference.key == "block_out_mode"
+                   || preference.key == "adm_block_in_mode" || preference.key == "adm_block_out_mode" %]
+                <li class="ui-state-default">
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
+                  <div class="span-10 last">
+                    <select size="1" name="[% preference.key %]"
+                      [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
+                      <option value="0" [% IF ! preference.value %]selected="selected"[% END %]>blacklist</option>
+                      <option value="1" [% IF preference.value %]selected="selected"[% END %]>whitelist</option>
+                    </select>
+                  </div>
+                </li>
+                [% ELSIF preference.key == "cfu"
+                      || preference.key == "cfb"
+                      || preference.key == "cft"
+                      || preference.key == "cfna" %]
+                <li class="ui-state-default [% IF edit_preferences %]high[% END %]">
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
+                  <div class="span-10 last">
+                  [% IF edit_preferences %]
+                    <input type="radio" id="[% preference.key %]disable" value="disable" name="[% preference.key %]_target" class="radio"
+                           [% IF preference.value == "" && ! preference.error %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]disable">Disabled</label>
+                    <br clear="all" />
+                    [% IF Catalyst.config.voicemail_features %]
+                    <input type="radio" id="[% preference.key %]voicebox" value="voicebox" name="[% preference.key %]_target" class="radio"
+                           [% IF preference.value == "voicebox" %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]voicebox">Voicebox</label>
+                    <br clear="all" />
+                    [% END %]
+                    [% IF Catalyst.config.fax_features %]
+                    <input type="radio" id="[% preference.key %]faxserver" value="fax2mail" name="[% preference.key %]_target" class="radio"
+                           [% IF preference.value == "fax2mail" %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]faxserver">Fax2Mail</label>
+                    <br clear="all" />
+                    [% END %]
+                    [% IF Catalyst.config.conference_features %]
+                    <input type="radio" id="[% preference.key %]conference" value="conference" name="[% preference.key %]_target" class="radio"
+                           [% IF preference.value == "conference" %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]conference">Conference room</label>
+                    <br clear="all" />
+                    [% END %]
+                    <input type="radio" id="[% preference.key %]sipuri" value="sipuri" name="[% preference.key %]_target" class="radio"
+                           [% IF (preference.value || preference.error)
+                                 && preference.value != "voicebox" && preference.value != "fax2mail" && preference.value != "conference" %]checked="checked"[% END %] />
+                    <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
+                    <input type="text" id="[% preference.key %]sipuritxt" name="[% preference.key %]_sipuri" size="25"
+                           value="[% preference.value UNLESS preference.value == "voicebox" OR preference.value == "fax2mail" OR preference.value == "conference" %]" />
+                  [% ELSE %]
+                    [% IF preference.value == "voicebox" %]
+                      Voicebox
+                    [% ELSIF preference.value == "fax2mail" %]
+                      Fax2Mail
+                    [% ELSIF preference.value == "conference" %]
+                      Conference room
+                    [% ELSE %]
+                      <input type="text" size="25" value="[% preference.value %]"
+                             class="disabled txtpreference" disabled="disabled" />
+                    [% END %]
+                  [% END %]
+                  </div>
+                </li>
+                [% IF preference.value.error %]<div class="error">[% preference.value.error %]</div>[% END %]
+                [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
+                <li class="ui-state-default">
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
+                  <div class="span-10 last">
+                    [% IF ncos_levels %]
+                      <select size="1" name="[% preference.key %]"
+                              [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
+                          <option value="" [% IF preference.value == "" %]
+                                             selected="selected"
+                                           [% END %]></option>
+                        [% FOREACH lvl = ncos_levels %]
+                          <option value="[% lvl.level %]"
+                                  [% IF preference.value == lvl.level %]selected="selected"[% END %]
+                                 >[% lvl.level %]</option>
+                        [% END %]
+                      </select>
+                    [% ELSE %]
+                      [% IF edit_preferences %]no NCOS levels defined[% END %]
+                    [% END %]
+                  </div>
+                </li>
+                [% ELSIF preference.data_type == "boolean" %]
+                <li class="ui-state-default">
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
+                  <div class="span-10 last">
+                    <input type="checkbox" name="[% preference.key %]" class="checkbox"
+                      [% IF ! edit_preferences %]disabled="disabled"[% END %]
+                      [% IF preference.value %]checked="checked"[% END %] />
+                  </div>
+                </li>
+                [% ELSE %]
+                <li class="ui-state-default">
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
+                  <div class="span-10 last">
+                    <input type="text" name="[% preference.key %]" [% IF ! edit_preferences %]
+                      class="disabled txtpreference" disabled="disabled"
+                      [% ELSE %]
+                      class="txtpreference"
+                      [% END %]
+                      value="[% preference.value %]" />
+                  </div>
+                </li>
+                [% END %]
+              [% ELSE %]
+              <li class="ui-state-default">
+                <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
+                <div class="span-9">
+                  [% IF preference.value %]
+                    <select size="1" name="[% preference.key %]">
+                    [% FOREACH pref_entry = preference.value %]
+                      <option>[% pref_entry %]</option>
+                    [% END %]
+                    </select>
+                  [% ELSE %]
+                  <select size="1" name="[% preference.key %]"></select>
+                  [% END %]
+                </div>
+                <div class="span-1 last">
+                  [% IF ! edit_preferences && ! Catalyst.session.admin.read_only %]
+                    [% IF preference.key == "allowed_ips" || preference.key == "man_allowed_ips" %]
+                      <a href="edit_iplist?domain=[% domain %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
+                    [% ELSE %]
+                      <a href="edit_list?domain=[% domain %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
+                    [% END %]
+                  [% END %]
+                </div>
+              </li>
+              [% END %]
+              [% IF preference.error %]<div class="error">[% preference.error %]</div>[% END %]
+            [% END %]
+            </ul>
+          [% IF edit_preferences %]
+            <div class="hspace-20"></div>
+            <button name="submit" class="button-save">Save</button>
+          [% END %]
+          </form>
+
