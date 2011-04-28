@@ -824,6 +824,293 @@ sub copy_rewrite : Local {
 
 }
 
+=head2 preferences
+
+Show preferences for a given peer host.
+
+=cut
+
+sub preferences : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_preferences.tt';
+
+    my $peerid = $c->request->params->{peerid};
+
+    my $peer_details;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_host_details',
+                                                        { id => $peerid },
+                                                        \$peer_details
+                                                      );
+    $c->stash->{peer} = $peer_details;
+
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_preferences',
+                                                        { id => $peerid },
+                                                        \$preferences
+                                                      );
+
+    my $db_prefs;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
+                                                        undef, \$db_prefs
+                                                      );
+    $db_prefs = [ grep { $$_{peer_pref} } @$db_prefs ] if eval { @$db_prefs };
+
+    ### restore data entered by the user ###
+
+    if(ref $c->session->{restore_preferences_input} eq 'HASH') {
+        if(ref $preferences eq 'HASH') {
+            $preferences = { %$preferences, %{$c->session->{restore_preferences_input}} };
+        } else {
+            $preferences = $c->session->{restore_preferences_input};
+        }
+        delete $c->session->{restore_preferences_input};
+    }
+
+    if(eval { @$db_prefs }) {
+        $c->stash->{preferences_array} = admin::Utils::prepare_tt_prefs($c, $db_prefs, $preferences);
+    }
+
+    $c->stash->{edit_preferences} = $c->request->params->{edit_preferences};
+
+    return 1;
+}
+
+=head2 update_preferences
+
+Update peer host preferences in the database.
+
+=cut
+
+sub update_preferences : Local {
+    my ( $self, $c ) = @_;
+
+    my $peerid = $c->request->params->{peerid};
+
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_preferences',
+                                                        { id => $peerid },
+                                                        \$preferences
+                                                      );
+
+    my $db_prefs;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
+                                                        undef, \$db_prefs
+                                                      );
+    $db_prefs = [ grep { $$_{peer_pref} } @$db_prefs ] if eval { @$db_prefs };
+
+    return unless admin::Utils::prepare_db_prefs($c, $db_prefs, $preferences);
+
+    ### save settings ###
+
+    unless(eval {keys %{$c->session->{messages}} }) {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'set_peer_preferences',
+                                                 { id => $peerid,
+                                                   preferences => $preferences,
+                                                 },
+                                                 undef
+                                               ))
+        {
+            $c->session->{messages}{prefmsg} = 'Server.Voip.SavedSettings';
+            $c->response->redirect("preferences?peerid=$peerid");
+            return;
+
+        }
+    } else {
+        $c->session->{messages}{preferr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->session->{restore_preferences_input} = $preferences;
+    $c->response->redirect("preferences?peerid=$peerid&edit_preferences=1");
+    return;
+}
+
+=head2 edit_list
+
+Add, remove or activate/deactivate entries from a number list preference.
+
+=cut
+
+sub edit_list : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_edit_list.tt';
+
+    my $peerid = $c->request->params->{peerid};
+
+    my $peer_details;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_host_details',
+                                                        { id => $peerid },
+                                                        \$peer_details
+                                                      );
+    $c->stash->{peer} = $peer_details;
+
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_preferences',
+                                                        { id => $peerid },
+                                                        \$preferences
+                                                      );
+
+    my $list = $c->request->params->{list_name};
+
+    if(defined $$preferences{$list}) {
+        my $block_list = ref $$preferences{$list} ? $$preferences{$list} : [ $$preferences{$list} ];
+        $c->stash->{list_data} = admin::Utils::prepare_tt_list($c, $block_list);
+    }
+
+    $c->stash->{list_name} = $list;
+
+    my $list_mode = $list;
+    $list_mode =~ s/list$/mode/;
+    $c->stash->{list_mode} = $$preferences{$list_mode};
+    $list_mode =~ s/mode$/clir/;
+    $c->stash->{block_in_clir} = $$preferences{$list_mode};
+
+    if(defined $c->session->{blockaddtxt}) {
+        $c->stash->{blockaddtxt} = $c->session->{blockaddtxt};
+        delete $c->session->{blockaddtxt};
+    }
+
+    return 1;
+}
+
+=head2 do_edit_list
+
+Update a number list preference in the database.
+
+=cut
+
+sub do_edit_list : Local {
+    my ( $self, $c ) = @_;
+
+    my $peerid = $c->request->params->{peerid};
+
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_preferences',
+                                                        { id => $peerid },
+                                                        \$preferences
+                                                      );
+
+    my $list = $c->request->params->{list_name};
+
+    # input text field to add new entry to block list
+    my $add = $c->request->params->{block_add};
+
+    # delete link next to entries in block list
+    my $del = $c->request->params->{block_del};
+
+    # activate/deactivate link next to entries in block list
+    my $act = $c->request->params->{block_act};
+
+    admin::Utils::addelact_blocklist($c, $preferences, $list, $add, $del, $act);
+
+    unless(eval {keys %{$c->session->{messages}} }) {
+        $c->model('Provisioning')->call_prov( $c, 'voip', 'set_peer_preferences',
+                                              { id => $peerid,
+                                                preferences => {
+                                                                 $list => $$preferences{$list},
+                                                               },
+                                              },
+                                              undef
+                                            );
+    } else {
+        $c->session->{messages}{numerr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->response->redirect("edit_list?peerid=$peerid&list_name=$list");
+}
+
+=head2 edit_iplist
+
+Add or remove entries from an IP list preference.
+
+=cut
+
+sub edit_iplist : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/peering_edit_iplist.tt';
+
+    my $peerid = $c->request->params->{peerid};
+
+    my $peer_details;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_host_details',
+                                                        { id => $peerid },
+                                                        \$peer_details
+                                                      );
+    $c->stash->{peer} = $peer_details;
+
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_preferences',
+                                                        { id => $peerid },
+                                                        \$preferences
+                                                      );
+
+    my $list = $c->request->params->{list_name};
+    $c->stash->{list_name} = $list;
+
+    if(defined $$preferences{$list}) {
+        my $iplist = ref $$preferences{$list} ? $$preferences{$list} : [ $$preferences{$list} ];
+
+        my $bg = '';
+        my $i = 1;
+        foreach my $entry (sort @$iplist) {
+            push @{$c->stash->{list_data}}, { ipnet      => $entry,
+                                              background => $bg ? '' : 'tr_alt',
+                                              id         => $i++,
+                                            };
+            $bg = !$bg;
+        }
+    }
+
+    if(defined $c->session->{listaddtxt}) {
+        $c->stash->{listaddtxt} = $c->session->{listaddtxt};
+        delete $c->session->{listaddtxt};
+    }
+
+    return 1;
+}
+
+=head2 do_edit_iplist
+
+Update an IP list preference in the database.
+
+=cut
+
+sub do_edit_iplist : Local {
+    my ( $self, $c ) = @_;
+
+    my $peerid = $c->request->params->{peerid};
+
+    my $preferences;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_preferences',
+                                                        { id => $peerid },
+                                                        \$preferences
+                                                      );
+
+    my $list = $c->request->params->{list_name};
+
+    # input text field to add new entry to IP list
+    my $add = $c->request->params->{list_add};
+
+    # delete link next to entries in IP list
+    my $del = $c->request->params->{list_del};
+
+    admin::Utils::addel_iplist($c, $preferences, $list, $add, $del);
+
+    unless(eval {keys %{$c->session->{messages}} }) {
+        $c->model('Provisioning')->call_prov( $c, 'voip', 'set_peer_preferences',
+                                              { id => $peerid,
+                                                preferences => {
+                                                                 $list => $$preferences{$list},
+                                                               },
+                                              },
+                                              undef
+                                            );
+    } else {
+        $c->session->{messages}{numerr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->response->redirect("edit_iplist?peerid=$peerid&list_name=$list");
+}
+
 =head2 detail 
 
 Show SIP peering contract details.

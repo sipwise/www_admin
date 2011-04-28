@@ -23,13 +23,19 @@
 </script>
 
 
+      <h2> Peer Host [% peer.peer_host.name %] </h2>
 
-        <h2> SIP Peering Rewrite Rules for host 
-          <a class="noarrow" href="rewrite?peer_id=[% peer.peer_host.id %]">
-            [% peer.peer_host.name %]</a>
-        </h2>
+      <a href="detail?group_id=[% peer.peer_host.group_id %]"><span class="button-back">Back</span></a><br /><br />
 
-        <a href="detail?group_id=[% peer.peer_host.group_id %]"><span class="button-back">Back</span></a>
+      <div class="topsubmenu">
+        <ul>
+          <li class="selected"><a href="rewrite?peer_id=[% peer.peer_host.id %]"><span>Rewrite Rules</span></a></li>
+        [% IF Catalyst.config.peer.preference_features %]
+          <li><a href="preferences?peerid=[% peer.peer_host.id %]"><span>Preferences</span></a></li>
+        [% END %]
+        </ul>
+      </div>
+      <div class="topsubmenudivider"> </div>
 
         [% IF all_peers.size > 0 %]    
         [% UNLESS Catalyst.session.admin.read_only %]
