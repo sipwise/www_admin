@@ -148,7 +148,7 @@ sub create_rewrite : Local {
     elsif($field eq 'callee') { $a = 'callee'.$a; }
     if($direction eq 'in') { $a = 'i'.$a; }
     elsif($direction eq 'out') { $a = 'o'.$a; }
-    my $m = $a.'msg'; my $e = $a.'err';
+    my $m = $a.'msg'; my $e = $a.'err'; my $d = $a.'detail';
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_domain_rewrite',
@@ -173,6 +173,9 @@ sub create_rewrite : Local {
         else
         {
             $messages{$e} = 'Client.Voip.InputErrorFound';
+            if($c->session->{prov_error_object}) {
+              $c->flash->{$d} = $c->session->{prov_error_object};
+            }
         }
     } else {
     }
@@ -208,7 +211,7 @@ sub edit_rewrite : Local {
     elsif($field eq 'callee') { $a = 'callee'.$a; }
     if($direction eq 'in') { $a = 'i'.$a; }
     elsif($direction eq 'out') { $a = 'o'.$a; }
-    my $m = $a.'msg'; my $e = $a.'err';
+    my $m = $a.'msg'; my $e = $a.'err'; my $d = $a.'detail';
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_domain_rewrite',
@@ -233,6 +236,9 @@ sub edit_rewrite : Local {
         else
         {
             $messages{$e} = 'Client.Voip.InputErrorFound';
+            if($c->session->{prov_error_object}) {
+              $c->flash->{$d} = $c->session->{prov_error_object};
+            }
         }
     } else {
     }

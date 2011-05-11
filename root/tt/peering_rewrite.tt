@@ -82,6 +82,7 @@
               field = 'caller',
               msg = messages.icallermsg,
               err = messages.icallererr,
+              detail = icallerdetail,
               rules = peer.rewrite_in_caller,
             },
             {
@@ -92,6 +93,7 @@
               field = 'callee',
               msg = messages.icalleemsg,
               err = messages.icalleeerr,
+              detail = icalleedetail,
               rules = peer.rewrite_in_callee,
             },
             {
@@ -102,6 +104,7 @@
               field = 'caller',
               msg = messages.ocallermsg,
               err = messages.ocallererr,
+              detail = ocallerdetail,
               rules = peer.rewrite_out_caller,
             },
             {
@@ -112,6 +115,7 @@
               field = 'callee',
               msg = messages.ocalleemsg,
               err = messages.ocalleeerr,
+              detail = ocalleedetail,
               rules = peer.rewrite_out_callee,
             },
           ]
@@ -121,7 +125,7 @@
 
         <h3 id="[% rw.id %]">[% rw.header %]</h3>
           [% IF rw.msg %]<div class="success">[% rw.msg %]</div>[% END %]
-          [% IF rw.err %]<div class="error">[% rw.err %]</div>[% END %]
+          [% IF rw.err %]<div class="error">[% rw.err %][% IF rw.detail %]<br/>[% rw.detail %][% END %]</div>[% END %]
 
             <ul class="cleanlist">
               <li class="ui-state-default">

@@ -36,6 +36,8 @@ our $VERSION = '3';
 my $xs = new XML::Simple;
 my $xc = $xs->XMLin( '/etc/ngcp-www-admin/admin.conf', ForceArray => 0);
 
+__PACKAGE__->config(session => { flash_to_stash => 1 });
+
 __PACKAGE__->config( %$xc );
 __PACKAGE__->config( 'Plugin::Authentication' => {
         default_realm => 'default',
