@@ -426,11 +426,11 @@ sub delete_peer : Local {
     my %settings;
 
     my $grpid = $c->request->params->{grpid};
-    my $peer_id = $c->request->params->{peerid};
+    my $peerid = $c->request->params->{peerid};
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_peer_host',
-                                                 { id => $peer_id
+                                                 { id => $peerid
                                                  },
                                                  undef
                                                ))
@@ -517,7 +517,7 @@ sub rewrite : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/peering_rewrite.tt';
     
-	my $peerid = $c->request->params->{peer_id};
+	my $peerid = $c->request->params->{peerid};
 
     my $peer_details;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_host_details',
@@ -593,7 +593,7 @@ sub create_rewrite : Local {
         {
             $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+            $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
             return;
 		}
 		else
@@ -613,7 +613,7 @@ sub create_rewrite : Local {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+    $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
     return;
 }
 
@@ -696,14 +696,14 @@ sub delete_rewrite : Local {
         {
             $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+            $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
             return;
 		}
     } else {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+    $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
     return;
 }
 
@@ -756,7 +756,7 @@ sub edit_rewrite : Local {
         {
             $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+            $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
             return;
 		}
 		else
@@ -776,7 +776,7 @@ sub edit_rewrite : Local {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+    $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
     return;
 }
 
@@ -815,13 +815,13 @@ sub copy_rewrite : Local {
         {
             	$messages{cpmsg} = 'Server.Voip.SavedSettings';
 	            $c->session->{messages} = \%messages;
-    	        $c->response->redirect("/peering/rewrite?peer_id=$peerid");
+    	        $c->response->redirect("/peering/rewrite?peerid=$peerid");
         	    return;
 		}
 	}
 	else
 	{
-		$c->response->redirect("/peering/rewrite?peer_id=$peerid");
+		$c->response->redirect("/peering/rewrite?peerid=$peerid");
         return;
 	}
 

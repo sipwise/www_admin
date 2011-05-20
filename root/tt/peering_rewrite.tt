@@ -29,7 +29,7 @@
 
       <div class="topsubmenu">
         <ul>
-          <li class="selected"><a href="rewrite?peer_id=[% peer.peer_host.id %]"><span>Rewrite Rules</span></a></li>
+          <li class="selected"><a href="rewrite?peerid=[% peer.peer_host.id %]"><span>Rewrite Rules</span></a></li>
         [% IF Catalyst.config.peer.preference_features %]
           <li><a href="preferences?peerid=[% peer.peer_host.id %]"><span>Preferences</span></a></li>
         [% END %]
@@ -149,7 +149,6 @@
                     <input type="hidden" name="grpid" value="[% peer.peer_host.group_id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
-                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="priority" value="[% rule.priority %]" />
                     <div class="span-4">
@@ -169,7 +168,7 @@
                     </div>
                   </form>
                   <div class="prepend-1 span-1 last">
-                      <a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]#[% rw.id %]"><span class="button-cancel">Cancel</span></a>
+                      <a href="/peering/rewrite?peerid=[% peer.peer_host.id %]#[% rw.id %]"><span class="button-cancel">Cancel</span></a>
                   </div>
                 [% ELSE %]
                   <div class="span-4">[% rule.match_pattern %]</div>
@@ -177,11 +176,11 @@
                   <div class="span-4 append-1">[% rule.description %]</div>
                   <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
-                      <a href="/peering/rewrite?peer_id=[% peer.peer_host.id %]&editid=[% rule.id %]#[% rw.id %]"><span class="button-edit">Edit</span></a>
+                      <a href="/peering/rewrite?peerid=[% peer.peer_host.id %]&editid=[% rule.id %]#[% rw.id %]"><span class="button-edit">Edit</span></a>
                   [% END %]
                   </div>
                   <form action="/peering/delete_rewrite" method="post">
-                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
+                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -206,7 +205,6 @@
                   <input type="hidden" name="direction" value="[% rw.dir %]" />
                   <input type="hidden" name="field" value="[% rw.field%]" />
                   <input type="hidden" name="priority" value="[% priority - 1 %]" />
-                  <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                   <div class="span-1">&nbsp;</div>
                   <div class="span-4">
                     <input type="text" size="15" id="addtxt" title="string, match pattern"
