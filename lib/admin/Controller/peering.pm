@@ -426,11 +426,11 @@ sub delete_peer : Local {
     my %settings;
 
     my $grpid = $c->request->params->{grpid};
-    my $peer_id = $c->request->params->{peerid};
+    my $peerid = $c->request->params->{peerid};
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_peer_host',
-                                                 { id => $peer_id
+                                                 { id => $peerid
                                                  },
                                                  undef
                                                ))
@@ -517,7 +517,7 @@ sub rewrite : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/peering_rewrite.tt';
     
-	my $peerid = $c->request->params->{peer_id};
+	my $peerid = $c->request->params->{peerid};
 
     my $peer_details;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_host_details',
@@ -571,7 +571,7 @@ sub create_rewrite : Local {
 	elsif($field eq 'callee') { $a = 'callee'.$a; }
 	if($direction eq 'in') { $a = 'i'.$a; }
 	elsif($direction eq 'out') { $a = 'o'.$a; }
-	my $m = $a.'msg'; my $e = $a.'err';
+        my $m = $a.'msg'; my $e = $a.'err'; my $d = $a.'detail';
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
 #        unless $callee_prefix =~ /^[a-zA-Z0-9_\.\-\@\:]+/;
@@ -593,12 +593,15 @@ sub create_rewrite : Local {
         {
             $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+            $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
             return;
 		}
 		else
 		{
         	$messages{$e} = 'Client.Voip.InputErrorFound';
+                if($c->session->{prov_error_object}) {
+                  $c->flash->{$d} = $c->session->{prov_error_object};
+                }
 		}
     } else {
 		# TODO: add proper values here and set them in tt
@@ -610,7 +613,7 @@ sub create_rewrite : Local {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+    $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
     return;
 }
 
@@ -693,14 +696,14 @@ sub delete_rewrite : Local {
         {
             $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+            $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
             return;
 		}
     } else {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+    $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
     return;
 }
 
@@ -731,7 +734,7 @@ sub edit_rewrite : Local {
 	elsif($field eq 'callee') { $a = 'callee'.$a; }
 	if($direction eq 'in') { $a = 'i'.$a; }
 	elsif($direction eq 'out') { $a = 'o'.$a; }
-	my $m = $a.'msg'; my $e = $a.'err';
+        my $m = $a.'msg'; my $e = $a.'err'; my $d = $a.'detail';
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
 #        unless $callee_prefix =~ /^[a-zA-Z0-9_\.\-\@\:]+/;
@@ -753,12 +756,15 @@ sub edit_rewrite : Local {
         {
             $messages{$m} = 'Server.Voip.SavedSettings';
             $c->session->{messages} = \%messages;
-            $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+            $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
             return;
 		}
 		else
 		{
         	$messages{$e} = 'Client.Voip.InputErrorFound';
+                if($c->session->{prov_error_object}) {
+                  $c->flash->{$d} = $c->session->{prov_error_object};
+                }
 		}
     } else {
 		# TODO: add proper values here and set them in tt
@@ -770,7 +776,7 @@ sub edit_rewrite : Local {
     }
 
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering/rewrite?peer_id=$peerid#$a");
+    $c->response->redirect("/peering/rewrite?peerid=$peerid#$a");
     return;
 }
 
@@ -809,13 +815,13 @@ sub copy_rewrite : Local {
         {
             	$messages{cpmsg} = 'Server.Voip.SavedSettings';
 	            $c->session->{messages} = \%messages;
-    	        $c->response->redirect("/peering/rewrite?peer_id=$peerid");
+    	        $c->response->redirect("/peering/rewrite?peerid=$peerid");
         	    return;
 		}
 	}
 	else
 	{
-		$c->response->redirect("/peering/rewrite?peer_id=$peerid");
+		$c->response->redirect("/peering/rewrite?peerid=$peerid");
         return;
 	}
 

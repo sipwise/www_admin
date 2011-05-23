@@ -5,7 +5,7 @@
 
       <div class="topsubmenu">
         <ul>
-          <li><a href="rewrite?peer_id=[% peer.peer_host.id %]"><span>Rewrite Rules</span></a></li>
+          <li><a href="rewrite?peerid=[% peer.peer_host.id %]"><span>Rewrite Rules</span></a></li>
         [% IF Catalyst.config.peer.preference_features %]
           <li class="selected"><a href="preferences?peerid=[% peer.peer_host.id %]"><span>Preferences</span></a></li>
         [% END %]
