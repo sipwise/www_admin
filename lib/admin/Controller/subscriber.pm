@@ -144,6 +144,7 @@ sub detail : Local {
                                                           );
         $c->session->{subscriber}{registered_contacts} = $regcon if eval { @$regcon };
 
+        eval { $c->session->{subscriber}{aliases} = [ sort @{$c->session->{subscriber}{aliases}} ] };
         $c->stash->{subscriber} = $c->session->{subscriber};
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
         $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c->view($c->config->{view})->
@@ -316,6 +317,128 @@ sub update_subscriber : Local {
         $c->response->redirect("/subscriber/detail?account_id=". $c->session->{subscriber}{account_id} ."&new=1");
     }
     return;
+}
+
+sub edit_aliases : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_edit_aliases.tt';
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber',
+                                                        { id       => $c->session->{subscriber}{account_id},
+                                                          username => $c->session->{subscriber}{username},
+                                                          domain   => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    eval {
+        $c->session->{subscriber}{alias_numbers} =
+            [ sort { $$a{cc}.$$a{ac}.$$a{sn} cmp $$b{cc}.$$b{ac}.$$b{sn} }
+                   @{$c->session->{subscriber}{alias_numbers}} ];
+    };
+    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    if(defined $c->session->{aliasadd}) {
+        $c->stash->{aliasadd} = $c->session->{aliasadd};
+        delete $c->session->{aliasadd};
+    }
+
+    return 1;
+}
+
+sub do_edit_aliases : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    my $acid = $c->session->{subscriber}{account_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber',
+                                                        { id       => $acid,
+                                                          username => $c->session->{subscriber}{username},
+                                                          domain   => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$c->session->{subscriber}
+                                                      );
+
+    # delete button next to entries in alias list
+    if(    defined $c->request->params->{alias_del_cc}
+       and defined $c->request->params->{alias_del_ac}
+       and defined $c->request->params->{alias_del_sn} )
+    {
+        my $cc = $c->request->params->{alias_del_cc};
+        my $ac = $c->request->params->{alias_del_ac};
+        my $sn = $c->request->params->{alias_del_sn};
+        my $aliaslist = $c->session->{subscriber}{alias_numbers};
+        if(defined $aliaslist) {
+            $c->session->{subscriber}{alias_numbers} = [ grep { $$_{cc} ne $cc or $$_{ac} ne $ac or $$_{sn} ne $sn } @$aliaslist ];
+        }
+    }
+
+    # input text fields to add new entry to list
+    if(    defined $c->request->params->{alias_add_cc}
+       and defined $c->request->params->{alias_add_ac}
+       and defined $c->request->params->{alias_add_sn} )
+    {
+        my $cc = $c->request->params->{alias_add_cc};
+        my $ac = $c->request->params->{alias_add_ac};
+        my $sn = $c->request->params->{alias_add_sn};
+        my $checkresult;
+
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
+                                                            $cc, \$checkresult
+                                                          );
+        $messages{number_cc} = 'Client.Voip.MalformedCc'
+            unless $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
+                                                            $ac, \$checkresult
+                                                          );
+        $messages{number_ac} = 'Client.Voip.MalformedAc'
+            unless $checkresult;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sn',
+                                                            $sn, \$checkresult
+                                                          );
+        $messages{number_sn} = 'Client.Voip.MalformedSn'
+            unless $checkresult;
+
+        unless(keys %messages) {
+            my $aliaslist = $c->session->{subscriber}{alias_numbers};
+            $aliaslist = [] unless defined $aliaslist;
+            $c->session->{subscriber}{alias_numbers} = [ @$aliaslist, { cc => $cc, ac => $ac, sn => $sn } ];
+        } else {
+            $c->session->{aliasadd} = { cc => $cc, ac => $ac, sn => $sn };
+        }
+    }
+
+    unless(keys %messages) {
+        $c->model('Provisioning')->call_prov( $c, 'billing', 'update_voip_account_subscriber',
+                                              { id         => $acid,
+                                                subscriber => { username      => $c->session->{subscriber}{username},
+                                                                domain        => $c->session->{subscriber}{domain},
+                                                                alias_numbers => $c->session->{subscriber}{alias_numbers},
+                                                              },
+                                              },
+                                              undef
+                                            );
+    } else {
+        $messages{aliaserr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_aliases?subscriber_id=$subscriber_id");
+
 }
 
 =head2 lock

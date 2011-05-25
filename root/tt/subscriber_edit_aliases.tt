@@ -1,0 +1,60 @@
+        <h3>Edit alias numbers for
+          <a class="noarrow" href="detail?subscriber_id=[% subscriber_id %]">
+            [% subscriber.username %]@[% subscriber.domain %]</a>
+        </h3>
+
+          <a href="detail?subscriber_id=[% subscriber_id %]"><span class="button-back">Back</span></a>
+          <div class="hspace-20"></div><br clear="all" />
+          [% IF messages.aliaserr %]<div class="error">[% messages.aliaserr %]</div>[% END %]
+
+          <div class="list_explanation">
+            The numbers in this list will be treated as alternative numbers of the subscriber for incoming calls.
+          </div>
+          <div class="hspace-20"></div>
+
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-3"> Country Code </div>
+              <div class="span-3"> Area Code </div>
+              <div class="span-10"> Subscriber Number </div>
+            </li>
+            [% id = 0 %]
+            [% FOREACH aliasentry = subscriber.alias_numbers %]
+              <li class="ui-state-default">
+                <div class="span-3"> [% aliasentry.cc %] </div>
+                <div class="span-3"> [% aliasentry.ac %] </div>
+                <div class="span-9"> [% aliasentry.sn %] </div>
+                <form action="do_edit_aliases" method="post">
+                  <div class="span-1 last">
+                    <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                    <input type="hidden" name="alias_del_cc" value="[% aliasentry.cc %]" />
+                    <input type="hidden" name="alias_del_ac" value="[% aliasentry.ac %]" />
+                    <input type="hidden" name="alias_del_sn" value="[% aliasentry.sn %]" />
+                    <button class="button-delete" id="aliasdel[% id %]">Delete</button>
+                  </div>
+                </form>
+              </li>
+              [% id = id + 1 %]
+            [% END %]
+          </ul><br clear="all" />
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <form action="do_edit_aliases" method="post">
+                <div class="span-3"> <input type="text" size="5" name="alias_add_cc" id="aliasaddcc" value="[% aliasadd.cc %]" /> </div>
+                <div class="span-3"> <input type="text" size="5" name="alias_add_ac" id="aliasaddac" value="[% aliasadd.ac %]" /> </div>
+                <div class="span-9"> <input type="text" size="20" name="alias_add_sn" id="aliasaddsn" value="[% aliasadd.sn %]" /> </div>
+                <div class="span-1 last">
+                  <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                  <button class="button-add" id="aliasadd">Add</button>
+                </div>
+              </form>
+            </li>
+            [% IF messages.number_cc OR messages.number_ac OR messages.number_sn %]
+              <div class="error">
+                [% messages.number_cc IF messages.number_cc %]
+                [% messages.number_ac IF messages.number_ac %]
+                [% messages.number_sn IF messages.number_sn %]
+              </div>
+            [% END %]
+          </ul>
+

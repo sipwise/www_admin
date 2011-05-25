@@ -134,6 +134,26 @@
               [% IF messages.number_ac %]<div class="error">[% messages.number_ac %]</div>[% END %]
               [% IF messages.number_sn %]<div class="error">[% messages.number_sn %]</div>[% END %]
 
+              <li class="ui-state-default">
+                <div class="span-6">Alias Numbers:</div>
+                <div class="span-9">
+                  [% IF subscriber.aliases %]
+                    <select size="1">
+                    [% FOREACH alias_number = subscriber.aliases %]
+                      <option>+[% alias_number %]</option>
+                    [% END %]
+                    </select>
+                  [% ELSE %]
+                  <select size="1"></select>
+                  [% END %]
+                </div>
+                <div class="span-1 last">
+                  [% IF ! edit_subscriber && ! Catalyst.session.admin.read_only %]
+                    <a href="edit_aliases?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-edit">Edit List</span></a>
+                  [% END %]
+                </div>
+              </li>
+
               [% IF subscriber.subscriber_id %]
               <li class="ui-state-default"><div class="span-6">SIP URI:</div><div class="span-10 last">[% subscriber.username %]@[% subscriber.domain %]</div></li>
               [% ELSE %]
