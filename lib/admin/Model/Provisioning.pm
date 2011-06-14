@@ -85,32 +85,21 @@ sub login {
         return;
     }
 
-    unless(Scalar::Util::blessed($admin)
-           and ($Catalyst::Plugin::Authentication::VERSION < 0.10003
-                ? $admin->isa("Catalyst::Plugin::Authentication::User")
-                : $admin->isa("Catalyst::Authentication::User")))
-    {
-        if(my $user_obj = $self->_get_admin($c, $admin)) {
-            $admin = $user_obj;
-        } else {
-            if($c->session->{prov_error} and $c->session->{prov_error} eq 'Server.Voip.NoSuchAdmin') {
-                $c->log->info("***Provisioning::login authentication failed for '$admin', unknown login.");
-                $c->session->{prov_error} = 'Client.Voip.AuthFailed';
-            }
-            return;
-        }
-    }
-    if($self->_auth_admin($c, $admin, $password)) {
-        $c->set_authenticated($admin);
+    $c->session->{admin}{login} = $admin;
+    $c->session->{admin}{password} = $password;
+    if(my $adm_obj = $self->_get_admin($c, $admin)) {
+        $c->set_authenticated($adm_obj);
         $c->log->debug('***Provisioning::login authentication succeeded.');
-        $$admin{password} = $password;
-        $c->session->{admin} = $admin;
+        $$adm_obj{password} = $password;
+        $c->session->{admin} = $adm_obj;
         return 1;
+    } else {
+        delete $c->session->{admin};
+        if($c->session->{prov_error} and $c->session->{prov_error} eq 'Client.Voip.AuthFailed') {
+            $c->log->info("***Provisioning::login authentication failed for '$admin'.");
+        }
+        return;
     }
-
-    $c->log->info("***Provisioning::login authentication failed for '$$admin{login}', wrong password.");
-    $c->session->{prov_error} = 'Client.Voip.AuthFailed';
-    return;
 }
 
 sub localize {
@@ -147,47 +136,16 @@ sub localize {
 sub _get_admin {
     my ($self, $c, $login) = @_;
 
-    my $admin_obj = eval {
-        $$self{billing}->get_admin({login => $login});
-    };
-    if($@) {
-        if(ref $@ eq 'SOAP::Fault') {
-            $c->log->error("***Provisioning::_get_admin failed to get admin '$login' from DB: ". $@->faultstring)
-                unless $@->faultcode eq 'Server.Voip.NoSuchAdmin';
-            $c->session->{prov_error} = $@->faultcode;
-        } else {
-            $c->log->error("***Provisioning::_get_admin failed to get admin '$login' from DB: $@.");
-            $c->session->{prov_error} = 'Server.Internal';
-        }
-        return;
-    }
+    my $admin_obj;
+    $self->call_prov($c, 'billing', 'get_admin', { login => $login }, \$admin_obj)
+        or return;
+
     my $return = { %$admin_obj, id => $login, store => $self };
     if($Catalyst::Plugin::Authentication::VERSION < 0.10003) {
         return bless $return, "Catalyst::Plugin::Authentication::User::Hash";
     } else {
         return bless $return, "Catalyst::Authentication::User::Hash";
     }
-}
-
-sub _auth_admin {
-    my ($self, $c, $admin, $pass) = @_;
-
-    eval { $$self{billing}->authenticate_admin({ login => $$admin{login},
-                                                 password => $pass,
-                                              });
-    };
-    if($@) {
-        if(ref $@ eq 'SOAP::Fault') {
-            $c->log->error("***Provisioning::_auth_admin failed to auth admin '$$admin{login}': ". $@->faultstring);
-            $c->session->{prov_error} = $@->faultcode;
-        } else {
-            $c->log->error("***Provisioning::_auth_admin failed to auth admin '$$admin{login}': $@.");
-            $c->session->{prov_error} = 'Server.Internal';
-        }
-        return;
-    }
-
-    return 1;
 }
 
 =head1 BUGS AND LIMITATIONS
