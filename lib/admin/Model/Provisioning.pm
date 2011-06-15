@@ -116,7 +116,7 @@ sub localize {
     if(ref $messages eq 'HASH') {
         my %translations;
         foreach my $msgname (keys %$messages) {
-            $translations{$msgname} = $self->_translate($c, $msgname, $lang);
+            $translations{$msgname} = $self->_translate($c, $$messages{$msgname}, $lang);
         }
         return \%translations;
     } elsif(!ref $messages) {
