@@ -103,25 +103,24 @@ sub login {
 }
 
 sub localize {
-    my ($self, $lang, $messages) = @_;
+    my ($self, $c, $lang, $messages) = @_;
 
     return unless defined $messages;
+    if(! defined $c->session->{admin}) {
+        if($messages eq 'Client.Voip.AuthFailed') {
+            return 'Login failed, please verify username and password.';
+        }
+        return;
+    }
 
     if(ref $messages eq 'HASH') {
         my %translations;
         foreach my $msgname (keys %$messages) {
-            $translations{$msgname} = eval { $$self{voip}->get_localized_string({language => $lang, code => $$messages{$msgname}}) };
-            unless(defined $translations{$msgname}) {
-                $translations{$msgname} = eval { $$self{voip}->get_localized_string({language => $lang, code => 'Server.Internal'}) };
-            }
+            $translations{$msgname} = $self->_translate($c, $msgname, $lang);
         }
         return \%translations;
     } elsif(!ref $messages) {
-        my $translation = eval { $$self{voip}->get_localized_string({language => $lang, code => $messages}) };
-        unless(defined $translation) {
-            $translation = eval { $$self{voip}->get_localized_string({language => $lang, code => 'Server.Internal'}) };
-        }
-        return $translation;
+        return $self->_translate($c, $messages, $lang);
     }
 
     return;
@@ -146,6 +145,28 @@ sub _get_admin {
     } else {
         return bless $return, "Catalyst::Authentication::User::Hash";
     }
+}
+
+sub _translate {
+    my ($self, $c, $code, $lang) = @_;
+
+    my $translation;
+    eval {
+        $self->call_prov( $c, 'voip', 'get_localized_string',
+                          { language => $lang, code => $code },
+                          \$translation,
+                        )
+    };
+    unless(defined $translation) {
+        eval {
+            $self->call_prov( $c, 'voip', 'get_localized_string',
+                              { language => $lang, code => 'Server.Internal' },
+                              \$translation,
+                            )
+        };
+    }
+
+    return $translation;
 }
 
 =head1 BUGS AND LIMITATIONS

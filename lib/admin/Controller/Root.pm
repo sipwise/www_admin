@@ -87,15 +87,15 @@ sub end : ActionClass('RenderView') {
     unless($c->response->{status} =~ /^3/) { # only if not a redirect
         if(exists $c->session->{prov_error}) {
             $c->stash->{prov_error} =
-                $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                        config->{VARIABLES}{site_config}{language},
+                $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
+                                                            config->{VARIABLES}{site_config}{language},
                                                     $c->session->{prov_error});
             delete $c->session->{prov_error};
         }
 
         if(exists $c->session->{messages}) {
-            $c->stash->{messages} = $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                            config->{VARIABLES}{site_config}{language},
+            $c->stash->{messages} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
+                                                                                config->{VARIABLES}{site_config}{language},
                                                                         $c->session->{messages});
             delete $c->session->{messages};
         }

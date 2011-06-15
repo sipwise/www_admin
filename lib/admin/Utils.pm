@@ -282,8 +282,8 @@ sub prepare_tt_prefs {
                max_occur   => $$pref{max_occur},
                description => encode_entities($$pref{description}),
                error       => $c->session->{messages}{$$pref{preference}}
-                              ? $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                      config->{VARIABLES}{site_config}{language},
+                              ? $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
+                                                                            config->{VARIABLES}{site_config}{language},
                                                                     $c->session->{messages}{$$pref{preference}})
                               : undef,
              };

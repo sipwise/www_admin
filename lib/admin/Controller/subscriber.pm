@@ -147,8 +147,8 @@ sub detail : Local {
         eval { $c->session->{subscriber}{aliases} = [ sort @{$c->session->{subscriber}{aliases}} ] };
         $c->stash->{subscriber} = $c->session->{subscriber};
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
-        $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                                     config->{VARIABLES}{site_config}{language},
+        $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
+                                                                                         config->{VARIABLES}{site_config}{language},
                                                                                  'Web.Subscriber.Lock'.$$preferences{lock})
             if $$preferences{lock};
 
@@ -602,8 +602,8 @@ sub preferences : Local {
 
     $c->stash->{subscriber} = $c->session->{subscriber};
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
-    $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                                 config->{VARIABLES}{site_config}{language},
+    $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
+                                                                                     config->{VARIABLES}{site_config}{language},
                                                                              'Web.Subscriber.Lock'.$$preferences{lock})
         if $$preferences{lock};
 
@@ -697,8 +697,8 @@ sub preferences : Local {
                max_occur   => $$pref{max_occur},
                description => encode_entities($$pref{description}),
                error       => $c->session->{messages}{$$pref{preference}}
-                              ? $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                      config->{VARIABLES}{site_config}{language},
+                              ? $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
+                                                                            config->{VARIABLES}{site_config}{language},
                                                                     $c->session->{messages}{$$pref{preference}})
                               : undef,
              };
@@ -1022,8 +1022,8 @@ sub call_data : Local {
 
         for(1 .. 12) {
             push @localized_months,
-                $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                        config->{VARIABLES}{site_config}{language},
+                $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
+                                                            config->{VARIABLES}{site_config}{language},
                                                     sprintf("Web.Months.%02d", $_));
         }
 
@@ -1479,9 +1479,9 @@ sub edit_speed_dial_slots : Local {
                 }
                 delete $c->session->{updateslotidtxt};
                 $updateerrormsg = $c->session->{messages}{updateerr} ?
-                                    $c->model('Provisioning')->localize($c->view($c->config->{view})->
-                                                                      config->{VARIABLES}{site_config}{language},
-                                                                      $c->session->{messages}{updateerr})
+                                    $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
+                                                                                config->{VARIABLES}{site_config}{language},
+                                                                        $c->session->{messages}{updateerr})
                                     : undef;
                 #delete $c->session->{updateerrmsg};
             }

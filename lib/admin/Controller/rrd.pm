@@ -58,7 +58,9 @@ sub end : ActionClass('RenderView') {
         }
 
         if(exists $c->session->{messages}) {
-            $c->stash->{messages} = $c->model('Provisioning')->localize($c, $c->session->{messages});
+            $c->stash->{messages} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
+                                                                                config->{VARIABLES}{site_config}{language},
+                                                                        $c->session->{messages});
             delete $c->session->{messages};
         }
     }

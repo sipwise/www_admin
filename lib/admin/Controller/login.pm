@@ -39,8 +39,7 @@ sub index : Private {
             }
         }
     } else {
-        $c->session->{prov_error} = 'Client.Syntax.LoginMissingPass' unless length $password;
-        $c->session->{prov_error} = 'Client.Syntax.LoginMissingUsername' unless length $username;
+        $c->session->{prov_error} = 'Client.Voip.AuthFailed';
     }
 
     $c->response->redirect($c->uri_for('/'));
