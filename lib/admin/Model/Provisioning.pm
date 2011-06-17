@@ -55,6 +55,7 @@ sub call_prov {
         if(ref $perr eq 'SOAP::Fault') {
             $c->log->error("***Provisioning::call_prov: $backend\::$function failed: ". $perr->faultstring);
             $c->session->{prov_error} = $perr->faultcode;
+            $c->session->{prov_error} =~ s/^soap://;
             $c->session->{prov_error_object} = $perr->faultdetail->{object}
                 if defined eval { $perr->faultdetail->{object} };
         } else {
