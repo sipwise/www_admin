@@ -123,7 +123,7 @@ sub detail : Local {
 
     unless($is_new) {
         my $subscriber_id = $c->request->params->{subscriber_id};
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                             { subscriber_id => $subscriber_id },
                                                             \$c->session->{subscriber}
                                                           );
@@ -198,7 +198,7 @@ sub update_subscriber : Local {
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     if($subscriber_id) {
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                             { subscriber_id => $subscriber_id },
                                                             \$c->session->{subscriber}
                                                           );
@@ -451,7 +451,7 @@ sub lock : Local {
     my ( $self, $c ) = @_;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -481,7 +481,7 @@ sub terminate : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -510,7 +510,7 @@ sub expire : Local {
     my $subscriber_id = $c->request->params->{subscriber_id};
     my $contact_id = $c->request->params->{contact_id};
 
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -544,7 +544,7 @@ sub preferences : Local {
     my $speed_dial_slots;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -745,7 +745,7 @@ sub update_preferences : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -897,7 +897,7 @@ sub update_reminder : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -937,7 +937,7 @@ sub update_voicebox : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -1004,7 +1004,7 @@ sub call_data : Local {
     $c->stash->{template} = 'tt/subscriber_call_data.tt';
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -1170,7 +1170,7 @@ sub edit_list : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -1228,7 +1228,7 @@ sub do_edit_list : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -1385,7 +1385,7 @@ sub do_edit_iplist : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -1449,7 +1449,7 @@ sub edit_speed_dial_slots : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -1529,7 +1529,7 @@ sub do_edit_speed_dial_slots : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
@@ -1760,7 +1760,7 @@ sub do_edit_destlist : Local {
     my %entry;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
                                                         \$c->session->{subscriber}
                                                       );
