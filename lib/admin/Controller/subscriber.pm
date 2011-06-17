@@ -764,7 +764,8 @@ sub update_preferences : Local {
     foreach my $db_pref (eval { @$db_prefs }) {
 
         next unless $$db_pref{usr_pref};
-        next if $$db_pref{read_only};
+        delete $$preferences{$$db_pref{preference}}, next
+            if $$db_pref{read_only};
 
         if($$db_pref{preference} eq 'cfu'
                 or $$db_pref{preference} eq 'cfb'
