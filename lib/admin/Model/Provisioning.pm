@@ -139,7 +139,7 @@ sub _get_admin {
     $self->call_prov($c, 'billing', 'get_admin', { login => $login }, \$admin_obj)
         or return;
 
-    my $return = { %$admin_obj, id => $login, store => $self };
+    my $return = { %$admin_obj, id => $login };
     if($Catalyst::Plugin::Authentication::VERSION < 0.10003) {
         return bless $return, "Catalyst::Plugin::Authentication::User::Hash";
     } else {
