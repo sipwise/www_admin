@@ -136,7 +136,7 @@ sub detail : Local {
                                                           );
 
         my $regcon;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_registered_contacts',
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_registered_devices',
                                                             { username => $c->session->{subscriber}{username},
                                                               domain   => $c->session->{subscriber}{domain},
                                                             },
@@ -515,7 +515,7 @@ sub expire : Local {
                                                         \$c->session->{subscriber}
                                                       );
 
-    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_registered_contact',
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_registered_device',
                                              { username => $c->session->{subscriber}{username},
                                                domain   => $c->session->{subscriber}{domain},
                                                id       => $contact_id,

@@ -176,7 +176,7 @@ sub detail : Local {
 
     foreach my $vas (eval { @{$c->session->{voip_account}{subscribers}} }) {
         my $regcon;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_registered_contacts',
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_registered_devices',
                                                             { username => $$vas{username},
                                                               domain   => $$vas{domain},
                                                             },
