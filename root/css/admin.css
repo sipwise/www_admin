@@ -299,13 +299,40 @@ ul.cleanlist li {
 	margin: 2px 0;
 }
 
-.pagination li.currentpage, .pagination li.disablepage {
-	margin: 0 5px 0 0;
+.pagination {
+    margin-top: 10px;
+    padding: 2px;
 }
-
-#contentplace .pagination li.nextpage a:after {
-	margin-left: 0px;
-	content: "";
+.pagination ul {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+.pagination li {
+    display: inline;
+    list-style-type: none;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-decoration: none;
+    margin-right: 5px;
+}
+.pagination li.currentpage {
+    padding: 3px 6px;
+    background-color: #54c000;
+}
+.pagination li.disablepage {
+    padding: 3px 6px;
+    background-color: #929292;
+}
+.pagination a, .pagination a:visited {
+    padding: 3px 6px;
+    background-color: #459e00;
+    color: #FFFFFF;
+}
+.pagination a:hover, .pagination a:active {
+    padding: 3px 6px;
+    background-color: #54c000;
+    color: #FFFFFF;
 }
 
 .hspace-20 {

@@ -104,7 +104,7 @@
               </li>
 
             [% END %]
-            </ul>
+            </ul><br clear="all" />
 
             [% IF pagination %]
             <div class="pagination">
