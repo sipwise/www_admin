@@ -205,8 +205,9 @@ sub save_account : Local {
 
     my $account_id = $c->request->params->{account_id} || undef;
 
-    my $external_id = $c->request->params->{external_id} || undef;
-    $settings{external_id} = $external_id if defined $external_id;
+    if(defined $c->request->params->{external_id}) {
+        $settings{external_id} = $c->request->params->{external_id};
+    }
 
     my $product = $c->request->params->{product};
     $settings{product} = $product if defined $product;
