@@ -219,6 +219,10 @@ sub update_subscriber : Local {
         $messages{domain} = 'Client.Syntax.MalformedDomain' unless($checkresult);
     }
 
+    if(defined $c->request->params->{external_id}) {
+        $settings{external_id} = $c->request->params->{external_id};
+    }
+
     $settings{admin} = 1 if $c->request->params->{admin};
 
     my $password = $c->request->params->{password};

@@ -70,6 +70,17 @@
               <li class="ui-state-default"><div class="span-5">Subscriber ID:</div><div class="span-11 last">[% subscriber.subscriber_id %]</div></li>
               <li class="ui-state-default"><div class="span-5">Contract ID:</div><div class="span-11 last"><a href="/account/detail?account_id=[% subscriber.account_id || account_id %]">[% subscriber.account_id || account_id %]</a></div></li>
               <li class="ui-state-default">
+                <div class="span-5">External ID:</div>
+                <div class="span-11 last">
+                [% IF edit_subscriber %]
+                  <input type="text" name="external_id" value="[% subscriber.external_id %]"
+                         title="the unique external ID of the subscriber, string, optional" />
+                [% ELSE %]
+                  [% subscriber.external_id %]
+                [% END %]
+                </div>
+              </li>
+              <li class="ui-state-default">
                 <div class="span-5">Web User:</div>
                 <div class="span-11 last">
                 [% IF edit_subscriber %]
