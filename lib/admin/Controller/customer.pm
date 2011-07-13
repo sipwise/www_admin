@@ -186,6 +186,10 @@ sub create_customer : Local {
 
     my (%settings, %messages);
 
+    if(length $c->request->params->{external_id}) {
+        $settings{external_id} = $c->request->params->{external_id};
+    }
+
     if(length $c->request->params->{shopuser}) {
         $settings{shopuser} = $c->request->params->{shopuser};
         my $checkresult;
@@ -251,6 +255,10 @@ sub update_customer : Local {
     my %settings;
 
     my $customer_id = $c->request->params->{customer_id};
+
+    if(length $c->request->params->{external_id}) {
+        $settings{external_id} = $c->request->params->{external_id};
+    }
 
     if(length $c->request->params->{shopuser}) {
         $settings{shopuser} = $c->request->params->{shopuser};

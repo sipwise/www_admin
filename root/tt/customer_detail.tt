@@ -32,7 +32,14 @@
             [% IF messages.custerr %]<div class="error">[% messages.custerr %]</div>[% END %]
               <input type="hidden" name="customer_id" value="[% customer.id %]" />
               <table>
-                <tr><td class="tdkey">CustomerID:</td><td>[% customer.id %]</td></tr>
+                <tr><td class="tdkey">customer ID:</td><td>[% customer.id %]</td></tr>
+                <tr>
+                  <td class="tdkey">external ID:</td>
+                  <td>
+                  <input type="text" id="external_id" [% IF ! edit_customer %]class="disabled" disabled="disabled"[% END %]
+                         name="external_id" value="[% customer.external_id %]" />
+                  </td>
+                </tr>
                 <tr>
                   <td class="tdkey">shop username:</td>
                   <td>
