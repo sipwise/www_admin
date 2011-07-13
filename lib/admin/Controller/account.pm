@@ -110,13 +110,6 @@ sub detail : Local {
                 sprintf "%.2f", $c->session->{voip_account}{balance}{cash_balance_interval} / 100;
         }
 
-        if(ref $c->session->{restore_account_input} eq 'HASH') {
-            $c->session->{voip_account}{product} = $c->session->{restore_account_input}{product};
-            $c->session->{voip_account}{billing_profile} = $c->session->{restore_account_input}{billing_profile};
-            $c->session->{voip_account}{customer_id} = $c->session->{restore_account_input}{customer_id};
-            delete $c->session->{restore_account_input};
-        }
-
         if(ref $c->session->{restore_balance_input} eq 'HASH') {
             $c->stash->{balanceadd} = $c->session->{restore_balance_input};
             delete $c->session->{restore_balance_input};
@@ -168,6 +161,13 @@ sub detail : Local {
         $c->stash->{billing_features} = 1;
     }
 
+    if(ref $c->session->{restore_account_input} eq 'HASH') {
+        for(keys %{$c->session->{restore_account_input}}) {
+            $c->session->{voip_account}{$_} = $c->session->{restore_account_input}{$_};
+        }
+        delete $c->session->{restore_account_input};
+    }
+
     delete $c->session->{voip_account}{subscribers}
         if exists $c->session->{voip_account}{subscribers}
            and !defined $c->session->{voip_account}{subscribers}
@@ -204,6 +204,9 @@ sub save_account : Local {
     my %settings;
 
     my $account_id = $c->request->params->{account_id} || undef;
+
+    my $external_id = $c->request->params->{external_id} || undef;
+    $settings{external_id} = $external_id if defined $external_id;
 
     my $product = $c->request->params->{product};
     $settings{product} = $product if defined $product;
