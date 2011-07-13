@@ -49,7 +49,7 @@ sub search : Local {
         %exact = %{ $c->session->{exact_filter} }
             if defined $c->session->{exact_filter};
     } else {
-        foreach my $sf (qw(username domain number uuid)) {
+        foreach my $sf (qw(username domain number uuid external_id)) {
             if((    defined $c->request->params->{'search_'.$sf}
                 and length $c->request->params->{'search_'.$sf})
                or $c->request->params->{'exact_'.$sf})
@@ -63,7 +63,7 @@ sub search : Local {
         $c->session->{exact_filter} = { %exact };
     }
 
-    foreach my $sf (qw(username domain number uuid)) {
+    foreach my $sf (qw(username domain number uuid external_id)) {
         # set values for webform
         $c->stash->{'exact_'.$sf} = $exact{$sf};
         $c->stash->{'search_'.$sf} = $filter{$sf};

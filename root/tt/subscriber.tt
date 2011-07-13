@@ -57,6 +57,20 @@
             </div>
             <br/>
 
+            <div class="span-3">
+              <label class="search_label" for="search_by_external_id">External ID:</label>
+            </div>
+            <div class="span-5">
+              <input type="text" id="search_by_external_id" name="search_external_id" value="[% search_external_id %]"
+                   title="search by the subscriber's external ID, wildcards allowed" />
+            </div>
+            <div class="span-3 last">
+              <input type="checkbox" class="checkbox" id="exact_external_id" name="exact_external_id" [% IF exact_external_id %]checked="checked"[% END %]
+                   title="if checked, the search string will not be surrounded by wildcards" />
+              <label for="exact_external_id">exact match</label>
+            </div>
+            <br/>
+
             <div class="span-6 append-5 last">
               <input type="checkbox" class="checkbox" id="include_terminated" name="terminated" [% IF terminated %]checked="checked"[% END %]
                      title="if checked, the search result will include terminated subscribers" />

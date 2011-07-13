@@ -28,6 +28,10 @@ sub index : Private {
         $c->stash->{refill_account_id} = $c->session->{refill_account_id};
         delete $c->session->{refill_account_id};
     }
+    if(defined $c->session->{refill_external_id}) {
+        $c->stash->{refill_external_id} = $c->session->{refill_external_id};
+        delete $c->session->{refill_external_id};
+    }
 
     return 1;
 }
@@ -61,6 +65,39 @@ sub getbyid : Local {
     }
 
     $c->session->{refill_account_id} = $account_id;
+    $c->response->redirect("/account");
+    return;
+}
+
+=head2 getbyextid 
+
+Search for entered external ID and redirect.
+
+=cut
+
+sub getbyextid : Local {
+    my ( $self, $c ) = @_;
+
+    my $external_id = $c->request->params->{external_id};
+
+    if(length $external_id) {
+
+        if($c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_external_id',
+                                                 { external_id => $external_id },
+                                                 \$c->session->{voip_account}
+                                               ))
+        {
+            $c->response->redirect("/account/detail?account_id=". $c->session->{voip_account}{id});
+            return;
+        }
+
+        delete $c->session->{prov_error} if $c->session->{prov_error} eq 'Client.Voip.NoSuchAccount';
+        $c->session->{messages} = { extidsearcherr => 'Client.Voip.NoSuchAccount' };
+    } else {
+        $c->session->{messages} = { extidsearcherr => 'Web.Syntax.MissingExternalID' };
+    }
+
+    $c->session->{refill_external_id} = $external_id;
     $c->response->redirect("/account");
     return;
 }

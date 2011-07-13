@@ -5,6 +5,13 @@
           </form>
           [% IF messages.accsearcherr %]<div class="error">[% messages.accsearcherr %]</div>[% END %]
 
+        <h3>Get by External ID</h3>
+          <form action="/account/getbyextid" method="GET">
+            <input type="text" id="external_id" name="external_id" value="[% refill_external_id %]" />
+            <button class="button-search" name="submit">Search</button>
+          </form>
+          [% IF messages.extidsearcherr %]<div class="error">[% messages.extidsearcherr %]</div>[% END %]
+
         <h3>Search by subscriber</h3>
           <form action="/subscriber/search" method="post">
             <input type="text" id="search_subscriber" name="search_username" value="[% search_string %]" />

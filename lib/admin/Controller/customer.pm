@@ -38,6 +38,7 @@ sub search : Local {
     $c->stash->{template} = 'tt/customer.tt';
 
     my $filter;
+    my $extid_filter;
     my $limit = 10;
     my $offset = $c->request->params->{offset} || 0;
     $offset = 0 if $offset !~ /^\d+$/;
@@ -45,18 +46,27 @@ sub search : Local {
     if($c->request->params->{use_session}) {
         $filter = $c->session->{search_filter}
             if defined $c->session->{search_filter};
+        $extid_filter = $c->session->{extid_search_filter}
+            if defined $c->session->{extid_search_filter};
     } else {
         $filter = $c->request->params->{search_string} || '';
         $c->session->{search_filter} = $filter;
+        $extid_filter = $c->request->params->{extid_search_string} || '';
+        $c->session->{extid_search_filter} = $extid_filter;
     }
 
     $c->stash->{search_string} = $filter;
     $filter =~ s/\*/\%/;
     $filter =~ s/\?/\_/;
+    $c->stash->{extid_search_string} = $extid_filter;
+    $extid_filter =~ s/\*/\%/;
+    $extid_filter =~ s/\?/\_/;
 
     my $customer_list;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'search_customers',
-                                                        { filter => { anything => '%'.$filter.'%',
+                                                        { filter => {
+                                                                      length $filter ? (anything => '%'.$filter.'%')
+                                                                                     : (external_id => '%'.$extid_filter.'%'),
                                                                       limit    => $limit,
                                                                       offset   => $limit * $offset,
                                                         }           },

@@ -7,6 +7,14 @@
           [% IF messages.accgeterr %]<div class="error">[% messages.accgeterr %]</div>[% END %]
         </div>
 
+        <h3>Search by external ID</h3>
+        <div class="p1">
+          <form action="/customer/search" method="post">
+            <input type="text" id="extid_search_string" name="extid_search_string" value="[% extid_search_string %]" />
+            <input type="submit" value="Search &#187;" class="but ui-corner-all" />
+          </form>
+        </div>
+
         <h3>Search by contacts</h3>
         <div class="p1">
           <form action="/customer/search" method="post">
