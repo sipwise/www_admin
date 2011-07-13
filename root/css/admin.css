@@ -346,6 +346,10 @@ ul.cleanlist li {
   width: 70px;
 }
 
+.imedium {
+  width: 140px;
+}
+
 .tooltip {
 display:none;
   background:url(../static/images/black_arrow_big.png);

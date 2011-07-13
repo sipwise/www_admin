@@ -67,11 +67,11 @@
             <input type="hidden" name="account_id" value="[% account_id %]" />
             <div class="hspace-20"></div>
             <ul class="cleanlist">
-              <li class="ui-state-default"><div class="span-6">Subscriber ID:</div><div class="span-10 last">[% subscriber.subscriber_id %]</div></li>
-              <li class="ui-state-default"><div class="span-6">Contract ID:</div><div class="span-10 last"><a href="/account/detail?account_id=[% subscriber.account_id || account_id %]">[% subscriber.account_id || account_id %]</a></div></li>
+              <li class="ui-state-default"><div class="span-5">Subscriber ID:</div><div class="span-11 last">[% subscriber.subscriber_id %]</div></li>
+              <li class="ui-state-default"><div class="span-5">Contract ID:</div><div class="span-11 last"><a href="/account/detail?account_id=[% subscriber.account_id || account_id %]">[% subscriber.account_id || account_id %]</a></div></li>
               <li class="ui-state-default">
-                <div class="span-6">Web User:</div>
-                <div class="span-10 last">
+                <div class="span-5">Web User:</div>
+                <div class="span-11 last">
                 [% IF edit_subscriber %]
                   <input type="text" name="webusername" value="[% subscriber.webusername %]"
                          title="the username (without domain) used for login at the SOAP and CSC interfaces, string" />
@@ -83,8 +83,8 @@
               </li>
               [% IF messages.webusername %]<div class="error">[% messages.webusername %]</div>[% END %]
               <li class="ui-state-default">
-                <div class="span-6">Web Password:</div>
-                <div class="span-9">
+                <div class="span-5">Web Password:</div>
+                <div class="span-10">
                 [% IF edit_subscriber %]
                   <input type="text" name="webpassword" id="edit_webpass" value="[% subscriber.edit_webpass %]"
                          title="the password used for login at the SOAP and CSC interfaces, string" />
@@ -106,22 +106,25 @@
               </li>
               [% IF messages.webpassword %]<div class="error">[% messages.webpassword %]</div>[% END %]
               <li class="ui-state-default">
-                <div class="span-6">E.164 Number:</div>
+                <div class="span-5">E.164 Number:</div>
                 [% IF edit_subscriber %]
-                  <div class="span-2">
+                  <div class="span-3">
+                  cc:
                   <input type="text" name="cc" class="ishort" value="[% subscriber.cc %]"
                          title="the country code of the E.164 number, integer" />
                   </div>
-                  <div class="span-2">
+                  <div class="span-3">
+                  ac:
                   <input type="text" name="ac" class="ishort" value="[% subscriber.ac %]"
                          title="the area code of the E.164 number, integer" />
                   </div>
-                  <div class="span-6 last">
-                  <input type="text" name="sn" value="[% subscriber.sn %]"
+                  <div class="span-5 last">
+                  sn:
+                  <input type="text" name="sn" class="imedium" value="[% subscriber.sn %]"
                          title="the subscriber part of the E.164 number, numeric string" />
                   </div>
                 [% ELSE %]
-                  <div class="span-10 last">
+                  <div class="span-11 last">
                   [% IF subscriber.sn %]
                     +[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %]
                   [% ELSE %]
@@ -135,8 +138,8 @@
               [% IF messages.number_sn %]<div class="error">[% messages.number_sn %]</div>[% END %]
 
               <li class="ui-state-default">
-                <div class="span-6">Alias Numbers:</div>
-                <div class="span-9">
+                <div class="span-5">Alias Numbers:</div>
+                <div class="span-10">
                   [% IF subscriber.aliases %]
                     <select size="1">
                     [% FOREACH alias_number = subscriber.aliases %]
@@ -155,11 +158,11 @@
               </li>
 
               [% IF subscriber.subscriber_id %]
-              <li class="ui-state-default"><div class="span-6">SIP URI:</div><div class="span-10 last">[% subscriber.username %]@[% subscriber.domain %]</div></li>
+              <li class="ui-state-default"><div class="span-5">SIP URI:</div><div class="span-11 last">[% subscriber.username %]@[% subscriber.domain %]</div></li>
               [% ELSE %]
               <li class="ui-state-default">
-                <div class="span-6">SIP URI:</div>
-                <div class="span-10 last">
+                <div class="span-5">SIP URI:</div>
+                <div class="span-11 last">
                   <input type="text" name="username" value="[% subscriber.username %]"
                          title="the local part of the SIP URI, string" />
                   @
@@ -172,14 +175,14 @@
               </li>
               [% END %]
               <li class="ui-state-default">
-                <div class="span-6">SIP password:</div>
+                <div class="span-5">SIP password:</div>
                 [% IF edit_subscriber %]
-                  <div class="span-10 last">
+                  <div class="span-11 last">
                     <input type="text" name="password" id="edit_pass" value="[% subscriber.edit_pass %]"
                          title="the password used for SIP authentication, string" />
                   </div>
                 [% ELSE %]
-                  <div class="span-9">
+                  <div class="span-10">
                     [% IF show_pass && Catalyst.session.admin.show_passwords %]
                     [% subscriber.password %]</div><div class="span-1 last"><a href="?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-hide">Hide</span></a></div>
                   [% ELSE %]
@@ -196,16 +199,16 @@
               </li>
               [% IF messages.password %]<div class="error">[% messages.password %]</div>[% END %]
               <li class="ui-state-default">
-                <div class="span-6">Administrative:</div>
-                <div class="span-10 last">
+                <div class="span-5">Administrative:</div>
+                <div class="span-11 last">
                   <input type="checkbox" name="admin" class="checkbox" [% IF ! edit_subscriber %]disabled="disabled"[% END %]
                          title="if checked, the subscriber may create and edit other subscribers in the same VoIP account"
                   [% IF subscriber.admin %]checked="checked"[% END %] />
                 </div>
               </li>
-              <li class="ui-state-default"><div class="span-6">UUID:</div><div class="span-10 last">[% subscriber.uuid %]</div></li>
-              <li class="ui-state-default"><div class="span-6">Created:</div><div class="span-10 last">[% subscriber.create_timestamp %]</div></li>
-              <li class="ui-state-default"><div class="span-6">Modified:</div><div class="span-10 last">[% subscriber.modify_timestamp %]</div></li>
+              <li class="ui-state-default"><div class="span-5">UUID:</div><div class="span-11 last">[% subscriber.uuid %]</div></li>
+              <li class="ui-state-default"><div class="span-5">Created:</div><div class="span-11 last">[% subscriber.create_timestamp %]</div></li>
+              <li class="ui-state-default"><div class="span-5">Modified:</div><div class="span-11 last">[% subscriber.modify_timestamp %]</div></li>
           </ul>
           [% IF edit_subscriber %]
             <div class="hspace-20"></div>
