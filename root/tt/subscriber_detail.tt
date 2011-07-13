@@ -223,28 +223,27 @@
 
         [% IF messages.contmsg %]<div class="success">[% messages.contmsg %]</div>[% END %]
 
-          <ul class="cleanlist">
-          [% IF subscriber.registered_contacts.0 %]
-              <li class="ui-state-default">
-                <div class="span-5">User Agent</div>
+        [% IF subscriber.registered_contacts.0 %]
+          [% FOREACH regcon = subscriber.registered_contacts %]
+            <ul class="cleanlist">
+              <li class="ui-state-default ui-state-quad">
+                <div class="span-5">User Agent:</div>
+                <div class="span-11 last"> [% regcon.user_agent %]</div>
                 <div class="span-5">Contact</div>
-                <div class="span-1">NAT</div>
-                <div class="span-4 append-1 last">Expires</div>
+                <div class="span-11 last">[% regcon.contact %]</div>
+                <div class="span-5">NAT</div>
+                <div class="span-11 last">[% IF regcon.nat %]yes[% ELSE %]no[% END %]</div>
+                <div class="span-5">Expires</div>
+                <div class="span-4">[% regcon.expires %]</div>
+                <div class="span-7 last"><a href="expire?subscriber_id=[% subscriber.subscriber_id %]&amp;contact_id=[% regcon.id %]"><span class="button-delete">Expire Now</span></a></div>
               </li>
-
-              [% FOREACH regcon = subscriber.registered_contacts %]
-                <li class="ui-state-default">
-                  <div class="span-5"> [% regcon.user_agent %]</div>
-                  <div class="span-5">[% regcon.contact %]</div>
-                  <div class="span-1">[% IF regcon.nat %]yes[% ELSE %]no[% END %]</div>
-                  <div class="span-4">[% regcon.expires %]</div>
-                  <div class="span-1 last"><a href="expire?subscriber_id=[% subscriber.subscriber_id %]&amp;contact_id=[% regcon.id %]"><span class="button-delete">Expire Now</span></a></div>
-                </li>
-              [% END %]
-          [% ELSE %]
-            <li class="ui-state-default"><div>None</div></li>
+            </ul><br clear="all" /><br clear="all" />
           [% END %]
+        [% ELSE %]
+          <ul class="cleanlist">
+            <li class="ui-state-default"><div>None</div></li>
           </ul>
+        [% END %]
 
         [% END %]
 

@@ -363,3 +363,8 @@ display:none;
 .success {
   margin-top: 20px;
 }
+
+.content li.ui-state-quad {
+  height: 104px;
+  background: url("smooth/images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 37% #E6E6E6;
+}
