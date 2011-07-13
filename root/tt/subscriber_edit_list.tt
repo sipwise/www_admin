@@ -28,7 +28,7 @@
             [% ELSE %]
               Anonymous calls (CLIR) are currently accepted!<br />
             [% END %]
-          [% ELSE %]
+          [% ELSIF list_name == 'block_out_list' || list_name == 'adm_block_out_list' %]
             [% IF list_mode %]
               [% IF list_data %]
                 All outgoing calls are blocked by default, only the following destinations are allowed.<br />
@@ -42,8 +42,10 @@
                 All outgoing calls are currently allowed, exceptions may be added below.<br />
               [% END %]
             [% END %]
+          [% ELSE %]
+            Add or remove entries in the list below.<br />
           [% END %]
-          </div>
+          </div><br />
 
           <ul class="cleanlist">
             [% FOREACH blockentry = list_data %]
@@ -82,7 +84,8 @@
             <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
             <input type="hidden" name="list_name" value="[% list_name %]" />
             <label for="blockaddtxt">New entry:</label><br />
-              <input type="text" size="20" name="block_add" id="blockaddtxt" value="[% blockaddtxt %]" /> &nbsp;
+              <input type="text" size="20" name="block_add" id="blockaddtxt" value="[% blockaddtxt %]"
+                     title="E.164 number string with shell pattern wildcards (*, ?), with international prefix or as local number, will be normalized to international format" /> &nbsp;
               <button class="button-add" id="blockadd">Add</button>
               [% IF messages.msgadd %]<div class="error">[% messages.msgadd %]</div>[% END %]
             <br clear="all" />
