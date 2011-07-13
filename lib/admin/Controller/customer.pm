@@ -256,7 +256,7 @@ sub update_customer : Local {
 
     my $customer_id = $c->request->params->{customer_id};
 
-    if(length $c->request->params->{external_id}) {
+    if(defined $c->request->params->{external_id}) {
         $settings{external_id} = $c->request->params->{external_id};
     }
 
