@@ -144,6 +144,22 @@ sub detail : Local {
                                                           );
         $c->session->{subscriber}{registered_contacts} = $regcon if eval { @$regcon };
 
+        my $regpeer;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_registered_peer',
+                                                            { username => $c->session->{subscriber}{username},
+                                                              domain   => $c->session->{subscriber}{domain},
+                                                            },
+                                                            \$regpeer
+                                                          );
+        if(defined $$regpeer{last_registration}) {
+            $$regpeer{contacts_short} = substr($$regpeer{contacts}, 0, 60) . '...';
+            $$regpeer{contacts} =~ s/</\&lt;/g;
+            $$regpeer{contacts} =~ s/>/\&gt;/g;
+            $$regpeer{contacts_short} =~ s/</\&lt;/g;
+            $$regpeer{contacts_short} =~ s/>/\&gt;/g;
+            $c->session->{subscriber}{registered_peer} = $regpeer;
+        }
+
         eval { $c->session->{subscriber}{aliases} = [ sort @{$c->session->{subscriber}{aliases}} ] };
         $c->stash->{subscriber} = $c->session->{subscriber};
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;

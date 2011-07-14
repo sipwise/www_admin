@@ -230,7 +230,7 @@
         [% IF subscriber.subscriber_id %]
 
         <div class="hspace-20"></div>
-        <h3 id="activeregs">Active Registrations</h3>
+        <h3 id="activeregs">Active Device Registrations</h3>
 
         [% IF messages.contmsg %]<div class="success">[% messages.contmsg %]</div>[% END %]
 
@@ -250,6 +250,32 @@
               </li>
             </ul><br clear="all" /><br clear="all" />
           [% END %]
+        [% ELSE %]
+          <ul class="cleanlist">
+            <li class="ui-state-default"><div>None</div></li>
+          </ul>
+        [% END %]
+
+        <div class="hspace-20"></div>
+        <h3 id="activeregs">Active Peer Registration</h3>
+
+        [% IF subscriber.registered_peer %]
+          <ul class="cleanlist">
+            <li class="ui-state-default ui-state-hexa">
+              <div class="span-5">Currently Registered:</div>
+              <div class="span-11 last">[% IF subscriber.registered_peer.registration_status %]yes[% ELSE %]no[% END %]</div>
+              <div class="span-5">Last Registration at:</div>
+              <div class="span-11 last"> [% subscriber.registered_peer.last_registration %]</div>
+              <div class="span-5">Expires at:</div>
+              <div class="span-11 last"> [% subscriber.registered_peer.expiry %]</div>
+              <div class="span-5">Last Response Code:</div>
+              <div class="span-11 last"> [% subscriber.registered_peer.last_code %]</div>
+              <div class="span-5">Last Response String:</div>
+              <div class="span-11 last"> [% subscriber.registered_peer.last_reason %]</div>
+              <div class="span-5">Contacts:</div>
+              <div class="span-11 last" title="[% subscriber.registered_peer.contacts %]"> [% subscriber.registered_peer.contacts_short %]</div>
+            </li>
+          </ul><br clear="all" /><br clear="all" />
         [% ELSE %]
           <ul class="cleanlist">
             <li class="ui-state-default"><div>None</div></li>
