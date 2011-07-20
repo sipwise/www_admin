@@ -711,6 +711,7 @@ sub show_peaktimes : Local {
                                                         { handle => $bilprof },
                                                         \$peaktimes
                                                       );
+    $peaktimes = {} unless $peaktimes;
     my @weekdays;
     for(0 .. 6) {
         $weekdays[$_] = { name => $WEEKDAYS[$_] };
