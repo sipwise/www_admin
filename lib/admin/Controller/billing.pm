@@ -494,7 +494,8 @@ sub set_fees : Local {
     my @elements = eval { @{$c->config->{fees_csv}{element_order}} };
 
     my $line = 0;
-    foreach my $fee (split /\r?\n/, $fees) {
+    # split file at CR, LF or CRLF
+    foreach my $fee (split /(?:\015\012?|\012)/, $fees) {
         $line++;
         my %keyval;
         my @values = map { length $_ ? $_ : undef } split / *, */, $fee;
