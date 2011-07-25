@@ -497,6 +497,11 @@ sub set_fees : Local {
     # split file at CR, LF or CRLF
     foreach my $fee (split /(?:\015\012?|\012)/, $fees) {
         $line++;
+        if($line == 1 and $fee !~ /\d/) {
+            # header line - TODO: check syntax
+            @elements = split / *, */, $fee;
+            next;
+        }
         my %keyval;
         my @values = map { length $_ ? $_ : undef } split / *, */, $fee;
         unless(@elements == @values) {
@@ -514,6 +519,7 @@ sub set_fees : Local {
             $c->session->{feeerr}{line} = $line;
             last;
         }
+        # TODO: more syntax checks
         push @fees, \%keyval;
     }
 
