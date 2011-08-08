@@ -629,7 +629,7 @@ sub update_rewrite_priority : Local {
     my %messages;
     my %settings;
 
-    my $prio = 999;
+    my $prio = 0;
 
     my $rules = $c->request->params->{'rule[]'};
 
@@ -653,7 +653,7 @@ sub update_rewrite_priority : Local {
            },
            undef
         );
-        $prio-- if($prio > 1);
+        $prio++;
     }
 
     $c->session->{messages} = \%messages;

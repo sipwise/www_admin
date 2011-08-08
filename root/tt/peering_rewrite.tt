@@ -138,7 +138,7 @@
 
             <ul id="[% rw.id %]list" class="cleanlist">
             [% id = 0 %]
-            [% priority = 999 %]
+            [% priority = 0 %]
             [% FOREACH rule = rw.rules %]
               [% priority = rule.priority %]
             <li class="ui-state-default" id="rule_[% rule.id %]">
@@ -204,7 +204,7 @@
                   <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
                   <input type="hidden" name="direction" value="[% rw.dir %]" />
                   <input type="hidden" name="field" value="[% rw.field%]" />
-                  <input type="hidden" name="priority" value="[% priority - 1 %]" />
+                  <input type="hidden" name="priority" value="[% priority + 1 %]" />
                   <div class="span-1">&nbsp;</div>
                   <div class="span-4">
                     <input type="text" size="15" id="addtxt" title="string, match pattern"
