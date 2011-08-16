@@ -7,18 +7,18 @@
           
           <ul class="cleanlist">
             <li class="ui-state-default">
-              <div class="span-4">Name</div>
-              <div class="span-10 last">Description</div>
+              <div class="span-5">Name</div>
+              <div class="span-9 last">Description</div>
             </li>
             [% id = 0 %]
             [% FOREACH set = rule_sets %]
               <li class="ui-state-default">
                 [% IF set.id == editid %]
-                  <div class="span-4">[% set.name %]</div>
+                  <div class="span-5">[% set.name %]</div>
                   <form action="/rewrite/edit_set" method="post">
                     <input type="hidden" name="setid" value="[% set.id %]" />
-                    <div class="span-10">
-                      <input type="text" id="addtxt" title="string, description of rewrite rule set"
+                    <div class="span-9">
+                      <input type="text" size="30" id="addtxt" title="string, description of rewrite rule set"
                              name="setdesc" value="[% set.description %]" />
                     </div>
                     <div class="span-1">
@@ -29,8 +29,8 @@
                       <a href="/rewrite"><span class="button-cancel">Cancel</span></a>
                   </div>
                 [% ELSE %]
-                  <div class="span-4"><a href="/rewrite/detail?set_id=[%set.id%]">[% set.name %]</a></div>
-                  <div class="span-10">[% set.description %]</div>
+                  <div class="span-5"><a href="/rewrite/detail?set_id=[%set.id%]">[% set.name %]</a></div>
+                  <div class="span-9">[% set.description %]</div>
                   <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
                     <a href="/rewrite?editid=[% set.id %]"><span class="button-edit">Edit</span></a>
@@ -52,12 +52,12 @@
       [% UNLESS Catalyst.session.admin.read_only %]
             <form action="/rewrite/create_set" method="post">
               <li class="ui-state-default">
-                <div class="span-4">
+                <div class="span-5">
                   <input type="text" size="20" name="setname" title="string, name of rewrite rule set"
                          id="addtxt" value="[% garefill.name %]" />
                 </div>
-                <div class="span-10">
-                  <input type="text" size="20" name="setdesc" title="string, description of rewrite rule set"
+                <div class="span-9">
+                  <input type="text" size="30" name="setdesc" title="string, description of rewrite rule set"
                          id="addtxt" value="[% garefill.description %]" />
                 </div>
                 <div class="span-1 last">
