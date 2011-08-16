@@ -1,8 +1,9 @@
 
-      <h2> Peer Host [% peer.peer_host.name %] </h2>
+      <h2> Peer Host [% peer.peer_host.name %] Preferences</h2>
 
-      <a href="detail?group_id=[% peer.peer_host.group_id %]"><span class="button-back">Back</span></a><br /><br />
-
+      <a href="detail?group_id=[% peer.peer_host.group_id %]"><span class="button-back">Back</span></a>
+[% IF 0 %]
+      <br /><br />
       <div class="topsubmenu">
         <ul>
           <li><a href="rewrite?peerid=[% peer.peer_host.id %]"><span>Rewrite Rules</span></a></li>
@@ -14,6 +15,7 @@
       <div class="topsubmenudivider"> </div>
 
         <h3 id="peerprefs">Peer Host Preferences</h3>
+[% END %]
 
       [% UNLESS Catalyst.session.admin.read_only %]
           [% IF edit_preferences %]
