@@ -63,7 +63,7 @@ sub delete_set : Local {
                                               undef
                                             ))
     {
-        $messages{epeermsg} = 'Server.Voip.RewriteRuleSetDeleted';
+        $messages{epeermsg} = 'Web.Rewrite.RuleSetDeleted';
         $c->session->{messages} = \%messages;
         $c->response->redirect("/rewrite");
         return;
