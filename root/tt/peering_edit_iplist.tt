@@ -1,6 +1,6 @@
-        <h2>Edit [% list_name %] for Peer Host [% peer.peer_host.name %]</h2>
+        <h2>Edit [% list_name %] for Peer Host [% peer.name %]</h2>
 
-        <a href="preferences?peerid=[% peer.peer_host.id %]"><span class="button-back">Back</span></a>
+        <a href="preferences?peerid=[% peer.id %]"><span class="button-back">Back</span></a>
           <div class="list_explanation">
             The subscribers are limited to the following list of IP addresses.
             An empty list does not limit the subscribers at all.
@@ -14,7 +14,7 @@
                 <div class="span-15"> [% listentry.ipnet %] </div>
                 <form action="do_edit_iplist" method="post">
                   <div class="span-1 last">
-                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     <input type="hidden" name="list_del" value="[% listentry.ipnet %]" />
                     <button class="button-delete" id="listdel[% listentry.id %]">Delete</button>
@@ -26,7 +26,7 @@
 
           <div class="hspace-20"></div>
           <form action="do_edit_iplist" method="post">
-            <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
+            <input type="hidden" name="peerid" value="[% peer.id %]" />
             <input type="hidden" name="list_name" value="[% list_name %]" />
             <label for="listaddtxt">New entry:</label><br />
               <input type="text" size="20" name="list_add" id="listaddtxt" value="[% listaddtxt %]" /> &nbsp;

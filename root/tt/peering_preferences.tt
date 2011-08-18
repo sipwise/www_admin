@@ -1,14 +1,14 @@
 
-      <h2> Peer Host [% peer.peer_host.name %] Preferences</h2>
+      <h2> Peer Host [% peer.name %] Preferences</h2>
 
-      <a href="detail?group_id=[% peer.peer_host.group_id %]"><span class="button-back">Back</span></a>
+      <a href="detail?group_id=[% peer.group_id %]"><span class="button-back">Back</span></a>
 [% IF 0 %]
       <br /><br />
       <div class="topsubmenu">
         <ul>
-          <li><a href="rewrite?peerid=[% peer.peer_host.id %]"><span>Rewrite Rules</span></a></li>
+          <li><a href="rewrite?peerid=[% peer.id %]"><span>Rewrite Rules</span></a></li>
         [% IF Catalyst.config.peer.preference_features %]
-          <li class="selected"><a href="preferences?peerid=[% peer.peer_host.id %]"><span>Preferences</span></a></li>
+          <li class="selected"><a href="preferences?peerid=[% peer.id %]"><span>Preferences</span></a></li>
         [% END %]
         </ul>
       </div>
@@ -19,16 +19,16 @@
 
       [% UNLESS Catalyst.session.admin.read_only %]
           [% IF edit_preferences %]
-          <a href="preferences?peerid=[% peer.peer_host.id %]"><span class="button-cancel">Cancel</span></a>
+          <a href="preferences?peerid=[% peer.id %]"><span class="button-cancel">Cancel</span></a>
           [% ELSE %]
-          <a href="preferences?peerid=[% peer.peer_host.id %]&amp;edit_preferences=1"><span class="button-edit">Edit</span></a>
+          <a href="preferences?peerid=[% peer.id %]&amp;edit_preferences=1"><span class="button-edit">Edit</span></a>
           [% END %]
       [% END %]
           [% IF messages.prefmsg %]<div class="success">[% messages.prefmsg %]</div>[% END %]
           [% IF messages.preferr %]<div class="error">[% messages.preferr %]</div>[% END %]
           [% IF edit_preferences && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
             <form action="update_preferences" method="post">
-              <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
+              <input type="hidden" name="peerid" value="[% peer.id %]" />
               <div class="hspace-20"></div>
               <ul class="cleanlist">
             [% FOREACH preference = preferences_array %]
@@ -184,9 +184,9 @@
                 <div class="span-1 last">
                   [% IF ! edit_preferences && ! Catalyst.session.admin.read_only %]
                     [% IF preference.key == "allowed_ips" || preference.key == "man_allowed_ips" %]
-                      <a href="edit_iplist?peerid=[% peer.peer_host.id %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
+                      <a href="edit_iplist?peerid=[% peer.id %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
                     [% ELSE %]
-                      <a href="edit_list?peerid=[% peer.peer_host.id %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
+                      <a href="edit_list?peerid=[% peer.id %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
                     [% END %]
                   [% END %]
                 </div>
