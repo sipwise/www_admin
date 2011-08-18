@@ -35,6 +35,7 @@
             [% IF Catalyst.config.peering_features %]
             <li [% 'class="active_menu"' IF menu.active == "peering" %]><a href="/peering">SIP Peerings</a></li>
             [% END %]
+            <li [% 'class="active_menu"' IF menu.active == "rewrite" %]><a href="/rewrite">Rewrite Rule Sets</a></li>
           </ul>
         </div>
 

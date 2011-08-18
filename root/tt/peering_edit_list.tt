@@ -1,6 +1,6 @@
-        <h2>Edit [% list_name %] for Peer Host [% peer.peer_host.name %]</h2>
+        <h2>Edit [% list_name %] for Peer Host [% peer.name %]</h2>
 
-          <a href="preferences?peerid=[% peer.peer_host.id %]"><span class="button-back">Back</span></a>
+          <a href="preferences?peerid=[% peer.id %]"><span class="button-back">Back</span></a>
           [% IF messages.nummsg %]<div class="success">[% messages.nummsg %]</div>[% END %]
           [% IF messages.numerr %]<div class="error">[% messages.numerr %]</div>[% END %]
 
@@ -48,7 +48,7 @@
                 <div class="span-14[% IF blockentry.active == 0 %] listentry_disabled[% END %]"> [% blockentry.number %] </div>
                 <form action="do_edit_list" method="post">
                   <div class="span-1">
-                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     <input type="hidden" name="block_del" value="[% blockentry.number %]" />
                     <input type="hidden" name="block_stat" value="[% blockentry.active %]" />
@@ -57,7 +57,7 @@
                 </form>
                 <form action="do_edit_list" method="post">
                   <div class="span-1 last">
-                    <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
+                    <input type="hidden" name="peerid" value="[% peer.id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     [% IF    blockentry.active  == 1 %]
                       <input type="hidden" name="block_act" value="[% blockentry.number %]" />
@@ -76,7 +76,7 @@
 
           <div class="hspace-20"></div>
           <form action="do_edit_list" method="post">
-            <input type="hidden" name="peerid" value="[% peer.peer_host.id %]" />
+            <input type="hidden" name="peerid" value="[% peer.id %]" />
             <input type="hidden" name="list_name" value="[% list_name %]" />
             <label for="blockaddtxt">New entry:</label><br />
               <input type="text" size="20" name="block_add" id="blockaddtxt" value="[% blockaddtxt %]" /> &nbsp;

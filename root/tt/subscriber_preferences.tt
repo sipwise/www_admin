@@ -119,6 +119,28 @@
                     [% END %]
                   </div>
                 </li>
+                [% ELSIF preference.key == "rewrite_rule_set" %]
+                <li class="ui-state-default">
+                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
+                  <div class="span-10 last">
+                    [% IF rewrite_rule_sets %]
+                      <select size="1" name="[% preference.key %]"
+                              [% IF ! edit_preferences %]class="disabled" disabled="disabled"[% END %] >
+                          <option value="" [% IF preference.value == "" %]
+                                             selected="selected"
+                                           [% END %]></option>
+                        [% FOREACH set = rewrite_rule_sets %]
+                          <option value="[% set.id %]" title="[% set.description %]"
+                                  [% IF preference.value == set.id %]selected="selected"[% END %]
+                                 >[% set.name %]</option>
+                        [% END %]
+                      </select>
+                    [% ELSE %]
+                      [% IF edit_preferences %]no rewrite rule sets defined[% END %]
+                    [% END %]
+                  </div>
+                </li>
                 [% ELSIF preference.data_type == "boolean" %]
                 <li class="ui-state-default">
                   <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>

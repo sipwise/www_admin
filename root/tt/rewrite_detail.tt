@@ -1,7 +1,7 @@
 <script type="text/javascript">
   $(function() {
 
-  [% ids = ['icaller', 'icallee', 'ocaller'] %]
+  [% ids = ['icaller', 'icallee', 'ocaller', 'ocallee'] %]
   [% FOREACH id = ids %]
     $("#[% id %]list").sortable({
       placeholder: 'ui-state-highlight',
@@ -22,29 +22,12 @@
   });
 </script>
 
-        <h2> Domain [% domain.domain.domain %] </h2>
 
-<!--       <a href="/domain"><span class="button-back">Back</span></a>  -->
+      <h2> Rewrite Rule Set [% set.rewrite_set.name %] </h2>
 
-      <div class="topsubmenu">
-        <ul>
-        [% IF Catalyst.config.domain.rewrite_features %]
-          <li class="selected"><a href="rewrite?domain=[% domain.domain.domain %]"><span>Rewrite Rules</span></a></li>
-        [% END %]
-        [% IF Catalyst.config.domain.preference_features %]
-          <li><a href="preferences?domain=[% domain.domain.domain %]"><span>Preferences</span></a></li>
-        [% END %]
-        [% IF Catalyst.config.domain.audiofile_features %]
-          <li><a href="audio?domain=[% domain.domain.domain %]"><span>Announcements</span></a></li>
-        [% END %]
-        [% IF Catalyst.config.domain.vsc_features %]
-          <li><a href="vsc?domain=[% domain.domain.domain %]"><span>VSCs</span></a></li>
-        [% END %]
-        </ul>
-      </div>
-      <div class="topsubmenudivider"> </div>
+      <a href="/rewrite"><span class="button-back">Back</span></a><br /><br />
 
-        [% 
+        [%
           rewrites = [
             {
               header = 'Inbound Rewrite Rules for Caller',
@@ -55,7 +38,7 @@
               msg = messages.icallermsg,
               err = messages.icallererr,
               detail = icallerdetail,
-              rules = domain.rewrite_in_caller,
+              rules = set.rewrite_in_caller,
             },
             {
               header = 'Inbound Rewrite Rules for Callee',
@@ -66,7 +49,7 @@
               msg = messages.icalleemsg,
               err = messages.icalleeerr,
               detail = icalleedetail,
-              rules = domain.rewrite_in_callee,
+              rules = set.rewrite_in_callee,
             },
             {
               header = 'Outbound Rewrite Rules for Caller',
@@ -77,7 +60,18 @@
               msg = messages.ocallermsg,
               err = messages.ocallererr,
               detail = ocallerdetail,
-              rules = domain.rewrite_out_caller,
+              rules = set.rewrite_out_caller,
+            },
+            {
+              header = 'Outbound Rewrite Rules for Callee',
+              id = 'ocallee',
+              tag = 'ot',
+              dir = 'out',
+              field = 'callee',
+              msg = messages.ocalleemsg,
+              err = messages.ocalleeerr,
+              detail = ocalleedetail,
+              rules = set.rewrite_out_callee,
             },
           ]
         %]
@@ -85,7 +79,6 @@
         [% FOREACH rw = rewrites %]
 
         <h3 id="[% rw.id %]">[% rw.header %]</h3>
-
           [% IF rw.msg %]<div class="success">[% rw.msg %]</div>[% END %]
           [% IF rw.err %]<div class="error">[% rw.err %][% IF rw.detail %]<br/>[% rw.detail %][% END %]</div>[% END %]
 
@@ -106,10 +99,10 @@
             <li class="ui-state-default" id="rule_[% rule.id %]">
                 <div class="span-1"><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>
                 [% IF rule.id == editid && !Catalyst.session.admin.read_only %]
-                  <form action="/domain/edit_rewrite" method="post">
+                  <form action="/rewrite/edit_rewrite" method="post">
+                    <input type="hidden" name="setid" value="[% set.rewrite_set.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
-                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="priority" value="[% rule.priority %]" />
                     <div class="span-4">
@@ -129,7 +122,7 @@
                     </div>
                   </form>
                   <div class="prepend-1 span-1 last">
-                      <a href="/domain/rewrite?domain=[% domain.domain.domain %]#[% rw.id %]"><span class="button-cancel">Cancel</span></a>
+                      <a href="/rewrite/detail?set_id=[% set.rewrite_set.id %]#[% rw.id %]"><span class="button-cancel">Cancel</span></a>
                   </div>
                 [% ELSE %]
                   <div class="span-4">[% rule.match_pattern %]</div>
@@ -137,11 +130,11 @@
                   <div class="span-4 append-1">[% rule.description %]</div>
                   <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
-                      <a href="/domain/rewrite?domain=[% domain.domain.domain %]&amp;editid=[% rule.id %]#[% rw.id %]"><span class="button-edit">Edit</span></a>
+                      <a href="/rewrite/detail?set_id=[% set.rewrite_set.id %]&editid=[% rule.id %]#[% rw.id %]"><span class="button-edit">Edit</span></a>
                   [% END %]
                   </div>
-                  <form action="/domain/delete_rewrite" method="post">
-                    <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
+                  <form action="/rewrite/delete_rewrite" method="post">
+                    <input type="hidden" name="setid" value="[% set.rewrite_set.id %]" />
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
@@ -150,7 +143,7 @@
                         <button id="[% rw.tag %]del[% id %]" class="button-delete">Delete</button>
                     [% END %]
                   </div>
-                [% END %]  
+                [% END %]
                 </form>
             </li>
             [% id = id + 1 %]
@@ -160,11 +153,11 @@
             [% UNLESS Catalyst.session.admin.read_only %]
             <ul class="cleanlist">
             <li class="ui-state-default">
-                <form action="/domain/create_rewrite" method="post">
+                <form action="/rewrite/create_rewrite" method="post">
+                  <input type="hidden" name="setid" value="[% set.rewrite_set.id %]" />
                   <input type="hidden" name="direction" value="[% rw.dir %]" />
                   <input type="hidden" name="field" value="[% rw.field%]" />
                   <input type="hidden" name="priority" value="[% priority + 1 %]" />
-                  <input type="hidden" name="domain" value="[% domain.domain.domain %]" />
                   <div class="span-1">&nbsp;</div>
                   <div class="span-4">
                     <input type="text" size="15" id="addtxt" title="string, match pattern"
@@ -188,6 +181,4 @@
             [% END %]
 
         [% END %]
-
-
 

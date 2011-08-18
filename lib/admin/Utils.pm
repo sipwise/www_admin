@@ -271,6 +271,13 @@ sub prepare_tt_prefs {
                                                               \$ncoslvl
                                                             );
           $c->stash->{ncos_levels} = $ncoslvl if eval { @$ncoslvl };
+        } elsif(!$c->stash->{rewrite_rule_sets} and $$pref{preference} eq 'rewrite_rule_set') {
+          my $rules;
+          return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_rewrite_rule_sets',
+                                                              undef,
+                                                              \$rules
+                                                            );
+          $c->stash->{rewrite_rule_sets} = $rules if eval { @$rules };
         } elsif($$pref{preference} eq 'block_in_list' or $$pref{preference} eq 'block_out_list') {
           eval { @{$$preferences{$$pref{preference}}} = map { s/^([1-9])/+$1/; $_ } @{$$preferences{$$pref{preference}}} };
         }
