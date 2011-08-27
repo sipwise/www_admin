@@ -1,3 +1,12 @@
+ngcp-www-admin (3.2.0) UNRELEASED; urgency=low
+
+  * added support for subscriber alias numbers
+  * display SEMS registrar information
+  * display and accept external IDs for accounts and subscribers
+  * some minor fixes and improvements
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Sat, 27 Aug 2011 02:45:40 +0200
+
 ngcp-www-admin (3.1.4) unstable; urgency=low
 
   * added generic rewrite rule sets for subscribers/domains/peers
