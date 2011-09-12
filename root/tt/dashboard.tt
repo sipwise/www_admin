@@ -21,8 +21,6 @@
 	
     <div class="nobg span-17">
       [% even = 0 %]
-        <span style="font-weight: bold;">test</span>
-        <div id="plot_test"><div style="margin: 20px;"><img src="/static/images/loader.gif" alt="loading" style="margin-right: 10px;"/>loading...</div></div>
       [% FOREACH item IN plotdata %]
         <span style="font-weight: bold;">[% item.title %]</span>
         <div id="plot_[% item.name %]"><div style="margin: 20px;"><img src="/static/images/loader.gif" alt="loading" style="margin-right: 10px;"/>loading...</div></div>
@@ -72,7 +70,6 @@
         }
       }
 
-          fname_update(["/rrd/get?path=memory/memory-free.rrd", "/rrd/get?path=memory/memory-cached.rrd"], "plot_test", true);
       [% FOREACH item IN plotdata %]
           fname_update(["[% item.url %]"], "plot_[% item.name %]", [% item.si ? "true" : "false" %]);
       [% END %]
