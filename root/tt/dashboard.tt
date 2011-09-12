@@ -1,6 +1,7 @@
     <!--[if IE]><script language="javascript" type="text/javascript" src="/js/jsrrd/flot/excanvas.min.js"></script><![endif]-->
     <script type="text/javascript" src="/js/jsrrd/jsrrd/binaryXHR.js"></script>
     <script type="text/javascript" src="/js/jsrrd/jsrrd/rrdFile.js"></script>
+    <script type="text/javascript" src="/js/jsrrd/jsrrd/rrdMultiFile.js"></script>
     <script type="text/javascript" src="/js/jsrrd/jsrrd/rrdFlotSupport.js"></script>
     <script type="text/javascript" src="/js/jsrrd/jsrrd/rrdFlot.js"></script>
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.js"></script>
@@ -20,6 +21,8 @@
 	
     <div class="nobg span-17">
       [% even = 0 %]
+        <span style="font-weight: bold;">test</span>
+        <div id="plot_test"><div style="margin: 20px;"><img src="/static/images/loader.gif" alt="loading" style="margin-right: 10px;"/>loading...</div></div>
       [% FOREACH item IN plotdata %]
         <span style="font-weight: bold;">[% item.title %]</span>
         <div id="plot_[% item.name %]"><div style="margin: 20px;"><img src="/static/images/loader.gif" alt="loading" style="margin-right: 10px;"/>loading...</div></div>
@@ -28,34 +31,50 @@
 
     <script type="text/javascript">
 
-      function update_fname(rrd_data, args) {
+      function update_fname(rrd_data_arr, args) {
         var graph_opts={};
         var ds_graph_opts={};
-        var f=new rrdFlot(args['plot_id'],rrd_data,graph_opts,ds_graph_opts, args['si_suffix']);
+	if (rrd_data_arr.length == 1)
+          var f=new rrdFlot(args['plot_id'],rrd_data_arr[0],graph_opts,ds_graph_opts, args['si_suffix']);
+	else {
+	  var t = new RRDFileSum(rrd_data_arr, false);
+          var f=new rrdFlot(args['plot_id'],t,graph_opts,ds_graph_opts, args['si_suffix']);
+	}
       }
 
       function update_fname_handler(bf, args) {
           var rrd_data=undefined;
+          var fname = args['name'];
+          var output = args['output'];
           try {
-            var rrd_data=new RRDFile(bf);            
+            var rrd_data=new RRDFile(bf);
           } catch(err) {
             alert("File "+fname+" is not a valid RRD archive!");
           }
           if (rrd_data!=undefined) {
-            update_fname(rrd_data, args);
+	    output.push(rrd_data);
+            if (output.length >= args['rrd_count']) {
+              update_fname(output, args);
+            }
           }
       }
 
       function fname_update(fname, plot_id, si_suffix) {
-        try {
-          FetchBinaryURLAsync(fname, update_fname_handler, {plot_id: plot_id, si_suffix: si_suffix});
-        } catch (err) {
-           alert("Failed loading "+fname+"\n"+err);
+	var o = new Array();
+        for (var i = 0; i < fname.length; i++) {
+          try {
+            FetchBinaryURLAsync(fname[i], update_fname_handler, {plot_id: plot_id,
+                                     si_suffix: si_suffix, rrd_count: fname.length, name: fname[i],
+                                     output: o});
+          } catch (err) {
+             alert("Failed loading "+fname[i]+"\n"+err);
+          }
         }
       }
 
+          fname_update(["/rrd/get?path=memory/memory-free.rrd", "/rrd/get?path=memory/memory-cached.rrd"], "plot_test", true);
       [% FOREACH item IN plotdata %]
-          fname_update("[% item.url %]", "plot_[% item.name %]", [% item.si ? "true" : "false" %]);
+          fname_update(["[% item.url %]"], "plot_[% item.name %]", [% item.si ? "true" : "false" %]);
       [% END %]
 
     </script>
