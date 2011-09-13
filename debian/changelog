@@ -1,3 +1,11 @@
+ngcp-www-admin (3.2.1) UNRELEASED; urgency=low
+
+  * add support for statistics graphs pulling data from multiple RRD files
+  * change the "free memory" graph to show free+buffers+cache memory
+  * add a "free swap" graph
+
+ -- Richard Fuchs <rfuchs@sipwise.com>  Tue, 13 Sep 2011 10:36:57 -0400
+
 ngcp-www-admin (3.2.0) UNRELEASED; urgency=low
 
   * added support for subscriber alias numbers
