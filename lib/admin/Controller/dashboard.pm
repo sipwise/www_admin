@@ -43,8 +43,14 @@ sub system : Local {
     $c->stash->{template} = 'tt/dashboard.tt';
 
     my @plotdata = ();
-    push @plotdata, {name=>"mem", title=>"Free Memory", 
-        url=>"/rrd/get?path=memory/memory-free.rrd", si=>1};
+    push @plotdata, {name=>"mem", title=>"Free Physical Memory", 
+        url=>[qw(
+		/rrd/get?path=memory/memory-free.rrd
+		/rrd/get?path=memory/memory-cached.rrd
+		/rrd/get?path=memory/memory-buffered.rrd
+	)], si=>1};
+    push @plotdata, {name=>"swap", title=>"Free Swap Memory", 
+        url=>"/rrd/get?path=swap/swap-free.rrd", si=>1};
     push @plotdata, {name=>"load", title=>"Load", 
         url=>"/rrd/get?path=load/load.rrd", si=>0};
     push @plotdata, {name=>"rdisk", title=>"Root Disk", 

@@ -71,7 +71,11 @@
       }
 
       [% FOREACH item IN plotdata %]
-          fname_update(["[% item.url %]"], "plot_[% item.name %]", [% item.si ? "true" : "false" %]);
+        fname_update([
+          [% FOREACH url IN item.url %]
+            "[% url %]",
+          [% END %]
+        ], "plot_[% item.name %]", [% item.si ? "true" : "false" %]);
       [% END %]
 
     </script>
