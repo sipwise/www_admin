@@ -51,7 +51,7 @@ sub getbyid : Local {
 
         if($c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_id',
                                                  { id => $account_id },
-                                                 \$c->session->{voip_account}
+                                                 undef
                                                ))
         {
             $c->response->redirect("/account/detail?account_id=$account_id");
@@ -79,15 +79,16 @@ sub getbyextid : Local {
     my ( $self, $c ) = @_;
 
     my $external_id = $c->request->params->{external_id};
+    my $voip_account;
 
     if(length $external_id) {
 
         if($c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_external_id',
                                                  { external_id => $external_id },
-                                                 \$c->session->{voip_account}
+                                                 \$voip_account
                                                ))
         {
-            $c->response->redirect("/account/detail?account_id=". $c->session->{voip_account}{id});
+            $c->response->redirect("/account/detail?account_id=". $$voip_account{id});
             return;
         }
 
@@ -112,15 +113,15 @@ sub detail : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/account_detail.tt';
 
+    my $voip_account;
     my $account_id = $c->request->params->{account_id} || undef;
     if(defined $account_id) {
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_id',
                                                             { id => $account_id },
-                                                            \$c->session->{voip_account}
+                                                            \$voip_account
                                                           );
     } else {
-        delete $c->session->{voip_account};
-        $c->session->{voip_account}{customer_id} = $c->request->params->{customer_id} || undef;
+        $$voip_account{customer_id} = $c->request->params->{customer_id} || undef;
     }
 
     $c->stash->{edit_account} = $c->request->params->{edit_account};
@@ -129,22 +130,22 @@ sub detail : Local {
         if(defined $account_id) {
             return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_balance',
                                                                 { id => $account_id },
-                                                                \$c->session->{voip_account}{balance}
+                                                                \$$voip_account{balance}
                                                               );
 
-            $c->session->{voip_account}{balance}{cash_balance} = 0
-                unless defined $c->session->{voip_account}{balance}{cash_balance};
-            $c->session->{voip_account}{balance}{cash_balance_interval} = 0
-                unless defined $c->session->{voip_account}{balance}{cash_balance_interval};
-            $c->session->{voip_account}{balance}{free_time_balance} = 0
-                unless defined $c->session->{voip_account}{balance}{free_time_balance};
-            $c->session->{voip_account}{balance}{free_time_balance_interval} = 0
-                unless defined $c->session->{voip_account}{balance}{free_time_balance_interval};
+            $$voip_account{balance}{cash_balance} = 0
+                unless defined $$voip_account{balance}{cash_balance};
+            $$voip_account{balance}{cash_balance_interval} = 0
+                unless defined $$voip_account{balance}{cash_balance_interval};
+            $$voip_account{balance}{free_time_balance} = 0
+                unless defined $$voip_account{balance}{free_time_balance};
+            $$voip_account{balance}{free_time_balance_interval} = 0
+                unless defined $$voip_account{balance}{free_time_balance_interval};
 
-            $c->session->{voip_account}{balance}{cash_balance} = 
-                sprintf "%.2f", $c->session->{voip_account}{balance}{cash_balance} / 100;
-            $c->session->{voip_account}{balance}{cash_balance_interval} = 
-                sprintf "%.2f", $c->session->{voip_account}{balance}{cash_balance_interval} / 100;
+            $$voip_account{balance}{cash_balance} = 
+                sprintf "%.2f", $$voip_account{balance}{cash_balance} / 100;
+            $$voip_account{balance}{cash_balance_interval} = 
+                sprintf "%.2f", $$voip_account{balance}{cash_balance_interval} / 100;
         }
 
         if(ref $c->session->{restore_balance_input} eq 'HASH') {
@@ -177,21 +178,21 @@ sub detail : Local {
                                                 eval { @$billing_profiles }
                                             ];
         } else {
-            if(defined $c->session->{voip_account}{product}) {
+            if(defined $$voip_account{product}) {
                 my $product;
                 return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_product',
-                                                                    { handle => $c->session->{voip_account}{product} },
+                                                                    { handle => $$voip_account{product} },
                                                                     \$product
                                                                   );
-                $c->session->{voip_account}{product_name} = $$product{data}{name};
+                $$voip_account{product_name} = $$product{data}{name};
             }
-            if(defined $c->session->{voip_account}{billing_profile}) {
+            if(defined $$voip_account{billing_profile}) {
                 my $profile;
                 return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
-                                                                    { handle => $c->session->{voip_account}{billing_profile} },
+                                                                    { handle => $$voip_account{billing_profile} },
                                                                     \$profile
                                                                   );
-                $c->session->{voip_account}{billing_profile_name} = $$profile{data}{name};
+                $$voip_account{billing_profile_name} = $$profile{data}{name};
             }
         }
 
@@ -200,18 +201,18 @@ sub detail : Local {
 
     if(ref $c->session->{restore_account_input} eq 'HASH') {
         for(keys %{$c->session->{restore_account_input}}) {
-            $c->session->{voip_account}{$_} = $c->session->{restore_account_input}{$_};
+            $$voip_account{$_} = $c->session->{restore_account_input}{$_};
         }
         delete $c->session->{restore_account_input};
     }
 
-    delete $c->session->{voip_account}{subscribers}
-        if exists $c->session->{voip_account}{subscribers}
-           and !defined $c->session->{voip_account}{subscribers}
-            or ref $c->session->{voip_account}{subscribers} ne 'ARRAY'
-            or $#{$c->session->{voip_account}{subscribers}} == -1;
+    delete $$voip_account{subscribers}
+        if exists $$voip_account{subscribers}
+           and !defined $$voip_account{subscribers}
+            or ref $$voip_account{subscribers} ne 'ARRAY'
+            or $#{$$voip_account{subscribers}} == -1;
 
-    foreach my $vas (eval { @{$c->session->{voip_account}{subscribers}} }) {
+    foreach my $vas (eval { @{$$voip_account{subscribers}} }) {
         my $regcon;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_registered_devices',
                                                             { username => $$vas{username},
@@ -222,8 +223,8 @@ sub detail : Local {
         $$vas{registered_contacts} = join ", ", map { $$_{user_agent} } @$regcon if eval { @$regcon };
     }
 
-    $c->stash->{account} = $c->session->{voip_account};
-    $c->stash->{account}{is_locked} = 1 if $c->session->{voip_account}{status} eq 'locked';
+    $c->stash->{account} = $voip_account;
+    $c->stash->{account}{is_locked} = 1 if $$voip_account{status} eq 'locked';
 
     return 1;
 }
