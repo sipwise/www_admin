@@ -60,7 +60,7 @@
                   <td>[% pattern.description %]</td>
                   <td>
                   [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/ncos/lists?level=[% level.level %]&amp;edit_pattern=[% pattern.pattern %]" class="aaction">edit</a>
+                    <a href="/ncos/lists?level=[% level.level %]&amp;edit_pattern=[% pattern.urlenc_pattern %]" class="aaction">edit</a>
                   [% END %]
                   </td>
                   <form action="/ncos/do_delete_pattern" method="post">

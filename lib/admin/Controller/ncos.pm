@@ -3,6 +3,7 @@ package admin::Controller::ncos;
 use strict;
 use warnings;
 use base 'Catalyst::Controller';
+use URI::Escape;;
 
 =head1 NAME
 
@@ -186,7 +187,12 @@ sub lists : Local {
                                                         { level => $level },
                                                         \$patterns
                                                       );
-    $c->stash->{patterns} = $patterns if eval { @$patterns };
+    if(eval { @$patterns }) {
+        for(@$patterns) {
+            $$_{urlenc_pattern} = uri_escape($$_{pattern});
+        }
+        $c->stash->{patterns} = $patterns;
+    }
 
     my $lnpids;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_ncos_lnp_list',
