@@ -3,6 +3,7 @@ package admin::Controller::billing;
 use strict;
 use warnings;
 use base 'Catalyst::Controller';
+use URI::Escape;
 
 my @WEEKDAYS = qw(Monday Tuesday Wednesday Thursday Friday Saturday Sunday);
 
@@ -452,6 +453,9 @@ sub search_fees : Local {
 
     $c->stash->{searched} = 1;
     if(ref $$fee_list{fees} eq 'ARRAY' and @{$$fee_list{fees}}) {
+        for(@{$$fee_list{fees}}) {
+            $$_{urlenc_destination} = uri_escape($$_{destination});
+        }
         $c->stash->{fee_list} = $$fee_list{fees};
         $c->stash->{total_count} = $$fee_list{total_count};
         $c->stash->{offset} = $offset;

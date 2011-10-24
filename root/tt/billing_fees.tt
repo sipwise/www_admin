@@ -109,10 +109,10 @@
                 <td>[% fee.zone_detail %]</td>
               [% UNLESS Catalyst.session.admin.read_only %]
                 <td>
-                  <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.destination %]&amp;offset=[% offset %]"><span class="button-edit">Edit</span></a>
+                  <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.urlenc_destination %]&amp;offset=[% offset %]"><span class="button-edit">Edit</span></a>
                 </td>
                 <td>
-                  <a href="/billing/do_delete_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.destination %]&amp;offset=[% offset %][% IF last_one %]&amp;last_one=1[% END %]"><span class="button-delete">Delete</span></a>
+                  <a href="/billing/do_delete_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.urlenc_destination %]&amp;offset=[% offset %][% IF last_one %]&amp;last_one=1[% END %]"><span class="button-delete">Delete</span></a>
                 </td>
               [% ELSE %]
                 <td />
