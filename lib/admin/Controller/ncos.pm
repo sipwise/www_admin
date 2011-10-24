@@ -3,7 +3,7 @@ package admin::Controller::ncos;
 use strict;
 use warnings;
 use base 'Catalyst::Controller';
-use URI::Escape;;
+use URI::Escape;
 
 =head1 NAME
 
