@@ -257,6 +257,7 @@ sub do_edit_bilprof : Local {
     my $handle = $c->request->params->{handle};
 
     $settings{name} = $c->request->params->{name};
+    $settings{prepaid} = $c->request->params->{prepaid} ? 1 : 0;
     $settings{interval_unit} = $c->request->params->{interval_unit} || 'month';
     $settings{interval_count} = $c->request->params->{interval_count} || 1;
 
