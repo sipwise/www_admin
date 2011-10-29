@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base 'Catalyst::Controller';
 use URI::Escape;
+use Encode;
 
 my @WEEKDAYS = qw(Monday Tuesday Wednesday Thursday Friday Saturday Sunday);
 
@@ -524,7 +525,40 @@ sub set_fees : Local {
             $c->session->{feeerr}{line} = $line;
             last;
         }
-        # TODO: more syntax checks
+        for(qw(zone zone_detail)) {
+          if(length $keyval{$_}) {
+            eval { $keyval{$_} = decode("utf8", $keyval{$_}, Encode::FB_CROAK) };
+            if($@) {
+              $messages{feeerr} = 'Web.Fees.InvalidCharset';
+              last;
+            }
+          } else {
+            $messages{feeerr} = $_ eq 'zone' ? 'Web.Fees.InvalidZone' : 'Web.Fees.InvalidZoneDetail';
+            $c->session->{feeerr}{line} = $line;
+            last;
+          }
+        }
+        last if $messages{feeerr};
+        for(qw(onpeak_init_rate onpeak_follow_rate offpeak_init_rate offpeak_follow_rate)) {
+          if(length $keyval{$_}) {
+            unless($keyval{$_} =~ /^\d+(?:\.\d+)?$/) {
+              $messages{feeerr} = 'Web.Fees.InvalidRate';
+              $c->session->{feeerr}{line} = $line;
+              last;
+            }
+          }
+        }
+        last if $messages{feeerr};
+        for(qw(onpeak_init_interval onpeak_follow_interval offpeak_init_interval offpeak_follow_interval)) {
+          if(length $keyval{$_}) {
+            unless($keyval{$_} =~ /^\d+$/) {
+              $messages{feeerr} = 'Web.Fees.InvalidInterval';
+              $c->session->{feeerr}{line} = $line;
+              last;
+            }
+          }
+        }
+        last if $messages{feeerr};
         push @fees, \%keyval;
     }
 
