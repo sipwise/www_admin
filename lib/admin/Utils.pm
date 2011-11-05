@@ -128,7 +128,7 @@ sub get_qualified_number_for_subscriber {
 # as returned by the prov. interface and returns a reference to an
 # array suited for TT display
 sub prepare_call_list {
-    my ($c, $call_list, $filter) = @_;
+    my ($c, $call_list, $filter, $bilprof) = @_;
     my $callentries = [];
 
     my @time = localtime time;
@@ -167,7 +167,7 @@ sub prepare_call_list {
 
         if(defined $$call{call_fee}) {
             # money is allways returned as cents
-            $callentry{call_fee} = sprintf $c->session->{voip_account}{billing_profile}{data}{currency} . " %.04f", $$call{call_fee}/100;
+            $callentry{call_fee} = sprintf $$bilprof{data}{currency} . " %.04f", $$call{call_fee}/100;
         } else {
             $callentry{call_fee} = '';
         }

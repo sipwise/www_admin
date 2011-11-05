@@ -1177,14 +1177,15 @@ sub call_data : Local {
                                                         { id => $$subscriber{account_id} },
                                                         \$account
                                                       );
+    my $bilprof = {};
     if(eval { defined $$account{billing_profile} }) {
         return 1 unless $c->model('Provisioning')->call_prov($c, 'billing', 'get_billing_profile',
                                                              { handle => $$account{billing_profile} },
-                                                             \$c->session->{voip_account}{billing_profile}
+                                                             \$bilprof
                                                             );
     }
 
-    $c->stash->{call_list} = admin::Utils::prepare_call_list($c, $calls, $listfilter);
+    $c->stash->{call_list} = admin::Utils::prepare_call_list($c, $calls, $listfilter, $bilprof);
     $c->stash->{subscriber}{list_filter} = $listfilter if defined $listfilter;
 
     undef $c->stash->{call_list} unless eval { @{$c->stash->{call_list}} };
