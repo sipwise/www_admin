@@ -213,6 +213,7 @@ sub detail : Local {
             or $#{$$voip_account{subscribers}} == -1;
 
     foreach my $vas (eval { @{$$voip_account{subscribers}} }) {
+        next if $$vas{status} eq 'terminated';
         my $regcon;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_registered_devices',
                                                             { username => $$vas{username},
