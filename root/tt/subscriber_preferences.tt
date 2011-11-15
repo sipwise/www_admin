@@ -67,6 +67,7 @@
                       || preference.key == "ignore_allowed_ips"
                       || preference.key == "alternative_route"
                       || preference.key == "is_external"
+                      || preference.key == "intercept"
                 %]
                 <tr>
                   <td class="tdkey">[% preference.key %]:</td>
