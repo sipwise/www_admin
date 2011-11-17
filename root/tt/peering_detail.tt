@@ -14,8 +14,9 @@
             <li class="ui-state-default">
               <div class="span-4">Name</div>
               <div class="span-4">IP Address</div>
-              <div class="span-3">Port</div>
-              <div class="span-3 last">Weight</div>
+              <div class="span-4">Hostname</div>
+              <div class="span-2">Port</div>
+              <div class="span-2 last">Weight</div>
             </li>
             [% id = 0 %]
             [% FOREACH peer = grp.peers %]
@@ -25,19 +26,23 @@
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="peerid" value="[% peer.id %]" />
                     <div class="span-4">
-                      <input type="text" size="15 id="addtxt" title="string, peer name"
+                      <input type="text" size="14 id="addtxt" title="string, peer name"
                              name="name" value="[% peer.name %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="string, peer ip address"
+                      <input type="text" size="14" id="addtxt" title="string, peer ip address"
                              name="ip" value="[% peer.ip %]" />
                     </div>
-                    <div class="span-3">
+                    <div class="span-4">
+                      <input type="text" size="14" id="addtxt" title="string, peer hostname (optional)"
+                             name="host" value="[% peer.host %]" />
+                    </div>
+                    <div class="span-2">
                       <input type="text" size="5" id="addtxt" title="int, peer port (1-65535)"
                              name="port" value="[% peer.port %]" />
                     </div>
-                    <div class="span-3 append-1">
-                      <input type="text" size="3" id="addtxt" title="int, peer weight (0-255)"
+                    <div class="span-1">
+                      <input type="text" size="1" id="addtxt" title="int, peer weight (0-255)"
                              name="weight" value="[% peer.weight %]" />
                     </div>
                     <div class="span-1">
@@ -50,8 +55,9 @@
                 [% ELSE %]
                   <div class="span-4"><a href="/peering/preferences?peerid=[% peer.id%]" class="aaction">[% peer.name %]</a></div>
                   <div class="span-4">[% peer.ip %]</div>
-                  <div class="span-3">[% peer.port %]</div>
-                  <div class="span-3 append-1">[% peer.weight %]</div>
+                  <div class="span-4">[% peer.host %]</div>
+                  <div class="span-2">[% peer.port %]</div>
+                  <div class="span-1">[% peer.weight %]</div>
                   <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
                       <a href="/peering/detail?group_id=[% grp.group.id %]&peditid=[% peer.id %]"><span class="button-edit">Edit</span></a>
@@ -75,22 +81,26 @@
                   <form action="/peering/create_peer" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="string, peer name"
+                      <input type="text" size="14" id="addtxt" title="string, peer name"
                              name="name" value="" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="string, peer ip address"
+                      <input type="text" size="14" id="addtxt" title="string, peer ip address"
                              name="ip" value="" />
                     </div>
-                    <div class="span-3">
+                    <div class="span-4">
+                      <input type="text" size="14" id="addtxt" title="string, peer hostname (optional)"
+                             name="host" value="" />
+                    </div>
+                    <div class="span-2">
                       <input type="text" size="5" id="addtxt" title="int, peer port (1-65535)"
                              name="port" value="5060" />
                     </div>
-                    <div class="span-3 append-1">
-                      <input type="text" size="3" id="addtxt" title="int, peer weight (0-255)"
+                    <div class="span-1">
+                      <input type="text" size="1" id="addtxt" title="int, peer weight (0-255)"
                              name="weight" value="1" />
                     </div>
-                    <div class="span-1 append-1 last">
+                    <div class="span-1 last">
                             <button class="button-add" id="padd">Add</button>
                     </div>
                   </form>
@@ -120,15 +130,15 @@
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="ruleid" value="[% rule.id %]" />
                     <div class="span-4">
-                      <input type="text" size="15 id="addtxt" title="string, callee prefix"
+                      <input type="text" size="14 id="addtxt" title="string, callee prefix"
                              name="callee_prefix" value="[% rule.callee_prefix %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="string, caller pattern"
+                      <input type="text" size="14" id="addtxt" title="string, caller pattern"
                              name="caller_prefix" value="[% rule.caller_prefix %]" />
                     </div>
                     <div class="span-4 append-3">
-                      <input type="text" size="15" id="addtxt" title="string, rule description"
+                      <input type="text" size="14" id="addtxt" title="string, rule description"
                              name="description" value="[% rule.description %]" />
                     </div>
                     <div class="span-1">
@@ -165,15 +175,15 @@
                   <form action="/peering/create_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="string, callee prefix"
+                      <input type="text" size="14" id="addtxt" title="string, callee prefix"
                              name="callee_prefix" value="" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="string, caller pattern"
+                      <input type="text" size="14" id="addtxt" title="string, caller pattern"
                              name="caller_prefix" value="" />
                     </div>
                     <div class="span-4 append-3">
-                      <input type="text" size="15" id="addtxt" title="string, rule description"
+                      <input type="text" size="14" id="addtxt" title="string, rule description"
                              name="description" value="" />
                     </div>
                     <div class="span-1 last">
