@@ -4,6 +4,7 @@ use warnings;
 
 use Time::Local;
 use HTML::Entities;
+use POSIX;
 
 # Takes a search result total count, an offset and a limit and returns
 # an array containing offset values for a pagination link list
@@ -153,7 +154,7 @@ sub prepare_call_list {
         $callentry{date} = sprintf("%02d.%02d.%04d %02d:%02d:%02d", @date[3,4,5,2,1,0]);
 
         if($$call{duration}) {
-            my $duration = $$call{duration};
+            my $duration = ceil($$call{duration});
             while($duration > 59) {
                 my $left = sprintf("%02d", $duration % 60);
                 $callentry{duration} = ":$left". (defined $callentry{duration} ? $callentry{duration} : '');
