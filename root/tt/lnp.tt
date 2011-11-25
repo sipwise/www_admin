@@ -221,6 +221,7 @@
 	  </li>
 	  [% END %]
 	</ul>
+        <div class="hspace-20"></div>
 
           [% IF pagination %]
           <div class="pagination">

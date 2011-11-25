@@ -116,104 +116,88 @@
         [% IF pcrefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
         [% IF messages.lacerr %]<div class="error">[% messages.lacerr %]</div>[% END %]
 
-      [% IF Catalyst.config.lnp_features %]
+	<div class="hspace-20"></div>
+	[% IF Catalyst.config.lnp_features %]
 
         <h3 id="LNP">LNP Provider List</h3>
 
-        <div class="p1">
           [% IF messages.lnpmsg %]<div class="success">[% messages.lnpmsg %]</div>[% END %]
           [% IF messages.lnperr %]<div class="error">[% messages.lnperr %]</div>[% END %]
+          [% IF messages.clnp %]<div class="error">[% messages.clnp %]</div>[% END %]
+          [% IF lcrefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
 
-          <table class="ncoslnp">
-            <tr class="table_header">
-              <td style="width:120px;">LNP Provider</td>
-              <td style="width:310px;">Description</td>
-              <td style="width:40px;" />
-              <td style="width:60px;" />
-            </tr>
-            [% id = 0 %]
-            [% FOREACH lnpid = lnpids %]
-              [% id = id + 1 %]
-              [% IF lnpid.lnp_provider_id == edit_lnpid %]
-                <tr>
-                  <form action="/ncos/do_set_lnp_provider_id" method="post">
-                    <input type="hidden" name="level" value="[% level.level %]" />
-                    <input type="hidden" name="lnp_provider_id" value="[% lnpid.lnp_provider_id %]" />
-                    <td class="tdkey">[% lnpid.lnp_provider %]</td>
-                    <td>
-                      <input type="text" class="ilong" title="free-form description string"
+	<ul class="cleanlist">
+	  <li class="ui-state-default">
+	    <div class="span-4">LNP Provider</div>
+	    <div class="span-4 last">Description</div>
+	  </li>
+          [% id = 0 %]
+          [% FOREACH lnpid = lnpids %]
+	    <li class="ui-state-default">
+            [% id = id + 1 %]
+            [% IF lnpid.lnp_provider_id == edit_lnpid %]
+              <form action="/ncos/do_set_lnp_provider_id" method="post">
+                <input type="hidden" name="level" value="[% level.level %]" />
+                <input type="hidden" name="lnp_provider_id" value="[% lnpid.lnp_provider_id %]" />
+	        <div class="span-4">[% lnpid.lnp_provider %]</div>
+	        <div class="span-4">
+                  <input type="text" size="14" title="free-form description string"
                              name="description" value="[% lerefill.description %]" />
-                    </td>
-                    <td>
-                      <div class="postlink ui-corner-all">
-                        <label for="lnpsave">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lnpsave" />
-                      </div>
-                    </td>
-                  </form>
-                  <td><a href="/ncos/lists?level=[% level.level %]#LNP" class="aaction">cancel</a></td>
-                </tr>
-                [% IF messages.elnp %]
-                  <tr><td colspan="5"><div class="error">[% messages.elnp %]</div></td></tr>
-                [% END %]
-                [% IF lerefill && prov_error %]<tr><td colspan="5"><div class="error">[% prov_error %]</div></td></tr>[% END %]
-              [% ELSE %]
-                <tr>
-                  <td>[% lnpid.lnp_provider %]</td>
-                  <td>[% lnpid.description %]</td>
-                  <td>
-                  [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/ncos/lists?level=[% level.level %]&amp;edit_lnpid=[% lnpid.lnp_provider_id %]" class="aaction">edit</a>
-                  [% END %]
-                  </td>
+	        </div>
+	        <div class="prepend-3 span-1">
+	          <button id="lnpsave" class="button-save">Save</button>
+	        </div>
+	        <div class="span-1 last">
+	          <a href="/ncos/lists?level=[% level.level %]#LNP"><span class="button-cancel">Cancel</span></a>
+	        </div>
+              </form>
+	    [% ELSE %]
+	        <div class="span-4">[% lnpid.lnp_provider %]</div>
+	        <div class="span-4">[% lnpid.description %]</div>
+	        <div class="prepend-3 span-1">
+	          [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="/ncos/lists?level=[% level.level %]&amp;edit_lnpid=[% lnpid.lnp_provider_id %]#LNP"><span class="button-edit">Edit</span></a>
+	          [% END %] 
+	        </div>
+	        <div class="span-1 last">
+	          [% UNLESS Catalyst.session.admin.read_only %]
                   <form action="/ncos/do_delete_lnp_provider_id" method="post">
                     <input type="hidden" name="level" value="[% level.level %]" />
                     <input type="hidden" name="lnp_provider_id" value="[% lnpid.lnp_provider_id %]" />
-                    <td>
-                    [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink ui-corner-all">
-                        <label for="lnpdel[% id %]">delete</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lnpdel[% id %]" />
-                      </div>
-                    [% END %]
-                    </td>
+	                <button class="button-delete" id="lnpdel[% id %]">Delete</button>
                   </form>
-                </tr>
-              [% END %]
-            [% END %]
+	          [% END %] 
+	        </div>
+	    [% END %]
+	    </li>
+	  [% END %]
+          [% UNLESS Catalyst.session.admin.read_only %]
             [% IF providers %]
-              <tr>
-                <form action="/ncos/do_set_lnp_provider_id" method="post">
-                  <input type="hidden" name="level" value="[% level.level %]" />
-                  <input type="hidden" name="new" value="1" />
-                  <td>
-                    <select size="1" name="lnp_provider_id">                                    
-                      [% FOREACH provider = providers %]                                        
-                        <option value="[% provider.id %]"                                       
-                                [% IF lcrefill.lnp_provider_id == provider.id %]selected="selected"[% END %]
-                               >[% provider.name %]</option>                                                
-                      [% END %]                                                                             
-                    </select>
-                  </td>
-                  <td>
-                    <input type="text" class="ilong" title="free-form description string"
+	    <li class="ui-state-default">
+              <form action="/ncos/do_set_lnp_provider_id" method="post">
+                <input type="hidden" name="level" value="[% level.level %]" />
+                <input type="hidden" name="new" value="1" />
+                <div class="span-4">
+                  <select size="1" style="width: 145px" name="lnp_provider_id">                                    
+                  [% FOREACH provider = providers %]                                        
+                    <option value="[% provider.id %]"                                       
+                      [% IF lcrefill.lnp_provider_id == provider.id %]selected="selected"[% END %]
+                      >[% provider.name %]</option>                                                
+                  [% END %]                                                                             
+                  </select>
+                </div>
+                <div class="span-4">
+                  <input type="text" size="14" title="free-form description string"
                            name="description" value="[% lcrefill.description %]" />
-                  </td>
-                  <td>
-                    <div class="postlink ui-corner-all">
-                      <label for="lnpadd">add</label>
-                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="lnpadd" />
-                    </div>
-                  </td>
-                </form>
-                <td />
-              </tr>
+                </div>
+                <div class="prepend-3 span-1 last">
+	          <button id="lnpadd" class="button-add">Add</button>
+                </div>
+              </form>
+	    </li>
             [% ELSE %]
-              <tr><td colspan="5" class="tdcenter">No unused LNP providers found.</td></tr>
+	      No more unused LNP providers found to add.
             [% END %]
-          </table>
-            [% IF messages.clnp %]<div class="error">[% messages.clnp %]</div>[% END %]
-            [% IF lcrefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
-        </div>
-
-      [% END %]
+          [% END %]
+	</ul>
+        [% END %]
