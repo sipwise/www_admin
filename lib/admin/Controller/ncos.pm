@@ -437,7 +437,7 @@ sub do_set_lnp_provider_id : Local {
             $c->response->redirect("/ncos/lists?level=$settings{level}#LNP");
         } else {
             $c->session->{messages}{lnpmsg} = 'Web.NCOSLNP.Updated';
-            $c->response->redirect("/ncos/lists?level=$settings{level}&amp;#LNP");
+            $c->response->redirect("/ncos/lists?level=$settings{level}#LNP");
         }
         return;
     }
