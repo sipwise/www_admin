@@ -116,9 +116,7 @@
         <h3 id="stored">Stored Billing Fees</h3>
 
         [% UNLESS Catalyst.session.admin.read_only %]
-          <div class="span-16 last">
             <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;offset=[% offset %]"><span class="button-add">Add</span></a>
-          </div>
           <div class="hspace-20"></div>
         [% END %]
 
