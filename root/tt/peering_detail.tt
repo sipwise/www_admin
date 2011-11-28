@@ -113,6 +113,7 @@
         <div class="hspace-20"></div>
         <h3>Peering Rules</h3>
 
+	  [% IF !grp.rules || grp.rules.size == 0 %]<div class="notice">Peering Servers of this Peering Group will not be used until at least one Peering Rule is added!</div>[% END %]
           [% IF messages.erulmsg %]<div class="success">[% messages.erulmsg %]</div>[% END %]
           [% IF messages.erulerr %]<div class="error">[% messages.erulerr %]</div>[% END %]
 
