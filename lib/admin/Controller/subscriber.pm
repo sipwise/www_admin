@@ -830,7 +830,7 @@ sub update_preferences : Local {
             } elsif($fw_target_select eq 'voicebox') {
                 $fw_target = 'sip:vmu'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$vbdom";
             } elsif($fw_target_select eq 'fax2mail') {
-                $fw_target = 'sip:'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$fmdom";
+                $fw_target = 'sip:+'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$fmdom";
             } elsif($fw_target_select eq 'conference') {
                 $fw_target = 'sip:conf='.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$confdom";
             }
