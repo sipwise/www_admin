@@ -1,239 +1,227 @@
         <h3 id="provider">LNP Providers</h3>
 
-        <div class="p1">
-          [% IF messages.provmsg %]<div class="success">[% messages.provmsg %]</div>[% END %]
-          [% IF messages.proverr %]<div class="error">[% messages.proverr %]</div>[% END %]
-          <table>
-            <tr class="table_header">
-              <td>ID</td>
-              <td>name</td>
-              <td />
-              <td />
-            </tr>
-            [% FOREACH provider = providers %]
-              [% IF provider.id == edit_provider %]
-                <tr>
-                  <form action="/lnp/do_update_provider" method="post">
-                    <td>[% provider.id %]</td>
-                    <td>
-                      <input type="text" name="name" title="descriptive name, free-form"
-                             value="[% provider.name %]" />
-                    </td>
-                    <td>
-                      <input type="hidden" name="id" value="[% provider.id %]" />
-                      <div class="postlink ui-corner-all">
-                        <label for="listedit[% provider.id %]">save</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif"
-                               alt="" id="listedit[% provider.id %]" />
-                      </div>
-                    </td>
-                    <td><a href="/lnp" class="aaction">cancel</a></td>
-                  </form>
-                </tr>
-                [% IF messages.peditnamsg %]
-                <tr><td colspan="4"><div class="error">[% messages.peditnamsg %]</div></td></tr>
-                [% END %]
-              [% ELSE %]
-                <tr>
-                  <td>[% provider.id %]</td>
-                  <td>[% provider.name %]</td>
-                  <td>
-                  [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/lnp?edit_provider=[% provider.id %]" class="aaction">edit</a>
-                  [% END %]
-                  </td>
-                  <td>
-                  [% UNLESS Catalyst.session.admin.read_only %]
-                    <form action="/lnp/do_delete_provider" method="post">
-                      <input type="hidden" name="id" value="[% provider.id %]" />
-                      <div class="postlink ui-corner-all">
-                        <label for="provdel[% provider.id %]">delete</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif"
-                               alt="" id="provdel[% provider.id %]" />
-                      </div>
-                    </form>
-                  [% END %]
-                  </td>
-                </tr>
-              [% END %]
-            [% END %]
-            <tr>
-              <form action="/lnp/do_create_provider" method="post">
-                <td>
-                  <input type="text" class="ishort" name="id" title="unique, integer ID"
-                         value="[% parefill.id %]" />
-                </td>
-                <td>
-                  <input type="text" name="name" title="descriptive name, free-form"
-                         value="[% parefill.name %]" />
-                </td>
-                <td>
-                  <div class="postlink ui-corner-all">
-                    <label for="listpadd">add</label>
-                    <input type="image" class="hidden" src="/static/images/dot_trans.gif"
-                           alt="" id="listpadd" />
-                  </div>
-                </td>
-                <td />
+        [% IF messages.provmsg %]<div class="success">[% messages.provmsg %]</div>[% END %]
+        [% IF messages.proverr %]<div class="error">[% messages.proverr %]</div>[% END %]
+        [% IF messages.peditnamsg %]<div class="error">[% messages.peditnamsg %]</div>[% END %]
+        [% IF messages.paddidmsg %]<div class="error">[% messages.paddidmsg %]</div>[% END %]
+        [% IF messages.paddnamsg %]<div class="error">[% messages.paddnamsg %]</div>[% END %]
+
+	<ul class="cleanlist">
+	  <li class="ui-state-default">
+	    <div class="span-5">ID</div>
+	    <div class="span-6 last">Name</div>
+	  </li>
+          [% FOREACH provider = providers %]
+	  <li class="ui-state-default">
+	    [% IF provider.id == edit_provider && !Catalyst.session.admin.read_only %]
+              <form action="/lnp/do_update_provider" method="post">
+                <input type="hidden" name="id" value="[% provider.id %]" />
+	        <div class="span-5">[% provider.id %]</div>
+  	        <div class="span-6">
+	          <input type="text" size="20" name="name" title="descriptive name, free-form"
+	            value="[% provider.name %]" />
+        	      </div>
+	        <div class="span-1">
+	         <button id="listedit[% provider.id %]" class="button-save">Save</button> 
+	        </div>
+                <div class="span-1 last">
+	          <a href="/lnp"><span class="button-cancel">Cancel</span></a>
+	        </div>	    
               </form>
-            </tr>
-          </table>
-          [% IF messages.paddidmsg %]<div class="error">[% messages.paddidmsg %]</div>[% END %]
-          [% IF messages.paddnamsg %]<div class="error">[% messages.paddnamsg %]</div>[% END %]
-        </div> 
+	    [% ELSE %]
+	      <div class="span-5">[% provider.id %]</div>
+	      <div class="span-6">[% provider.name %]</div>
+	      <div class="span-1">
+	      [% UNLESS Catalyst.session.admin.read_only %]
+                <a href="/lnp?edit_provider=[% provider.id %]"><span class="button-edit">Edit</span></a>
+              [% END %]
+	      </div>
+	      <div class="span-1">
+	      [% UNLESS Catalyst.session.admin.read_only %]
+                <form action="/lnp/do_delete_provider" method="post">
+                  <input type="hidden" name="id" value="[% provider.id %]" />
+	          <button class="button-delete" id="provdel[% provider.id %]">Delete</button>
+                </form>
+              [% END %]
+	      </div>
+	    [% END %]
+	  </li>
+	  [% END %]
+	  [% UNLESS Catalyst.session.admin.read_only %]
+	  <li class="ui-state-default">
+            <form action="/lnp/do_create_provider" method="post">
+	      <div class="span-5">
+	        <input type="text" size="19" name="id" title="unique, integer ID"
+	          value="[% parefill.id %]" />
+	      </div>
+  	      <div class="span-6">
+	        <input type="text" size="20" name="name" title="descriptive name, free-form"
+	          value="[% parefill.name %]" />
+	      </div>
+	      <div class="span-1 last">
+	       <button id="listpadd" class="button-add">Add</button> 
+	      </div>
+            </form>
+	  </li>
+	  [% END %]
+	</ul>
+	<div class="hspace-20"></div>	
+
 
         [% UNLESS Catalyst.session.admin.read_only %]
         <h3 id="create_number">Add Ported Number</h3>
 
-        <div class="p1">
           [% IF messages.cnumsg %]<div class="success">[% messages.cnumsg %]</div>[% END %]
           [% IF narefill && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
+
+	<ul class="cleanlist">
           <form action="/lnp/do_create_number" method="post" class="search_subscriber">
-            <label class="search_label" for="numaddnum">Number:</label>
-            <input type="text" name="number" id="numaddnum" value="[% narefill.number %]"
-                   title="E.164 phone number with country code" /><br />
-            <label class="search_label" for="numaddprov">Provider:</label>
-            <select size="1" name="lnp_provider_id" id="numaddprov">
+	  <li class="ui-state-default">
+	    <div class="span-4">Number</div>
+	    <div class="span-4">Provider</div>
+	    <div class="span-4">Start</div>
+	    <div class="span-4">End</div>
+	  </li>
+	  <li class="ui-state-default">
+	    <div class="span-4">
+              <input type="text" size="14" name="number" id="numaddnum" value="[% narefill.number %]"
+                   title="E.164 phone number with country code" />
+	    </div>
+	    <div class="span-4">
+              <select size="1" style="width: 145px" name="lnp_provider_id" id="numaddprov">
               [% FOREACH provider = providers %]
                 <option value="[% provider.id %]"
                         [% IF narefill.lnp_provider_id == provider.id %]selected="selected"[% END %]
                        >[% provider.name %]</option>
               [% END %]
-            </select><br />
-            <label class="search_label" for="numaddstart">Start:</label>
-            <input type="text" id="numaddstart" name="start" value="[% narefill.start %]"
-                   title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" /><br />
-            <label class="search_label" for="numaddend">End:</label>
-            <input type="text" id="numaddend" name="end" value="[% narefill.end %]"
-                   title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" /><br />
-            <input type="submit" value="Add &#187;" class="but ui-corner-all" />
-          </form>
-        </div>
+              </select>
+	    </div>
+	    <div class="span-4">
+              <input type="text" size="14" id="numaddstart" name="start" value="[% narefill.start %]"
+                   title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
+	    </div>
+	    <div class="span-4">
+              <input type="text" size="14" id="numaddend" name="end" value="[% narefill.end %]"
+                   title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
+	    </div>
+	    <div class="span-1 last">
+	      <button class="button-add" id="pnumadd">Add</button>
+	    </div>
+	  </li>
+	  </form>
+	</ul>
+	<div class="hspace-20"></div>	
         [% END %]
 
         <h3 id="search_numbers">Search Ported Numbers</h3>
 
-        <div class="p1">
-          <form action="lnp/search_numbers" method="post" class="search_subscriber">
-            <label class="search_label" for="search_by_provid">Provider:</label>
-            <select size="1" name="search_provid">
+	<ul class="cleanlist">
+          <form action="/lnp/search_numbers" method="post" class="search_subscriber">
+	  <li class="ui-state-default">
+	    <div class="span-4">Number</div>
+	    <div class="span-4">Provider</div>
+	    <div class="span-2 last">Exact Match</div>
+	  </li>
+	  <li class="ui-state-default">
+	    <div class="span-4">
+              <input type="text" size="14" id="search_by_number" name="search_number" title="SQL wildcards allowed"
+                   value="[% searched_numbers.number %]" />
+	    </div>
+	    <div class="span-4">
+              <select size="1" style="width: 145px" name="search_provid">
               <option value="0" [% UNLESS nerefill.lnp_provider_id %]selected="selected"[% END %]>&nbsp;</option>
               [% FOREACH provider = providers %]
                 <option value="[% provider.id %]"
                         [% IF searched_numbers.lnp_provider_id == provider.id %]selected="selected"[% END %]
                        >[% provider.name %]</option>
               [% END %]
-            </select><br />
-            <label class="search_label" for="search_by_number">Number:</label>
-            <input type="text" id="search_by_number" name="search_number" title="SQL wildcards allowed"
-                   value="[% searched_numbers.number %]" />
-            <input type="checkbox" class="checkbox" id="exact_number" name="exact_number"
+              </select>
+	    </div>
+	    <div class="span-2">
+              <input type="checkbox" class="checkbox" id="exact_number" name="exact_number"
                    [% IF searched_numbers.exact_number %]checked="checked"[% END %] />
-            <label for="exact_number">exact match</label><br />
-
-            <input type="submit" value="Search &#187;" class="but ui-corner-all" />
-          </form>
-        </div>
+	    </div>
+	    <div class="span-1 last">
+	      <button class="button-search">Search</button>
+	    </div>
+	  </li>
+	  </form>
+	</ul>
+	<div class="hspace-20"></div>	
 
         [% IF numbers %]
         <h3 id="stored_numbers">Found Ported Numbers</h3>
 
-        <div class="p1">
           [% IF messages.enumsg %]<div class="success">[% messages.enumsg %]</div>[% END %]
-          <table width="100%" style="border-spacing: 0px">
-            <tr class="table_header">
-              <td>number</td>
-              <td>provider ID</td>
-              <td style="width:135px;" >start</td>
-              <td style="width:135px;" >end</td>
-              <td style="width:30px;" />
-              <td style="width:30px;"  />
-            </tr>
-            [% bgflip = 1 %]
-            [% FOREACH number = numbers %]
-              [% IF edit_number == number.id %]
+
+	<ul class="cleanlist">
+	  <li class="ui-state-default">
+	    <div class="span-4">Number</div>
+	    <div class="span-3">Provider ID</div>
+	    <div class="span-4">Start</div>
+	    <div class="span-4 last">End</div>
+	  </li>
+          [% FOREACH number = numbers %]
+	  <li class="ui-state-default">
+            [% IF edit_number == number.id %]
               <form action="/lnp/do_update_number" method="post">
-                [% IF bgflip %]
-                  [% bgflip = 0 %]
-                  <tr class="tr_alt">
-                [% ELSE %]
-                  [% bgflip = 1 %]
-                  <tr>
-                [% END %]
-                  <td><input type="text" class="ilnpnumedit" name="number" value="[% nerefill.number %]"
+	      <input type="hidden" name="id" value="[% number.id %]" />
+	      <div class="span-4">
+                <input type="text" size="14" name="number" value="[% nerefill.number %]"
                              title="E.164 phone number with country code" />
-                  </td>
-                  <td>
-                    <select size="1" class="ilnpproedit" name="lnp_provider_id">
+	      </div>
+	      <div class="span-3">
+                    <select size="1" style="width: 105px" name="lnp_provider_id">
                       [% FOREACH provider = providers %]
                         <option value="[% provider.id %]"
                                 [% IF nerefill.lnp_provider_id == provider.id %]selected="selected"[% END %]
                                >[% provider.name %]</option>
                       [% END %]
                     </select>
-                  </td>
-                  <td><input type="text" class="ilnptimedit" name="start" value="[% nerefill.start %]"
+	      </div>
+	      <div class="span-4">
+                  <td><input type="text" size="14" name="start" value="[% nerefill.start %]"
                              title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
-                  </td>
-                  <td><input type="text" class="ilnptimedit" name="end" value="[% nerefill.end %]"
+	      </div>
+	      <div class="span-4">
+                  <td><input type="text" size="14" name="end" value="[% nerefill.end %]"
                              title="SQL date or timestamp in &quot;YYYY-MM-DD hh:mm:ss&quot; format" />
-                  </td>
-                  <td>
-                    <input type="hidden" name="id" value="[% number.id %]" />
-                    <div class="postlink ui-corner-all">
-                      <label for="numedit[% number.id %]">save</label>
-                      <input type="image" class="hidden" src="/static/images/dot_trans.gif"
-                             alt="" id="numedit[% number.id %]" />
-                    </div>
-                  </td>
-                  <td>
-                    <a href="/lnp#stored_numbers" class="aaction">cancel</a>
-                  </td>
-                </tr>
-                [% IF nerefill && prov_error %]
-                [% IF bgflip %]
-                  <tr>
-                [% ELSE %]
-                  <tr class="tr_alt">
-                [% END %]
-                  <td colspan="6"><div class="error">[% prov_error %]</div></td>
-                </tr>
-                [% END %]
-              </form>
-              [% ELSE %]
-                [% IF bgflip %]
-                  [% bgflip = 0 %]
-                  <tr class="tr_alt">
-                [% ELSE %]
-                  [% bgflip = 1 %]
-                  <tr>
-                [% END %]
-                  <td>[% number.number %]</td>
-                  <td>[% number.lnp_provider %]</td>
-                  <td style="white-space:nowrap;">[% number.start %]</td>
-                  <td style="white-space:nowrap;">[% number.end %]</td>
-                  <td>
-                  [% UNLESS Catalyst.session.admin.read_only %]
-                    <a href="/lnp?edit_number=[% number.id %]#stored_numbers" class="aaction">edit</a>
-                  [% END %]
-                  </td>
-                  <td>
-                    <form action="/lnp/do_delete_number" method="post">
-                      <input type="hidden" name="id" value="[% number.id %]" />
-                      <input type="hidden" name="last_one" value="[% last_one %]" />
-                    [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="postlink ui-corner-all">
-                        <label for="numdel[% number.id %]">delete</label>
-                        <input type="image" class="hidden" src="/static/images/dot_trans.gif"
-                               alt="" id="numdel[% number.id %]" />
-                      </div>
-                    [% END %]
-                    </form>
-                  </td>
-                </tr>
-              [% END %]
-            [% END %]
-          </table>
+	      </div>
+	      <div class="span-1">
+	      [% UNLESS Catalyst.session.admin.read_only %]
+	        <button id="numedit[% number.id %]" class="button-save">Save</button>
+	      [% END %]
+	      </div>
+	      <div class="span-1 last">
+	      [% UNLESS Catalyst.session.admin.read_only %]
+	        <a href="/lnp#stored_numbers"><span class="button-cancel">Cancel</span></a>
+	      [% END %]
+	      </div>
+	      </form>
+	    [% ELSE %]
+	      <div class="span-4">[% number.number %]</div>
+	      <div class="span-3">[% number.lnp_provider %]</div>
+	      <div class="span-4">[% number.start %]</div>
+	      <div class="span-4">[% number.end %]</div>
+	      <div class="span-1">
+	      [% UNLESS Catalyst.session.admin.read_only %]
+	        <a href="/lnp?edit_number=[% number.id %]#stored_numbers"><span class="button-edit">Edit</span></a>
+	      [% END %]
+	      </div>
+	      <div class="span-1 last">
+	      [% UNLESS Catalyst.session.admin.read_only %]
+                <form action="/lnp/do_delete_number" method="post">
+                  <input type="hidden" name="id" value="[% number.id %]" />
+                  <input type="hidden" name="last_one" value="[% last_one %]" />
+	          <button class="button-delete" id="numdel[% number.id %]">Delete</button>
+                </form>
+	      [% END %]
+	      </div>
+	    [% END %]
+	  </li>
+	  [% END %]
+	</ul>
+        <div class="hspace-20"></div>
 
           [% IF pagination %]
           <div class="pagination">
@@ -270,14 +258,9 @@
             </ul>
           </div>
           [% END %]
-
-        </div>
-
         [% END %]
 
         [% IF searched_numbers  && ! numbers %]
-        <div class="p1">
-          No numbers found in the database.
-        </div>
+          No numbers matching your search criteria found.
         [% END %]
 

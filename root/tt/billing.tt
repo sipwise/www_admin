@@ -60,7 +60,7 @@
             [% FOREACH bilprof = bilprofs %]
               <li class="ui-state-default">
                 <div class="span-9">[% bilprof.data.name %]</div>
-                <div class="span-2">
+                <div class="prepend-1 span-2">
                 [% UNLESS Catalyst.session.admin.read_only %]
                   <a href="/billing/edit_bilprof?bilprof=[% bilprof.handle %]"><span class="button-edit">Edit</span></a>
                 [% ELSE %]&nbsp;
@@ -68,12 +68,11 @@
                 </div>
                 <form action="/billing/do_delete_bilprof" method="post">
                   <input type="hidden" name="bilprof" value="[% bilprof.handle %]" />
+                  [% UNLESS Catalyst.session.admin.read_only || 1 %]<!-- agranig: deletion of billing profiles not supported yet -->
                   <div class="span-2">
-                  [% UNLESS Catalyst.session.admin.read_only %]
                       <button class="button-delete" id="bildel[% id %]">Delete</button>
-                  [% ELSE %]&nbsp;
-                  [% END %]
                   </div>
+                  [% END %]
                 </form>
                 <div class="span-2">
                   <a href="/billing/search_fees?bilprof=[% bilprof.handle %]"><span class="button-cart">Edit Fees</span></a>

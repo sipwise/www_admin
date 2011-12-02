@@ -6,146 +6,149 @@
 
         <a href="/billing/search_fees?bilprof=[% bilprof %]&amp;use_session=1&amp;offset=[% offset %]"><span class="button-cancel">Cancel</span></a>
 
-        <div class="p1">
+	<div class="hspace-20"></div>
+
           <form action="do_edit_fee" method="post">
             <input type="hidden" name="bilprof" value="[% bilprof %]" />
             <input type="hidden" name="destination" value="[% fee.destination %]" />
             <input type="hidden" name="offset" value="[% offset %]" />
-            <table>
-              <tr>
-                <td class="tdkey">destination:</td>
+
+	    <ul class="cleanlist">
+              <li class="ui-state-default">
+                <div class="span-5">Destination:</div>
                 [% IF destination %]
-                <td>[% fee.destination %]</td>
+		<div class="span-6 last">[% fee.destination %]</div>
                 [% ELSE %]
-                <td>
+		<div class="span-6">
                   <input type="text" name="new_destination" title="string, e.g.: 431"
                          value="[% fee.destination %]" />
+		</div>
+		<div class="span-5 last">
                   E.164 prefix or SIP domain
-                </td>
+		</div>
                 [% END %]
-              </tr>
-              [% IF messages.destination %]
-                <tr><td /><td><div class="error">[% messages.destination %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">zone:</td>
-                <td>
+              </li>
+	      [% IF messages.destination %]<div class="error">[% messages.destination %]</div>[% END %]
+
+              <li class="ui-state-default">
+                <div class="span-5">Zone:</div>
+		<div class="span-6">
                   <input type="text" name="zone" title="string, e.g.: on-net"
                          value="[% fee.zone %]" />
+                </div>
+		<div class="span-5 last">
                   existing or new zone name
-                </td>
-              </tr>
-              [% IF messages.zone %]
-                <tr><td /><td><div class="error">[% messages.zone %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">zone detail:</td>
-                <td>
+                </div>
+              </li>
+	      [% IF messages.zone %]<div class="error">[% messages.zone %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Zone Detail:</div>
+                <div class="span-6">
                   <input type="text" name="zone_detail" title="string, e.g.: voicebox"
                          value="[% fee.zone_detail %]" />
+		</div>
+		<div class="span-5 last">
                   existing or new zone detail
-                </td>
-              </tr>
-              [% IF messages.zone_detail %]
-                <tr><td /><td><div class="error">[% messages.zone_detail %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">onpeak init rate:</td>
-                <td>
+		</div>
+              </li>
+	      [% IF messages.zone_detail %]<div class="error">[% messages.zone_detail %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Onpeak Init Rate:</div>
+                <div class="span-6">
                   <input type="text" name="onpeak_init_rate" title="float, e.g.: 0.15"
                          value="[% fee.onpeak_init_rate %]" />
+		</div>
+		<div class="span-5 last">
                   rate in cent per second
-                </td>
-              </tr>
-              [% IF messages.onpeak_init_rate %]
-                <tr><td /><td><div class="error">[% messages.onpeak_init_rate %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">onpeak init interval:</td>
-                <td>
+                </div>
+              </li>
+	      [% IF messages.onpeak_init_rate %]<div class="error">[% messages.onpeak_init_rate %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Onpeak Init Interval:</div>
+                <div class="span-6">
                   <input type="text" name="onpeak_init_interval" title="integer, e.g.: 60"
                          value="[% fee.onpeak_init_interval %]" />
+		</div>
+		<div class="span-5 last">
                   interval in seconds
-                </td>
-              </tr>
-              [% IF messages.onpeak_init_interval %]
-                <tr><td /><td><div class="error">[% messages.onpeak_init_interval %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">onpeak follow rate:</td>
-                <td>
+                </div>
+              </li>
+	      [% IF messages.onpeak_init_interval %]<div class="error">[% messages.onpeak_init_interval %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Onpeak Follow Rate:</div>
+                <div class="span-6">
                   <input type="text" name="onpeak_follow_rate" title="float, e.g.: 0.15"
                          value="[% fee.onpeak_follow_rate %]" />
+		</div>
+		<div class="span-5 last">
                   rate in cent per second
-                </td>
-              </tr>
-              [% IF messages.onpeak_follow_rate %]
-                <tr><td /><td><div class="error">[% messages.onpeak_follow_rate %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">onpeak follow interval:</td>
-                <td>
+                </div>
+              </li>
+	      [% IF messages.onpeak_follow_rate %]<div class="error">[% messages.onpeak_follow_rate %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Onpeak Follow Interval:</div>
+                <div class="span-6">
                   <input type="text" name="onpeak_follow_interval" title="integer, e.g.: 30"
                          value="[% fee.onpeak_follow_interval %]" />
+		</div>
+		<div class="span-5 last">
                   interval in seconds
-                </td>
-              </tr>
-              [% IF messages.onpeak_follow_interval %]
-                <tr><td /><td><div class="error">[% messages.onpeak_follow_interval %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">offpeak init rate:</td>
-                <td>
+                </div>
+              </li>
+	      [% IF messages.onpeak_follow_interval %]<div class="error">[% messages.onpeak_follow_interval %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Offpeak Init Rate:</div>
+                <div class="span-6">
                   <input type="text" name="offpeak_init_rate" title="float, e.g.: 0.1"
                          value="[% fee.offpeak_init_rate %]" />
+		</div>
+		<div class="span-5 last">
                   rate in cent per second
-                </td>
-              </tr>
-              [% IF messages.offpeak_init_rate %]
-                <tr><td /><td><div class="error">[% messages.offpeak_init_rate %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">offpeak init interval:</td>
-                <td>
+                </div>
+              </li>
+	      [% IF messages.offpeak_init_rate %]<div class="error">[% messages.offpeak_init_rate %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Offpeak Init Interval:</div>
+                <div class="span-6">
                   <input type="text" name="offpeak_init_interval" title="integer, e.g.: 60"
                          value="[% fee.offpeak_init_interval %]" />
+		</div>
+		<div class="span-5 last">
                   interval in seconds
-                </td>
-              </tr>
-              [% IF messages.offpeak_init_interval %]
-                <tr><td /><td><div class="error">[% messages.offpeak_init_interval %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">offpeak follow rate:</td>
-                <td>
+                </div>
+              </li>
+	      [% IF messages.offpeak_init_interval %]<div class="error">[% messages.offpeak_init_interval %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Offpeak Follow Rate:</div>
+                <div class="span-6">
                   <input type="text" name="offpeak_follow_rate" title="float, e.g.: 0.1"
                          value="[% fee.offpeak_follow_rate %]" />
+		</div>
+		<div class="span-5 last">
                   rate in cent per seconds
-                </td>
-              </tr>
-              [% IF messages.offpeak_follow_rate %]
-                <tr><td /><td><div class="error">[% messages.offpeak_follow_rate %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">offpeak follow interval:</td>
-                <td>
+                </div>
+              </li>
+	      [% IF messages.offpeak_follow_rate %]<div class="error">[% messages.offpeak_follow_rate %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Offpeak Follow Interval:</div>
+                <div class="span-6">
                   <input type="text" name="offpeak_follow_interval" title="integer, e.g.: 30"
                          value="[% fee.offpeak_follow_interval %]" />
+		</div>
+		<div class="span-5 last">
                   interval in seconds
-                </td>
-              </tr>
-              [% IF messages.offpeak_follow_interval %]
-                <tr><td /><td><div class="error">[% messages.offpeak_follow_interval %]</div></td></tr>
-              [% END %]
-              <tr>
-                <td class="tdkey">use free time:</td>
-                <td>
+                </div>
+              </li>
+	      [% IF messages.offpeak_follow_interval %]<div class="error">[% messages.offpeak_follow_interval %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-5">Use Free Time:</div>
+                <div class="span-6 last">
                   <input type="checkbox" class="checkbox" name="use_free_time" title="free minutes may be used when calling this destination"
                          [% IF fee.use_free_time %]checked="checked"[% END %] />
-                </td>
-              </tr>
-            </table>
+                </div>
+              </li>
+	    </ul>
+	    <div class="hspace-20"></div>
             <button name="submit" class="button-save">Save</button>
           </form>
-        </div>
 

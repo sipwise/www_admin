@@ -367,6 +367,7 @@ sub create_peer : Local {
     my $grpid = $c->request->params->{grpid};
     my $name = $c->request->params->{name};
     my $ip = $c->request->params->{ip};
+    my $host = length($c->request->params->{host}) ? $c->request->params->{host} : undef;
     my $port = $c->request->params->{port};
     my $weight = $c->request->params->{weight};
 
@@ -382,6 +383,7 @@ sub create_peer : Local {
                                                    data => {
                                                        name => $name,
                                                        ip => $ip,
+                                                       host => $host,
                                                        port => $port,
                                                        weight => $weight,
                                                    },
@@ -465,6 +467,7 @@ sub edit_peer : Local {
     my $peerid = $c->request->params->{peerid};
     my $name = $c->request->params->{name};
     my $ip = $c->request->params->{ip};
+    my $host = length($c->request->params->{host}) ? $c->request->params->{host} : undef;
     my $port = $c->request->params->{port};
     my $weight = $c->request->params->{weight};
 
@@ -477,6 +480,7 @@ sub edit_peer : Local {
                                                    data => {
                                                        name => $name,
                                                        ip => $ip,
+                                                       host => $host,
                                                        port => $port,
                                                        weight => $weight,
                                                    },
@@ -491,7 +495,7 @@ sub edit_peer : Local {
 		}
 		else
 		{
-        	$messages{erulerr} = 'Client.Voip.InputErrorFound';
+        	$messages{serverr} = 'Client.Voip.InputErrorFound';
 		}
     } else {
 		# TODO: add proper values here and set them in tt

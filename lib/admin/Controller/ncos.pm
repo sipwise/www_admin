@@ -3,6 +3,7 @@ package admin::Controller::ncos;
 use strict;
 use warnings;
 use base 'Catalyst::Controller';
+use URI::Escape;
 
 =head1 NAME
 
@@ -186,7 +187,12 @@ sub lists : Local {
                                                         { level => $level },
                                                         \$patterns
                                                       );
-    $c->stash->{patterns} = $patterns if eval { @$patterns };
+    if(eval { @$patterns }) {
+        for(@$patterns) {
+            $$_{urlenc_pattern} = uri_escape($$_{pattern});
+        }
+        $c->stash->{patterns} = $patterns;
+    }
 
     my $lnpids;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_ncos_lnp_list',
@@ -431,8 +437,7 @@ sub do_set_lnp_provider_id : Local {
             $c->response->redirect("/ncos/lists?level=$settings{level}#LNP");
         } else {
             $c->session->{messages}{lnpmsg} = 'Web.NCOSLNP.Updated';
-            $c->response->redirect("/ncos/lists?level=$settings{level}&amp;edit_lnpid=".
-                                   $c->request->params->{lnp_provider_id} ."#LNP");
+            $c->response->redirect("/ncos/lists?level=$settings{level}#LNP");
         }
         return;
     }
