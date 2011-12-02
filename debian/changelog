@@ -1,20 +1,14 @@
-ngcp-www-admin (3.2.1) UNRELEASED; urgency=low
+ngcp-www-admin (3.2.0) unstable; urgency=low
 
-  * add support for statistics graphs pulling data from multiple RRD files
-  * change the "free memory" graph to show free+buffers+cache memory
-  * add a "free swap" graph
-  * add hostname field to sip peering hosts.
-
- -- Andreas Granig <agranig@sipwise.com>  Thu, 17 Nov 2011 18:42:07 +0100
-
-ngcp-www-admin (3.2.0) UNRELEASED; urgency=low
-
-  * added support for subscriber alias numbers
+  * support for subscriber alias numbers
   * display SEMS registrar information
   * display and accept external IDs for accounts and subscribers
-  * some minor fixes and improvements
+  * support for statistics graphs pulling data from multiple RRD files
+  * some improvements to statistics graphs
+  * more template design updates, creating a consistent look and feel
+  * many minor fixes and improvements
 
- -- Daniel Tiefnig <dtiefnig@sipwise.com>  Sat, 27 Aug 2011 02:45:40 +0200
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Fri, 02 Dec 2011 13:33:58 +0100
 
 ngcp-www-admin (3.1.4) unstable; urgency=low
 
