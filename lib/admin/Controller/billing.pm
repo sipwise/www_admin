@@ -649,6 +649,7 @@ sub do_edit_fee : Local {
     $settings{destination} = $self->_normalize_destination($c, $settings{destination}) || $settings{destination}
         if length $settings{destination};
     if(defined $c->request->params->{new_destination}) {
+        undef $settings{destination};
         $settings{destination} = $self->_normalize_destination($c, $c->request->params->{new_destination})
                                    || $c->request->params->{new_destination}
             if length $c->request->params->{new_destination};
@@ -657,39 +658,53 @@ sub do_edit_fee : Local {
         }
     }
     $settings{zone} = $c->request->params->{zone};
+    $messages{zone} = 'Web.Fees.InvalidZone' unless length $settings{zone};
     $settings{zone_detail} = $c->request->params->{zone_detail};
+    $messages{zone_detail} = 'Web.Fees.InvalidZoneDetail' unless length $settings{zone_detail};
+
     $settings{onpeak_init_rate} = $c->request->params->{onpeak_init_rate};
+    $messages{onpeak_init_rate} = 'Web.Fees.InvalidRate'
+        unless $settings{onpeak_init_rate} =~ /^\d+(?:\.\d+)?$/;
     $settings{onpeak_init_interval} = $c->request->params->{onpeak_init_interval};
-    $settings{onpeak_follow_rate} = $c->request->params->{onpeak_follow_rate};
-    $settings{onpeak_follow_interval} = $c->request->params->{onpeak_follow_interval};
-    $settings{offpeak_init_rate} = $c->request->params->{offpeak_init_rate};
-    $settings{offpeak_init_interval} = $c->request->params->{offpeak_init_interval};
-    $settings{offpeak_follow_rate} = $c->request->params->{offpeak_follow_rate};
-    $settings{offpeak_follow_interval} = $c->request->params->{offpeak_follow_interval};
+    $messages{onpeak_init_interval} = 'Web.Fees.InvalidInterval'
+        unless $settings{onpeak_init_interval} =~ /^\d+$/;
+
+    for(qw(onpeak_follow_rate offpeak_init_rate offpeak_follow_rate)) {
+      $settings{$_} = $c->request->params->{$_};
+      $messages{$_} = 'Web.Fees.InvalidRate'
+          unless ! length $settings{$_}
+                 or $settings{$_} =~ /^\d+(?:\.\d+)?$/;
+      $settings{$_} = undef unless length $settings{$_};
+    }
+    for(qw(onpeak_follow_interval offpeak_init_interval offpeak_follow_interval)) {
+      $settings{$_} = $c->request->params->{$_};
+      $messages{$_} = 'Web.Fees.InvalidInterval'
+          unless ! length $settings{$_}
+                 or $settings{$_} =~ /^\d+$/;
+      $settings{$_} = undef unless length $settings{$_};
+    }
+
     $settings{use_free_time} = $c->request->params->{use_free_time} ? 1 : 0;
 
-    for(qw(onpeak_init_rate onpeak_init_interval onpeak_follow_rate onpeak_follow_interval
-           offpeak_init_rate offpeak_init_interval offpeak_follow_rate offpeak_follow_interval))
-    {
-        $settings{$_} = undef unless length $settings{$_};
+    unless(keys %messages) {
+      if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_billing_profile_fees',
+                                               { handle => $bilprof,
+                                                 fees   => [ \%settings ],
+                                                 purge_existing => 0,
+                                               },
+                                               undef))
+      {
+          $c->session->{messages}{stfeemsg} = 'Web.Bilprof.Updated';
+          $c->response->redirect("/billing/search_fees?bilprof=$bilprof&use_session=1&offset=$offset#stored");
+          return;
+      }
     }
-
-    if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_billing_profile_fees',
-                                             { handle => $bilprof,
-                                               fees   => [ \%settings ],
-                                               purge_existing => 0,
-                                             },
-                                             undef))
-    {
-        $c->session->{messages}{stfeemsg} = 'Web.Bilprof.Updated';
-        $c->response->redirect("/billing/search_fees?bilprof=$bilprof&use_session=1&offset=$offset#stored");
-        return;
-    }
+    $c->session->{messages} = \%messages;
 
     $settings{destination} = $self->_denormalize_destination($c, $settings{destination})
         if defined $settings{destination};
     $c->session->{restore_fee_input} = \%settings;
-    $c->response->redirect("/billing/edit_fee?bilprof=$bilprof&offset=$offset");
+    $c->response->redirect("/billing/edit_fee?bilprof=$bilprof&offset=$offset&destination=".uri_escape($settings{destination}));
     return;
 }
 
