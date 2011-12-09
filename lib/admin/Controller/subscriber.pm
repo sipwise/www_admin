@@ -119,35 +119,35 @@ sub detail : Local {
     $c->stash->{template} = 'tt/subscriber_detail.tt';
 
     my $is_new = $c->request->params->{new};
-    my $preferences;
+    my ($preferences, $subscriber);
 
     unless($is_new) {
         my $subscriber_id = $c->request->params->{subscriber_id};
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                             { subscriber_id => $subscriber_id },
-                                                            \$c->session->{subscriber}
+                                                            \$subscriber
                                                           );
 
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain => $c->session->{subscriber}{domain},
+                                                            { username => $$subscriber{username},
+                                                              domain => $$subscriber{domain},
                                                             },
                                                             \$preferences
                                                           );
 
         my $regcon;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_registered_devices',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain   => $c->session->{subscriber}{domain},
+                                                            { username => $$subscriber{username},
+                                                              domain   => $$subscriber{domain},
                                                             },
                                                             \$regcon
                                                           );
-        $c->session->{subscriber}{registered_contacts} = $regcon if eval { @$regcon };
+        $$subscriber{registered_contacts} = $regcon if eval { @$regcon };
 
         my $regpeer;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_registered_peer',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain   => $c->session->{subscriber}{domain},
+                                                            { username => $$subscriber{username},
+                                                              domain   => $$subscriber{domain},
                                                             },
                                                             \$regpeer
                                                           );
@@ -157,11 +157,11 @@ sub detail : Local {
             $$regpeer{contacts} =~ s/>/\&gt;/g;
             $$regpeer{contacts_short} =~ s/</\&lt;/g;
             $$regpeer{contacts_short} =~ s/>/\&gt;/g;
-            $c->session->{subscriber}{registered_peer} = $regpeer;
+            $$subscriber{registered_peer} = $regpeer;
         }
 
-        eval { $c->session->{subscriber}{aliases} = [ sort @{$c->session->{subscriber}{aliases}} ] };
-        $c->stash->{subscriber} = $c->session->{subscriber};
+        eval { $$subscriber{aliases} = [ sort @{$$subscriber{aliases}} ] };
+        $c->stash->{subscriber} = $subscriber;
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
         $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
                                                                                          config->{VARIABLES}{site_config}{language},
@@ -211,26 +211,27 @@ sub update_subscriber : Local {
     my ( $self, $c ) = @_;
 
     my (%settings, %messages);
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     if($subscriber_id) {
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                             { subscriber_id => $subscriber_id },
-                                                            \$c->session->{subscriber}
+                                                            \$subscriber
                                                           );
     } else {
         my $checkresult;
-        $c->session->{subscriber}{account_id} = $c->request->params->{account_id};
+        $$subscriber{account_id} = $c->request->params->{account_id};
 
-        $c->session->{subscriber}{username} = $c->request->params->{username};
+        $$subscriber{username} = $c->request->params->{username};
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_username',
-                                                            $c->session->{subscriber}{username}, \$checkresult
+                                                            $$subscriber{username}, \$checkresult
                                                           );
         $messages{username} = 'Client.Syntax.MalformedUsername' unless($checkresult);
 
-        $c->session->{subscriber}{domain} = $c->request->params->{domain};
+        $$subscriber{domain} = $c->request->params->{domain};
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_domain',
-                                                            $c->session->{subscriber}{domain}, \$checkresult
+                                                            $$subscriber{domain}, \$checkresult
                                                           );
         $messages{domain} = 'Client.Syntax.MalformedDomain' unless($checkresult);
     }
@@ -264,7 +265,7 @@ sub update_subscriber : Local {
                                                           );
         $messages{webusername} = 'Client.Syntax.MalformedUsername' unless($checkresult);
     } else {
-        $settings{webusername} = $c->session->{subscriber}{username};
+        $settings{webusername} = $$subscriber{username};
     }
 
 
@@ -301,9 +302,9 @@ sub update_subscriber : Local {
         if($c->model('Provisioning')->call_prov( $c, 'billing', ($subscriber_id
                                                                  ? 'update_voip_account_subscriber'
                                                                  : 'add_voip_account_subscriber'),
-                                                 { id         => $c->session->{subscriber}{account_id},
-                                                   subscriber => { username => $c->session->{subscriber}{username},
-                                                                   domain   => $c->session->{subscriber}{domain},
+                                                 { id         => $$subscriber{account_id},
+                                                   subscriber => { username => $$subscriber{username},
+                                                                   domain   => $$subscriber{domain},
                                                                    %settings
                                                                  },
                                                  },
@@ -315,12 +316,12 @@ sub update_subscriber : Local {
                 $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
             } else {
                 return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber',
-                                                                    { username => $c->session->{subscriber}{username},
-                                                                      domain   => $c->session->{subscriber}{domain},
+                                                                    { username => $$subscriber{username},
+                                                                      domain   => $$subscriber{domain},
                                                                     },
-                                                                    \$c->session->{subscriber}
+                                                                    \$subscriber
                                                                   );
-                $c->response->redirect("/subscriber/detail?subscriber_id=". $c->session->{subscriber}{subscriber_id});
+                $c->response->redirect("/subscriber/detail?subscriber_id=". $$subscriber{subscriber_id});
             }
             return;
         }
@@ -333,8 +334,8 @@ sub update_subscriber : Local {
     if($subscriber_id) {
         $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id&edit_subscriber=1");
     } else {
-        $c->session->{restore_subscriber_input}{username} = $c->session->{subscriber}{username};
-        $c->response->redirect("/subscriber/detail?account_id=". $c->session->{subscriber}{account_id} ."&new=1");
+        $c->session->{restore_subscriber_input}{username} = $$subscriber{username};
+        $c->response->redirect("/subscriber/detail?account_id=". $$subscriber{account_id} ."&new=1");
     }
     return;
 }
@@ -344,26 +345,27 @@ sub edit_aliases : Local {
     $c->stash->{template} = 'tt/subscriber_edit_aliases.tt';
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber',
-                                                        { id       => $c->session->{subscriber}{account_id},
-                                                          username => $c->session->{subscriber}{username},
-                                                          domain   => $c->session->{subscriber}{domain},
+                                                        { id       => $$subscriber{account_id},
+                                                          username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
     eval {
-        $c->session->{subscriber}{alias_numbers} =
+        $$subscriber{alias_numbers} =
             [ sort { $$a{cc}.$$a{ac}.$$a{sn} cmp $$b{cc}.$$b{ac}.$$b{sn} }
-                   @{$c->session->{subscriber}{alias_numbers}} ];
+                   @{$$subscriber{alias_numbers}} ];
     };
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber_id} = $subscriber_id;
 
     if(defined $c->session->{aliasadd}) {
@@ -378,19 +380,20 @@ sub do_edit_aliases : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
-    my $acid = $c->session->{subscriber}{account_id};
+    my $acid = $$subscriber{account_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber',
                                                         { id       => $acid,
-                                                          username => $c->session->{subscriber}{username},
-                                                          domain   => $c->session->{subscriber}{domain},
+                                                          username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
     # delete button next to entries in alias list
@@ -401,9 +404,9 @@ sub do_edit_aliases : Local {
         my $cc = $c->request->params->{alias_del_cc};
         my $ac = $c->request->params->{alias_del_ac};
         my $sn = $c->request->params->{alias_del_sn};
-        my $aliaslist = $c->session->{subscriber}{alias_numbers};
+        my $aliaslist = $$subscriber{alias_numbers};
         if(defined $aliaslist) {
-            $c->session->{subscriber}{alias_numbers} = [ grep { $$_{cc} ne $cc or $$_{ac} ne $ac or $$_{sn} ne $sn } @$aliaslist ];
+            $$subscriber{alias_numbers} = [ grep { $$_{cc} ne $cc or $$_{ac} ne $ac or $$_{sn} ne $sn } @$aliaslist ];
         }
     }
 
@@ -434,9 +437,9 @@ sub do_edit_aliases : Local {
             unless $checkresult;
 
         unless(keys %messages) {
-            my $aliaslist = $c->session->{subscriber}{alias_numbers};
+            my $aliaslist = $$subscriber{alias_numbers};
             $aliaslist = [] unless defined $aliaslist;
-            $c->session->{subscriber}{alias_numbers} = [ @$aliaslist, { cc => $cc, ac => $ac, sn => $sn } ];
+            $$subscriber{alias_numbers} = [ @$aliaslist, { cc => $cc, ac => $ac, sn => $sn } ];
         } else {
             $c->session->{aliasadd} = { cc => $cc, ac => $ac, sn => $sn };
         }
@@ -445,9 +448,9 @@ sub do_edit_aliases : Local {
     unless(keys %messages) {
         $c->model('Provisioning')->call_prov( $c, 'billing', 'update_voip_account_subscriber',
                                               { id         => $acid,
-                                                subscriber => { username      => $c->session->{subscriber}{username},
-                                                                domain        => $c->session->{subscriber}{domain},
-                                                                alias_numbers => $c->session->{subscriber}{alias_numbers},
+                                                subscriber => { username      => $$subscriber{username},
+                                                                domain        => $$subscriber{domain},
+                                                                alias_numbers => $$subscriber{alias_numbers},
                                                               },
                                               },
                                               undef
@@ -470,17 +473,19 @@ Locks a subscriber.
 sub lock : Local {
     my ( $self, $c ) = @_;
 
+    my $subscriber;
+
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
     my $lock = $c->request->params->{lock};
     $c->model('Provisioning')->call_prov( $c, 'billing', 'lock_voip_account_subscriber',
-                                          { id       => $c->session->{subscriber}{account_id},
-                                            username => $c->session->{subscriber}{username},
-                                            domain   => $c->session->{subscriber}{domain},
+                                          { id       => $$subscriber{account_id},
+                                            username => $$subscriber{username},
+                                            domain   => $$subscriber{domain},
                                             lock     => $lock,
                                           },
                                           undef
@@ -499,17 +504,18 @@ sub terminate : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
     if($c->model('Provisioning')->call_prov( $c, 'billing', 'terminate_voip_account_subscriber',
-                                             { id       => $c->session->{subscriber}{account_id},
-                                               username => $c->session->{subscriber}{username},
-                                               domain   => $c->session->{subscriber}{domain},
+                                             { id       => $$subscriber{account_id},
+                                               username => $$subscriber{username},
+                                               domain   => $$subscriber{domain},
                                              },
                                              undef))
     {
@@ -527,17 +533,19 @@ sub terminate : Local {
 sub expire : Local {
     my ( $self, $c ) = @_;
 
+    my $subscriber;
+
     my $subscriber_id = $c->request->params->{subscriber_id};
     my $contact_id = $c->request->params->{contact_id};
 
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_registered_device',
-                                             { username => $c->session->{subscriber}{username},
-                                               domain   => $c->session->{subscriber}{domain},
+                                             { username => $$subscriber{username},
+                                               domain   => $$subscriber{domain},
                                                id       => $contact_id,
                                              },
                                              undef
@@ -560,67 +568,69 @@ sub preferences : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_preferences.tt';
 
+    my $subscriber;
+
     my $preferences;
     my $speed_dial_slots;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$preferences
                                                       );
 
     # voicebox requires a number
-    if(length $c->session->{subscriber}{sn} && $c->config->{voicemail_features}) {
+    if(length $$subscriber{sn} && $c->config->{voicemail_features}) {
       return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_voicebox_preferences',
-                                                          { username => $c->session->{subscriber}{username},
-                                                            domain   => $c->session->{subscriber}{domain},
+                                                          { username => $$subscriber{username},
+                                                            domain   => $$subscriber{domain},
                                                           },
-                                                          \$c->session->{subscriber}{voicebox_preferences}
+                                                          $$subscriber{voicebox_preferences}
                                                         );
     }
 
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_speed_dial_slots',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain   => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$speed_dial_slots
                                                       );
 
     if($c->config->{fax_features}) {
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain   => $c->session->{subscriber}{domain},
+                                                            { username => $$subscriber{username},
+                                                              domain   => $$subscriber{domain},
                                                             },
-                                                            \$c->session->{subscriber}{fax_preferences}
+                                                            $$subscriber{fax_preferences}
                                                           );
     }
 
     if($c->config->{subscriber}{audiofile_features}) {
         my $audio_files;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain   => $c->session->{subscriber}{domain},
+                                                            { username => $$subscriber{username},
+                                                              domain   => $$subscriber{domain},
                                                             },
                                                             \$audio_files
                                                           );
-        $c->session->{subscriber}{audio_files} = $audio_files if eval { @$audio_files };
+        $$subscriber{audio_files} = $audio_files if eval { @$audio_files };
     }
 
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_reminder',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain   => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
-                                                        \$c->session->{subscriber}{reminder}
+                                                        $$subscriber{reminder}
                                                       );
 
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
     $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
                                                                                      config->{VARIABLES}{site_config}{language},
@@ -770,16 +780,17 @@ sub update_preferences : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $preferences;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$preferences
                                                       );
@@ -822,17 +833,17 @@ sub update_preferences : Local {
                 } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+(:\d{1,5})?$/i) {
                     $fw_target = 'sip:'. lc $fw_target;
                 } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+$/) {
-                    $fw_target = 'sip:'. lc($fw_target) .'@'. $c->session->{subscriber}{domain};
+                    $fw_target = 'sip:'. lc($fw_target) .'@'. $$subscriber{domain};
                 } else {
                     $messages{$fwtype} = 'Client.Voip.MalformedTarget';
                     $fw_target = $c->request->params->{$fwtype .'_sipuri'};
                 }
             } elsif($fw_target_select eq 'voicebox') {
-                $fw_target = 'sip:vmu'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$vbdom";
+                $fw_target = 'sip:vmu'.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$vbdom";
             } elsif($fw_target_select eq 'fax2mail') {
-                $fw_target = 'sip:+'.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$fmdom";
+                $fw_target = 'sip:'.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$fmdom";
             } elsif($fw_target_select eq 'conference') {
-                $fw_target = 'sip:conf='.$c->session->{subscriber}{cc}.$c->session->{subscriber}{ac}.$c->session->{subscriber}{sn}."\@$confdom";
+                $fw_target = 'sip:conf='.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$confdom";
             }
             $$preferences{$fwtype} = $fw_target;
         } elsif($$db_pref{preference} eq 'cli') {
@@ -895,8 +906,8 @@ sub update_preferences : Local {
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_preferences',
-                                                 { username => $c->session->{subscriber}{username},
-                                                   domain => $c->session->{subscriber}{domain},
+                                                 { username => $$subscriber{username},
+                                                   domain   => $$subscriber{domain},
                                                    preferences => $preferences,
                                                  },
                                                  undef
@@ -923,11 +934,12 @@ sub update_reminder : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $reminder;
     $$reminder{time} = $c->request->params->{time};
@@ -937,8 +949,8 @@ sub update_reminder : Local {
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_reminder',
-                                                 { username => $c->session->{subscriber}{username},
-                                                   domain => $c->session->{subscriber}{domain},
+                                                 { username => $$subscriber{username},
+                                                   domain   => $$subscriber{domain},
                                                    data => $reminder,
                                                  },
                                                  undef
@@ -963,16 +975,17 @@ sub update_voicebox : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $vboxprefs;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_voicebox_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$vboxprefs
                                                       );
@@ -999,8 +1012,8 @@ sub update_voicebox : Local {
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_voicebox_preferences',
-                                                 { username => $c->session->{subscriber}{username},
-                                                   domain => $c->session->{subscriber}{domain},
+                                                 { username => $$subscriber{username},
+                                                   domain => $$subscriber{domain},
                                                    preferences => $vboxprefs,
                                                  },
                                                  undef
@@ -1199,16 +1212,17 @@ sub edit_list : Local {
     $c->stash->{template} = 'tt/subscriber_edit_list.tt';
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $preferences;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$preferences
                                                       );
@@ -1235,7 +1249,7 @@ sub edit_list : Local {
         }
     }
 
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber_id} = $subscriber_id;
     $c->stash->{list_name} = $list;
 
@@ -1257,16 +1271,17 @@ sub do_edit_list : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $preferences;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$preferences
                                                       );
@@ -1283,9 +1298,9 @@ sub do_edit_list : Local {
             } elsif($add =~ s/^\+// or $add =~ s/^$ccdp//) {
                 # nothing more to do
             } elsif($add =~ s/^$acdp//) {
-                $add = $c->session->{subscriber}{cc} . $add;
+                $add = $$subscriber{cc} . $add;
             } else {
-                $add = $c->session->{subscriber}{cc} . $c->session->{subscriber}{ac} . $add;
+                $add = $$subscriber{cc} . $$subscriber{ac} . $add;
             }
             my $blocklist = $$preferences{$list};
             $blocklist = [] unless defined $blocklist;
@@ -1309,7 +1324,7 @@ sub do_edit_list : Local {
             } elsif($del =~ s/^\+// or $del =~ s/^$ccdp//) {
                 # nothing more to do
             } elsif($del =~ s/^$acdp//) {
-                $del = $c->session->{subscriber}{cc} . $del;
+                $del = $$subscriber{cc} . $del;
             }
             $blocklist = [ $blocklist ] unless ref $blocklist;
             if($c->request->params->{block_stat}) {
@@ -1332,7 +1347,7 @@ sub do_edit_list : Local {
             } elsif($act =~ s/^\+// or $act =~ s/^$ccdp//) {
                 # nothing more to do
             } elsif($act =~ s/^$acdp//) {
-                $act = $c->session->{subscriber}{cc} . $act;
+                $act = $$subscriber{cc} . $act;
             }
             $blocklist = [ $blocklist ] unless ref $blocklist;
             if($c->request->params->{block_stat}) {
@@ -1347,8 +1362,8 @@ sub do_edit_list : Local {
 
     unless(keys %messages) {
         $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_preferences',
-                                              { username => $c->session->{subscriber}{username},
-                                                domain => $c->session->{subscriber}{domain},
+                                              { username => $$subscriber{username},
+                                                domain   => $$subscriber{domain},
                                                 preferences => {
                                                                  $list => $$preferences{$list},
                                                                },
@@ -1369,16 +1384,17 @@ sub edit_iplist : Local {
     $c->stash->{template} = 'tt/subscriber_edit_iplist.tt';
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $preferences;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$preferences
                                                       );
@@ -1398,7 +1414,7 @@ sub edit_iplist : Local {
         }
     }
 
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber_id} = $subscriber_id;
     $c->stash->{list_name} = $list;
 
@@ -1414,16 +1430,17 @@ sub do_edit_iplist : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $preferences;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$preferences
                                                       );
@@ -1457,8 +1474,8 @@ sub do_edit_iplist : Local {
 
     unless(keys %messages) {
         $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_preferences',
-                                              { username => $c->session->{subscriber}{username},
-                                                domain => $c->session->{subscriber}{domain},
+                                              { username => $$subscriber{username},
+                                                domain   => $$subscriber{domain},
                                                 preferences => {
                                                                  $list => $$preferences{$list},
                                                                },
@@ -1478,16 +1495,17 @@ sub edit_speed_dial_slots : Local {
     $c->stash->{template} = 'tt/subscriber_edit_speeddial.tt';
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $speed_dial_slots;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_speed_dial_slots',
-                                                            { username => $c->session->{subscriber}{username},
-                                                              domain   => $c->session->{subscriber}{domain},
+                                                            { username => $$subscriber{username},
+                                                              domain   => $$subscriber{domain},
                                                             },
                                                             \$speed_dial_slots
                                                           );
@@ -1539,7 +1557,7 @@ sub edit_speed_dial_slots : Local {
         }
     }
 
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber_id} = $subscriber_id;
 
     if(defined $c->session->{addslottxt}) {
@@ -1558,11 +1576,12 @@ sub do_edit_speed_dial_slots : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
     # add new entry form
@@ -1578,7 +1597,7 @@ sub do_edit_speed_dial_slots : Local {
             $add_destination = admin::Utils::get_qualified_number_for_subscriber($c, $add_destination);
             my $checkresult;
             return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $add_destination, \$checkresult);
-            $destination = 'sip:'. $add_destination .'@'. $c->session->{subscriber}{domain}
+            $destination = 'sip:'. $add_destination .'@'. $$subscriber{domain}
                 if $checkresult;
         } else {
             $destination = $add_destination;
@@ -1589,8 +1608,8 @@ sub do_edit_speed_dial_slots : Local {
 
         if($checkadd_slot and $checkadd_destination) {
             $c->model('Provisioning')->call_prov( $c, 'voip', 'create_speed_dial_slot',
-                                                  { username => $c->session->{subscriber}{username},
-                                                    domain => $c->session->{subscriber}{domain},
+                                                  { username => $$subscriber{username},
+                                                    domain   => $$subscriber{domain},
                                                     data => {
                                                                  slot        => $add_slot,
                                                                  destination => $add_destination
@@ -1620,8 +1639,8 @@ sub do_edit_speed_dial_slots : Local {
     my $delete_slotid = $c->request->params->{delete_id};
     if(defined $delete_slotid) {
         $c->model('Provisioning')->call_prov( $c, 'voip', 'delete_speed_dial_slot',
-                                          { username => $c->session->{subscriber}{username},
-                                            domain => $c->session->{subscriber}{domain},
+                                          { username => $$subscriber{username},
+                                            domain   => $$subscriber{domain},
                                             id => $delete_slotid
                                           },
                                           undef
@@ -1642,7 +1661,7 @@ sub do_edit_speed_dial_slots : Local {
             $update_destination = admin::Utils::get_qualified_number_for_subscriber($c, $update_destination);
             my $checkresult;
             return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $update_destination, \$checkresult);
-            $destination = 'sip:'. $update_destination .'@'. $c->session->{subscriber}{domain}
+            $destination = 'sip:'. $update_destination .'@'. $$subscriber{domain}
                 if $checkresult;
         } else {
             $destination = $update_destination;
@@ -1653,8 +1672,8 @@ sub do_edit_speed_dial_slots : Local {
 
         if($checkupdate_slot and $checkupdate_destination) {
             $c->model('Provisioning')->call_prov( $c, 'voip', 'update_speed_dial_slot',
-                                                  { username => $c->session->{subscriber}{username},
-                                                    domain => $c->session->{subscriber}{domain},
+                                                  { username => $$subscriber{username},
+                                                    domain   => $$subscriber{domain},
                                                     id => $update_slotid,
                                                     data => {
                                                                      slot        => $update_slot,
@@ -1697,11 +1716,12 @@ sub update_fax : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $faxprefs;
     $$faxprefs{name} = $c->request->params->{name} || undef;
@@ -1714,8 +1734,8 @@ sub update_fax : Local {
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_fax_preferences',
-                                                 { username => $c->session->{subscriber}{username},
-                                                   domain => $c->session->{subscriber}{domain},
+                                                 { username => $$subscriber{username},
+                                                   domain => $$subscriber{domain},
                                                    preferences => $faxprefs,
                                                  },
                                                  undef
@@ -1742,16 +1762,17 @@ sub edit_destlist : Local {
     $c->stash->{template} = 'tt/subscriber_edit_destlist.tt';
 
     my %messages;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $preferences;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$preferences
                                                       );
@@ -1771,7 +1792,7 @@ sub edit_destlist : Local {
         }
     }
 
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber_id} = $subscriber_id;
     $c->stash->{list_name} = $list;
     $c->stash->{edit_dest} = $c->request->params->{list_edit};
@@ -1789,16 +1810,17 @@ sub do_edit_destlist : Local {
 
     my %messages;
     my %entry;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $preferences;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_fax_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                         },
                                                         \$preferences
                                                       );
@@ -1851,8 +1873,8 @@ sub do_edit_destlist : Local {
 
     unless(keys %messages) {
         $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_fax_preferences',
-                                              { username => $c->session->{subscriber}{username},
-                                                domain => $c->session->{subscriber}{domain},
+                                              { username => $$subscriber{username},
+                                                domain   => $$subscriber{domain},
                                                 preferences => {
                                                                  $list => $$preferences{$list},
                                                                },
@@ -1871,18 +1893,20 @@ sub edit_audio_files : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_edit_audio_files.tt';
 
+    my $subscriber;
+
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber_id} = $subscriber_id;
 
     my %settings;
-    $settings{username} = $c->session->{subscriber}{username};
-    $settings{domain} = $c->session->{subscriber}{domain};
+    $settings{username} = $$subscriber{username};
+    $settings{domain} = $$subscriber{domain};
 
     my $audio_files;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_audio_files',
@@ -1923,18 +1947,19 @@ sub do_create_audio : Local {
 
     my %messages;
     my %settings;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber_id} = $subscriber_id;
 
-    $settings{username} = $c->session->{subscriber}{username};
-    $settings{domain} = $c->session->{subscriber}{domain};
+    $settings{username} = $$subscriber{username};
+    $settings{domain} = $$subscriber{domain};
     $settings{handle} = $c->request->params->{handle};
     $settings{data}{description} = $c->request->params->{description}
         if length $c->request->params->{description};
@@ -1971,18 +1996,19 @@ sub do_update_audio : Local {
 
     my %messages;
     my %settings;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber_id} = $subscriber_id;
 
-    $settings{username} = $c->session->{subscriber}{username};
-    $settings{domain} = $c->session->{subscriber}{domain};
+    $settings{username} = $$subscriber{username};
+    $settings{domain} = $$subscriber{domain};
     $settings{handle} = $c->request->params->{handle};
     unless(length $settings{handle}) {
         $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
@@ -2023,18 +2049,19 @@ sub do_delete_audio : Local {
     my ( $self, $c ) = @_;
 
     my %settings;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber_id} = $subscriber_id;
 
-    $settings{username} = $c->session->{subscriber}{username};
-    $settings{domain} = $c->session->{subscriber}{domain};
+    $settings{username} = $$subscriber{username};
+    $settings{domain} = $$subscriber{domain};
     $settings{handle} = $c->request->params->{handle};
     unless(length $settings{handle}) {
         $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
@@ -2064,15 +2091,16 @@ sub listen_audio : Local {
     my ( $self, $c ) = @_;
 
     my %settings;
+    my $subscriber;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
 
-    $settings{username} = $c->session->{subscriber}{username};
-    $settings{domain} = $c->session->{subscriber}{domain};
+    $settings{username} = $$subscriber{username};
+    $settings{domain} = $$subscriber{domain};
     $settings{handle} = $c->request->params->{handle};
     unless(length $settings{handle}) {
         $c->response->redirect("/subscriber/edit_audio_files?subscriber_id=$subscriber_id");
