@@ -174,7 +174,7 @@
               <li class="ui-state-default">
                 <div class="span-5">SIP URI:</div>
                 <div class="span-11 last">
-                  <input type="text" name="username" value="[% subscriber.username %]"
+                  <input size="15" type="text" name="username" value="[% subscriber.username %]"
                          title="the local part of the SIP URI, string" />
                   @
                   <select size="1" name="domain">
