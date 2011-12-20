@@ -47,6 +47,8 @@
           [% END %]
           </div><br />
 
+          [% IF messages.msgadd %]<div class="error">[% messages.msgadd %]</div>[% END %]
+
           <ul class="cleanlist">
             [% FOREACH blockentry = list_data %]
               <li class="ui-state-default">
@@ -77,16 +79,17 @@
                 </form>
               </li>
             [% END %]
+              <li class="ui-state-default">
+                <form action="/subscriber/do_edit_list" method="post">
+                  <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                  <input type="hidden" name="list_name" value="[% list_name %]" />
+                  <div class="span-14">
+                    <input type="text" size="20" name="block_add" id="blockaddtxt" value="[% blockaddtxt %]"
+                      title="E.164 number string with shell pattern wildcards (*, ?), with international prefix or as local number, will be normalized to international format" />
+                  </div>
+                  <div class="span-1 last">
+                    <button class="button-add" id="blockadd">Add</button>
+                  </div>
+                </form>
+              </li>
           </ul>
-
-          <div class="hspace-20"></div>
-          <form action="/subscriber/do_edit_list" method="post">
-            <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
-            <input type="hidden" name="list_name" value="[% list_name %]" />
-            <label for="blockaddtxt">New entry:</label><br />
-              <input type="text" size="20" name="block_add" id="blockaddtxt" value="[% blockaddtxt %]"
-                     title="E.164 number string with shell pattern wildcards (*, ?), with international prefix or as local number, will be normalized to international format" /> &nbsp;
-              <button class="button-add" id="blockadd">Add</button>
-              [% IF messages.msgadd %]<div class="error">[% messages.msgadd %]</div>[% END %]
-            <br clear="all" />
-          </form>
