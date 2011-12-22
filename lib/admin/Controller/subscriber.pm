@@ -641,7 +641,7 @@ sub preferences : Local {
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
                                                         undef, \$db_prefs
                                                       );
-    $c->session->{voip_preferences} = [ grep { $$_{usr_pref} } @$db_prefs ] if eval { @$db_prefs };
+    my $voip_preferences = [ grep { $$_{usr_pref} } @$db_prefs ] if eval { @$db_prefs };
 
     ### restore data entered by the user ###
 
@@ -683,11 +683,11 @@ sub preferences : Local {
 
     ### build preference array for TT ###
 
-    if(ref $c->session->{voip_preferences} eq 'ARRAY') {
+    if(ref $voip_preferences eq 'ARRAY') {
 
       my @stashprefs;
 
-      foreach my $pref (@{$c->session->{voip_preferences}}) {
+      foreach my $pref (@$voip_preferences) {
 
         # managed separately
         next if $$pref{preference} eq 'lock';
