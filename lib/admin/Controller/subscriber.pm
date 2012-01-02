@@ -6,6 +6,8 @@ use base 'Catalyst::Controller';
 use admin::Utils;
 use HTML::Entities;
 
+my @WEEKDAYS = qw(Monday Tuesday Wednesday Thursday Friday Saturday Sunday);
+
 =head1 NAME
 
 admin::Controller::subscriber - Catalyst Controller
@@ -1205,6 +1207,188 @@ sub call_data : Local {
 
     return;
 }
+
+sub edit_cf : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_callforward.tt';
+
+    my $type = $c->request->params->{type};
+    $c->stash->{type} = $type;
+    $c->stash->{seditid} = $c->request->params->{seditid};
+
+    my %messages;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$c->session->{subscriber}
+                                                      );
+    $c->stash->{subscriber} = $c->session->{subscriber};
+
+    my $dsets;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_destination_sets',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$dsets,
+                                                      );
+    $c->stash->{dsets} = $dsets;
+
+
+
+
+    my $cftimes;
+#    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_callforward_data',
+#                                                        { handle => $bilprof },
+#                                                        \$peaktimes
+#                                                      );
+
+#    $$peaktimes{weekdays} = [] unless defined eval { @{$$peaktimes{weekdays}} };
+#    foreach (sort { $$a{day} <=> $$b{day} } @{$$peaktimes{weekdays}}) {
+#        if(defined $c->session->{restore_peaktimes}
+#           and defined $edit_weekday and $$_{day} == $edit_weekday)
+#        {
+#            my $rpt = $c->session->{restore_peaktimes};
+#            if(defined $$rpt{startold} or defined $$rpt{endold}) {
+#                for(eval { @{$$_{ranges}} }) {
+#                    if($$_{start} eq $$rpt{startold} and $$_{end} eq $$rpt{endold}) {
+#                        $$_{restore_start} = $$rpt{start};
+#                        $$_{restore_end} = $$rpt{end};
+#                    }
+#                }
+#            } else {
+#                $c->stash->{newrange}{start} = $$rpt{start};
+#                $c->stash->{newrange}{end} = $$rpt{end};
+#            }
+#        }
+#        $weekdays[$$_{day}]{ranges} = $$_{ranges};
+#    }
+
+
+    my @weekdays;
+    for(0 .. 6) {
+        $weekdays[$_] = { name => $WEEKDAYS[$_] };
+    }
+    $c->stash->{cftimes}{weekdays} = \@weekdays;
+
+    # cf preference is a cf_id, which points to a table callforwards[id, cf_id, wday, start, end, target]
+    #  1. fetch rows from callforwards table matching subscriber and cf-type (we don't have the cf_id, have we?)
+
+
+    return 1;
+}
+
+sub edit_cf_saveset : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_callforward.tt';
+
+    my $type = $c->request->params->{type};
+    $c->stash->{type} = $type;
+    my $dset_id = $c->request->params->{seditid};
+    $c->stash->{seditid} = $dset_id;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my %messages;
+    my %dset;
+
+    $dset{name} = $c->request->params->{dsetname};
+    $dset{id} = $dset_id;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_destination_set',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                          data => \%dset,
+                                                        },
+                                                        undef,
+                                                      ))
+    {
+      $messages{esetmsg} = 'Server.Voip.SavedSettings';
+      $c->session->{messages} = \%messages;
+      $c->response->redirect("/subscriber/edit_cf?subscriber_id=$subscriber_id&type=$type");
+    }
+    else
+    {
+      $c->session->{messages} = \%messages;
+      $messages{eseterr} = 'Client.Voip.InputErrorFound';
+      $c->response->redirect("/subscriber/edit_cf?subscriber_id=$subscriber_id&type=$type&seditid=$dset_id");
+    }
+}
+
+sub edit_cf_delset : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_callforward.tt';
+
+    my $type = $c->request->params->{type};
+    $c->stash->{type} = $type;
+    my $dset_id = $c->request->params->{seditid};
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my %messages;
+    my %dset;
+
+    $dset{id} = $dset_id;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_destination_set',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                          data => \%dset,
+                                                        },
+                                                        undef,
+                                                      ))
+    {
+      $messages{esetmsg} = 'Server.Voip.SavedSettings';
+    }
+    else
+    {
+      $messages{eseterr} = 'Client.Voip.InputErrorFound';
+    }
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_cf?subscriber_id=$subscriber_id&type=$type");
+}
+
+sub edit_cf_createset : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_callforward.tt';
+
+    my $type = $c->request->params->{type};
+    $c->stash->{type} = $type;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+    
+    my %messages;
+    my %dset;
+
+    $dset{name} = $c->request->params->{dsetname};
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_destination_set',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                          data => \%dset,
+                                                        },
+                                                        undef,
+                                                      ))
+    {
+      $messages{esetmsg} = 'Server.Voip.SavedSettings';
+    }
+    else
+    {
+      $messages{eseterr} = 'Client.Voip.InputErrorFound';
+    }
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_cf?subscriber_id=$subscriber_id&type=$type");
+}
+
+
+
+
+
+
 
 
 sub edit_list : Local {

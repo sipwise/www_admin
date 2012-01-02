@@ -69,7 +69,12 @@ a:hover {
 }
 
 .content li.ui-state-default.high {
-  height: 91px;
+  height: 85px;
+}
+
+.content li.ui-state-default.intend {
+  margin-left: 10px;
+  width: 624px;
 }
 
 .content li.ui-state-default div {
