@@ -1550,14 +1550,15 @@ sub edit_list : Local {
     my %messages;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
+    my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
     my $preferences;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_preferences',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
                                                         },
                                                         \$preferences
                                                       );
