@@ -6,6 +6,8 @@
                 
 	[% IF messages.esetmsg %]<div class="success">[% messages.esetmsg %]</div>[% END %]
         [% IF messages.eseterr %]<div class="error">[% messages.eseterr %]</div>[% END %]
+	[% IF messages.edestmsg %]<div class="success">[% messages.edestmsg %]</div>[% END %]
+        [% IF messages.edesterr %]<div class="error">[% messages.edesterr %]</div>[% END %]
 
           <ul class="cleanlist">
             <li class="ui-state-default">
@@ -20,7 +22,7 @@
                   <input type="hidden" name="type" value="[% type %]"/>
                   <input type="hidden" name="seditid" value="[% dset.id %]"/>
                   <div class="span-4"><input type="text" size="20" name="dsetname" value="[% dset.name %]"/></div>
-                  <div class="prepend-9 span-1"><button class="button-save">Save</button></div>
+                  <div class="prepend-10 span-1"><button class="button-save">Save</button></div>
                   <div class="span-1">
                     <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]&type=[% type %]#dset[% dset.id %]"><span class="button-cancel">Cancel</span></a>
                   </div>
@@ -29,10 +31,10 @@
                 <div class="span-4 last">[% dset.name %]</div>
               [% ELSE %]
                 <div class="span-4">[% dset.name %]</div>
-                <div class="prepend-9 span-1">
+                <div class="prepend-10 span-1">
                   <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]&type=[% type %]&seditid=[% dset.id %]#dset[% dset.id %]"><span class="button-edit">Edit</span></a>
                 </div>
-                <div class="span-1">
+                <div class="span-1 last">
                   <form action="/subscriber/edit_cf_delset" method="post">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
                     <input type="hidden" name="type" value="[% type %]"/>
@@ -43,11 +45,103 @@
               [% END %]
               [% FOREACH dest IN dset.destinations %]
                 </li> [% # closing previous entry to not make a list within a list %]
-                <li class="ui-state-default intend" id="dest_[% dest.id %]">
+                <li class="ui-state-default intend [% IF teditid == dest.id %]high[% END %]" id="dest[% dest.id %]">
                   <div class="span-1"><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>
-                  <div class="span-5 last">[% dest.destination %]</div>
+
+                  [% IF teditid == dest.id %]
+                  <form action="/subscriber/edit_cf_savedst" method="post">
+                    <div class="span-12">
+                      <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                      <input type="hidden" name="type" value="[% type %]"/>
+                      <input type="hidden" name="seditid" value="[% dset.id %]"/>
+                      <input type="hidden" name="teditid" value="[% dest.id %]"/>
+
+                      [% IF Catalyst.config.voicemail_features %]
+                        <input type="radio" id="[% type %]_voicebox" value="voicebox" name="[% type %]_target" class="radio"
+                          [% IF dest.destination == "voicebox" %] checked="checked"[% END %]/>
+                        <label for="[% type %]_voicebox">Voicebox</label>
+                        <br clear="all" />
+                      [% END %]
+                      [% IF Catalyst.config.fax_features %]
+                        <input type="radio" id="[% type %]_faxserver" value="fax2mail" name="[% type %]_target" class="radio"
+                          [% IF dest.destination == "fax2mail" %] checked="checked"[% END %]/>
+                        <label for="[% preference.key %]faxserver">Fax2Mail</label>
+                        <br clear="all" />
+                      [% END %]
+                      [% IF Catalyst.config.conference_features %]
+                        <input type="radio" id="[% type %]_conference" value="conference" name="[% type %]_target" class="radio"
+                          [% IF dest.destination == "conference" %] checked="checked"[% END %]/>
+                        <label for="[% preference.key %]conference">Conference room</label>
+                        <br clear="all" />
+                      [% END %]
+                      <input type="radio" id="[% type %]_sipuri" value="sipuri" name="[% type %]_target" class="radio"
+                          [% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" %] checked="checked"[% END %]/>
+                      <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
+                      <input type="text" id="[% type %]_sipuritxt" name="[% type %]_sipuri" size="25" value="[% dest.destination %]"/>
+                    </div>
+                    <div class="span-1">
+                      <button class="button-save">Save</button>
+                    </div>
+	            <div class="span-1 last">
+                      <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]&type=[% type %]#dest[% dest.id %]"><span class="button-cancel">Cancel</span></a>
+		    </div>
+                  </form>
+                  [% ELSE %]
+                    <div class="span-5 last">[% dest.destination %]</div>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="prepend-7 span-1">
+                        <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]&type=[% type %]&teditid=[% dest.id %]#dest[% dest.id %]"><span class="button-edit">Edit</span></a>
+                      </div>
+                      <div class="span-1 last">
+                        <form action="/subscriber/edit_cf_deldest" method="post">
+                          <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                          <input type="hidden" name="type" value="[% type %]"/>
+                          <input type="hidden" name="seditid" value="[% dset.id %]"/>
+                          <input type="hidden" name="teditid" value="[% dest.id %]"/>
+                          <button class="button-delete">Delete</button>
+                        </form>
+                      </div>
+                    [% END %]
+                  [% END %]
                 [% # </li> is inserted in next loop interation or at the very end %]
               [% END %]
+
+              [% IF seditid == dset.id %]
+                </li> [% # closing previous entry to not make a list within a list %]
+                <li class="ui-state-default intend high">
+                  <div class="span-1"><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>
+                  <form action="/subscriber/edit_cf_savedst" method="post">
+                    <div class="span-12">
+                      <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                      <input type="hidden" name="type" value="[% type %]"/>
+                      <input type="hidden" name="seditid" value="[% dset.id %]"/>
+
+                      [% IF Catalyst.config.voicemail_features %]
+                        <input type="radio" id="[% type %]_voicebox" value="voicebox" name="[% type %]_target" class="radio"/>
+                        <label for="[% type %]_voicebox">Voicebox</label>
+                        <br clear="all" />
+                      [% END %]
+                      [% IF Catalyst.config.fax_features %]
+                        <input type="radio" id="[% type %]_faxserver" value="fax2mail" name="[% type %]_target" class="radio"/>
+                        <label for="[% preference.key %]faxserver">Fax2Mail</label>
+                        <br clear="all" />
+                      [% END %]
+                      [% IF Catalyst.config.conference_features %]
+                        <input type="radio" id="[% type %]_conference" value="conference" name="[% type %]_target" class="radio"/>
+                        <label for="[% preference.key %]conference">Conference room</label>
+                        <br clear="all" />
+                      [% END %]
+                      <input type="radio" id="[% type %]_sipuri" value="sipuri" name="[% type %]_target" class="radio" checked="checked"/>
+                      <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
+                      <input type="text" id="[% type %]_sipuritxt" name="[% type %]_sipuri" size="25"/>
+                    </div>
+                    <div class="span-1 last">
+                      <button class="button-add">Add</button>
+                    </div>
+                  </form>
+                [% # </li> is inserted in next loop interation or at the very end %]
+              [% END %]
+
             </li>
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
@@ -56,64 +150,12 @@
                   <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
                   <input type="hidden" name="type" value="[% type %]"/>
                   <div class="span-4"><input type="text" size="20" name="dsetname" value=""/></div>
-                  <div class="prepend-9 span-1 last"><button class="button-add">Add</button></div>
+                  <div class="prepend-10 span-1 last"><button class="button-add">Add</button></div>
                 </form>
             </li>
             [% END %]
           </ul>
 
-<!--
-
-            <li class="ui-state-default [% IF edit_preferences %]high[% END %]">
-              <div class="span-4">
-              [% IF edit_preferences %]
-                <input type="text" id="cfname" name="cfname" size="12" value="test"/>
-              [% ELSE %]
-                test 
-              [% END %]
-              </div>
-              <div class="span-10 last">
-              [% IF edit_preferences %]
-                [% IF Catalyst.config.voicemail_features %]
-                  <input type="radio" id="[% preference.key %]voicebox" value="voicebox" name="[% preference.key %]_target" class="radio"
-                           [% IF preference.value == "voicebox" %]checked="checked"[% END %] />
-                  <label for="[% preference.key %]voicebox">Voicebox</label>
-                  <br clear="all" />
-                [% END %]
-                [% IF Catalyst.config.fax_features %]
-                  <input type="radio" id="[% preference.key %]faxserver" value="fax2mail" name="[% preference.key %]_target" class="radio"
-                         [% IF preference.value == "fax2mail" %]checked="checked"[% END %] />
-                  <label for="[% preference.key %]faxserver">Fax2Mail</label>
-                  <br clear="all" />
-                [% END %]
-                [% IF Catalyst.config.conference_features %]
-                  <input type="radio" id="[% preference.key %]conference" value="conference" name="[% preference.key %]_target" class="radio"
-                           [% IF preference.value == "conference" %]checked="checked"[% END %] />
-                  <label for="[% preference.key %]conference">Conference room</label>
-                  <br clear="all" />
-                [% END %]
-                <input type="radio" id="[% preference.key %]sipuri" value="sipuri" name="[% preference.key %]_target" class="radio"
-                           [% IF (preference.value || preference.error)
-                                 && preference.value != "voicebox" && preference.value != "fax2mail" && preference.value != "conference" %]checked="checked"[% END %] />
-                <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
-                <input type="text" id="[% preference.key %]sipuritxt" name="[% preference.key %]_sipuri" size="25"
-                           value="[% preference.value UNLESS preference.value == "voicebox" OR preference.value == "fax2mail" OR preference.value == "conference" %]" />
-              [% ELSE %]
-                [% IF preference.value == "voicebox" %]
-                  Voicebox
-                [% ELSIF preference.value == "fax2mail" %]
-                  Fax2Mail
-                [% ELSIF preference.value == "conference" %]
-                  Conference room
-                [% ELSE %]
-                  <input type="text" size="25" value="[% preference.value %]"
-                         class="disabled txtpreference" disabled="disabled" />
-                [% END %]
-              [% END %]
-              </div>
-            </li>
-          </ul>
--->
 
         <div class="hspace-20"></div>
         <h3 id="weekdays">Weekdays</h3>
