@@ -129,11 +129,10 @@
                     [% END %]
                   [% END %]
                 </li>
-              <!-- priority = [% priority %] -->
               [% priority = priority + 1 %]
               [% END %]
 
-              [% IF seditid == dset.id %]
+              [% IF seditid == dset.id || !dset.destinations || dset.destinations.size == 0 %]
                 <li class="ui-state-default intend high">
                   <div class="span-1"><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>
                   <form action="/subscriber/edit_cf_savedst" method="post">
@@ -142,8 +141,6 @@
                       <input type="hidden" name="type" value="[% type %]"/>
                       <input type="hidden" name="seditid" value="[% dset.id %]"/>
                       <input type="hidden" name="priority" value="[% priority %]"/>
-                      <!-- create priority = [% priority %] -->
-
                       [% IF Catalyst.config.voicemail_features %]
                         <input type="radio" id="[% type %]_voicebox" value="voicebox" name="[% type %]_target" class="radio"/>
                         <label for="[% type %]_voicebox">Voicebox</label>
