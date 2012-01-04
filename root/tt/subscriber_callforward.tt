@@ -102,7 +102,7 @@
                       <input type="radio" id="[% type %]_sipuri" value="sipuri" name="[% type %]_target" class="radio"
                           [% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" %] checked="checked"[% END %]/>
                       <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
-                      <input type="text" id="[% type %]_sipuritxt" name="[% type %]_sipuri" size="25" value="[% dest.destination %]"/>
+                      <input type="text" id="[% type %]_sipuritxt" name="[% type %]_sipuri" size="25" value="[% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" %][% dest.destination %][% END %]"/>
                     </div>
                     <div class="span-1">
                       <button class="button-save">Save</button>

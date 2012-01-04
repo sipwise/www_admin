@@ -1234,6 +1234,27 @@ sub edit_cf : Local {
                                                         },
                                                         \$dsets,
                                                       );
+
+    my $vbdom = $c->config->{voicebox_domain};
+    my $fmdom = $c->config->{fax2mail_domain};
+    my $confdom = $c->config->{conference_domain};
+
+    foreach my $dset(@{$dsets})
+    {
+      foreach my $dest(@{$dset->{destinations}})
+      {
+        if($dest->{destination} =~ /\@$vbdom$/) {
+          $dest->{destination} = 'voicebox';
+        } elsif($dest->{destination} =~ /\@$fmdom$/) {
+          $dest->{destination} = 'fax2mail';
+        } elsif($dest->{destination} =~ /\@$confdom$/) {
+          $dest->{destination} = 'conference';
+        } elsif($dest->{destination} =~ /^sip:\+?[0-9]+\@/) {
+          $dest->{destination} =~ s/^sip:([^\@]+)\@.+$/$1/;
+        }
+      }
+    }
+
     $c->stash->{dsets} = $dsets;
 
 
