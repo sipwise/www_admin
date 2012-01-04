@@ -1,3 +1,22 @@
+<script type="text/javascript">
+  $(function() {
+  [% FOREACH dset IN dsets %]
+    $("#[% dset.id %]set").sortable({
+      placeholder: 'ui-state-highlight',
+      forcePlaceholderSize: true,
+      stop: function(i) {
+        placeholder: 'ui-state-highlight'
+        $.ajax({
+          type: "POST",
+          url: "edit_cf_updatepriority",
+          data: $("#[% dset.id %]set").sortable("serialize")
+        });
+      },
+    });
+  [% END %]
+  });
+</script>
+
         <h3>Edit [% type %] for <a href="detail?subscriber_id=[% subscriber_id %]">[% subscriber.username %]@[% subscriber.domain %]</a></h3>
 
         <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#userprefs"><span class="button-back">Back</span></a>
@@ -13,8 +32,10 @@
             <li class="ui-state-default">
               <div class="span-4 last">Name</div>
             </li>
+          </ul>
 
-            [% FOREACH dset IN dsets %]
+          [% FOREACH dset IN dsets %]
+          <ul class="cleanlist">
             <li class="ui-state-default" id="dset[% dset.id %]">
               [% IF seditid == dset.id %]
                 <form action="/subscriber/edit_cf_saveset" method="post">
@@ -43,10 +64,13 @@
                   </form>
                 </div>
               [% END %]
-              [% FOREACH dest IN dset.destinations %]
-                </li> [% # closing previous entry to not make a list within a list %]
-                <li class="ui-state-default intend [% IF teditid == dest.id %]high[% END %]" id="dest[% dest.id %]">
-                  <div class="span-1"><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>
+            </li>
+          </ul>
+          <ul class="cleanlist" id="[% dset.id %]set">
+            [% priority = 0 %]
+            [% FOREACH dest IN dset.destinations %]
+              <li class="ui-state-default intend [% IF teditid == dest.id %]high[% END %]" id="dest_[% dest.id %]">
+                <div class="span-1"><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>
 
                   [% IF teditid == dest.id %]
                   <form action="/subscriber/edit_cf_savedst" method="post">
@@ -55,6 +79,7 @@
                       <input type="hidden" name="type" value="[% type %]"/>
                       <input type="hidden" name="seditid" value="[% dset.id %]"/>
                       <input type="hidden" name="teditid" value="[% dest.id %]"/>
+                      <input type="hidden" name="priority" value="[% dest.priority %]"/>
 
                       [% IF Catalyst.config.voicemail_features %]
                         <input type="radio" id="[% type %]_voicebox" value="voicebox" name="[% type %]_target" class="radio"
@@ -90,7 +115,7 @@
                     <div class="span-5 last">[% dest.destination %]</div>
                     [% UNLESS Catalyst.session.admin.read_only %]
                       <div class="prepend-7 span-1">
-                        <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]&type=[% type %]&teditid=[% dest.id %]#dest[% dest.id %]"><span class="button-edit">Edit</span></a>
+                        <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]&type=[% type %]&teditid=[% dest.id %]"><span class="button-edit">Edit</span></a>
                       </div>
                       <div class="span-1 last">
                         <form action="/subscriber/edit_cf_deldest" method="post">
@@ -103,11 +128,12 @@
                       </div>
                     [% END %]
                   [% END %]
-                [% # </li> is inserted in next loop interation or at the very end %]
+                </li>
+              <!-- priority = [% priority %] -->
+              [% priority = priority + 1 %]
               [% END %]
 
               [% IF seditid == dset.id %]
-                </li> [% # closing previous entry to not make a list within a list %]
                 <li class="ui-state-default intend high">
                   <div class="span-1"><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>
                   <form action="/subscriber/edit_cf_savedst" method="post">
@@ -115,6 +141,8 @@
                       <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
                       <input type="hidden" name="type" value="[% type %]"/>
                       <input type="hidden" name="seditid" value="[% dset.id %]"/>
+                      <input type="hidden" name="priority" value="[% priority %]"/>
+                      <!-- create priority = [% priority %] -->
 
                       [% IF Catalyst.config.voicemail_features %]
                         <input type="radio" id="[% type %]_voicebox" value="voicebox" name="[% type %]_target" class="radio"/>
@@ -139,11 +167,12 @@
                       <button class="button-add">Add</button>
                     </div>
                   </form>
-                [% # </li> is inserted in next loop interation or at the very end %]
+                </li>
               [% END %]
+          </ul>
+          [% END %]
 
-            </li>
-            [% END %]
+          <ul class="cleanlist">
             [% UNLESS Catalyst.session.admin.read_only %]
             <li class="ui-state-default">
                 <form action="/subscriber/edit_cf_createset" method="post">

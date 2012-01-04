@@ -1215,6 +1215,7 @@ sub edit_cf : Local {
     my $type = $c->request->params->{type};
     $c->stash->{type} = $type;
     $c->stash->{seditid} = $c->request->params->{seditid};
+    $c->stash->{teditid} = $c->request->params->{teditid};
 
     my %messages;
 
@@ -1443,6 +1444,8 @@ sub edit_cf_savedst : Local {
       $fw_target = 'sip:conf='.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$confdom";
     }
 
+    my $prio = $c->request->params->{priority};
+
     if(keys %messages) {
       $messages{preferr} = 'Client.Voip.InputErrorFound';
       $c->session->{messages} = \%messages;
@@ -1452,6 +1455,7 @@ sub edit_cf_savedst : Local {
 
     $dest{setid} = $dset_id;
     $dest{destination} = $fw_target;
+    $dest{priority} = $prio;
 
     if($dest_id)
     {
@@ -1541,6 +1545,39 @@ sub edit_cf_deldest : Local {
     }
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/edit_cf?subscriber_id=$subscriber_id&type=$type");
+}
+
+sub edit_cf_updatepriority : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    my $prio = 0;
+
+    my $dests = $c->request->params->{'dest[]'};
+
+    foreach my $dest_id(@$dests)
+    {
+       my $dest = undef;
+#       $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_destination',
+#           { id => $dest_id },
+#           \$dest
+#       );
+       $c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_destination_by_id',
+           { id   => $dest_id,
+             data => {
+               priority => $prio,
+             },
+           },
+           undef
+        );
+        $prio++;
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/");
+    return;
 }
 
 sub edit_list : Local {
