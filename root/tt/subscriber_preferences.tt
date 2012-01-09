@@ -184,8 +184,6 @@
                   [% IF ! edit_preferences && ! Catalyst.session.admin.read_only %]
                     [% IF preference.key == "allowed_ips" || preference.key == "man_allowed_ips" %]
                       <a href="edit_iplist?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
-                    [% ELSIF preference.key == "cftest" || preference.key == "cftest_foo" %]
-                      <a href="edit_cf?subscriber_id=[% subscriber.subscriber_id %]&amp;type=[% preference.key %]"><span class="button-edit">Edit List</span></a>
                     [% ELSE %]
                       <a href="edit_list?subscriber_id=[% subscriber.subscriber_id %]&amp;list_name=[% preference.key %]"><span class="button-edit">Edit List</span></a>
                     [% END %]
@@ -201,6 +199,37 @@
             <button name="submit" class="button-save">Save</button>
           [% END %]
           </form>
+
+        <div class="hspace-20"></div>
+        <h3 id="callforward">Call Forwards</h3>
+        [% UNLESS Catalyst.session.admin.read_only %]
+          [% IF edit_callforward %]
+            <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#callforward"><span class="button-cancel">Cancel</span></a>
+          [% ELSE %]
+            <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&edit_callforward=1#callforward"><span class="button-edit">Edit Call-Forwards</span></a>
+            <a href="edit_cf?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-transfer">Edit Destination Sets</span></a>
+            <a href="edit_cf_times?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-clock">Edit Time Sets</span></a>
+          [% END %]
+        [% END %]
+          [% IF messages.cfmsg %]<div class="success">[% messages.cfmsg %]</div>[% END %]
+          [% IF messages.cferr %]<div class="error">[% messages.cferr %]</div>[% END %]
+          [% IF edit_callforward && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
+          <form action="update_callforward" method="post">
+            <ul class="cleanlist">
+              <li class="ui-state-default">
+                <div class="span-6">Call Forward Unconditional:</div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-6">Call Forward Busy:</div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-6">Call Forward Timeout:</div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-6">Call Forward Unavailable:</div>
+              </li>
+           </ul>
+        </form>
 
         <div class="hspace-20"></div>
         <h3 id="reminder">Reminder Calls</h3>

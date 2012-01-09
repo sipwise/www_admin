@@ -1,0 +1,300 @@
+<style>
+      div.ui-widget-header.drophead, div.ui-widget-header.dropfoot {
+        height: 18px;
+        width: 150px;
+      }
+      div.ui-widget-header.drophead p, div.ui-widget-header.dropfoot p {
+        text-align: center;
+        font-weight: normal;
+      }
+      div.ui-widget-header.dropfoot p a,
+      div.ui-widget-header.dropfoot p a:visited,
+      div.ui-widget-header.dropfoot p a:link {
+        color: #459E00;
+        text-decoration: none;
+      }
+      div.ui-widget-header.dropfoot p a:hover {
+        color: #54c000;
+        text-decoration: none;
+      }
+      div.dateform-elem {
+        height: 26px;
+        width: 150px;
+      }
+      div.waiting {
+        background: url("jquery-ui/css/smooth/images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #E6E6E6;
+        border: 1px solid #D3D3D3;
+        color: #555555;
+      }
+      div.accepting {
+        background: url("jquery-ui/css/smooth/images/ui-bg_glass_55_fbf9ee_1x400.png") repeat-x scroll 50% 50% #FBF9EE;
+        border: 1px solid #FCEFA1;
+        color: #363636;
+      }
+      div.hovering {
+        background: url("jquery-ui/css/smooth/images/ui-bg_glass_55_f2fbee_1x400.png") repeat-x scroll 50% 50% #F2FBEE;
+        border: 1px solid #BFFCA1;
+        color: #363636;
+      }
+</style>
+
+<script type="text/javascript">
+      $(document).ready(function(){
+
+        createDropZone('drop-elem-year');
+        createDropZone('drop-elem-month');
+        createDropZone('drop-elem-wday');
+        createDropZone('drop-elem-tofday');
+
+        function createDropZone(id) {
+          var anchor;
+
+          if(id == "drop-elem-year") {
+
+            anchor = $('div#drop-anchor-year');
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+              hoverClass: "hovering",
+              activeClass: "accepting",
+              accept: function(d){ 
+                if(d.attr("id") == "drag-elem-year" ||
+                   d.attr("id") == "drag-elem-year-range")
+                { return true; }
+              },
+              drop: handleDrop,
+            }));
+
+          } else if(id == "drop-elem-month") {
+
+            anchor = $('div#drop-anchor-month');
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+              hoverClass: "hovering",
+              activeClass: "accepting",
+              accept: function(d){ 
+                if(d.attr("id") == "drag-elem-month" ||
+                   d.attr("id") == "drag-elem-month-range")
+                { return true; }
+              },
+              drop: handleDrop,
+            }));
+
+          } else if(id == "drop-elem-wday") {
+
+            anchor = $('div#drop-anchor-wday');
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+              hoverClass: "hovering",
+              activeClass: "accepting",
+              accept: function(d){ 
+                if(d.attr("id") == "drag-elem-wday" ||
+                   d.attr("id") == "drag-elem-wday-range")
+                { return true; }
+              },
+              drop: handleDrop,
+            }));
+          } else if(id == "drop-elem-tofday") {
+            anchor = $('div#drop-anchor-tofday');
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+              hoverClass: "hovering",
+              activeClass: "accepting",
+              accept: function(d){ 
+                if(d.attr("id") == "drag-elem-tofday" ||
+                   d.attr("id") == "drag-elem-tofday-range")
+                { return true; }
+              },
+              drop: handleDrop,
+            }));
+
+          }
+
+          if(anchor != undefined) {
+            var foot = $(anchor).find('div.dropfoot');
+            $(foot).find('p').replaceWith('<p>Drop to refine</p>');
+          }
+        }
+
+        function removeDrop(id) {
+          $('div#' + id).remove();
+          createDropZone(id);          
+        }
+
+        function handleDrop(event, ui) {
+          var dropped = ui.draggable.clone();
+
+          var from_select = dropped.find('select.from');
+          if(from_select) {
+            from_select.removeAttr('disabled');
+            from_select.children().remove();
+          }
+          var to_select = dropped.find('select.to');
+          if(to_select) {
+            to_select.removeAttr('disabled');
+            to_select.children().remove();
+          }
+          var from_text = dropped.find('input.from');
+          if(from_text) {
+            from_text.removeAttr('value');
+            from_text.removeAttr('disabled');
+          }
+          var to_text = dropped.find('input.to');
+          if(to_text) {
+            to_text.removeAttr('value');
+            to_text.removeAttr('disabled');
+          }
+
+          var d = new Date();
+          var years = new Array(10);
+          var months = new Array(12);
+          var month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          var wdays = new Array(7);
+          var wday_names = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
+          // from-year
+          var newid;
+          if(dropped.attr("id") == "drag-elem-year" || dropped.attr("id") == "drag-elem-year-range") {
+            for(var i = 0; i < years.length; ++i) {
+              $('<option value="' + (d.getFullYear()+i) + '">' + (d.getFullYear()+i) + '</option>').appendTo(from_select);
+            }
+            newid = "drop-elem-year";
+          }
+          // to-year
+          if(dropped.attr("id") == "drag-elem-year-range") {
+            for(var i = 0; i < years.length; ++i) {
+              $('<option value="' + (d.getFullYear()+i+1) + '">' + (d.getFullYear()+i+1) + '</option>').appendTo(to_select);
+            }
+          }
+          // from-month
+          if(dropped.attr("id") == "drag-elem-month" || dropped.attr("id") == "drag-elem-month-range") {
+            for(var i = 0; i < months.length; ++i) {
+              $('<option value="' + (i+1) + '">' + month_names[i] + '</option>').appendTo(from_select);
+            }
+            newid = "drop-elem-month";
+          }
+          // to-month
+          if(dropped.attr("id") == "drag-elem-month-range") {
+            for(var i = 0; i < months.length; ++i) {
+              $('<option value="' + (i+1) + '">' + month_names[i] + '</option>').appendTo(to_select);
+            }
+          }
+          // from-wday
+          if(dropped.attr("id") == "drag-elem-wday" || dropped.attr("id") == "drag-elem-wday-range") {
+            for(var i = 0; i < wdays.length; ++i) {
+              $('<option value="' + (i+1) + '">' + wday_names[i] + '</option>').appendTo(from_select);
+            }
+            newid = "drop-elem-wday";
+          }
+          // to-wday
+          if(dropped.attr("id") == "drag-elem-wday-range") {
+            for(var i = 0; i < wdays.length; ++i) {
+              $('<option value="' + (i+1) + '">' + wday_names[i] + '</option>').appendTo(to_select);
+            }
+          }
+          if(dropped.attr("id") == "drag-elem-tofday-range") {
+            newid = "drop-elem-tofday";
+          }
+
+          dropped.attr("id", newid);
+
+          // replace old footer text by remove-link and bind click handler
+          var foot = $(this).next('div');
+          $(foot).find('p').replaceWith('<p></p>');
+          $('<a href="javascript:void(0);">Remove</a>').click(function(){
+            removeDrop(dropped.attr("id"));
+          }).appendTo($(foot).find('p'));
+          $(this).replaceWith(dropped).attr('class', 'span-4 ui-state-default dateform-elem');
+          if(dropped.attr("id") == "drag-elem-wday-range") {
+            $(this).addClass("last");
+          }
+        }
+
+        // create draggables for
+        // drag-elem-{year,month,wday,tofday}-range and
+        // drag-elem-{year,month,wday}
+        drags = ["year", "month", "wday", "tofday"];
+        for(var i = 0; i < drags.length; ++i) {
+          $("#drag-elem-" + drags[i] + "-range").draggable({
+            cursor: "move",
+            helper: "clone",
+            revert: false,
+            opacity: 0.7,
+          });
+          if(drags[i] != "tofday") {
+            $("#drag-elem-" + drags[i]).draggable({
+              cursor: "move",
+              helper: "clone",
+              revert: false,
+              opacity: 0.7,
+            });
+          }
+        }
+
+        //$("ul, li").disableSelection();
+
+      });
+
+</script>
+
+        <h3>Edit Call Forward Time Sets for <a href="detail?subscriber_id=[% subscriber_id %]">[% subscriber.username %]@[% subscriber.domain %]</a></h3>
+
+        <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#callforward"><span class="button-back">Back</span></a>
+
+        <div class="hspace-20"></div>
+        <h3 id="weekdays">Drag Building Blocks to Sets</h3>
+                
+	[% IF messages.epeakmsg %]<div class="success">[% messages.epeakmsg %]</div>[% END %]
+        [% IF messages.epeakerr %]<div class="error">[% messages.epeakerr %]</div>[% END %]
+
+         <div class="span-4">
+            <div class="ui-state-default dateform-elem" id="drag-elem-year">
+              <select size="1" class="from" disabled="disabled"><option>Year</option></select>
+            </div>
+            <div class="ui-state-default dateform-elem" id="drag-elem-year-range">
+              <select size="1" class="from" disabled="disabled"><option>Year</option></select> to
+              <select size="1" class="to"   disabled="disabled"><option>Year</option></select>
+            </div>
+          </div>
+          <div class="span-4">
+            <div class="ui-state-default dateform-elem" id="drag-elem-month">
+              <select size="1" class="from" disabled="disabled"><option>Month</option></select>
+            </div>
+            <div class="ui-state-default dateform-elem" id="drag-elem-month-range">
+              <select size="1" class="from" disabled="disabled"><option>Month</option></select> to
+              <select size="1" class="to"   disabled="disabled"><option>Month</option></select>
+            </div>
+          </div>
+          <div class="span-4">
+            <div class="ui-state-default dateform-elem" id="drag-elem-wday">
+              <select size="1" class="from" disabled="disabled"><option>WDay</option></select>
+            </div>
+            <div class="ui-state-default dateform-elem" id="drag-elem-wday-range">
+              <select size="1" class="from" disabled="disabled"><option>WDay</option></select> to
+              <select size="1" class="to"   disabled="disabled"><option>WDay</option></select>
+            </div>
+          </div>
+          <div class="span-4 last">
+            <div class="ui-state-default dateform-elem" id="drag-elem-tofday-range">
+              <input type="text" size="5" class="from" disabled="disabled" value="hh:mm"/> to
+              <input type="text" size="5" class="to"   disabled="disabled" value="hh:mm"/>
+            </div>
+          </div>
+
+	<br/>
+        <div class="hspace-20"></div>
+        <h3 id="timesets">Time Sets</h3>
+
+          <div class="span-4" id="drop-anchor-year">
+            <div class="ui-widget-header drophead"><p>Year</p></div>
+            <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+          </div>
+          <div class="span-4" id="drop-anchor-month">
+            <div class="ui-widget-header drophead"><p>Month</p></div>
+            <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+          </div>
+          <div class="span-4" id="drop-anchor-wday">
+            <div class="ui-widget-header drophead"><p>Weekday</p></div>
+            <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+          </div>
+          <div class="span-4 last" id="drop-anchor-tofday">
+            <div class="ui-widget-header drophead"><p>Time of Day</p></div>
+            <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+          </div>
+

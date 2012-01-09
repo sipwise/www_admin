@@ -83,6 +83,7 @@
            { name = "deactivate", icon="minus" },
            { name = "listen", icon="video" },
            { name = "clock", icon="clock" },
+           { name = "transfer", icon="transferthick-e-w" },
            { name = "cart", icon="cart" },
            { name = "browse", icon="folder-open" },
          ]
