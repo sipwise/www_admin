@@ -574,6 +574,7 @@ sub preferences : Local {
 
     my $preferences;
     my $speed_dial_slots;
+    my $cf_dsets;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
@@ -586,6 +587,13 @@ sub preferences : Local {
                                                           domain   => $$subscriber{domain},
                                                         },
                                                         \$preferences
+                                                      );
+
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_destination_sets',
+                                                        { username => $$subscriber{username},
+                                                          domain => $$subscriber{domain},
+                                                        },
+                                                        \$cf_dsets,
                                                       );
 
     # voicebox requires a number
@@ -632,6 +640,7 @@ sub preferences : Local {
                                                         $$subscriber{reminder}
                                                       );
 
+    $c->stash->{cf_dsets} = $cf_dsets;
     $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
     $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
@@ -774,6 +783,7 @@ sub preferences : Local {
     $c->stash->{edit_voicebox} = $c->request->params->{edit_voicebox};
     $c->stash->{edit_fax} = $c->request->params->{edit_fax};
     $c->stash->{edit_reminder} = $c->request->params->{edit_reminder};
+    $c->stash->{edit_callforward} = $c->request->params->{edit_callforward};
 
     return 1;
 }
@@ -1219,16 +1229,18 @@ sub edit_cf : Local {
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     $c->stash->{subscriber_id} = $subscriber_id;
+
+    my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber,
                                                       );
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
 
     my $dsets;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_destination_sets',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
                                                         },
                                                         \$dsets,
                                                       );
@@ -1274,9 +1286,16 @@ sub edit_cf_saveset : Local {
     $dset{name} = $c->request->params->{dsetname};
     $dset{id} = $dset_id;
 
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_destination_set',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
                                                           data => \%dset,
                                                         },
                                                         undef,
@@ -1308,9 +1327,16 @@ sub edit_cf_delset : Local {
 
     $dset{id} = $dset_id;
 
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_destination_set',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
                                                           data => \%dset,
                                                         },
                                                         undef,
@@ -1338,9 +1364,16 @@ sub edit_cf_createset : Local {
 
     $dset{name} = $c->request->params->{dsetname};
 
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_destination_set',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain => $c->session->{subscriber}{domain},
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
                                                           data => \%dset,
                                                         },
                                                         undef,

@@ -202,32 +202,73 @@
 
         <div class="hspace-20"></div>
         <h3 id="callforward">Call Forwards</h3>
+
+          [% IF messages.cfmsg %]<div class="success">[% messages.cfmsg %]</div>[% END %]
+          [% IF messages.cferr %]<div class="error">[% messages.cferr %]</div>[% END %]
+          [% IF edit_callforward && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
+
         [% UNLESS Catalyst.session.admin.read_only %]
+          <form action="update_callforward" method="post">
           [% IF edit_callforward %]
             <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#callforward"><span class="button-cancel">Cancel</span></a>
+            <button name="submit" class="button-save">Save</button>
           [% ELSE %]
             <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&edit_callforward=1#callforward"><span class="button-edit">Edit Call-Forwards</span></a>
             <a href="edit_cf?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-transfer">Edit Destination Sets</span></a>
             <a href="edit_cf_times?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-clock">Edit Time Sets</span></a>
           [% END %]
         [% END %]
-          [% IF messages.cfmsg %]<div class="success">[% messages.cfmsg %]</div>[% END %]
-          [% IF messages.cferr %]<div class="error">[% messages.cferr %]</div>[% END %]
-          [% IF edit_callforward && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
-          <form action="update_callforward" method="post">
+
+        <div class="hspace-20"></div>
             <ul class="cleanlist">
+
+             [% 
+               cf_types = [
+                 {
+                   name = 'cfu',
+                   description = 'Call Forward Unconditional',
+                 },
+                 {
+                   name = 'cfb',
+                   description = 'Call Forward Busy',
+                 },
+                 {
+                   name = 'cft',
+                   description = 'Call Forward Timeout',
+                 },
+                 {
+                   name = 'cfna',
+                   description = 'Call Forward Unavailable',
+                 },
+               ]
+             %]
+
+              [% FOREACH cf_type IN cf_types %]
               <li class="ui-state-default">
-                <div class="span-6">Call Forward Unconditional:</div>
+                <div class="span-5">[% cf_type.description %]:</div>
+                [% IF edit_callforward %]
+                  <div class="span-4">
+                    <label for="cfdest_[% cf_type.name %]">to</label>
+                    <select id="cfdest_[% cf_type.name %]" name="dest_[% cf_type.name %]" size="1" style="width: 120px;">
+                      [% FOREACH dset IN cf_dsets %]
+                        [% IF dset.destinations.size > 0 %]
+                        <option value="[% dset.id %]">[% dset.name %]</option>
+                        [% END %]
+                      [% END %]
+                    </select>
+                  </div>
+                  <div class="span-6 last">
+                    <label for="cftime_[% cf_type.name %]">during period</label>
+                    <select id="cftime_[% cf_type.name %]" name="time_[% cf_type.name %]" size="1" style="width: 120px;">
+                        <option value="0">&lt;always&gt;</option>
+                      [% FOREACH tset IN cf_tsets %]
+                        <option value="[% tset.id %]">[% tset.name %]</option>
+                      [% END %]
+                    </select>
+                  </div>
+                [% END %]
               </li>
-              <li class="ui-state-default">
-                <div class="span-6">Call Forward Busy:</div>
-              </li>
-              <li class="ui-state-default">
-                <div class="span-6">Call Forward Timeout:</div>
-              </li>
-              <li class="ui-state-default">
-                <div class="span-6">Call Forward Unavailable:</div>
-              </li>
+              [% END %]
            </ul>
         </form>
 
