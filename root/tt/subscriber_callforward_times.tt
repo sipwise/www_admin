@@ -239,9 +239,6 @@
 
         <div class="hspace-20"></div>
         <h3 id="weekdays">Drag Building Blocks to Sets</h3>
-                
-	[% IF messages.epeakmsg %]<div class="success">[% messages.epeakmsg %]</div>[% END %]
-        [% IF messages.epeakerr %]<div class="error">[% messages.epeakerr %]</div>[% END %]
 
          <div class="span-4">
             <div class="ui-state-default dateform-elem" id="drag-elem-year">
@@ -280,6 +277,71 @@
 	<br/>
         <div class="hspace-20"></div>
         <h3 id="timesets">Time Sets</h3>
+
+        [% IF messages.esetmsg %]<div class="success">[% messages.esetmsg %]</div>[% END %]
+        [% IF messages.eseterr %]<div class="error">[% messages.eseterr %]</div>[% END %]
+        [% IF messages.epermsg %]<div class="success">[% messages.epermsg %]</div>[% END %]
+        [% IF messages.epererr %]<div class="error">[% messages.epererr %]</div>[% END %]                
+
+          [% FOREACH tset IN tsets %]
+          <ul class="cleanlist">
+            <li class="ui-state-default" id="tset[% tset.id %]">
+              [% IF seditid == tset.id %]
+                <form action="/subscriber/edit_cf_time_saveset" method="post">
+                  <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                  <input type="hidden" name="seditid" value="[% tset.id %]"/>
+                  <div class="span-4"><input type="text" size="20" name="tsetname" value="[% tset.name %]"/></div>
+                  <div class="prepend-10 span-1"><button class="button-save">Save</button></div>
+                  <div class="span-1">
+                    <a href="/subscriber/edit_cf_times?subscriber_id=[% subscriber_id %]#tset[% tset.id %]"><span class="button-cancel">Cancel</span></a>
+                  </div>
+                </form>
+              [% ELSIF Catalyst.session.admin.read_only %]
+                <div class="span-4 last">[% tset.name %]</div>
+              [% ELSE %]
+                <div class="span-4">[% tset.name %]</div>
+                <div class="prepend-10 span-1">
+                  <a href="/subscriber/edit_cf_times?subscriber_id=[% subscriber_id %]&seditid=[% tset.id %]#tset[% tset.id %]"><span class="button-edit">Edit</span></a>
+                </div>
+                <div class="span-1 last">
+                  <form action="/subscriber/edit_cf_time_delset" method="post">
+                    <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                    <input type="hidden" name="seditid" value="[% tset.id %]"/>
+                    <button class="button-delete">Delete</button>
+                  </form>
+                </div>
+              [% END %]
+            </li>
+          </ul>
+          <ul class="cleanlist" id="[% tset.id %]set">
+            [% priority = 0 %]
+            [% FOREACH period IN tset.periods %]
+              <li class="ui-state-default intend id="period_[% period.id %]">
+                <div class="span-1"><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>
+                <div class="span-2">[% period.year %]</div>
+                <div class="span-2">[% period.month %]</div>
+                <div class="span-2">[% period.mday %]</div>
+                <div class="span-2">[% period.wday %]</div>
+                <div class="span-2">[% period.hour %]</div>
+                <div class="span-2">[% period.minute %]</div>
+              </li>
+            [% END %]
+          </ul>
+          [% END %]  
+          <ul class="cleanlist">
+            [% UNLESS Catalyst.session.admin.read_only %]
+            <li class="ui-state-default">
+                <form action="/subscriber/edit_cf_times_createset" method="post">
+                  <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                  <div class="span-4"><input type="text" size="20" name="tsetname" value=""/></div>
+                  <div class="prepend-10 span-1 last"><button class="button-add">Add</button></div>
+                </form>
+            </li>
+            [% END %]
+          </ul>
+
+         <div class="hspace-20"></div>
+
 
           <div class="span-4" id="drop-anchor-year">
             <div class="ui-widget-header drophead"><p>Year</p></div>

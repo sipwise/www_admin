@@ -1582,6 +1582,8 @@ sub edit_cf_updatepriority : Local {
     return;
 }
 
+# fooooooooo
+
 sub edit_cf_times : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_callforward_times.tt';
@@ -1597,20 +1599,139 @@ sub edit_cf_times : Local {
     $c->stash->{subscriber} = $c->session->{subscriber};
 
     my $tsets;
-#    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_destination_sets',
-#                                                        { username => $c->session->{subscriber}{username},
-#                                                          domain => $c->session->{subscriber}{domain},
-#                                                        },
-#                                                        \$dsets,
-#                                                      );
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_time_sets',
+                                                        { username => $c->session->{subscriber}{username},
+                                                          domain => $c->session->{subscriber}{domain},
+                                                        },
+                                                        \$tsets,
+                                                      );
 
     $c->stash->{tsets} = $tsets;
+    $c->stash->{seditid} = $c->request->params->{seditid};
 
     return 1;
 }
 
+sub edit_cf_time_saveset : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_callforward_times.tt';
 
+    my $tset_id = $c->request->params->{seditid};
+    $c->stash->{seditid} = $tset_id;
 
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my %messages;
+    my %tset;
+
+    $tset{name} = $c->request->params->{tsetname};
+    $tset{id} = $tset_id;
+
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_time_set',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%tset,
+                                                        },
+                                                        undef,
+                                                      ))
+    {
+      $messages{esetmsg} = 'Server.Voip.SavedSettings';
+      $c->session->{messages} = \%messages;
+      $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id");
+    }
+    else
+    {
+      $c->session->{messages} = \%messages;
+      $messages{eseterr} = 'Client.Voip.InputErrorFound';
+      $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id&seditid=$tset_id");
+    }
+}
+
+sub edit_cf_time_delset : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_callforward_times.tt';
+
+    my $tset_id = $c->request->params->{seditid};
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my %messages;
+    my %tset;
+
+    $tset{id} = $tset_id;
+
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_time_set',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%tset,
+                                                        },
+                                                        undef,
+                                                      ))
+    {
+      $messages{esetmsg} = 'Server.Voip.SavedSettings';
+    }
+    else
+    {
+      $messages{eseterr} = 'Client.Voip.InputErrorFound';
+    }
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id");
+}
+
+sub edit_cf_times_createset : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_callforward_times.tt';
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+    
+    my %messages;
+    my %tset;
+
+    $tset{name} = $c->request->params->{tsetname};
+
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_time_set',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%tset,
+                                                        },
+                                                        undef,
+                                                      ))
+    {
+      $messages{esetmsg} = 'Server.Voip.SavedSettings';
+    }
+    else
+    {
+      $messages{eseterr} = 'Client.Voip.InputErrorFound';
+    }
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id");
+}
+
+# fooooo
 
 
 
