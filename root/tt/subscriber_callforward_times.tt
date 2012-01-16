@@ -1,11 +1,15 @@
 <style>
-      div.ui-widget-header.drophead, div.ui-widget-header.dropfoot {
-        height: 18px;
-        width: 150px;
+      .content li.ui-state-default div.drophead, .content li.ui-state-default div.dropfoot {
+        height: 12px;
+        margin: 0;
+        width: 67px;
       }
       div.ui-widget-header.drophead p, div.ui-widget-header.dropfoot p {
+        font-size: xx-small;
         text-align: center;
         font-weight: normal;
+        height: 12px;
+        margin: 0;
       }
       div.ui-widget-header.dropfoot p a,
       div.ui-widget-header.dropfoot p a:visited,
@@ -17,9 +21,12 @@
         color: #54c000;
         text-decoration: none;
       }
+      .content li.ui-state-default div.dateform-elem,
       div.dateform-elem {
-        height: 26px;
-        width: 150px;
+        width: 67px;
+        height: 60px;
+        margin: 0;
+        text-align: center;
       }
       div.waiting {
         background: url("jquery-ui/css/smooth/images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #E6E6E6;
@@ -36,6 +43,14 @@
         border: 1px solid #BFFCA1;
         color: #363636;
       }
+      select {
+        font-size: small;
+      }
+      .content li.ui-state-default.mediumhigh {
+        height: 94px;
+        padding: 2px;
+      }
+
 </style>
 
 <script type="text/javascript">
@@ -43,8 +58,14 @@
 
         createDropZone('drop-elem-year');
         createDropZone('drop-elem-month');
+        createDropZone('drop-elem-mday');
         createDropZone('drop-elem-wday');
-        createDropZone('drop-elem-tofday');
+        createDropZone('drop-elem-hour');
+        createDropZone('drop-elem-minute');
+
+        function pad2(number) {
+          return (number < 10 ? '0' : '') + number;
+        }
 
         function createDropZone(id) {
           var anchor;
@@ -77,6 +98,20 @@
               drop: handleDrop,
             }));
 
+          } else if(id == "drop-elem-mday") {
+
+            anchor = $('div#drop-anchor-mday');
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+              hoverClass: "hovering",
+              activeClass: "accepting",
+              accept: function(d){ 
+                if(d.attr("id") == "drag-elem-mday" ||
+                   d.attr("id") == "drag-elem-mday-range")
+                { return true; }
+              },
+              drop: handleDrop,
+            }));
+
           } else if(id == "drop-elem-wday") {
 
             anchor = $('div#drop-anchor-wday');
@@ -90,14 +125,30 @@
               },
               drop: handleDrop,
             }));
-          } else if(id == "drop-elem-tofday") {
-            anchor = $('div#drop-anchor-tofday');
+
+          } else if(id == "drop-elem-hour") {
+
+            anchor = $('div#drop-anchor-hour');
             anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
-                if(d.attr("id") == "drag-elem-tofday" ||
-                   d.attr("id") == "drag-elem-tofday-range")
+                if(d.attr("id") == "drag-elem-hour" ||
+                   d.attr("id") == "drag-elem-hour-range")
+                { return true; }
+              },
+              drop: handleDrop,
+            }));
+
+          } else if(id == "drop-elem-minute") {
+
+            anchor = $('div#drop-anchor-minute');
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+              hoverClass: "hovering",
+              activeClass: "accepting",
+              accept: function(d){ 
+                if(d.attr("id") == "drag-elem-minute" ||
+                   d.attr("id") == "drag-elem-minute-range")
                 { return true; }
               },
               drop: handleDrop,
@@ -129,16 +180,6 @@
             to_select.removeAttr('disabled');
             to_select.children().remove();
           }
-          var from_text = dropped.find('input.from');
-          if(from_text) {
-            from_text.removeAttr('value');
-            from_text.removeAttr('disabled');
-          }
-          var to_text = dropped.find('input.to');
-          if(to_text) {
-            to_text.removeAttr('value');
-            to_text.removeAttr('disabled');
-          }
 
           var d = new Date();
           var years = new Array(10);
@@ -147,6 +188,9 @@
                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
           var wdays = new Array(7);
           var wday_names = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+          var mdays = new Array(31);
+          var hours = new Array(24);
+          var minutes = new Array(60);
 
           // from-year
           var newid;
@@ -188,8 +232,44 @@
               $('<option value="' + (i+1) + '">' + wday_names[i] + '</option>').appendTo(to_select);
             }
           }
-          if(dropped.attr("id") == "drag-elem-tofday-range") {
-            newid = "drop-elem-tofday";
+          // from-mday
+          if(dropped.attr("id") == "drag-elem-mday" || dropped.attr("id") == "drag-elem-mday-range") {
+            for(var i = 0; i < mdays.length; ++i) {
+              $('<option value="' + (i + 1) + '">' + (i + 1) + '</option>').appendTo(from_select);
+            }
+            newid = "drop-elem-mday";
+          }
+          // to-mday
+          if(dropped.attr("id") == "drag-elem-mday-range") {
+            for(var i = 0; i < mdays.length; ++i) {
+              $('<option value="' + (i + 1) + '">' + (i + 1) + '</option>').appendTo(to_select);
+            }
+          }
+          // from-hour
+          if(dropped.attr("id") == "drag-elem-hour" || dropped.attr("id") == "drag-elem-hour-range") {
+            for(var i = 0; i < hours.length; ++i) {
+              $('<option value="' + i  + '">' + pad2(i) + '</option>').appendTo(from_select);
+            }
+            newid = "drop-elem-hour";
+          }
+          // to-hour
+          if(dropped.attr("id") == "drag-elem-hour-range") {
+            for(var i = 0; i < hours.length; ++i) {
+              $('<option value="' + i + '">' + pad2(i) + '</option>').appendTo(to_select);
+            }
+          }
+          // from-minute
+          if(dropped.attr("id") == "drag-elem-minute" || dropped.attr("id") == "drag-elem-minute-range") {
+            for(var i = 0; i < minutes.length; ++i) {
+              $('<option value="' + i + '">' + pad2(i) + '</option>').appendTo(from_select);
+            }
+            newid = "drop-elem-minute";
+          }
+          // to-minute
+          if(dropped.attr("id") == "drag-elem-minute-range") {
+            for(var i = 0; i < minutes.length; ++i) {
+              $('<option value="' + i + '">' + pad2(i) + '</option>').appendTo(to_select);
+            }
           }
 
           dropped.attr("id", newid);
@@ -207,9 +287,8 @@
         }
 
         // create draggables for
-        // drag-elem-{year,month,wday,tofday}-range and
-        // drag-elem-{year,month,wday}
-        drags = ["year", "month", "wday", "tofday"];
+        // drag-elem-{year,month,wday,mday,hour,minute}-range
+        drags = ["year", "month", "wday", "mday", "hour", "minute"];
         for(var i = 0; i < drags.length; ++i) {
           $("#drag-elem-" + drags[i] + "-range").draggable({
             cursor: "move",
@@ -233,50 +312,77 @@
 
 </script>
 
+
         <h3>Edit Call Forward Time Sets for <a href="detail?subscriber_id=[% subscriber_id %]">[% subscriber.username %]@[% subscriber.domain %]</a></h3>
 
         <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#callforward"><span class="button-back">Back</span></a>
 
         <div class="hspace-20"></div>
-        <h3 id="weekdays">Drag Building Blocks to Sets</h3>
+        <h3 id="weekdays">Drag Building Blocks to Time Sets below</h3>
 
-         <div class="span-4">
+         <div class="span-2">
             <div class="ui-state-default dateform-elem" id="drag-elem-year">
               <select size="1" class="from" disabled="disabled"><option>Year</option></select>
             </div>
             <div class="ui-state-default dateform-elem" id="drag-elem-year-range">
-              <select size="1" class="from" disabled="disabled"><option>Year</option></select> to
+              <select size="1" class="from" disabled="disabled"><option>Year</option></select>
+              <br/>through</br>
               <select size="1" class="to"   disabled="disabled"><option>Year</option></select>
             </div>
           </div>
-          <div class="span-4">
+          <div class="span-2">
             <div class="ui-state-default dateform-elem" id="drag-elem-month">
               <select size="1" class="from" disabled="disabled"><option>Month</option></select>
             </div>
             <div class="ui-state-default dateform-elem" id="drag-elem-month-range">
-              <select size="1" class="from" disabled="disabled"><option>Month</option></select> to
+              <select size="1" class="from" disabled="disabled"><option>Month</option></select>
+              <br/>through</br>
               <select size="1" class="to"   disabled="disabled"><option>Month</option></select>
             </div>
           </div>
-          <div class="span-4">
+          <div class="span-2">
+            <div class="ui-state-default dateform-elem" id="drag-elem-mday">
+              <select size="1" class="from" disabled="disabled"><option>Day</option></select>
+            </div>
+            <div class="ui-state-default dateform-elem" id="drag-elem-mday-range">
+              <select size="1" class="from" disabled="disabled"><option>Day</option></select>
+              <br/>through</br>
+              <select size="1" class="to"   disabled="disabled"><option>Day</option></select>
+            </div>
+          </div>
+          <div class="span-2">
             <div class="ui-state-default dateform-elem" id="drag-elem-wday">
               <select size="1" class="from" disabled="disabled"><option>WDay</option></select>
             </div>
             <div class="ui-state-default dateform-elem" id="drag-elem-wday-range">
-              <select size="1" class="from" disabled="disabled"><option>WDay</option></select> to
+              <select size="1" class="from" disabled="disabled"><option>WDay</option></select>
+              <br/>through</br>
               <select size="1" class="to"   disabled="disabled"><option>WDay</option></select>
             </div>
           </div>
-          <div class="span-4 last">
-            <div class="ui-state-default dateform-elem" id="drag-elem-tofday-range">
-              <input type="text" size="5" class="from" disabled="disabled" value="hh:mm"/> to
-              <input type="text" size="5" class="to"   disabled="disabled" value="hh:mm"/>
+          <div class="span-2">
+            <div class="ui-state-default dateform-elem" id="drag-elem-hour">
+              <select size="1" class="from" disabled="disabled"><option>Hour</option></select>
+            </div>
+            <div class="ui-state-default dateform-elem" id="drag-elem-hour-range">
+              <select size="1" class="from" disabled="disabled"><option>Hour</option></select>
+              <br/>through</br>
+              <select size="1" class="to"   disabled="disabled"><option>Hour</option></select>
+            </div>
+          </div>
+          <div class="span-2 last">
+            <div class="ui-state-default dateform-elem" id="drag-elem-minute">
+              <select size="1" class="from" disabled="disabled"><option>Min</option></select>
+            </div>
+            <div class="ui-state-default dateform-elem" id="drag-elem-minute-range">
+              <select size="1" class="from" disabled="disabled"><option>Min</option></select>
+              <br/>through</br>
+              <select size="1" class="to"   disabled="disabled"><option>Min</option></select>
             </div>
           </div>
 
-	<br/>
         <div class="hspace-20"></div>
-        <h3 id="timesets">Time Sets</h3>
+        <h3 id="timesets" class="span-16 last">Time Sets</h3>
 
         [% IF messages.esetmsg %]<div class="success">[% messages.esetmsg %]</div>[% END %]
         [% IF messages.eseterr %]<div class="error">[% messages.eseterr %]</div>[% END %]
@@ -317,15 +423,71 @@
             [% priority = 0 %]
             [% FOREACH period IN tset.periods %]
               <li class="ui-state-default intend id="period_[% period.id %]">
-                <div class="span-1"><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>
-                <div class="span-2">[% period.year %]</div>
-                <div class="span-2">[% period.month %]</div>
-                <div class="span-2">[% period.mday %]</div>
-                <div class="span-2">[% period.wday %]</div>
-                <div class="span-2">[% period.hour %]</div>
-                <div class="span-2">[% period.minute %]</div>
+                [% IF peditid == period.id %]
+                  [% # TODO: period editing %]
+                [% ELSE %]
+                  <div class="span-4">[% period.year   ? period.year   : "any" %]</div>
+                  <div class="span-3">[% period.month  ? period.month  : "any" %]</div>
+                  <div class="span-2">[% period.mday   ? period.mday   : "any" %]</div>
+                  <div class="span-2">[% period.wday   ? period.wday   : "any" %]</div>
+                  <div class="span-2">[% period.hour   ? period.hour   : "any" %]</div>
+                  <div class="span-2">[% period.minute ? period.minute : "any" %]</div>
+                    [% UNLESS Catalyst.session.admin.read_only %]
+                      <div class="span-1">
+                        <a href="/subscriber/edit_cf_times?subscriber_id=[% subscriber_id %]&peditid=[% period.id %]"><span class="button-edit">Edit</span></a>
+                      </div>
+                      <div class="span-1 last">
+                        <form action="/subscriber/edit_cf_time_delperiod" method="post">
+                          <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                          <input type="hidden" name="seditid" value="[% dset.id %]"/>
+                          <input type="hidden" name="peditid" value="[% period.id %]"/>
+                          <button class="button-delete">Delete</button>
+                        </form>
+                      </div>
+                    [% END %]
+                [% END %]
               </li>
+            [% priority = priority + 1 %]
             [% END %]
+
+
+              [% IF seditid == tset.id || !tset.periods || tset.periods.size == 0 %]
+                <li class="ui-state-default intend mediumhigh">
+                  <form action="/subscriber/edit_cf_time_saveperiod" method="post">
+                    <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                    <input type="hidden" name="seditid" value="[% dset.id %]"/>
+                    <input type="hidden" name="priority" value="[% priority %]"/>
+                    <div class="span-2" id="drop-anchor-year">
+                      <div class="ui-widget-header drophead"><p>Year</p></div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+                    </div>
+                    <div class="span-2" id="drop-anchor-month">
+                      <div class="ui-widget-header drophead"><p>Month</p></div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+                    </div>
+                    <div class="span-2" id="drop-anchor-mday">
+                      <div class="ui-widget-header drophead"><p>Day</p></div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+                    </div>
+                    <div class="span-2" id="drop-anchor-wday">
+                      <div class="ui-widget-header drophead"><p>Weekday</p></div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+                    </div>
+                    <div class="span-2" id="drop-anchor-hour">
+                      <div class="ui-widget-header drophead"><p>Hour</p></div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+                    </div>
+                    <div class="span-2" id="drop-anchor-minute">
+                      <div class="ui-widget-header drophead"><p>Minute</p></div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
+                    </div>
+
+
+                  </form>
+                </li>
+              [% END %]
+
+
           </ul>
           [% END %]  
           <ul class="cleanlist">
@@ -340,9 +502,10 @@
             [% END %]
           </ul>
 
+
          <div class="hspace-20"></div>
 
-
+[% IF 0 %]
           <div class="span-4" id="drop-anchor-year">
             <div class="ui-widget-header drophead"><p>Year</p></div>
             <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
@@ -359,4 +522,4 @@
             <div class="ui-widget-header drophead"><p>Time of Day</p></div>
             <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
           </div>
-
+[% END %]
