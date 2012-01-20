@@ -56,24 +56,25 @@
 <script type="text/javascript">
       $(document).ready(function(){
 
-        createDropZone('drop-elem-year');
-        createDropZone('drop-elem-month');
-        createDropZone('drop-elem-mday');
-        createDropZone('drop-elem-wday');
-        createDropZone('drop-elem-hour');
-        createDropZone('drop-elem-minute');
+        [% FOREACH tset IN tsets %]
+        createDropZone('drop-elem-year', '[% tset.id %]');
+        createDropZone('drop-elem-month', '[% tset.id %]');
+        createDropZone('drop-elem-mday', '[% tset.id %]');
+        createDropZone('drop-elem-wday', '[% tset.id %]');
+        createDropZone('drop-elem-hour', '[% tset.id %]');
+        createDropZone('drop-elem-minute', '[% tset.id %]');
+        [% END %]
 
         function pad2(number) {
           return (number < 10 ? '0' : '') + number;
         }
 
-        function createDropZone(id) {
+        function createDropZone(id, zoneid) {
           var anchor;
-
           if(id == "drop-elem-year") {
 
-            anchor = $('div#drop-anchor-year');
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-year-' + zoneid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
@@ -86,8 +87,8 @@
 
           } else if(id == "drop-elem-month") {
 
-            anchor = $('div#drop-anchor-month');
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-month-' + zoneid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
@@ -100,8 +101,8 @@
 
           } else if(id == "drop-elem-mday") {
 
-            anchor = $('div#drop-anchor-mday');
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-mday-' + zoneid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
@@ -114,8 +115,8 @@
 
           } else if(id == "drop-elem-wday") {
 
-            anchor = $('div#drop-anchor-wday');
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-wday-' + zoneid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
@@ -128,8 +129,8 @@
 
           } else if(id == "drop-elem-hour") {
 
-            anchor = $('div#drop-anchor-hour');
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-hour-' + zoneid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
@@ -142,8 +143,8 @@
 
           } else if(id == "drop-elem-minute") {
 
-            anchor = $('div#drop-anchor-minute');
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-minute-' + zoneid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
@@ -162,13 +163,18 @@
           }
         }
 
-        function removeDrop(id) {
-          $('div#' + id).remove();
-          createDropZone(id);          
+        function removeDrop(id, zoneid) {
+          $('div#' + zoneid).remove();
+          var zonearr = zoneid.match(/^.+\-([0-9]+)$/);
+          zoneid = zonearr[1];
+          zonearr = id.match(/^(.+)\-[0-9]+$/);
+          id = zonearr[1];
+          createDropZone(id, zoneid);          
         }
 
         function handleDrop(event, ui) {
           var dropped = ui.draggable.clone();
+          var zoneid = $(this).attr('id');
 
           var from_select = dropped.find('select.from');
           if(from_select) {
@@ -193,12 +199,10 @@
           var minutes = new Array(60);
 
           // from-year
-          var newid;
           if(dropped.attr("id") == "drag-elem-year" || dropped.attr("id") == "drag-elem-year-range") {
             for(var i = 0; i < years.length; ++i) {
               $('<option value="' + (d.getFullYear()+i) + '">' + (d.getFullYear()+i) + '</option>').appendTo(from_select);
             }
-            newid = "drop-elem-year";
           }
           // to-year
           if(dropped.attr("id") == "drag-elem-year-range") {
@@ -211,7 +215,6 @@
             for(var i = 0; i < months.length; ++i) {
               $('<option value="' + (i+1) + '">' + month_names[i] + '</option>').appendTo(from_select);
             }
-            newid = "drop-elem-month";
           }
           // to-month
           if(dropped.attr("id") == "drag-elem-month-range") {
@@ -224,7 +227,6 @@
             for(var i = 0; i < wdays.length; ++i) {
               $('<option value="' + (i+1) + '">' + wday_names[i] + '</option>').appendTo(from_select);
             }
-            newid = "drop-elem-wday";
           }
           // to-wday
           if(dropped.attr("id") == "drag-elem-wday-range") {
@@ -237,7 +239,6 @@
             for(var i = 0; i < mdays.length; ++i) {
               $('<option value="' + (i + 1) + '">' + (i + 1) + '</option>').appendTo(from_select);
             }
-            newid = "drop-elem-mday";
           }
           // to-mday
           if(dropped.attr("id") == "drag-elem-mday-range") {
@@ -250,7 +251,6 @@
             for(var i = 0; i < hours.length; ++i) {
               $('<option value="' + i  + '">' + pad2(i) + '</option>').appendTo(from_select);
             }
-            newid = "drop-elem-hour";
           }
           // to-hour
           if(dropped.attr("id") == "drag-elem-hour-range") {
@@ -263,7 +263,6 @@
             for(var i = 0; i < minutes.length; ++i) {
               $('<option value="' + i + '">' + pad2(i) + '</option>').appendTo(from_select);
             }
-            newid = "drop-elem-minute";
           }
           // to-minute
           if(dropped.attr("id") == "drag-elem-minute-range") {
@@ -272,13 +271,13 @@
             }
           }
 
-          dropped.attr("id", newid);
+          dropped.attr("id", zoneid);
 
           // replace old footer text by remove-link and bind click handler
           var foot = $(this).next('div');
           $(foot).find('p').replaceWith('<p></p>');
           $('<a href="javascript:void(0);">Remove</a>').click(function(){
-            removeDrop(dropped.attr("id"));
+            removeDrop(dropped.attr("id"), zoneid);
           }).appendTo($(foot).find('p'));
           $(this).replaceWith(dropped).attr('class', 'span-4 ui-state-default dateform-elem');
           if(dropped.attr("id") == "drag-elem-wday-range") {
@@ -457,27 +456,27 @@
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
                     <input type="hidden" name="seditid" value="[% dset.id %]"/>
                     <input type="hidden" name="priority" value="[% priority %]"/>
-                    <div class="span-2" id="drop-anchor-year">
+                    <div class="span-2" id="drop-anchor-year-[% tset.id %]">
                       <div class="ui-widget-header drophead"><p>Year</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-month">
+                    <div class="span-2" id="drop-anchor-month-[% tset.id %]">
                       <div class="ui-widget-header drophead"><p>Month</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-mday">
+                    <div class="span-2" id="drop-anchor-mday-[% tset.id %]">
                       <div class="ui-widget-header drophead"><p>Day</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-wday">
+                    <div class="span-2" id="drop-anchor-wday-[% tset.id %]">
                       <div class="ui-widget-header drophead"><p>Weekday</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-hour">
+                    <div class="span-2" id="drop-anchor-hour-[% tset.id %]">
                       <div class="ui-widget-header drophead"><p>Hour</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-minute">
+                    <div class="span-2" id="drop-anchor-minute-[% tset.id %]">
                       <div class="ui-widget-header drophead"><p>Minute</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
