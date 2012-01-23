@@ -1880,6 +1880,47 @@ sub period_collapse : Private {
     return 0;
 }
 
+sub edit_cf_time_delperiod : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_callforward_times.tt';
+
+    my $period_id = $c->request->params->{peditid};
+    my $tset_id = $c->request->params->{seditid};
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my %messages;
+    my %period;
+
+    $period{setid} = $tset_id;
+    $period{id} = $period_id;
+
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_time_period',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%period,
+                                                        },
+                                                        undef,
+                                                      ))
+    {
+      $messages{esetmsg} = 'Server.Voip.SavedSettings';
+    }
+    else
+    {
+      $messages{eseterr} = 'Client.Voip.InputErrorFound';
+    }
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id");
+}
+
 sub edit_list : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_edit_list.tt';
