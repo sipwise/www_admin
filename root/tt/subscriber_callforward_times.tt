@@ -321,62 +321,62 @@
 
          <div class="span-2">
             <div class="ui-state-default dateform-elem" id="drag-elem-year">
-              <select size="1" class="from" disabled="disabled"><option>Year</option></select>
+              <select size="1" class="from" name="year" disabled="disabled"><option>Year</option></select>
             </div>
             <div class="ui-state-default dateform-elem" id="drag-elem-year-range">
-              <select size="1" class="from" disabled="disabled"><option>Year</option></select>
+              <select size="1" class="from" name="from_year" disabled="disabled"><option>Year</option></select>
               <br/>through</br>
-              <select size="1" class="to"   disabled="disabled"><option>Year</option></select>
+              <select size="1" class="to" name="to_year" disabled="disabled"><option>Year</option></select>
             </div>
           </div>
           <div class="span-2">
             <div class="ui-state-default dateform-elem" id="drag-elem-month">
-              <select size="1" class="from" disabled="disabled"><option>Month</option></select>
+              <select size="1" class="from" name="month" disabled="disabled"><option>Month</option></select>
             </div>
             <div class="ui-state-default dateform-elem" id="drag-elem-month-range">
-              <select size="1" class="from" disabled="disabled"><option>Month</option></select>
+              <select size="1" class="from" name="from_month" disabled="disabled"><option>Month</option></select>
               <br/>through</br>
-              <select size="1" class="to"   disabled="disabled"><option>Month</option></select>
+              <select size="1" class="to" name="to_month" disabled="disabled"><option>Month</option></select>
             </div>
           </div>
           <div class="span-2">
             <div class="ui-state-default dateform-elem" id="drag-elem-mday">
-              <select size="1" class="from" disabled="disabled"><option>Day</option></select>
+              <select size="1" class="from" name="mday" disabled="disabled"><option>Day</option></select>
             </div>
             <div class="ui-state-default dateform-elem" id="drag-elem-mday-range">
-              <select size="1" class="from" disabled="disabled"><option>Day</option></select>
+              <select size="1" class="from" name="from_mday" disabled="disabled"><option>Day</option></select>
               <br/>through</br>
-              <select size="1" class="to"   disabled="disabled"><option>Day</option></select>
+              <select size="1" class="to" name="to_mday" disabled="disabled"><option>Day</option></select>
             </div>
           </div>
           <div class="span-2">
             <div class="ui-state-default dateform-elem" id="drag-elem-wday">
-              <select size="1" class="from" disabled="disabled"><option>WDay</option></select>
+              <select size="1" class="from" name="wday" disabled="disabled"><option>WDay</option></select>
             </div>
             <div class="ui-state-default dateform-elem" id="drag-elem-wday-range">
-              <select size="1" class="from" disabled="disabled"><option>WDay</option></select>
+              <select size="1" class="from" name="from_wday" disabled="disabled"><option>WDay</option></select>
               <br/>through</br>
-              <select size="1" class="to"   disabled="disabled"><option>WDay</option></select>
+              <select size="1" class="to" name="to_wday" disabled="disabled"><option>WDay</option></select>
             </div>
           </div>
           <div class="span-2">
             <div class="ui-state-default dateform-elem" id="drag-elem-hour">
-              <select size="1" class="from" disabled="disabled"><option>Hour</option></select>
+              <select size="1" class="from" name="hour" disabled="disabled"><option>Hour</option></select>
             </div>
             <div class="ui-state-default dateform-elem" id="drag-elem-hour-range">
-              <select size="1" class="from" disabled="disabled"><option>Hour</option></select>
+              <select size="1" class="from" name="from_hour" disabled="disabled"><option>Hour</option></select>
               <br/>through</br>
-              <select size="1" class="to"   disabled="disabled"><option>Hour</option></select>
+              <select size="1" class="to" name="to_hour" disabled="disabled"><option>Hour</option></select>
             </div>
           </div>
           <div class="span-2 last">
             <div class="ui-state-default dateform-elem" id="drag-elem-minute">
-              <select size="1" class="from" disabled="disabled"><option>Min</option></select>
+              <select size="1" class="from" name="minute" disabled="disabled"><option>Min</option></select>
             </div>
             <div class="ui-state-default dateform-elem" id="drag-elem-minute-range">
-              <select size="1" class="from" disabled="disabled"><option>Min</option></select>
+              <select size="1" class="from" name="from_minute" disabled="disabled"><option>Min</option></select>
               <br/>through</br>
-              <select size="1" class="to"   disabled="disabled"><option>Min</option></select>
+              <select size="1" class="to" name="to_minute" disabled="disabled"><option>Min</option></select>
             </div>
           </div>
 
@@ -438,7 +438,7 @@
                       <div class="span-1 last">
                         <form action="/subscriber/edit_cf_time_delperiod" method="post">
                           <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
-                          <input type="hidden" name="seditid" value="[% dset.id %]"/>
+                          <input type="hidden" name="seditid" value="[% tset.id %]"/>
                           <input type="hidden" name="peditid" value="[% period.id %]"/>
                           <button class="button-delete">Delete</button>
                         </form>
@@ -452,9 +452,9 @@
 
               [% IF seditid == tset.id || !tset.periods || tset.periods.size == 0 %]
                 <li class="ui-state-default intend mediumhigh">
-                  <form action="/subscriber/edit_cf_time_saveperiod" method="post">
+                  <form action="/subscriber/edit_cf_times_createperiod" method="post">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
-                    <input type="hidden" name="seditid" value="[% dset.id %]"/>
+                    <input type="hidden" name="seditid" value="[% tset.id %]"/>
                     <input type="hidden" name="priority" value="[% priority %]"/>
                     <div class="span-2" id="drop-anchor-year-[% tset.id %]">
                       <div class="ui-widget-header drophead"><p>Year</p></div>
@@ -480,8 +480,7 @@
                       <div class="ui-widget-header drophead"><p>Minute</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-
-
+                    <div class="prepend-2 span-1 last"><button class="button-add">Add</button></div>
                   </form>
                 </li>
               [% END %]

@@ -1733,7 +1733,152 @@ sub edit_cf_times_createset : Local {
 
 # fooooo
 
+sub edit_cf_times_createperiod : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_callforward_times.tt';
 
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+    my $tset_id = $c->request->params->{seditid};
+    $c->stash->{seditid} = $tset_id;
+    
+    my %messages;
+    my %period;
+
+    $period{year} = $c->request->params->{year};
+    $period{from_year} = $c->request->params->{from_year};
+    $period{to_year} = $c->request->params->{to_year};
+    $period{month} = $c->request->params->{month};
+    $period{from_month} = $c->request->params->{from_month};
+    $period{to_month} = $c->request->params->{to_month};
+    $period{mday} = $c->request->params->{mday};
+    $period{from_mday} = $c->request->params->{from_mday};
+    $period{to_mday} = $c->request->params->{to_mday};
+    $period{wday} = $c->request->params->{wday};
+    $period{from_wday} = $c->request->params->{from_wday};
+    $period{to_wday} = $c->request->params->{to_wday};
+    $period{hour} = $c->request->params->{hour};
+    $period{from_hour} = $c->request->params->{from_hour};
+    $period{to_hour} = $c->request->params->{to_hour};
+    $period{minute} = $c->request->params->{minute};
+    $period{from_minute} = $c->request->params->{from_minute};
+    $period{to_minute} = $c->request->params->{to_minute};
+
+    $self->period_collapse(\%period);
+
+    $period{setid} = $tset_id;
+
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_time_period',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%period,
+                                                        },
+                                                        undef,
+                                                      ))
+    {
+      $messages{esetmsg} = 'Server.Voip.SavedSettings';
+    }
+    else
+    {
+      $messages{eseterr} = 'Client.Voip.InputErrorFound';
+    }
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id");
+}
+
+sub period_collapse : Private {
+    my ($self, $period) = @_;
+
+    if(defined $period->{year}) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{from_year} && defined $period->{to_year}) {
+      if(int($period->{from_year}) > int($period->{to_year})) {
+        return -1;
+      }
+      $period->{year} = $period->{from_year} . "-" . $period->{to_year};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{year};
+    }
+    delete $period->{from_year};
+    delete $period->{to_year};
+
+    if(defined $period->{month}) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{from_month} && defined $period->{to_month}) {
+      $period->{month} = $period->{from_month} . "-" . $period->{to_month};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{month};
+    }
+    delete $period->{from_month};
+    delete $period->{to_month};
+
+    if(defined $period->{mday}) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{from_mday} && defined $period->{to_mday}) {
+      $period->{mday} = $period->{from_mday} . "-" . $period->{to_mday};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{mday};
+    }
+    delete $period->{from_mday};
+    delete $period->{to_mday};
+
+    if(defined $period->{wday}) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{from_wday} && defined $period->{to_wday}) {
+      $period->{mday} = $period->{from_wday} . "-" . $period->{to_wday};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{wday};
+    }
+    delete $period->{from_wday};
+    delete $period->{to_wday};
+
+    if(defined $period->{hour}) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{from_hour} && defined $period->{to_hour}) {
+      $period->{hour} = $period->{from_hour} . "-" . $period->{to_hour};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{hour};
+    }
+    delete $period->{from_hour};
+    delete $period->{to_hour};
+
+    if(defined $period->{minute}) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{from_minute} && defined $period->{to_minute}) {
+      $period->{minute} = $period->{from_minute} . "-" . $period->{to_minute};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{minute};
+    }
+    delete $period->{from_minute};
+    delete $period->{to_minute};
+
+    return 0;
+}
 
 sub edit_list : Local {
     my ( $self, $c ) = @_;
