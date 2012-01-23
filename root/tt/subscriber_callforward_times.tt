@@ -50,6 +50,10 @@
         height: 94px;
         padding: 2px;
       }
+      .content li.ui-state-default.medium {
+        height: 82px;
+        padding: 2px;
+      }
 
 </style>
 
@@ -421,18 +425,103 @@
           <ul class="cleanlist" id="[% tset.id %]set">
             [% priority = 0 %]
             [% FOREACH period IN tset.periods %]
-              <li class="ui-state-default intend id="period_[% period.id %]">
+              <li class="ui-state-default intend medium" id="period_[% period.id %]">
                 [% IF peditid == period.id %]
                   [% # TODO: period editing %]
                 [% ELSE %]
-                  <div class="span-4">[% period.year   ? period.year   : "any" %]</div>
-                  <div class="span-3">[% period.month  ? period.month  : "any" %]</div>
-                  <div class="span-2">[% period.mday   ? period.mday   : "any" %]</div>
-                  <div class="span-2">[% period.wday   ? period.wday   : "any" %]</div>
-                  <div class="span-2">[% period.hour   ? period.hour   : "any" %]</div>
-                  <div class="span-2">[% period.minute ? period.minute : "any" %]</div>
+                    <div class="span-2"">
+                      <div class="ui-widget-header drophead"><p>Year</p></div>
+                      <div class="dateform-elem waiting">
+                        [% IF period.year.defined %]
+                          <select size="1" class="from" name="year" disabled="disabled">
+                            <option value="[% period.year %]">[% period.year %]</option>
+                          </select>
+                        [% ELSIF period.from_year.defined AND period.to_year.defined %]
+                          <select size="1" class="from" name="from_year" disabled="disabled"><option>[% period.from_year %]</option></select>
+                          <br/>through</br>
+                          <select size="1" class="to" name="to_year" disabled="disabled"><option>[% period.to_year %]</option></select>
+                        [% ELSE %]any
+                        [% END %]
+                      </div>
+                    </div>
+                    <div class="span-2"">
+                      <div class="ui-widget-header drophead"><p>Month</p></div>
+                      <div class="dateform-elem waiting">
+                        [% IF period.month.defined %]
+                          <select size="1" class="from" name="month" disabled="disabled">
+                            <option value="[% period.month %]">[% period.month %]</option>
+                          </select>
+                        [% ELSIF period.from_month.defined AND period.to_month.defined %]
+                          <select size="1" class="from" name="from_month" disabled="disabled"><option>[% period.from_month %]</option></select>
+                          <br/>through</br>
+                          <select size="1" class="to" name="to_month" disabled="disabled"><option>[% period.to_month %]</option></select>
+                        [% ELSE %]any
+                        [% END %]
+                      </div>
+                    </div>
+                    <div class="span-2"">
+                      <div class="ui-widget-header drophead"><p>Day</p></div>
+                      <div class="dateform-elem waiting">
+                        [% IF period.mday.defined %]
+                          <select size="1" class="from" name="mday" disabled="disabled">
+                            <option value="[% period.mday %]">[% period.mday %]</option>
+                          </select>
+                        [% ELSIF period.from_mday.defined AND period.to_mday.defined %]
+                          <select size="1" class="from" name="from_mday" disabled="disabled"><option>[% period.from_mday %]</option></select>
+                          <br/>through</br>
+                          <select size="1" class="to" name="to_mday" disabled="disabled"><option>[% period.to_mday %]</option></select>
+                        [% ELSE %]any
+                        [% END %]
+                      </div>
+                    </div>
+                    <div class="span-2"">
+                      <div class="ui-widget-header drophead"><p>Weekday</p></div>
+                      <div class="dateform-elem waiting">
+                        [% IF period.wday.defined %]
+                          <select size="1" class="from" name="wday" disabled="disabled">
+                            <option value="[% period.wday %]">[% period.wday %]</option>
+                          </select>
+                        [% ELSIF period.from_wday.defined AND period.to_wday.defined %]
+                          <select size="1" class="from" name="from_wday" disabled="disabled"><option>[% period.from_wday %]</option></select>
+                          <br/>through</br>
+                          <select size="1" class="to" name="to_wday" disabled="disabled"><option>[% period.to_wday %]</option></select>
+                        [% ELSE %]any
+                        [% END %]
+                      </div>
+                    </div>
+                    <div class="span-2"">
+                      <div class="ui-widget-header drophead"><p>Hour</p></div>
+                      <div class="dateform-elem waiting">
+                        [% IF period.hour.defined %]
+                          <select size="1" class="from" name="hour" disabled="disabled">
+                            <option value="[% period.hour %]">[% period.hour %]</option>
+                          </select>
+                        [% ELSIF period.from_hour.defined AND period.to_hour.defined %]
+                          <select size="1" class="from" name="from_hour" disabled="disabled"><option>[% period.from_hour %]</option></select>
+                          <br/>through</br>
+                          <select size="1" class="to" name="to_hour" disabled="disabled"><option>[% period.to_hour %]</option></select>
+                        [% ELSE %]any
+                        [% END %]
+                      </div>
+                    </div>
+                    <div class="span-2"">
+                      <div class="ui-widget-header drophead"><p>Minute</p></div>
+                      <div class="dateform-elem waiting">
+                        [% IF period.minute.defined %]
+                          <select size="1" class="from" name="minute" disabled="disabled">
+                            <option value="[% period.minute %]">[% period.minute %]</option>
+                          </select>
+                        [% ELSIF period.from_minute.defined AND period.to_minute.defined %]
+                          <select size="1" class="from" name="from_minute" disabled="disabled"><option>[% period.from_minute %]</option></select>
+                          <br/>through</br>
+                          <select size="1" class="to" name="to_minute" disabled="disabled"><option>[% period.to_minute %]</option></select>
+                        [% ELSE %]any
+                        [% END %]
+                      </div>
+                    </div>
+
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="span-1">
+                      <div class="prepend-2 span-1">
                         <a href="/subscriber/edit_cf_times?subscriber_id=[% subscriber_id %]&peditid=[% period.id %]"><span class="button-edit">Edit</span></a>
                       </div>
                       <div class="span-1 last">

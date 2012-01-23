@@ -1606,6 +1606,12 @@ sub edit_cf_times : Local {
                                                         \$tsets,
                                                       );
 
+    foreach my $tset (@{$tsets}) {
+      foreach my $per (@{$tset->{periods}}) {
+        $self->period_expand($per);
+      }
+    }
+
     $c->stash->{tsets} = $tsets;
     $c->stash->{seditid} = $c->request->params->{seditid};
 
@@ -1876,6 +1882,90 @@ sub period_collapse : Private {
     }
     delete $period->{from_minute};
     delete $period->{to_minute};
+
+    return 0;
+}
+
+sub period_expand : Private {
+    my ($self, $period) = @_;
+
+    if(defined $period->{year} && $period->{year} =~ /^\d+$/) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{year} && $period->{year} =~ /^(\d+)\-(\d+)$/) {
+      $period->{from_year} = $1;
+      $period->{to_year} = $2;
+      delete $period->{year};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{year};
+    }
+
+    if(defined $period->{month} && $period->{month} =~ /^\d+$/) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{month} && $period->{month} =~ /^(\d+)\-(\d+)$/) {
+      $period->{from_month} = $1;
+      $period->{to_month} = $2;
+      delete $period->{month};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{month};
+    }
+
+    if(defined $period->{mday} && $period->{mday} =~ /^\d+$/) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{mday} && $period->{mday} =~ /^(\d+)\-(\d+)$/) {
+      $period->{from_mday} = $1;
+      $period->{to_mday} = $2;
+      delete $period->{mday};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{mday};
+    }
+
+    if(defined $period->{wday} && $period->{wday} =~ /^\d+$/) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{wday} && $period->{wday} =~ /^(\d+)\-(\d+)$/) {
+      $period->{from_wday} = $1;
+      $period->{to_wday} = $2;
+      delete $period->{wday};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{wday};
+    }
+
+    if(defined $period->{hour} && $period->{hour} =~ /^\d+$/) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{hour} && $period->{hour} =~ /^(\d+)\-(\d+)$/) {
+      $period->{from_hour} = $1;
+      $period->{to_hour} = $2;
+      delete $period->{hour};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{hour};
+    }
+
+    if(defined $period->{minute} && $period->{minute} =~ /^\d+$/) {
+      # nothing to be done 
+    }
+    elsif(defined $period->{minute} && $period->{minute} =~ /^(\d+)\-(\d+)$/) {
+      $period->{from_minute} = $1;
+      $period->{to_minute} = $2;
+      delete $period->{minute};
+    }
+    else {
+      # skip if incomplete
+      delete $period->{minute};
+    }
 
     return 0;
 }
