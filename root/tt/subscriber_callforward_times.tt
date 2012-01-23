@@ -1,4 +1,9 @@
 <style>
+
+      .error, .alert, .notice, .success, .info {
+        float: left;
+        width: 100%;
+      }
       .content li.ui-state-default div.drophead, .content li.ui-state-default div.dropfoot {
         height: 12px;
         margin: 0;
@@ -323,6 +328,7 @@
         <div class="hspace-20"></div>
         <h3 id="weekdays">Drag Building Blocks to Time Sets below</h3>
 
+        <div class="span-16 last">
          <div class="span-2">
             <div class="ui-state-default dateform-elem" id="drag-elem-year">
               <select size="1" class="from" name="year" disabled="disabled"><option>Year</option></select>
@@ -383,6 +389,7 @@
               <select size="1" class="to" name="to_minute" disabled="disabled"><option>Min</option></select>
             </div>
           </div>
+        </div>
 
         <div class="hspace-20"></div>
         <h3 id="timesets" class="span-16 last">Time Sets</h3>
