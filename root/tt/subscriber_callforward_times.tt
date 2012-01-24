@@ -85,17 +85,49 @@
 
         var drops = Array('drop-elem-year', 'drop-elem-month', 'drop-elem-mday', 
           'drop-elem-wday', 'drop-elem-hour', 'drop-elem-minute');
-        var drags = Array('drag-elem-year', 'drag-elem-month', 'drag-elem-mday',
-          'drag-elem-wday', 'drag-elem-hour', 'drag-elem-minute');
         [% FOREACH tset IN tsets %]
           for(var i in drops) {
             createDropZone(drops[i], [% tset.id %], 0, true);
-            [% FOREACH p IN tset.periods %]
-              createDropZone(drops[i], [% tset.id %], [% p.id %], false);
-              // TODO: check whether it's a range and add "-range" where applicable
-              $('div#' + drops[i] + '-[% tset.id %]-[% p.id %]').trigger('drop', $('div#' + drags[i]).draggable().clone());
-            [% END %]
           }
+          [% FOREACH p IN tset.periods %]
+            createDropZone('drop-elem-year', [% tset.id %], [% p.id %], false);
+            [% IF p.year.defined %]
+              $('div#drop-elem-year-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-year').draggable().clone(), true, '[% p.year %]', undefined, undefined]);
+            [% ELSIF p.from_year.defined AND p.to_year.defined %]
+              $('div#drop-elem-year-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-year-range').draggable().clone(), true, undefined, '[% p.from_year %]', '[% p.to_year %]']);
+            [% END %]
+            createDropZone('drop-elem-month', [% tset.id %], [% p.id %], false);
+            [% IF p.month.defined %]
+              $('div#drop-elem-month-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-month').draggable().clone(), true, '[% p.month %]', undefined, undefined]);
+            [% ELSIF p.from_month.defined AND p.to_month.defined %]
+              $('div#drop-elem-month-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-month-range').draggable().clone(), true, undefined, '[% p.from_month %]', '[% p.to_month %]']);
+            [% END %]
+            createDropZone('drop-elem-mday', [% tset.id %], [% p.id %], false);
+            [% IF p.mday.defined %]
+              $('div#drop-elem-mday-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-mday').draggable().clone(), true, '[% p.mday %]', undefined, undefined]);
+            [% ELSIF p.from_mday.defined AND p.to_mday.defined %]
+              $('div#drop-elem-mday-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-mday-range').draggable().clone(), true, undefined, '[% p.from_mday %]', '[% p.to_mday %]']);
+            [% END %]
+            createDropZone('drop-elem-wday', [% tset.id %], [% p.id %], false);
+            [% IF p.wday.defined %]
+              $('div#drop-elem-wday-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-wday').draggable().clone(), true, '[% p.wday %]', undefined, undefined]);
+            [% ELSIF p.from_wday.defined AND p.to_wday.defined %]
+              $('div#drop-elem-wday-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-wday-range').draggable().clone(), true, undefined, '[% p.from_wday %]', '[% p.to_wday %]']);
+            [% END %]
+            createDropZone('drop-elem-hour', [% tset.id %], [% p.id %], false);
+            [% IF p.hour.defined %]
+              $('div#drop-elem-hour-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-hour').draggable().clone(), true, '[% p.hour %]', undefined, undefined]);
+            [% ELSIF p.from_hour.defined AND p.to_hour.defined %]
+              $('div#drop-elem-hour-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-hour-range').draggable().clone(), true, undefined, '[% p.from_hour %]', '[% p.to_hour %]']);
+            [% END %]
+            createDropZone('drop-elem-minute', [% tset.id %], [% p.id %], false);
+            [% IF p.minute.defined %]
+              $('div#drop-elem-minute-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-minute').draggable().clone(), true, '[% p.minute %]', undefined, undefined]);
+            [% ELSIF p.from_minute.defined AND p.to_minute.defined %]
+              $('div#drop-elem-minute-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-minute-range').draggable().clone(), true, undefined, '[% p.from_minute %]', '[% p.to_minute %]']);
+            [% END %]
+
+          [% END %]
         [% END %]
 
         function pad2(number) {
@@ -193,7 +225,10 @@
 
           if(anchor != undefined) {
             var foot = $(anchor).find('div.dropfoot');
-            $(foot).find('p').replaceWith('<p>Drop to refine</p>');
+            if(isactive)
+              $(foot).find('p').replaceWith('<p>Drop to refine</p>');
+            else
+              $(foot).find('p').replaceWith('<p></p>');
           }
         }
 
@@ -204,18 +239,18 @@
           var periodid = zonearr[2];
           zonearr = id.match(/^(.+)\-[0-9]+\-[0-9]+$/);
           id = zonearr[1];
-          createDropZone(id, tsetid, periodid);          
+          createDropZone(id, tsetid, periodid, true);          
         }
 
-        function handleDrop(event, ui) {
+        function handleDrop(event, ui, manual, param, from_param, to_param) {
+          if(manual)
+            ui = ui[0];
           var dropped;
           if(ui.draggable)
             dropped = ui.draggable.clone();
           else
             dropped = $(ui);
 
-          console.log(dropped);
-          
           var tsetid = $(this).attr('id');
           var zonearr = tsetid.match(/^.+\-([0-9]+)\-([0-9]+)$/);
           var periodid = zonearr[2];
@@ -245,82 +280,80 @@
           var hours = new Array(24);
           var minutes = new Array(60);
 
+          console.log("param=" + param + ", from_param=" + from_param + ", to_param=" + to_param);
 
           // from-year
           if(dropped.attr("id") == "drag-elem-year" || dropped.attr("id") == "drag-elem-year-range") {
             for(var i = 0; i < years.length; ++i) {
               var y = d.getFullYear() + i;
-              $('<option value="' + y + '">' + y + '</option>').appendTo(from_select);
-
-              // TODO: somehow get vals of currently displayed (or edited) period and set as selected="selected".
-              // this needs to be passed to this callback somehow, or fetched from tt.
+              $('<option value="' + y + '"' + ((param == y || from_param == y) ? 'selected="selected"' : '') + '>' + y + '</option>').appendTo(from_select);
             }
           }
           // to-year
           if(dropped.attr("id") == "drag-elem-year-range") {
             for(var i = 0; i < years.length; ++i) {
               var y = d.getFullYear() + i + 1;
-              $('<option value="' + y + '">' + y + '</option>').appendTo(to_select);
+              $('<option value="' + y + '"' + (to_param == y ? 'selected="selected"' : '') + '>' + y + '</option>').appendTo(to_select);
             }
           }
           // from-month
           if(dropped.attr("id") == "drag-elem-month" || dropped.attr("id") == "drag-elem-month-range") {
             for(var i = 0; i < months.length; ++i) {
-              $('<option value="' + (i+1) + '">' + month_names[i] + '</option>').appendTo(from_select);
+              $('<option value="' + (i+1) + '"' + ((param == (i+1) || from_param == (i+1)) ? 'selected="selected"' : '') + '>' + month_names[i] + '</option>').appendTo(from_select);
             }
           }
           // to-month
           if(dropped.attr("id") == "drag-elem-month-range") {
             for(var i = 0; i < months.length; ++i) {
-              $('<option value="' + (i+1) + '">' + month_names[i] + '</option>').appendTo(to_select);
+              $('<option value="' + (i+1) + '"' + (to_param == (i+1) ? 'selected="selected"' : '') + '>' + month_names[i] + '</option>').appendTo(to_select);
             }
           }
           // from-wday
           if(dropped.attr("id") == "drag-elem-wday" || dropped.attr("id") == "drag-elem-wday-range") {
             for(var i = 0; i < wdays.length; ++i) {
-              $('<option value="' + (i+1) + '">' + wday_names[i] + '</option>').appendTo(from_select);
+              $('<option value="' + (i+1) + '"' + ((param == (i+1) || from_param == (i+1)) ? 'selected="selected"' : '') + '>' + wday_names[i] + '</option>').appendTo(from_select);
             }
           }
           // to-wday
           if(dropped.attr("id") == "drag-elem-wday-range") {
             for(var i = 0; i < wdays.length; ++i) {
-              $('<option value="' + (i+1) + '">' + wday_names[i] + '</option>').appendTo(to_select);
+              $('<option value="' + (i+1) + '"' + (to_param == (i+1) ? 'selected="selected"' : '') + '>' + wday_names[i] + '</option>').appendTo(to_select);
             }
           }
           // from-mday
           if(dropped.attr("id") == "drag-elem-mday" || dropped.attr("id") == "drag-elem-mday-range") {
             for(var i = 0; i < mdays.length; ++i) {
-              $('<option value="' + (i + 1) + '">' + (i + 1) + '</option>').appendTo(from_select);
+              $('<option value="' + (i+1) + '"' + ((param == (i+1) || from_param == (i+1)) ? 'selected="selected"' : '') + '>' + (i+1) + '</option>').appendTo(from_select);
             }
           }
           // to-mday
           if(dropped.attr("id") == "drag-elem-mday-range") {
             for(var i = 0; i < mdays.length; ++i) {
-              $('<option value="' + (i + 1) + '">' + (i + 1) + '</option>').appendTo(to_select);
+              $('<option value="' + (i+1) + '"' + (to_param == (i+1) ? 'selected="selected"' : '') + '>' + (i+1) + '</option>').appendTo(to_select);
             }
           }
           // from-hour
           if(dropped.attr("id") == "drag-elem-hour" || dropped.attr("id") == "drag-elem-hour-range") {
             for(var i = 0; i < hours.length; ++i) {
-              $('<option value="' + i  + '">' + pad2(i) + '</option>').appendTo(from_select);
+              $('<option value="' + i + '"' + ((param == i || from_param == i) ? 'selected="selected"' : '') + '>' + pad2(i) + '</option>').appendTo(from_select);
             }
           }
           // to-hour
           if(dropped.attr("id") == "drag-elem-hour-range") {
             for(var i = 0; i < hours.length; ++i) {
-              $('<option value="' + i + '">' + pad2(i) + '</option>').appendTo(to_select);
+              $('<option value="' + i + '"' + (to_param == i ? 'selected="selected"' : '') + '>' + pad2(i) + '</option>').appendTo(to_select);
             }
           }
           // from-minute
           if(dropped.attr("id") == "drag-elem-minute" || dropped.attr("id") == "drag-elem-minute-range") {
             for(var i = 0; i < minutes.length; ++i) {
-              $('<option value="' + i + '">' + pad2(i) + '</option>').appendTo(from_select);
+              $('<option value="' + i + '"' + ((param == i || from_param == i) ? 'selected="selected"' : '') + '>' + pad2(i) + '</option>').appendTo(from_select);
             }
           }
           // to-minute
           if(dropped.attr("id") == "drag-elem-minute-range") {
             for(var i = 0; i < minutes.length; ++i) {
-              $('<option value="' + i + '">' + pad2(i) + '</option>').appendTo(to_select);
+              $('<option value="' + i + '"' + (to_param == i ? 'selected="selected"' : '') + '>' + pad2(i) + '</option>').appendTo(to_select);
             }
           }
 
