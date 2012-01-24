@@ -201,7 +201,7 @@
           </form>
 
         <div class="hspace-20"></div>
-        <h3 id="callforward">Call Forwards</h3>
+        <h3 id="callforward" style="clear:both">Call Forwards</h3>
 
           [% IF messages.cfmsg %]<div class="success">[% messages.cfmsg %]</div>[% END %]
           [% IF messages.cferr %]<div class="error">[% messages.cferr %]</div>[% END %]
