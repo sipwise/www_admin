@@ -1614,6 +1614,7 @@ sub edit_cf_times : Local {
 
     $c->stash->{tsets} = $tsets;
     $c->stash->{seditid} = $c->request->params->{seditid};
+    $c->stash->{peditid} = $c->request->params->{peditid};
 
     return 1;
 }

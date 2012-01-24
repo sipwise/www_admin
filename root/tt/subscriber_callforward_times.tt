@@ -65,106 +65,131 @@
 <script type="text/javascript">
       $(document).ready(function(){
 
+        // create draggables for
+        // drag-elem-{year,month,wday,mday,hour,minute}-range
+        drags = ["year", "month", "wday", "mday", "hour", "minute"];
+        for(var i in drags) {
+          $("#drag-elem-" + drags[i] + "-range").draggable({
+            cursor: "move",
+            helper: "clone",
+            revert: false,
+            opacity: 0.7,
+          });
+          $("#drag-elem-" + drags[i]).draggable({
+            cursor: "move",
+            helper: "clone",
+            revert: false,
+            opacity: 0.7,
+          });
+        }
+
+        var drops = Array('drop-elem-year', 'drop-elem-month', 'drop-elem-mday', 
+          'drop-elem-wday', 'drop-elem-hour', 'drop-elem-minute');
+        var drags = Array('drag-elem-year', 'drag-elem-month', 'drag-elem-mday',
+          'drag-elem-wday', 'drag-elem-hour', 'drag-elem-minute');
         [% FOREACH tset IN tsets %]
-        createDropZone('drop-elem-year', '[% tset.id %]');
-        createDropZone('drop-elem-month', '[% tset.id %]');
-        createDropZone('drop-elem-mday', '[% tset.id %]');
-        createDropZone('drop-elem-wday', '[% tset.id %]');
-        createDropZone('drop-elem-hour', '[% tset.id %]');
-        createDropZone('drop-elem-minute', '[% tset.id %]');
+          for(var i in drops) {
+            createDropZone(drops[i], [% tset.id %], 0, true);
+            [% FOREACH p IN tset.periods %]
+              createDropZone(drops[i], [% tset.id %], [% p.id %], false);
+              // TODO: check whether it's a range and add "-range" where applicable
+              $('div#' + drops[i] + '-[% tset.id %]-[% p.id %]').trigger('drop', $('div#' + drags[i]).draggable().clone());
+            [% END %]
+          }
         [% END %]
 
         function pad2(number) {
           return (number < 10 ? '0' : '') + number;
         }
 
-        function createDropZone(id, zoneid) {
+        function createDropZone(id, tsetid, periodid, isactive) {
           var anchor;
           if(id == "drop-elem-year") {
 
-            anchor = $('div#drop-anchor-year-' + zoneid);
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-year-' + tsetid + '-' + periodid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + tsetid + '-' + periodid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
-                if(d.attr("id") == "drag-elem-year" ||
-                   d.attr("id") == "drag-elem-year-range")
+                if(isactive && (
+                   d.attr("id") == "drag-elem-year" ||
+                   d.attr("id") == "drag-elem-year-range"))
                 { return true; }
               },
-              drop: handleDrop,
             }));
 
           } else if(id == "drop-elem-month") {
 
-            anchor = $('div#drop-anchor-month-' + zoneid);
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-month-' + tsetid + '-' + periodid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + tsetid + '-' + periodid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
-                if(d.attr("id") == "drag-elem-month" ||
-                   d.attr("id") == "drag-elem-month-range")
+                if(isactive && (
+                   d.attr("id") == "drag-elem-month" ||
+                   d.attr("id") == "drag-elem-month-range"))
                 { return true; }
               },
-              drop: handleDrop,
             }));
 
           } else if(id == "drop-elem-mday") {
 
-            anchor = $('div#drop-anchor-mday-' + zoneid);
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-mday-' + tsetid + '-' + periodid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + tsetid + '-' + periodid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
-                if(d.attr("id") == "drag-elem-mday" ||
-                   d.attr("id") == "drag-elem-mday-range")
+                if(isactive && (
+                   d.attr("id") == "drag-elem-mday" ||
+                   d.attr("id") == "drag-elem-mday-range"))
                 { return true; }
               },
-              drop: handleDrop,
             }));
 
           } else if(id == "drop-elem-wday") {
 
-            anchor = $('div#drop-anchor-wday-' + zoneid);
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-wday-' + tsetid + '-' + periodid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + tsetid + '-' + periodid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
-                if(d.attr("id") == "drag-elem-wday" ||
-                   d.attr("id") == "drag-elem-wday-range")
+                if(isactive && (
+                   d.attr("id") == "drag-elem-wday" ||
+                   d.attr("id") == "drag-elem-wday-range"))
                 { return true; }
               },
-              drop: handleDrop,
             }));
 
           } else if(id == "drop-elem-hour") {
 
-            anchor = $('div#drop-anchor-hour-' + zoneid);
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-hour-' + tsetid + '-' + periodid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + tsetid + '-' + periodid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
-                if(d.attr("id") == "drag-elem-hour" ||
-                   d.attr("id") == "drag-elem-hour-range")
+                if(isactive && (
+                   d.attr("id") == "drag-elem-hour" ||
+                   d.attr("id") == "drag-elem-hour-range"))
                 { return true; }
               },
-              drop: handleDrop,
             }));
 
           } else if(id == "drop-elem-minute") {
 
-            anchor = $('div#drop-anchor-minute-' + zoneid);
-            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + zoneid + '">any</div>').droppable({
+            anchor = $('div#drop-anchor-minute-' + tsetid + '-' + periodid);
+            anchor.find('div.drophead').after($('<div class="dateform-elem waiting" id="' + id + '-' + tsetid + '-' + periodid + '">any</div>').droppable({
               hoverClass: "hovering",
               activeClass: "accepting",
               accept: function(d){ 
-                if(d.attr("id") == "drag-elem-minute" ||
-                   d.attr("id") == "drag-elem-minute-range")
+                if(isactive && (
+                   d.attr("id") == "drag-elem-minute" ||
+                   d.attr("id") == "drag-elem-minute-range"))
                 { return true; }
               },
-              drop: handleDrop,
             }));
 
           }
+          $('#' + id + '-' + tsetid + '-' + periodid).bind("drop", handleDrop);
 
           if(anchor != undefined) {
             var foot = $(anchor).find('div.dropfoot');
@@ -172,27 +197,40 @@
           }
         }
 
-        function removeDrop(id, zoneid) {
-          $('div#' + zoneid).remove();
-          var zonearr = zoneid.match(/^.+\-([0-9]+)$/);
-          zoneid = zonearr[1];
-          zonearr = id.match(/^(.+)\-[0-9]+$/);
+        function removeDrop(id, tsetid) {
+          $('div#' + tsetid).remove();
+          var zonearr = tsetid.match(/^.+\-([0-9]+)\-([0-9]+)$/);
+          tsetid = zonearr[1];
+          var periodid = zonearr[2];
+          zonearr = id.match(/^(.+)\-[0-9]+\-[0-9]+$/);
           id = zonearr[1];
-          createDropZone(id, zoneid);          
+          createDropZone(id, tsetid, periodid);          
         }
 
         function handleDrop(event, ui) {
-          var dropped = ui.draggable.clone();
-          var zoneid = $(this).attr('id');
+          var dropped;
+          if(ui.draggable)
+            dropped = ui.draggable.clone();
+          else
+            dropped = $(ui);
+
+          console.log(dropped);
+          
+          var tsetid = $(this).attr('id');
+          var zonearr = tsetid.match(/^.+\-([0-9]+)\-([0-9]+)$/);
+          var periodid = zonearr[2];
+          var isactive = false;
+          if(periodid == "0" || periodid == "[% peditid %]")
+            isactive = true;
 
           var from_select = dropped.find('select.from');
           if(from_select) {
-            from_select.removeAttr('disabled');
+            if(isactive) from_select.removeAttr('disabled');
             from_select.children().remove();
           }
           var to_select = dropped.find('select.to');
           if(to_select) {
-            to_select.removeAttr('disabled');
+            if(isactive) to_select.removeAttr('disabled');
             to_select.children().remove();
           }
 
@@ -207,16 +245,22 @@
           var hours = new Array(24);
           var minutes = new Array(60);
 
+
           // from-year
           if(dropped.attr("id") == "drag-elem-year" || dropped.attr("id") == "drag-elem-year-range") {
             for(var i = 0; i < years.length; ++i) {
-              $('<option value="' + (d.getFullYear()+i) + '">' + (d.getFullYear()+i) + '</option>').appendTo(from_select);
+              var y = d.getFullYear() + i;
+              $('<option value="' + y + '">' + y + '</option>').appendTo(from_select);
+
+              // TODO: somehow get vals of currently displayed (or edited) period and set as selected="selected".
+              // this needs to be passed to this callback somehow, or fetched from tt.
             }
           }
           // to-year
           if(dropped.attr("id") == "drag-elem-year-range") {
             for(var i = 0; i < years.length; ++i) {
-              $('<option value="' + (d.getFullYear()+i+1) + '">' + (d.getFullYear()+i+1) + '</option>').appendTo(to_select);
+              var y = d.getFullYear() + i + 1;
+              $('<option value="' + y + '">' + y + '</option>').appendTo(to_select);
             }
           }
           // from-month
@@ -280,37 +324,21 @@
             }
           }
 
-          dropped.attr("id", zoneid);
+          dropped.attr("id", tsetid);
 
           // replace old footer text by remove-link and bind click handler
           var foot = $(this).next('div');
           $(foot).find('p').replaceWith('<p></p>');
-          $('<a href="javascript:void(0);">Remove</a>').click(function(){
-            removeDrop(dropped.attr("id"), zoneid);
-          }).appendTo($(foot).find('p'));
+          if(isactive) {
+            $('<a href="javascript:void(0);">Remove</a>').click(function(){
+              removeDrop(dropped.attr("id"), tsetid);
+            }).appendTo($(foot).find('p'));
+          } else {
+            // nothing here yet
+          }
           $(this).replaceWith(dropped).attr('class', 'span-4 ui-state-default dateform-elem');
           if(dropped.attr("id") == "drag-elem-wday-range") {
             $(this).addClass("last");
-          }
-        }
-
-        // create draggables for
-        // drag-elem-{year,month,wday,mday,hour,minute}-range
-        drags = ["year", "month", "wday", "mday", "hour", "minute"];
-        for(var i = 0; i < drags.length; ++i) {
-          $("#drag-elem-" + drags[i] + "-range").draggable({
-            cursor: "move",
-            helper: "clone",
-            revert: false,
-            opacity: 0.7,
-          });
-          if(drags[i] != "tofday") {
-            $("#drag-elem-" + drags[i]).draggable({
-              cursor: "move",
-              helper: "clone",
-              revert: false,
-              opacity: 0.7,
-            });
           }
         }
 
@@ -430,119 +458,67 @@
             </li>
           </ul>
           <ul class="cleanlist" id="[% tset.id %]set">
-            [% priority = 0 %]
+            [% pedit = 0 %]
             [% FOREACH period IN tset.periods %]
-              <li class="ui-state-default intend medium" id="period_[% period.id %]">
-                [% IF peditid == period.id %]
-                  [% # TODO: period editing %]
-                [% ELSE %]
-                    <div class="span-2"">
+              [% IF peditid == period.id  AND !Catalyst.session.admin.read_only %]
+                [%  pedit = 1 %]
+              [% ELSE %]
+                 [% pedit = 0 %]
+              [% END %]
+              <li class="ui-state-default intend mediumhigh" id="period_[% period.id %]">
+                    <div class="span-2" id="drop-anchor-year-[% tset.id %]-[% period.id %]">
                       <div class="ui-widget-header drophead"><p>Year</p></div>
-                      <div class="dateform-elem waiting">
-                        [% IF period.year.defined %]
-                          <select size="1" class="from" name="year" disabled="disabled">
-                            <option value="[% period.year %]">[% period.year %]</option>
-                          </select>
-                        [% ELSIF period.from_year.defined AND period.to_year.defined %]
-                          <select size="1" class="from" name="from_year" disabled="disabled"><option>[% period.from_year %]</option></select>
-                          <br/>through</br>
-                          <select size="1" class="to" name="to_year" disabled="disabled"><option>[% period.to_year %]</option></select>
-                        [% ELSE %]any
-                        [% END %]
-                      </div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2"">
+                    <div class="span-2" id="drop-anchor-month-[% tset.id %]-[% period.id %]">
                       <div class="ui-widget-header drophead"><p>Month</p></div>
-                      <div class="dateform-elem waiting">
-                        [% IF period.month.defined %]
-                          <select size="1" class="from" name="month" disabled="disabled">
-                            <option value="[% period.month %]">[% period.month %]</option>
-                          </select>
-                        [% ELSIF period.from_month.defined AND period.to_month.defined %]
-                          <select size="1" class="from" name="from_month" disabled="disabled"><option>[% period.from_month %]</option></select>
-                          <br/>through</br>
-                          <select size="1" class="to" name="to_month" disabled="disabled"><option>[% period.to_month %]</option></select>
-                        [% ELSE %]any
-                        [% END %]
-                      </div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2"">
+                    <div class="span-2" id="drop-anchor-mday-[% tset.id %]-[% period.id %]">
                       <div class="ui-widget-header drophead"><p>Day</p></div>
-                      <div class="dateform-elem waiting">
-                        [% IF period.mday.defined %]
-                          <select size="1" class="from" name="mday" disabled="disabled">
-                            <option value="[% period.mday %]">[% period.mday %]</option>
-                          </select>
-                        [% ELSIF period.from_mday.defined AND period.to_mday.defined %]
-                          <select size="1" class="from" name="from_mday" disabled="disabled"><option>[% period.from_mday %]</option></select>
-                          <br/>through</br>
-                          <select size="1" class="to" name="to_mday" disabled="disabled"><option>[% period.to_mday %]</option></select>
-                        [% ELSE %]any
-                        [% END %]
-                      </div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2"">
+                    <div class="span-2" id="drop-anchor-wday-[% tset.id %]-[% period.id %]">
                       <div class="ui-widget-header drophead"><p>Weekday</p></div>
-                      <div class="dateform-elem waiting">
-                        [% IF period.wday.defined %]
-                          <select size="1" class="from" name="wday" disabled="disabled">
-                            <option value="[% period.wday %]">[% period.wday %]</option>
-                          </select>
-                        [% ELSIF period.from_wday.defined AND period.to_wday.defined %]
-                          <select size="1" class="from" name="from_wday" disabled="disabled"><option>[% period.from_wday %]</option></select>
-                          <br/>through</br>
-                          <select size="1" class="to" name="to_wday" disabled="disabled"><option>[% period.to_wday %]</option></select>
-                        [% ELSE %]any
-                        [% END %]
-                      </div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2"">
+                    <div class="span-2" id="drop-anchor-hour-[% tset.id %]-[% period.id %]">
                       <div class="ui-widget-header drophead"><p>Hour</p></div>
-                      <div class="dateform-elem waiting">
-                        [% IF period.hour.defined %]
-                          <select size="1" class="from" name="hour" disabled="disabled">
-                            <option value="[% period.hour %]">[% period.hour %]</option>
-                          </select>
-                        [% ELSIF period.from_hour.defined AND period.to_hour.defined %]
-                          <select size="1" class="from" name="from_hour" disabled="disabled"><option>[% period.from_hour %]</option></select>
-                          <br/>through</br>
-                          <select size="1" class="to" name="to_hour" disabled="disabled"><option>[% period.to_hour %]</option></select>
-                        [% ELSE %]any
-                        [% END %]
-                      </div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2"">
+                    <div class="span-2" id="drop-anchor-minute-[% tset.id %]-[% period.id %]">
                       <div class="ui-widget-header drophead"><p>Minute</p></div>
-                      <div class="dateform-elem waiting">
-                        [% IF period.minute.defined %]
-                          <select size="1" class="from" name="minute" disabled="disabled">
-                            <option value="[% period.minute %]">[% period.minute %]</option>
-                          </select>
-                        [% ELSIF period.from_minute.defined AND period.to_minute.defined %]
-                          <select size="1" class="from" name="from_minute" disabled="disabled"><option>[% period.from_minute %]</option></select>
-                          <br/>through</br>
-                          <select size="1" class="to" name="to_minute" disabled="disabled"><option>[% period.to_minute %]</option></select>
-                        [% ELSE %]any
-                        [% END %]
-                      </div>
+                      <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
 
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="prepend-2 span-1">
-                        <a href="/subscriber/edit_cf_times?subscriber_id=[% subscriber_id %]&peditid=[% period.id %]"><span class="button-edit">Edit</span></a>
-                      </div>
-                      <div class="span-1 last">
-                        <form action="/subscriber/edit_cf_time_delperiod" method="post">
-                          <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
-                          <input type="hidden" name="seditid" value="[% tset.id %]"/>
-                          <input type="hidden" name="peditid" value="[% period.id %]"/>
-                          <button class="button-delete">Delete</button>
-                        </form>
-                      </div>
+                      [% IF pedit %]
+                        <div class="prepend-2 span-1">
+                          <form action="/subscriber/edit_cf_time_saveperiod" method="post">
+                            <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                            <input type="hidden" name="seditid" value="[% tset.id %]"/>
+                            <input type="hidden" name="peditid" value="[% period.id %]"/>
+                            <button class="button-save">Save</button>
+                          </form>
+                        </div>
+                        <div class="span-1 last">
+                          <a href="/subscriber/edit_cf_times?subscriber_id=[% subscriber_id %]#period_[% period.id %]"><span class="button-cancel">Cancel</span></a>
+                        </div>
+                      [% ELSE %]
+                        <div class="prepend-2 span-1">
+                          <a href="/subscriber/edit_cf_times?subscriber_id=[% subscriber_id %]&peditid=[% period.id %]#period_[% period.id %]"><span class="button-edit">Edit</span></a>
+                        </div>
+                        <div class="span-1 last">
+                          <form action="/subscriber/edit_cf_time_delperiod" method="post">
+                            <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
+                            <input type="hidden" name="seditid" value="[% tset.id %]"/>
+                            <input type="hidden" name="peditid" value="[% period.id %]"/>
+                            <button class="button-delete">Delete</button>
+                          </form>
+                        </div>
+                      [% END %]
                     [% END %]
-                [% END %]
               </li>
-            [% priority = priority + 1 %]
             [% END %]
 
 
@@ -552,27 +528,27 @@
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
                     <input type="hidden" name="seditid" value="[% tset.id %]"/>
                     <input type="hidden" name="priority" value="[% priority %]"/>
-                    <div class="span-2" id="drop-anchor-year-[% tset.id %]">
+                    <div class="span-2" id="drop-anchor-year-[% tset.id %]-0">
                       <div class="ui-widget-header drophead"><p>Year</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-month-[% tset.id %]">
+                    <div class="span-2" id="drop-anchor-month-[% tset.id %]-0">
                       <div class="ui-widget-header drophead"><p>Month</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-mday-[% tset.id %]">
+                    <div class="span-2" id="drop-anchor-mday-[% tset.id %]-0">
                       <div class="ui-widget-header drophead"><p>Day</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-wday-[% tset.id %]">
+                    <div class="span-2" id="drop-anchor-wday-[% tset.id %]-0">
                       <div class="ui-widget-header drophead"><p>Weekday</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-hour-[% tset.id %]">
+                    <div class="span-2" id="drop-anchor-hour-[% tset.id %]-0">
                       <div class="ui-widget-header drophead"><p>Hour</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
-                    <div class="span-2" id="drop-anchor-minute-[% tset.id %]">
+                    <div class="span-2" id="drop-anchor-minute-[% tset.id %]-0">
                       <div class="ui-widget-header drophead"><p>Minute</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
                     </div>
@@ -596,24 +572,3 @@
             [% END %]
           </ul>
 
-
-         <div class="hspace-20"></div>
-
-[% IF 0 %]
-          <div class="span-4" id="drop-anchor-year">
-            <div class="ui-widget-header drophead"><p>Year</p></div>
-            <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
-          </div>
-          <div class="span-4" id="drop-anchor-month">
-            <div class="ui-widget-header drophead"><p>Month</p></div>
-            <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
-          </div>
-          <div class="span-4" id="drop-anchor-wday">
-            <div class="ui-widget-header drophead"><p>Weekday</p></div>
-            <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
-          </div>
-          <div class="span-4 last" id="drop-anchor-tofday">
-            <div class="ui-widget-header drophead"><p>Time of Day</p></div>
-            <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
-          </div>
-[% END %]
