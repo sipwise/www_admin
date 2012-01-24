@@ -90,37 +90,39 @@
             createDropZone(drops[i], [% tset.id %], 0, true);
           }
           [% FOREACH p IN tset.periods %]
-            createDropZone('drop-elem-year', [% tset.id %], [% p.id %], false);
+            for(var i in drops) {
+              [% IF peditid == p.id %]
+                createDropZone(drops[i], [% tset.id %], [% p.id %], true);
+              [% ELSE %]
+                createDropZone(drops[i], [% tset.id %], [% p.id %], false);
+              [% END %]
+            }
+            
             [% IF p.year.defined %]
               $('div#drop-elem-year-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-year').draggable().clone(), true, '[% p.year %]', undefined, undefined]);
             [% ELSIF p.from_year.defined AND p.to_year.defined %]
               $('div#drop-elem-year-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-year-range').draggable().clone(), true, undefined, '[% p.from_year %]', '[% p.to_year %]']);
             [% END %]
-            createDropZone('drop-elem-month', [% tset.id %], [% p.id %], false);
             [% IF p.month.defined %]
               $('div#drop-elem-month-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-month').draggable().clone(), true, '[% p.month %]', undefined, undefined]);
             [% ELSIF p.from_month.defined AND p.to_month.defined %]
               $('div#drop-elem-month-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-month-range').draggable().clone(), true, undefined, '[% p.from_month %]', '[% p.to_month %]']);
             [% END %]
-            createDropZone('drop-elem-mday', [% tset.id %], [% p.id %], false);
             [% IF p.mday.defined %]
               $('div#drop-elem-mday-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-mday').draggable().clone(), true, '[% p.mday %]', undefined, undefined]);
             [% ELSIF p.from_mday.defined AND p.to_mday.defined %]
               $('div#drop-elem-mday-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-mday-range').draggable().clone(), true, undefined, '[% p.from_mday %]', '[% p.to_mday %]']);
             [% END %]
-            createDropZone('drop-elem-wday', [% tset.id %], [% p.id %], false);
             [% IF p.wday.defined %]
               $('div#drop-elem-wday-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-wday').draggable().clone(), true, '[% p.wday %]', undefined, undefined]);
             [% ELSIF p.from_wday.defined AND p.to_wday.defined %]
               $('div#drop-elem-wday-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-wday-range').draggable().clone(), true, undefined, '[% p.from_wday %]', '[% p.to_wday %]']);
             [% END %]
-            createDropZone('drop-elem-hour', [% tset.id %], [% p.id %], false);
             [% IF p.hour.defined %]
               $('div#drop-elem-hour-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-hour').draggable().clone(), true, '[% p.hour %]', undefined, undefined]);
             [% ELSIF p.from_hour.defined AND p.to_hour.defined %]
               $('div#drop-elem-hour-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-hour-range').draggable().clone(), true, undefined, '[% p.from_hour %]', '[% p.to_hour %]']);
             [% END %]
-            createDropZone('drop-elem-minute', [% tset.id %], [% p.id %], false);
             [% IF p.minute.defined %]
               $('div#drop-elem-minute-[% tset.id %]-[% p.id %]').trigger('drop', [$('div#drag-elem-minute').draggable().clone(), true, '[% p.minute %]', undefined, undefined]);
             [% ELSIF p.from_minute.defined AND p.to_minute.defined %]
@@ -243,13 +245,11 @@
         }
 
         function handleDrop(event, ui, manual, param, from_param, to_param) {
-          if(manual)
-            ui = ui[0];
           var dropped;
-          if(ui.draggable)
-            dropped = ui.draggable.clone();
-          else
+          if(manual)
             dropped = $(ui);
+          else
+            dropped = ui.draggable.clone();
 
           var tsetid = $(this).attr('id');
           var zonearr = tsetid.match(/^.+\-([0-9]+)\-([0-9]+)$/);
@@ -279,8 +279,6 @@
           var mdays = new Array(31);
           var hours = new Array(24);
           var minutes = new Array(60);
-
-          console.log("param=" + param + ", from_param=" + from_param + ", to_param=" + to_param);
 
           // from-year
           if(dropped.attr("id") == "drag-elem-year" || dropped.attr("id") == "drag-elem-year-range") {
@@ -366,8 +364,6 @@
             $('<a href="javascript:void(0);">Remove</a>').click(function(){
               removeDrop(dropped.attr("id"), tsetid);
             }).appendTo($(foot).find('p'));
-          } else {
-            // nothing here yet
           }
           $(this).replaceWith(dropped).attr('class', 'span-4 ui-state-default dateform-elem');
           if(dropped.attr("id") == "drag-elem-wday-range") {
@@ -499,6 +495,13 @@
                  [% pedit = 0 %]
               [% END %]
               <li class="ui-state-default intend mediumhigh" id="period_[% period.id %]">
+                [% UNLESS Catalyst.session.admin.read_only %]
+                  [% IF pedit %]
+                  <form action="/subscriber/edit_cf_times_saveperiod" method="post">
+                  [% ELSE %]
+                  <form action="/subscriber/edit_cf_time_delperiod" method="post">
+                  [% END %]
+                [% END %]
                     <div class="span-2" id="drop-anchor-year-[% tset.id %]-[% period.id %]">
                       <div class="ui-widget-header drophead"><p>Year</p></div>
                       <div class="ui-widget-header dropfoot"><p>Drop to refine</p></div>
@@ -527,12 +530,10 @@
                     [% UNLESS Catalyst.session.admin.read_only %]
                       [% IF pedit %]
                         <div class="prepend-2 span-1">
-                          <form action="/subscriber/edit_cf_time_saveperiod" method="post">
                             <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
                             <input type="hidden" name="seditid" value="[% tset.id %]"/>
                             <input type="hidden" name="peditid" value="[% period.id %]"/>
                             <button class="button-save">Save</button>
-                          </form>
                         </div>
                         <div class="span-1 last">
                           <a href="/subscriber/edit_cf_times?subscriber_id=[% subscriber_id %]#period_[% period.id %]"><span class="button-cancel">Cancel</span></a>
@@ -542,22 +543,23 @@
                           <a href="/subscriber/edit_cf_times?subscriber_id=[% subscriber_id %]&peditid=[% period.id %]#period_[% period.id %]"><span class="button-edit">Edit</span></a>
                         </div>
                         <div class="span-1 last">
-                          <form action="/subscriber/edit_cf_time_delperiod" method="post">
                             <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
                             <input type="hidden" name="seditid" value="[% tset.id %]"/>
                             <input type="hidden" name="peditid" value="[% period.id %]"/>
                             <button class="button-delete">Delete</button>
-                          </form>
                         </div>
                       [% END %]
                     [% END %]
+                [% UNLESS Catalyst.session.admin.read_only %]
+                  </form>
+                [% END %]
               </li>
             [% END %]
 
 
               [% IF seditid == tset.id || !tset.periods || tset.periods.size == 0 %]
                 <li class="ui-state-default intend mediumhigh">
-                  <form action="/subscriber/edit_cf_times_createperiod" method="post">
+                  <form action="/subscriber/edit_cf_times_saveperiod" method="post">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
                     <input type="hidden" name="seditid" value="[% tset.id %]"/>
                     <input type="hidden" name="priority" value="[% priority %]"/>

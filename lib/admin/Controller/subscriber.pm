@@ -1740,7 +1740,7 @@ sub edit_cf_times_createset : Local {
 
 # fooooo
 
-sub edit_cf_times_createperiod : Local {
+sub edit_cf_times_saveperiod : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_callforward_times.tt';
 
@@ -1748,6 +1748,8 @@ sub edit_cf_times_createperiod : Local {
     $c->stash->{subscriber_id} = $subscriber_id;
     my $tset_id = $c->request->params->{seditid};
     $c->stash->{seditid} = $tset_id;
+    my $period_id = $c->request->params->{peditid};
+    $c->stash->{peditid} = $period_id;
     
     my %messages;
     my %period;
@@ -1774,6 +1776,7 @@ sub edit_cf_times_createperiod : Local {
     $self->period_collapse(\%period);
 
     $period{setid} = $tset_id;
+    $period{id} = $period_id if(defined $period_id);
 
     my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
@@ -1782,13 +1785,29 @@ sub edit_cf_times_createperiod : Local {
                                                       );
     $c->stash->{subscriber} = $subscriber;
 
-    if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_time_period',
+    my $ret;
+    unless(defined $period_id) 
+    {
+      $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_time_period',
                                                         { username => $subscriber->{username},
                                                           domain => $subscriber->{domain},
                                                           data => \%period,
                                                         },
                                                         undef,
-                                                      ))
+                                                      );
+    } 
+    else 
+    {
+      $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_time_period',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%period,
+                                                        },
+                                                        undef,
+                                                      );
+    }
+
+    if($ret)
     {
       $messages{esetmsg} = 'Server.Voip.SavedSettings';
     }
@@ -1797,7 +1816,7 @@ sub edit_cf_times_createperiod : Local {
       $messages{eseterr} = 'Client.Voip.InputErrorFound';
     }
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id");
+    $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id#".$tset_id."set");
 }
 
 sub period_collapse : Private {
@@ -1849,7 +1868,7 @@ sub period_collapse : Private {
       # nothing to be done 
     }
     elsif(defined $period->{from_wday} && defined $period->{to_wday}) {
-      $period->{mday} = $period->{from_wday} . "-" . $period->{to_wday};
+      $period->{wday} = $period->{from_wday} . "-" . $period->{to_wday};
     }
     else {
       # skip if incomplete
@@ -2009,7 +2028,7 @@ sub edit_cf_time_delperiod : Local {
       $messages{eseterr} = 'Client.Voip.InputErrorFound';
     }
     $c->session->{messages} = \%messages;
-    $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id");
+    $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id#".$tset_id."set");
 }
 
 sub edit_list : Local {
