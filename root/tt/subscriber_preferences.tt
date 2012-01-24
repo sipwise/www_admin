@@ -209,6 +209,7 @@
 
         [% UNLESS Catalyst.session.admin.read_only %]
           <form action="update_callforward" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]"/>
           [% IF edit_callforward %]
             <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#callforward"><span class="button-cancel">Cancel</span></a>
             <button name="submit" class="button-save">Save</button>
@@ -246,27 +247,28 @@
               [% FOREACH cf_type IN cf_types %]
               <li class="ui-state-default">
                 <div class="span-5">[% cf_type.description %]:</div>
-                [% IF edit_callforward %]
                   <div class="span-4">
                     <label for="cfdest_[% cf_type.name %]">to</label>
-                    <select id="cfdest_[% cf_type.name %]" name="dest_[% cf_type.name %]" size="1" style="width: 120px;">
+                    <select id="cfdest_[% cf_type.name %]" name="[% cf_type.name %]_dest" size="1" style="width: 120px;" [% UNLESS edit_callforward %]disabled="disabled"[% END %]>
+                      <option value="0" [% UNLESS cf_maps.${cf_type.name}.defined %]selected="selected"[% END %]>&lt;disabled&gt;</option>
                       [% FOREACH dset IN cf_dsets %]
                         [% IF dset.destinations.size > 0 %]
-                        <option value="[% dset.id %]">[% dset.name %]</option>
+                        <option value="[% dset.id %]" [% IF cf_maps.${cf_type.name}.destination_set_id == dset.id %]selected="selected"[% END %]>[% dset.name %]</option>
                         [% END %]
                       [% END %]
                     </select>
                   </div>
                   <div class="span-6 last">
                     <label for="cftime_[% cf_type.name %]">during period</label>
-                    <select id="cftime_[% cf_type.name %]" name="time_[% cf_type.name %]" size="1" style="width: 120px;">
-                        <option value="0">&lt;always&gt;</option>
+                    <select id="cftime_[% cf_type.name %]" name="[% cf_type.name %]_time" size="1" style="width: 120px;" [% UNLESS edit_callforward %]disabled="disabled"[% END %]>
+                        <option value="0" [% UNLESS cf_maps.${cf_type.name}.defined && cf_maps.${cf_type.name}.time_set_id.defined %]selected="selected"[% END %]>&lt;always&gt;</option>
                       [% FOREACH tset IN cf_tsets %]
-                        <option value="[% tset.id %]">[% tset.name %]</option>
+                        [% IF tset.periods.size > 0 %]
+                        <option value="[% tset.id %]" [% IF cf_maps.${cf_type.name}.time_set_id == tset.id %]selected="selected"[% END %]>[% tset.name %]</option>
+                        [% END %]
                       [% END %]
                     </select>
                   </div>
-                [% END %]
               </li>
               [% END %]
            </ul>

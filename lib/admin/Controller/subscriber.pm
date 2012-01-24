@@ -575,6 +575,8 @@ sub preferences : Local {
     my $preferences;
     my $speed_dial_slots;
     my $cf_dsets;
+    my $cf_tsets;
+    my $cf_maps;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
@@ -589,11 +591,25 @@ sub preferences : Local {
                                                         \$preferences
                                                       );
 
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_maps',
+                                                        { username => $$subscriber{username},
+                                                          domain => $$subscriber{domain},
+                                                        },
+                                                        \$cf_maps,
+                                                      );
+
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_destination_sets',
                                                         { username => $$subscriber{username},
                                                           domain => $$subscriber{domain},
                                                         },
                                                         \$cf_dsets,
+                                                      );
+
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_time_sets',
+                                                        { username => $$subscriber{username},
+                                                          domain => $$subscriber{domain},
+                                                        },
+                                                        \$cf_tsets,
                                                       );
 
     # voicebox requires a number
@@ -641,6 +657,8 @@ sub preferences : Local {
                                                       );
 
     $c->stash->{cf_dsets} = $cf_dsets;
+    $c->stash->{cf_tsets} = $cf_tsets;
+    $c->stash->{cf_maps} = $cf_maps;
     $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
     $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
@@ -940,6 +958,49 @@ sub update_preferences : Local {
     $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&edit_preferences=1#userprefs");
     return;
 
+}
+
+sub update_callforward : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_preferences.tt';
+
+    my %cfmap;
+    my @cfs = ("cfu", "cfb", "cft", "cfna");
+    foreach my $cf(@cfs) {
+      $cfmap{$cf}{destination_set_id} = (defined $c->request->params->{$cf.'_dest'} && $c->request->params->{$cf.'_dest'} != "0") ? $c->request->params->{$cf.'_dest'} : undef;
+      $cfmap{$cf}{time_set_id} = (defined $c->request->params->{$cf.'_time'} && $c->request->params->{$cf.'_time'} != "0") ? $c->request->params->{$cf.'_time'} : undef;
+    }
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my %messages;
+
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_maps',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%cfmap,
+                                                        },
+                                                        undef,
+                                                      ))
+    {
+      $messages{cfmsg} = 'Server.Voip.SavedSettings';
+      $c->session->{messages} = \%messages;
+      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id#callforward");
+    }
+    else
+    {
+      $messages{cferr} = 'Client.Voip.InputErrorFound';
+      $c->session->{messages} = \%messages;
+      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&edit_callforward=1#callforward");
+    }
 }
 
 sub update_reminder : Local {
