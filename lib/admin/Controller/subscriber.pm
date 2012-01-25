@@ -721,24 +721,7 @@ sub preferences : Local {
         # managed separately
         next if $$pref{preference} eq 'lock';
 
-        if($$pref{preference} eq 'cfu'
-           or $$pref{preference} eq 'cfb'
-           or $$pref{preference} eq 'cft'
-           or $$pref{preference} eq 'cfna')
-        {
-          if(defined $$preferences{$$pref{preference}} and length $$preferences{$$pref{preference}}) {
-            my $vbdom = $c->config->{voicebox_domain};
-            my $fmdom = $c->config->{fax2mail_domain};
-            my $confdom = $c->config->{conference_domain};
-            if($$preferences{$$pref{preference}} =~ /\@$vbdom$/) {
-              $$preferences{$$pref{preference}} = 'voicebox';
-            } elsif($$preferences{$$pref{preference}} =~ /\@$fmdom$/) {
-              $$preferences{$$pref{preference}} = 'fax2mail';
-            } elsif($$preferences{$$pref{preference}} =~ /\@$confdom$/) {
-              $$preferences{$$pref{preference}} = 'conference';
-            }
-          }
-        } elsif(!$c->stash->{ncos_levels} and ($$pref{preference} eq 'ncos' or $$pref{preference} eq 'adm_ncos')) {
+        if(!$c->stash->{ncos_levels} and ($$pref{preference} eq 'ncos' or $$pref{preference} eq 'adm_ncos')) {
           my $ncoslvl;
           return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_ncos_levels',
                                                               undef,
@@ -835,48 +818,7 @@ sub update_preferences : Local {
         delete $$preferences{$$db_pref{preference}}, next
             if $$db_pref{read_only};
 
-        if($$db_pref{preference} eq 'cfu'
-                or $$db_pref{preference} eq 'cfb'
-                or $$db_pref{preference} eq 'cft'
-                or $$db_pref{preference} eq 'cfna')
-        {
-            my $vbdom = $c->config->{voicebox_domain};
-            my $fmdom = $c->config->{fax2mail_domain};
-            my $confdom = $c->config->{conference_domain};
-
-            my $fwtype = $$db_pref{preference};
-            my $fw_target_select = $c->request->params->{$fwtype .'_target'} || 'disable';
-
-            my $fw_target;
-            if($fw_target_select eq 'sipuri') {
-                $fw_target = $c->request->params->{$fwtype .'_sipuri'};
-
-                # normalize, so we can do some checks.
-                $fw_target =~ s/^sip://i;
-
-                if($fw_target =~ /^\+?\d+$/) {
-                    $fw_target = admin::Utils::get_qualified_number_for_subscriber($c, $fw_target);
-                    my $checkresult;
-                    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $fw_target, \$checkresult);
-                    $messages{$fwtype} = 'Client.Voip.MalformedNumber'
-                        unless $checkresult;
-                } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+(:\d{1,5})?$/i) {
-                    $fw_target = 'sip:'. lc $fw_target;
-                } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+$/) {
-                    $fw_target = 'sip:'. lc($fw_target) .'@'. $$subscriber{domain};
-                } else {
-                    $messages{$fwtype} = 'Client.Voip.MalformedTarget';
-                    $fw_target = $c->request->params->{$fwtype .'_sipuri'};
-                }
-            } elsif($fw_target_select eq 'voicebox') {
-                $fw_target = 'sip:vmu'.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$vbdom";
-            } elsif($fw_target_select eq 'fax2mail') {
-                $fw_target = 'sip:'.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$fmdom";
-            } elsif($fw_target_select eq 'conference') {
-                $fw_target = 'sip:conf='.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$confdom";
-            }
-            $$preferences{$fwtype} = $fw_target;
-        } elsif($$db_pref{preference} eq 'cli') {
+        if($$db_pref{preference} eq 'cli') {
             $$preferences{cli} = $c->request->params->{cli} or undef;
             if(defined $$preferences{cli} and $$preferences{cli} =~ /^\+?\d+$/) {
                 $$preferences{cli} = admin::Utils::get_qualified_number_for_subscriber($c, $$preferences{cli});

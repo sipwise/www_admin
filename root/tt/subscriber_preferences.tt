@@ -45,58 +45,6 @@
                     </select>
                   </div>
                 </li>
-                [% ELSIF preference.key == "cfu"
-                      || preference.key == "cfb"
-                      || preference.key == "cft"
-                      || preference.key == "cfna" %]
-                <li class="ui-state-default [% IF edit_preferences %]high[% END %]">
-                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
-                <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
-                  <div class="span-10 last">
-                  [% IF edit_preferences %]
-                    <input type="radio" id="[% preference.key %]disable" value="disable" name="[% preference.key %]_target" class="radio"
-                           [% IF preference.value == "" && ! preference.error %]checked="checked"[% END %] />
-                    <label for="[% preference.key %]disable">Disabled</label>
-                    <br clear="all" />
-                    [% IF Catalyst.config.voicemail_features %]
-                    <input type="radio" id="[% preference.key %]voicebox" value="voicebox" name="[% preference.key %]_target" class="radio"
-                           [% IF preference.value == "voicebox" %]checked="checked"[% END %] />
-                    <label for="[% preference.key %]voicebox">Voicebox</label>
-                    <br clear="all" />
-                    [% END %]
-                    [% IF Catalyst.config.fax_features %]
-                    <input type="radio" id="[% preference.key %]faxserver" value="fax2mail" name="[% preference.key %]_target" class="radio"
-                           [% IF preference.value == "fax2mail" %]checked="checked"[% END %] />
-                    <label for="[% preference.key %]faxserver">Fax2Mail</label>
-                    <br clear="all" />
-                    [% END %]
-                    [% IF Catalyst.config.conference_features %]
-                    <input type="radio" id="[% preference.key %]conference" value="conference" name="[% preference.key %]_target" class="radio"
-                           [% IF preference.value == "conference" %]checked="checked"[% END %] />
-                    <label for="[% preference.key %]conference">Conference room</label>
-                    <br clear="all" />
-                    [% END %]
-                    <input type="radio" id="[% preference.key %]sipuri" value="sipuri" name="[% preference.key %]_target" class="radio"
-                           [% IF (preference.value || preference.error)
-                                 && preference.value != "voicebox" && preference.value != "fax2mail" && preference.value != "conference" %]checked="checked"[% END %] />
-                    <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
-                    <input type="text" id="[% preference.key %]sipuritxt" name="[% preference.key %]_sipuri" size="25"
-                           value="[% preference.value UNLESS preference.value == "voicebox" OR preference.value == "fax2mail" OR preference.value == "conference" %]" />
-                  [% ELSE %]
-                    [% IF preference.value == "voicebox" %]
-                      Voicebox
-                    [% ELSIF preference.value == "fax2mail" %]
-                      Fax2Mail
-                    [% ELSIF preference.value == "conference" %]
-                      Conference room
-                    [% ELSE %]
-                      <input type="text" size="25" value="[% preference.value %]"
-                             class="disabled txtpreference" disabled="disabled" />
-                    [% END %]
-                  [% END %]
-                  </div>
-                </li>
-                [% IF preference.value.error %]<div class="error">[% preference.value.error %]</div>[% END %]
                 [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
                 <li class="ui-state-default">
                   <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
