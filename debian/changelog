@@ -1,3 +1,19 @@
+ngcp-www-admin (3.3.0) unstable; urgency=low
+
+  [ mprokop ]
+  * changelog: debian/changelog: fix invalid mail address
+  * ngcp-www-admin.postinst: postinst script: use invoke-rc.d instead of directly invoking init script
+
+  [ dtiefnig ]
+  * subscriber.pm: not storing subscriber in session to avoid "store_session: data too large" errors
+  * subscriber.pm: do not store preferences in session to avoid size limits
+
+  [ agranig ]
+  * Limit userpart length in SIP URI.
+  * Implement time-based call-forward.
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Thu, 26 Jan 2012 14:59:41 +0100
+
 ngcp-www-admin (3.2.0) unstable; urgency=low
 
   * support for subscriber alias numbers
