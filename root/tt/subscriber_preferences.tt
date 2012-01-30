@@ -1,3 +1,4 @@
+
         <h3> Subscriber
           <a class="noarrow" href="detail?subscriber_id=[% subscriber.subscriber_id %]">
             [% subscriber.username %]@[% subscriber.domain %]</a>
@@ -153,19 +154,11 @@
 
           [% IF messages.cfmsg %]<div class="success">[% messages.cfmsg %]</div>[% END %]
           [% IF messages.cferr %]<div class="error">[% messages.cferr %]</div>[% END %]
-          [% IF edit_callforward && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
+          [% IF meditid && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
 
         [% UNLESS Catalyst.session.admin.read_only %]
-          <form action="update_callforward" method="post">
-            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]"/>
-          [% IF edit_callforward %]
-            <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]#callforward"><span class="button-cancel">Cancel</span></a>
-            <button name="submit" class="button-save">Save</button>
-          [% ELSE %]
-            <a href="preferences?subscriber_id=[% subscriber.subscriber_id %]&edit_callforward=1#callforward"><span class="button-edit">Edit Call-Forwards</span></a>
-            <a href="edit_cf?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-transfer">Edit Destination Sets</span></a>
-            <a href="edit_cf_times?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-clock">Edit Time Sets</span></a>
-          [% END %]
+          <a href="edit_cf?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-transfer">Edit Destination Sets</span></a>
+          <a href="edit_cf_times?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-clock">Edit Time Sets</span></a>
         [% END %]
 
         <div class="hspace-20"></div>
@@ -193,31 +186,83 @@
              %]
 
               [% FOREACH cf_type IN cf_types %]
-              <li class="ui-state-default">
-                <div class="span-5">[% cf_type.description %]:</div>
-                  <div class="span-4">
-                    <label for="cfdest_[% cf_type.name %]">to</label>
-                    <select id="cfdest_[% cf_type.name %]" name="[% cf_type.name %]_dest" size="1" style="width: 120px;" [% UNLESS edit_callforward %]disabled="disabled"[% END %]>
-                      <option value="0" [% UNLESS cf_maps.${cf_type.name}.defined %]selected="selected"[% END %]>&lt;disabled&gt;</option>
-                      [% FOREACH dset IN cf_dsets %]
-                        [% IF dset.destinations.size > 0 %]
-                        <option value="[% dset.id %]" [% IF cf_maps.${cf_type.name}.destination_set_id == dset.id %]selected="selected"[% END %]>[% dset.name %]</option>
+
+                [% cf_map = cf_maps.${cf_type.name} %]
+                [% i = 0 %]
+                [% IF cf_map == '' %]
+                  [% cf_map = [{ id=0, type=cf_type.name }] %]
+                [% ELSE %]
+                  [% cf_map.push({ id=0, type=cf_type.name }) %]
+                [% END %]
+                [% FOREACH map IN cf_map %]
+                  <li class="ui-state-default" id="cfmap_[% map.id %]">
+                  [% IF i == 0 %]
+                    <div class="span-5">[% cf_type.description %]:</div>
+                  [% ELSE %]
+                    <div class="span-5"></div>
+                  [% END %]
+                    [% IF (map.id == 0 || map.id == meditid) && !Catalyst.session.admin.read_only %]
+                      <form action="update_callforward" method="post">
+                      <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]"/>
+                      <input type="hidden" name="type" value="[% map.type %]"/>
+                      <input type="hidden" name="map_id" value="[% map.id %]"/>
+                    [% END %]
+                    <div class="span-4">
+                      <label for="cfdest_[% map.id %]">to</label>
+                      <select id="cfdest_[% map.id %]" name="dest" size="1" style="width: 120px;" [% UNLESS meditid==map.id || map.id == 0 %]disabled="disabled"[% END %]>
+                        <option value="0" [% UNLESS map.destination_set_id.defined %]selected="selected"[% END %]>&lt;none&gt;</option>
+                        [% FOREACH dset IN cf_dsets %]
+                          [% IF dset.destinations.size > 0 %]
+                          <option value="[% dset.id %]" [% IF map.destination_set_id == dset.id %]selected="selected"[% END %]>[% dset.name %]</option>
+                          [% END %]
+                        [% END %]
+                      </select>
+                    </div>
+                    <div class="span-6">
+                      <label for="cftime_[% map.id %]">during period</label>
+                      <select id="cftime_[% map.id %]" name="time" size="1" style="width: 120px;" [% UNLESS meditid==map.id || map.id == 0  %]disabled="disabled"[% END %]>
+                        <option value="0" [% UNLESS map.time_set_id.defined %]selected="selected"[% END %]>&lt;always&gt;</option>
+                        [% FOREACH tset IN cf_tsets %]
+                          [% IF tset.periods.size > 0 %]
+                          <option value="[% tset.id %]" [% IF map.time_set_id == tset.id %]selected="selected"[% END %]>[% tset.name %]</option>
+                          [% END %]
+                        [% END %]
+                      </select>
+                    </div>
+                    <div class="span-1">
+                      [% UNLESS Catalyst.session.admin.read_only %]
+                        [% UNLESS map.id == 0 %]
+                          [% IF map.id == meditid %]
+                            <button class="button-save">Save</button>
+                            </form>
+                          [% ELSE %]
+                            <a href="/subscriber/preferences?subscriber_id=[% subscriber.subscriber_id %]&meditid=[% map.id %]#cfmap_[% map.id %]"><span class="button-edit">Edit</span></a>
+                          [% END %]
+                          </form>
+                        [% ELSE %]
+                          <button class="button-add">Add</button>
+                          </form>
                         [% END %]
                       [% END %]
-                    </select>
-                  </div>
-                  <div class="span-6 last">
-                    <label for="cftime_[% cf_type.name %]">during period</label>
-                    <select id="cftime_[% cf_type.name %]" name="[% cf_type.name %]_time" size="1" style="width: 120px;" [% UNLESS edit_callforward %]disabled="disabled"[% END %]>
-                        <option value="0" [% UNLESS cf_maps.${cf_type.name}.defined && cf_maps.${cf_type.name}.time_set_id.defined %]selected="selected"[% END %]>&lt;always&gt;</option>
-                      [% FOREACH tset IN cf_tsets %]
-                        [% IF tset.periods.size > 0 %]
-                        <option value="[% tset.id %]" [% IF cf_maps.${cf_type.name}.time_set_id == tset.id %]selected="selected"[% END %]>[% tset.name %]</option>
+                    </div>
+                    <div class="span-1 last">
+                      [% UNLESS Catalyst.session.admin.read_only %]
+                        [% IF map.id != 0 && map.id != meditid %]
+                          <form action="delete_callforward" method="post">
+                            <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]"/>
+                            <input type="hidden" name="map_id" value="[% map.id %]"/>
+                            <input type="hidden" name="type" value="[% map.type %]"/>
+                            <button class="button-delete">Delete</button>
+                          </form>
+                        [% ELSIF map.id == meditid %]
+                          <a href="/subscriber/preferences?subscriber_id=[% subscriber.subscriber_id %]#cfmap_[% map.id %]"><span class="button-cancel">Cancel</span></a>
                         [% END %]
                       [% END %]
-                    </select>
-                  </div>
-              </li>
+                    </div>
+                  </li>
+                  [% i = i + 1 %]
+                [% END %]
+
               [% END %]
            </ul>
         </form>

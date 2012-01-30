@@ -784,7 +784,7 @@ sub preferences : Local {
     $c->stash->{edit_voicebox} = $c->request->params->{edit_voicebox};
     $c->stash->{edit_fax} = $c->request->params->{edit_fax};
     $c->stash->{edit_reminder} = $c->request->params->{edit_reminder};
-    $c->stash->{edit_callforward} = $c->request->params->{edit_callforward};
+    $c->stash->{meditid} = $c->request->params->{meditid};
 
     return 1;
 }
@@ -907,11 +907,10 @@ sub update_callforward : Local {
     $c->stash->{template} = 'tt/subscriber_preferences.tt';
 
     my %cfmap;
-    my @cfs = ("cfu", "cfb", "cft", "cfna");
-    foreach my $cf(@cfs) {
-      $cfmap{$cf}{destination_set_id} = (defined $c->request->params->{$cf.'_dest'} && $c->request->params->{$cf.'_dest'} != "0") ? $c->request->params->{$cf.'_dest'} : undef;
-      $cfmap{$cf}{time_set_id} = (defined $c->request->params->{$cf.'_time'} && $c->request->params->{$cf.'_time'} != "0") ? $c->request->params->{$cf.'_time'} : undef;
-    }
+    $cfmap{id} = $c->request->params->{map_id};
+    $cfmap{destination_set_id} = (defined $c->request->params->{dest} && $c->request->params->{dest} != "0") ? $c->request->params->{dest} : undef;
+    $cfmap{time_set_id} = (defined $c->request->params->{time} && $c->request->params->{time} != "0") ? $c->request->params->{time} : undef;
+    $cfmap{type} = $c->request->params->{type};
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     $c->stash->{subscriber_id} = $subscriber_id;
@@ -925,7 +924,60 @@ sub update_callforward : Local {
                                                       );
     $c->stash->{subscriber} = $subscriber;
 
-    if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_maps',
+    my $ret;
+    unless(defined $cfmap{id}) {
+      delete $cfmap{id};
+      $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_map',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%cfmap,
+                                                        },
+                                                        undef,
+                                                      );
+    } else {
+      $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_map',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%cfmap,
+                                                        },
+                                                        undef,
+                                                      );
+    }
+    if($ret)
+    {
+      $messages{cfmsg} = 'Server.Voip.SavedSettings';
+      $c->session->{messages} = \%messages;
+      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id#callforward");
+    }
+    else
+    {
+      $messages{cferr} = 'Client.Voip.InputErrorFound';
+      $c->session->{messages} = \%messages;
+      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&meditid=$cfmap{id}#callforward");
+    }
+}
+
+sub delete_callforward : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_preferences.tt';
+
+    my %cfmap;
+    $cfmap{id} = $c->request->params->{map_id};
+    $cfmap{type} = $c->request->params->{type};
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my %messages;
+
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_map',
                                                         { username => $subscriber->{username},
                                                           domain => $subscriber->{domain},
                                                           data => \%cfmap,
@@ -941,7 +993,7 @@ sub update_callforward : Local {
     {
       $messages{cferr} = 'Client.Voip.InputErrorFound';
       $c->session->{messages} = \%messages;
-      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&edit_callforward=1#callforward");
+      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id#callforward");
     }
 }
 
