@@ -961,9 +961,7 @@ sub delete_callforward : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_preferences.tt';
 
-    my %cfmap;
-    $cfmap{id} = $c->request->params->{map_id};
-    $cfmap{type} = $c->request->params->{type};
+    my $cfmid = $c->request->params->{map_id};
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     $c->stash->{subscriber_id} = $subscriber_id;
@@ -979,8 +977,8 @@ sub delete_callforward : Local {
 
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_map',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%cfmap,
+                                                          domain   => $subscriber->{domain},
+                                                          id       => $cfmid,
                                                         },
                                                         undef,
                                                       ))
