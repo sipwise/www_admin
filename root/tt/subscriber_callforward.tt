@@ -169,7 +169,7 @@
             <li class="ui-state-default">
                 <form action="/subscriber/edit_cf_createset" method="post">
                   <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
-                  <div class="span-4"><input type="text" size="20" name="dsetname" value=""/></div>
+                  <div class="span-4"><input type="text" size="20" name="dsetname" value="" title="enter a name for the destination set" /></div>
                   <div class="prepend-10 span-1 last"><button class="button-add">Add</button></div>
                 </form>
             </li>

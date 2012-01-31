@@ -784,7 +784,7 @@ sub preferences : Local {
     $c->stash->{edit_voicebox} = $c->request->params->{edit_voicebox};
     $c->stash->{edit_fax} = $c->request->params->{edit_fax};
     $c->stash->{edit_reminder} = $c->request->params->{edit_reminder};
-    $c->stash->{edit_callforward} = $c->request->params->{edit_callforward};
+    $c->stash->{meditid} = $c->request->params->{meditid};
 
     return 1;
 }
@@ -907,11 +907,10 @@ sub update_callforward : Local {
     $c->stash->{template} = 'tt/subscriber_preferences.tt';
 
     my %cfmap;
-    my @cfs = ("cfu", "cfb", "cft", "cfna");
-    foreach my $cf(@cfs) {
-      $cfmap{$cf}{destination_set_id} = (defined $c->request->params->{$cf.'_dest'} && $c->request->params->{$cf.'_dest'} != "0") ? $c->request->params->{$cf.'_dest'} : undef;
-      $cfmap{$cf}{time_set_id} = (defined $c->request->params->{$cf.'_time'} && $c->request->params->{$cf.'_time'} != "0") ? $c->request->params->{$cf.'_time'} : undef;
-    }
+    $cfmap{id} = $c->request->params->{map_id};
+    $cfmap{destination_set_id} = (defined $c->request->params->{dest} && $c->request->params->{dest} != "0") ? $c->request->params->{dest} : undef;
+    $cfmap{time_set_id} = (defined $c->request->params->{time} && $c->request->params->{time} != "0") ? $c->request->params->{time} : undef;
+    $cfmap{type} = $c->request->params->{type};
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     $c->stash->{subscriber_id} = $subscriber_id;
@@ -925,10 +924,61 @@ sub update_callforward : Local {
                                                       );
     $c->stash->{subscriber} = $subscriber;
 
-    if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_maps',
+    my $ret;
+    unless(defined $cfmap{id}) {
+      delete $cfmap{id};
+      $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_map',
                                                         { username => $subscriber->{username},
                                                           domain => $subscriber->{domain},
                                                           data => \%cfmap,
+                                                        },
+                                                        undef,
+                                                      );
+    } else {
+      $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_map',
+                                                        { username => $subscriber->{username},
+                                                          domain => $subscriber->{domain},
+                                                          data => \%cfmap,
+                                                        },
+                                                        undef,
+                                                      );
+    }
+    if($ret)
+    {
+      $messages{cfmsg} = 'Server.Voip.SavedSettings';
+      $c->session->{messages} = \%messages;
+      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id#callforward");
+    }
+    else
+    {
+      $messages{cferr} = 'Client.Voip.InputErrorFound';
+      $c->session->{messages} = \%messages;
+      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&meditid=$cfmap{id}#callforward");
+    }
+}
+
+sub delete_callforward : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_preferences.tt';
+
+    my $cfmid = $c->request->params->{map_id};
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my %messages;
+
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber,
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_map',
+                                                        { username => $subscriber->{username},
+                                                          domain   => $subscriber->{domain},
+                                                          id       => $cfmid,
                                                         },
                                                         undef,
                                                       ))
@@ -941,7 +991,7 @@ sub update_callforward : Local {
     {
       $messages{cferr} = 'Client.Voip.InputErrorFound';
       $c->session->{messages} = \%messages;
-      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id&edit_callforward=1#callforward");
+      $c->response->redirect("/subscriber/preferences?subscriber_id=$subscriber_id#callforward");
     }
 }
 
@@ -1326,9 +1376,6 @@ sub edit_cf_delset : Local {
     $c->stash->{subscriber_id} = $subscriber_id;
 
     my %messages;
-    my %dset;
-
-    $dset{id} = $dset_id;
 
     my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
@@ -1339,8 +1386,8 @@ sub edit_cf_delset : Local {
 
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_destination_set',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%dset,
+                                                          domain   => $subscriber->{domain},
+                                                          id       => $dset_id,
                                                         },
                                                         undef,
                                                       ))
@@ -1460,7 +1507,6 @@ sub edit_cf_savedst : Local {
       return;
     }
 
-    $dest{setid} = $dset_id;
     $dest{destination} = $fw_target;
     $dest{priority} = $prio;
 
@@ -1470,8 +1516,9 @@ sub edit_cf_savedst : Local {
       $dest{id} = $dest_id;
       if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_destination',
                                                           { username => $subscriber->{username},
-                                                            domain => $subscriber->{domain},
-                                                            data => \%dest,
+                                                            domain   => $subscriber->{domain},
+                                                            set_id   => $dset_id,
+                                                            data     => \%dest,
                                                           },
                                                           undef,
                                                         ))
@@ -1492,8 +1539,9 @@ sub edit_cf_savedst : Local {
       # create
       if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_destination',
                                                           { username => $subscriber->{username},
-                                                            domain => $subscriber->{domain},
-                                                            data => \%dest,
+                                                            domain   => $subscriber->{domain},
+                                                            set_id   => $dset_id,
+                                                            data     => \%dest,
                                                           },
                                                           undef,
                                                         ))
@@ -1529,15 +1577,12 @@ sub edit_cf_deldest : Local {
     $c->stash->{subscriber} = $subscriber;
 
     my %messages;
-    my %dset;
-
-    $dset{id} = $dest_id;
-    $dset{setid} = $dset_id;
 
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_destination',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%dset,
+                                                          domain   => $subscriber->{domain},
+                                                          set_id   => $dset_id,
+                                                          id       => $dest_id,
                                                         },
                                                         undef,
                                                       ))
@@ -1565,10 +1610,6 @@ sub edit_cf_updatepriority : Local {
     foreach my $dest_id(@$dests)
     {
        my $dest = undef;
-#       $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_destination',
-#           { id => $dest_id },
-#           \$dest
-#       );
        $c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_destination_by_id',
            { id   => $dest_id,
              data => {
@@ -1675,9 +1716,6 @@ sub edit_cf_time_delset : Local {
     $c->stash->{subscriber_id} = $subscriber_id;
 
     my %messages;
-    my %tset;
-
-    $tset{id} = $tset_id;
 
     my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
@@ -1688,8 +1726,8 @@ sub edit_cf_time_delset : Local {
 
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_time_set',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%tset,
+                                                          domain   => $subscriber->{domain},
+                                                          id       => $tset_id,
                                                         },
                                                         undef,
                                                       ))
@@ -1778,7 +1816,6 @@ sub edit_cf_times_saveperiod : Local {
 
     $self->period_collapse(\%period);
 
-    $period{setid} = $tset_id;
     $period{id} = $period_id if(defined $period_id);
 
     my $subscriber;
@@ -1793,8 +1830,9 @@ sub edit_cf_times_saveperiod : Local {
     {
       $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_time_period',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%period,
+                                                          domain   => $subscriber->{domain},
+                                                          set_id   => $tset_id,
+                                                          data     => \%period,
                                                         },
                                                         undef,
                                                       );
@@ -1803,8 +1841,9 @@ sub edit_cf_times_saveperiod : Local {
     {
       $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_time_period',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%period,
+                                                          domain   => $subscriber->{domain},
+                                                          set_id   => $tset_id,
+                                                          data     => \%period,
                                                         },
                                                         undef,
                                                       );
@@ -2004,10 +2043,6 @@ sub edit_cf_time_delperiod : Local {
     $c->stash->{subscriber_id} = $subscriber_id;
 
     my %messages;
-    my %period;
-
-    $period{setid} = $tset_id;
-    $period{id} = $period_id;
 
     my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
@@ -2019,7 +2054,8 @@ sub edit_cf_time_delperiod : Local {
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_time_period',
                                                         { username => $subscriber->{username},
                                                           domain => $subscriber->{domain},
-                                                          data => \%period,
+                                                          set_id   => $tset_id,
+                                                          id       => $period_id,
                                                         },
                                                         undef,
                                                       ))
