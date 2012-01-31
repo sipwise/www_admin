@@ -1507,7 +1507,6 @@ sub edit_cf_savedst : Local {
       return;
     }
 
-    $dest{setid} = $dset_id;
     $dest{destination} = $fw_target;
     $dest{priority} = $prio;
 
@@ -1517,8 +1516,9 @@ sub edit_cf_savedst : Local {
       $dest{id} = $dest_id;
       if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_destination',
                                                           { username => $subscriber->{username},
-                                                            domain => $subscriber->{domain},
-                                                            data => \%dest,
+                                                            domain   => $subscriber->{domain},
+                                                            set_id   => $dset_id,
+                                                            data     => \%dest,
                                                           },
                                                           undef,
                                                         ))
@@ -1539,8 +1539,9 @@ sub edit_cf_savedst : Local {
       # create
       if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_destination',
                                                           { username => $subscriber->{username},
-                                                            domain => $subscriber->{domain},
-                                                            data => \%dest,
+                                                            domain   => $subscriber->{domain},
+                                                            set_id   => $dset_id,
+                                                            data     => \%dest,
                                                           },
                                                           undef,
                                                         ))
@@ -1576,15 +1577,12 @@ sub edit_cf_deldest : Local {
     $c->stash->{subscriber} = $subscriber;
 
     my %messages;
-    my %dset;
-
-    $dset{id} = $dest_id;
-    $dset{setid} = $dset_id;
 
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_destination',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%dset,
+                                                          domain   => $subscriber->{domain},
+                                                          set_id   => $dset_id,
+                                                          id       => $dest_id,
                                                         },
                                                         undef,
                                                       ))
@@ -1612,10 +1610,6 @@ sub edit_cf_updatepriority : Local {
     foreach my $dest_id(@$dests)
     {
        my $dest = undef;
-#       $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cf_destination',
-#           { id => $dest_id },
-#           \$dest
-#       );
        $c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_destination_by_id',
            { id   => $dest_id,
              data => {
