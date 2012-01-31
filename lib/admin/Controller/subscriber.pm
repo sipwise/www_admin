@@ -1376,9 +1376,6 @@ sub edit_cf_delset : Local {
     $c->stash->{subscriber_id} = $subscriber_id;
 
     my %messages;
-    my %dset;
-
-    $dset{id} = $dset_id;
 
     my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
@@ -1389,8 +1386,8 @@ sub edit_cf_delset : Local {
 
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_destination_set',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%dset,
+                                                          domain   => $subscriber->{domain},
+                                                          id       => $dset_id,
                                                         },
                                                         undef,
                                                       ))
