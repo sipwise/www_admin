@@ -1816,7 +1816,6 @@ sub edit_cf_times_saveperiod : Local {
 
     $self->period_collapse(\%period);
 
-    $period{setid} = $tset_id;
     $period{id} = $period_id if(defined $period_id);
 
     my $subscriber;
@@ -1831,8 +1830,9 @@ sub edit_cf_times_saveperiod : Local {
     {
       $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_cf_time_period',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%period,
+                                                          domain   => $subscriber->{domain},
+                                                          set_id   => $tset_id,
+                                                          data     => \%period,
                                                         },
                                                         undef,
                                                       );
@@ -1841,8 +1841,9 @@ sub edit_cf_times_saveperiod : Local {
     {
       $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_cf_time_period',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%period,
+                                                          domain   => $subscriber->{domain},
+                                                          set_id   => $tset_id,
+                                                          data     => \%period,
                                                         },
                                                         undef,
                                                       );
@@ -2042,10 +2043,6 @@ sub edit_cf_time_delperiod : Local {
     $c->stash->{subscriber_id} = $subscriber_id;
 
     my %messages;
-    my %period;
-
-    $period{setid} = $tset_id;
-    $period{id} = $period_id;
 
     my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
@@ -2057,7 +2054,8 @@ sub edit_cf_time_delperiod : Local {
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_time_period',
                                                         { username => $subscriber->{username},
                                                           domain => $subscriber->{domain},
-                                                          data => \%period,
+                                                          set_id   => $tset_id,
+                                                          id       => $period_id,
                                                         },
                                                         undef,
                                                       ))
