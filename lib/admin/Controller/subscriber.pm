@@ -1716,9 +1716,6 @@ sub edit_cf_time_delset : Local {
     $c->stash->{subscriber_id} = $subscriber_id;
 
     my %messages;
-    my %tset;
-
-    $tset{id} = $tset_id;
 
     my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
@@ -1729,8 +1726,8 @@ sub edit_cf_time_delset : Local {
 
     if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_subscriber_cf_time_set',
                                                         { username => $subscriber->{username},
-                                                          domain => $subscriber->{domain},
-                                                          data => \%tset,
+                                                          domain   => $subscriber->{domain},
+                                                          id       => $tset_id,
                                                         },
                                                         undef,
                                                       ))
