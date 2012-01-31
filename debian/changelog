@@ -1,3 +1,13 @@
+ngcp-www-admin (3.3.1) unstable; urgency=low
+
+  [ agranig ]
+  * allow multiple CF mappings per CF type
+
+  [ dtiefnig ]
+  * subscriber.pm: some changes to time-based call-forward parameters
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Tue, 31 Jan 2012 02:46:45 +0100
+
 ngcp-www-admin (3.3.0) unstable; urgency=low
 
   [ mprokop ]
