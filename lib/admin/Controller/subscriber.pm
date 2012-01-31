@@ -735,7 +735,9 @@ sub preferences : Local {
                                                               \$rules
                                                             );
           $c->stash->{rewrite_rule_sets} = $rules if eval { @$rules };
-        } elsif($$pref{preference} eq 'block_in_list' or $$pref{preference} eq 'block_out_list') {
+        } elsif($$pref{preference} eq 'block_in_list' or $$pref{preference} eq 'block_out_list' or
+                $$pref{preference} eq 'adm_block_in_list' or $$pref{preference} eq 'adm_block_out_list')
+        {
           eval { @{$$preferences{$$pref{preference}}} = map { s/^([1-9])/+$1/; $_ } @{$$preferences{$$pref{preference}}} };
         }
 
