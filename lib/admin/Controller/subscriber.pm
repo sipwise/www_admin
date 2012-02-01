@@ -618,7 +618,7 @@ sub preferences : Local {
                                                           { username => $$subscriber{username},
                                                             domain   => $$subscriber{domain},
                                                           },
-                                                          $$subscriber{voicebox_preferences}
+                                                          \$$subscriber{voicebox_preferences}
                                                         );
     }
 
@@ -634,7 +634,7 @@ sub preferences : Local {
                                                             { username => $$subscriber{username},
                                                               domain   => $$subscriber{domain},
                                                             },
-                                                            $$subscriber{fax_preferences}
+                                                            \$$subscriber{fax_preferences}
                                                           );
     }
 
