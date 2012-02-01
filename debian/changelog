@@ -3,6 +3,9 @@ ngcp-www-admin (3.3.2) unstable; urgency=low
   [ agranig ]
   * Fix fetching of voicebox/faxserver preferences.
 
+  [ dtiefnig ]
+  * number normalization for adm block lists
+
  -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Wed, 01 Feb 2012 16:54:39 +0100
 
 ngcp-www-admin (3.3.1) unstable; urgency=low
