@@ -1265,7 +1265,7 @@ sub call_data : Local {
                                                             );
     }
 
-    $c->stash->{call_list} = admin::Utils::prepare_call_list($c, $calls, $listfilter, $bilprof);
+    $c->stash->{call_list} = admin::Utils::prepare_call_list($c, $$subscriber{username}, $$subscriber{domain}, $calls, $listfilter, $bilprof);
     $c->stash->{subscriber}{list_filter} = $listfilter if defined $listfilter;
 
     undef $c->stash->{call_list} unless eval { @{$c->stash->{call_list}} };
