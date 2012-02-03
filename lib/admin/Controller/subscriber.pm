@@ -884,16 +884,17 @@ sub call_data : Local {
     $c->stash->{template} = 'tt/subscriber_call_data.tt';
 
     my $subscriber_id = $c->request->params->{subscriber_id};
+    my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_byid',
                                                         { subscriber_id => $subscriber_id },
-                                                        \$c->session->{subscriber}
+                                                        \$subscriber
                                                       );
-    $c->stash->{subscriber} = $c->session->{subscriber};
+    $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
 
     my @localized_months = ( "foo" );
 
-    my $cts = $c->session->{subscriber}{create_timestamp};
+    my $cts = $$subscriber{create_timestamp};
     if($cts =~ s/^(\d{4}-\d\d)-\d\d \d\d:\d\d:\d\d/$1/) {
         my ($cyear, $cmonth) = split /-/, $cts;
         my ($nyear, $nmonth) = (localtime)[5,4];
@@ -1014,8 +1015,8 @@ sub call_data : Local {
 
     my $calls;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_calls',
-                                                        { username => $c->session->{subscriber}{username},
-                                                          domain   => $c->session->{subscriber}{domain},
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
                                                           filter   => { start_date => $sdate,
                                                                         end_date   => $edate,
                                                                       }
@@ -1023,13 +1024,14 @@ sub call_data : Local {
                                                         \$calls
                                                       );
 
+    my $account;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_id',
-                                                        { id => $c->session->{subscriber}{account_id} },
-                                                        \$c->session->{voip_account}
+                                                        { id => $$subscriber{account_id} },
+                                                        \$account
                                                       );
-    if(eval { defined $c->session->{voip_account}{billing_profile} }) {
+    if(eval { defined $$account{billing_profile} }) {
         return 1 unless $c->model('Provisioning')->call_prov($c, 'billing', 'get_billing_profile',
-                                                             { handle => $c->session->{voip_account}{billing_profile} },
+                                                             { handle => $$account{billing_profile} },
                                                              \$c->session->{voip_account}{billing_profile}
                                                             );
     }
