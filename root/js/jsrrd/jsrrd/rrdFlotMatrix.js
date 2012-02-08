@@ -60,13 +60,9 @@
  *   }
  */
 
-function rrdFlotMatrix(html_id, rrd_files, ds_list, graph_options, rrd_graph_options,rrdflot_defaults) {
+function rrdFlotMatrix(html_id, rrd_files, ds_list, graph_options, rrd_graph_options) {
   this.html_id=html_id;
   this.rrd_files=rrd_files;
-  if (rrdflot_defaults==null) {
-     this.rrdflot_defaults=new Object(); 
-  }
-  else {this.rrdflot_defaults=rrdflot_defaults;}
   if (ds_list==null) {
     this.ds_list=[];
     var rrd_file=this.rrd_files[0][1]; // get the first one... they are all the same
@@ -164,11 +160,11 @@ rrdFlotMatrix.prototype.createHTML = function() {
   cellScaleLegend.appendChild(document.createElement('br'));
   var forScaleLegend=document.createElement("Select");
   forScaleLegend.id=this.legend_sel_id;
-  forScaleLegend.appendChild(new Option("Top","nw",this.rrdflot_defaults.legend=="Top"));
-  forScaleLegend.appendChild(new Option("Bottom","sw",this.rrdflot_defaults.legend=="Bottom"));
-  forScaleLegend.appendChild(new Option("TopRight","ne",this.rrdflot_defaults.legend=="TopRight"));
-  forScaleLegend.appendChild(new Option("BottomRight","se",this.rrdflot_defaults.legend=="BottomRight"));
-  forScaleLegend.appendChild(new Option("None","None",this.rrdflot_defaults.legend=="None"));
+  forScaleLegend.appendChild(new Option("Top","nw"));
+  forScaleLegend.appendChild(new Option("Bottom","sw"));
+  forScaleLegend.appendChild(new Option("TopRight","ne"));
+  forScaleLegend.appendChild(new Option("BottomRight","se"));
+  forScaleLegend.appendChild(new Option("None","None"));
   forScaleLegend.onchange= function () {rf_this.callback_legend_changed();};
   cellScaleLegend.appendChild(forScaleLegend);
 
@@ -375,6 +371,7 @@ rrdFlotMatrix.prototype.bindFlotGraph = function(flot_obj) {
   // Legend
   var oSelect=document.getElementById(this.legend_sel_id);
   var legend_id=oSelect.options[oSelect.selectedIndex].value;
+
   var graph_jq_id="#"+this.graph_id;
   var scale_jq_id="#"+this.scale_id;
 
@@ -384,27 +381,8 @@ rrdFlotMatrix.prototype.bindFlotGraph = function(flot_obj) {
     xaxis: { mode: "time" },
     yaxis: { autoscaleMargin: 0.20},
     selection: { mode: "x" },
-    tooltip: true,
-    tooltipOpts: { content: "<h4>%s</h4> Value: %y.3" },
-    grid: { hoverable: true },
   };
-  
-  if (this.graph_options!=null) {
-    if (typeof(this.graph_options.tooltip)=='boolean'&&this.graph_options.tooltip==true) {
-      //nothing
-    }
-    else if(typeof(this.graph_options.tooltip)=='boolean'&&this.graph_options.tooltip==false) {
-      graph_options.grid.hoverable=false;
-      graph_options.tooltip=false;
-    }
-    else if(typeof(this.graph_options.tooltip)=='undefined') {
-      //defaults to true
-    }
-    else {
-      graph_options.grid.hoverable=false;
-      graph_options.tooltip=false;
-    }
-  }
+
 
   if (legend_id=="None") {
     // do nothing
