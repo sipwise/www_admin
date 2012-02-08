@@ -33,6 +33,7 @@
         var graph_opts = {};
         var ds_graph_opts = {};
         var tz_offset = [% tz_offset %];
+
         if (rrd_data_arr.length == 1)
           var f = new rrdFlot(args['plot_id'],rrd_data_arr[0],graph_opts,ds_graph_opts,args['si_suffix'],tz_offset);
         else {

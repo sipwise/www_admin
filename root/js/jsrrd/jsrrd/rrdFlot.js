@@ -32,7 +32,7 @@ function rrdFlot(html_id, rrd_file, graph_options, ds_graph_options, si_suffix, 
   else
     this.si_suffix = si_suffix;
 
-  // tz_offset: offset of timezone in hours
+  // tz_offset: offset of timezone in seconds
   if(tz_offset==null)
     this.tz_offset = 0;
   else
@@ -187,7 +187,7 @@ rrdFlot.prototype.drawFlotGraph = function() {
 	}
 	ds_colors[ds_name]=i;
   } 
-
+  
   var flot_obj=rrdRRAStackFlotObj(this.rrd_file,rra_idx,
     ds_positive_stack_list,ds_negative_stack_list,ds_single_list,
     this.tz_offset);

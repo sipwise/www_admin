@@ -5,6 +5,7 @@ use warnings;
 use Time::Local;
 use HTML::Entities;
 use POSIX;
+use DateTime::TimeZone::OffsetOnly;
 
 # Takes a search result total count, an offset and a limit and returns
 # an array containing offset values for a pagination link list
@@ -544,9 +545,16 @@ sub addel_iplist {
     return 1;
 }
 
-# returns the offset in localhost's timezone to GMT
+=head2 tz_offset
+
+Returns localhost's offset to GMT in seconds
+
+=cut
+
 sub tz_offset {
-    return strftime ("%z", localtime(time));
+    use DateTime::TimeZone::OffsetOnly;
+    my $tz_offset = DateTime::TimeZone::OffsetOnly->new ( offset => strftime("%z", localtime(time())) );
+    return $tz_offset->{offset} ;
 }
 
 1;
