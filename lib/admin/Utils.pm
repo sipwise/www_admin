@@ -544,4 +544,9 @@ sub addel_iplist {
     return 1;
 }
 
+# returns the offset in localhost's timezone to GMT
+sub tz_offset {
+    return strftime ("%z", localtime(time));
+}
+
 1;

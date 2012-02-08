@@ -99,7 +99,10 @@ function rrdRRA2FlotObj(rrd_file,rra_idx,ds_list,want_ds_labels,want_rounding) {
 //  of the stack is invalid
 function rrdRRAStackFlotObj(rrd_file,rra_idx,
 			    ds_positive_stack_list,ds_negative_stack_list,ds_single_list,
-			    want_ds_labels,want_rounding,one_undefined_enough) {
+			    want_ds_labels,want_rounding,one_undefined_enough,tz_offset) 
+  
+  var timestamp_shift = 3600 * tz_offset;
+
   var rra=rrd_file.getRRA(rra_idx);
   var rra_rows=rra.getNrRows();
   var last_update=rrd_file.getLastUpdate();
@@ -114,8 +117,7 @@ function rrdRRAStackFlotObj(rrd_file,rra_idx,
   }
 
   var first_el=last_update-(rra_rows-1)*step;
-
-  var out_el={data:[], min:first_el*1000.0, max:last_update*1000.0};
+  var out_el={data:[], min:(first_el+timestamp_shift)*1000.0, max:(last_update+timestamp_shift)*1000.0};
 
   // first the stacks stack
   var stack_els=[ds_positive_stack_list,ds_negative_stack_list];
@@ -164,7 +166,7 @@ function rrdRRAStackFlotObj(rrd_file,rra_idx,
 	  }
 	  // fill the flot data
 	  for (var id=0; id<tmp_nr_ids; id++) {
-	    tmp_flot_els[id].data.push([timestamp*1000.0,ds_vals[id]]);
+        tmp_flot_els[id].data.push([(timestamp+timestamp_shift)*1000.0,ds_vals[id]]);
 	  }
 	}
       } // end if
@@ -190,7 +192,7 @@ function rrdRRAStackFlotObj(rrd_file,rra_idx,
     for (var i=0;i<rra_rows;i++) {
       var el=rra.getEl(i,ds_idx);
       if (el!=undefined) {
-	flot_series.push([timestamp*1000.0,el]);
+    flot_series.push([(timestamp+timestamp_shift)*1000.0,el]);
       }
       timestamp+=step;
     } // end for
