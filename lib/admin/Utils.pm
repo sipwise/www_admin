@@ -544,4 +544,13 @@ sub addel_iplist {
     return 1;
 }
 
+# returns the timezone offset to GMT for 
+# localhost (hours only) as +HH
+sub tz_offset_hours {
+    my $timezone_offset = strftime("%z", localtime());
+    $timezone_offset =~ s/.0$//;
+    
+    return $timezone_offset;
+}
+
 1;

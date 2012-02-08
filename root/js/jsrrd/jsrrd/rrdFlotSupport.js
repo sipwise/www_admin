@@ -99,7 +99,7 @@ function rrdRRA2FlotObj(rrd_file,rra_idx,ds_list,want_ds_labels,want_rounding) {
 //  of the stack is invalid
 function rrdRRAStackFlotObj(rrd_file,rra_idx,
 			    ds_positive_stack_list,ds_negative_stack_list,ds_single_list,
-			    want_ds_labels,want_rounding,one_undefined_enough) {
+                            timestamp_shift, want_ds_labels,want_rounding,one_undefined_enough) {
   var rra=rrd_file.getRRA(rra_idx);
   var rra_rows=rra.getNrRows();
   var last_update=rrd_file.getLastUpdate();
@@ -115,7 +115,7 @@ function rrdRRAStackFlotObj(rrd_file,rra_idx,
 
   var first_el=last_update-(rra_rows-1)*step;
 
-  var out_el={data:[], min:first_el*1000.0, max:last_update*1000.0};
+  var out_el={data:[], min:(first_el+timestamp_shift)*1000.0, max:(last_update+timestamp_shift)*1000.0};
 
   // first the stacks stack
   var stack_els=[ds_positive_stack_list,ds_negative_stack_list];
@@ -164,7 +164,7 @@ function rrdRRAStackFlotObj(rrd_file,rra_idx,
 	  }
 	  // fill the flot data
 	  for (var id=0; id<tmp_nr_ids; id++) {
-	    tmp_flot_els[id].data.push([timestamp*1000.0,ds_vals[id]]);
+	    tmp_flot_els[id].data.push([(timestamp+timestamp_shift)*1000.0,ds_vals[id]]);
 	  }
 	}
       } // end if
@@ -190,7 +190,7 @@ function rrdRRAStackFlotObj(rrd_file,rra_idx,
     for (var i=0;i<rra_rows;i++) {
       var el=rra.getEl(i,ds_idx);
       if (el!=undefined) {
-	flot_series.push([timestamp*1000.0,el]);
+	flot_series.push([(timestamp+timestamp_shift)*1000.0,el]);
       }
       timestamp+=step;
     } // end for
@@ -349,8 +349,10 @@ rrdFlotSelection.prototype.trim_data = function(data_list) {
 
   var out_data=[];
   for (var i=0; i<data_list.length; i++) {
+    
     if (data_list[i]==null) continue; // protect
-    var nr=data_list[i][0];
+    //data_list[i][0]+=3550000*5;
+    var nr=data_list[i][0]; //date in unix time
     if ((nr>=this.selection_min) && (nr<=this.selection_max)) {
       out_data.push(data_list[i]);
     }
@@ -358,8 +360,35 @@ rrdFlotSelection.prototype.trim_data = function(data_list) {
   return out_data;
 };
 
+
+// Given an array of flot lines, limit to the selection
+rrdFlotSelection.prototype.trim_flot_timezone_data = function(flot_data,shift) {
+  var out_data=[];
+  for (var i=0; i<flot_data.length; i++) {
+    var data_el=flot_data[i];
+    out_data.push({label : data_el.label, data:this.trim_timezone_data(data_el.data,shift), color:data_el.color, lines:data_el.lines, yaxis:data_el.yaxis});
+  }
+  return out_data;
+};
+
+// Limit to selection the flot series data element
+rrdFlotSelection.prototype.trim_timezone_data = function(data_list,shift) {
+  if (this.selection_min==null) return data_list; // no selection => no filtering
+
+  var out_data=[];
+  for (var i=0; i<data_list.length; i++) {
+    if (data_list[i]==null) continue; // protect
+    var nr=data_list[i][0]+shift;
+    if ((nr>=this.selection_min) && (nr<=this.selection_max)) {
+      out_data.push(data_list[i]);
+    }
+  }
+  return out_data;
+};
+
+
 // ======================================
-// Miscelabeous helper functions
+// Miscelaneous helper functions
 // ======================================
 
 function rfs_format_time(s) {
