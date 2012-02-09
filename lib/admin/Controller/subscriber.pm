@@ -1470,6 +1470,7 @@ sub edit_cf_savedst : Local {
     my $fmdom = $c->config->{fax2mail_domain};
     my $confdom = $c->config->{conference_domain};
 
+    my $fw_timeout = $c->request->params->{'dest_timeout'} || 300;
     my $fw_target_select = $c->request->params->{'dest_target'} || 'disable';
     my $fw_target;
     if($fw_target_select eq 'sipuri') {
@@ -1514,6 +1515,7 @@ sub edit_cf_savedst : Local {
 
     $dest{destination} = $fw_target;
     $dest{priority} = $prio;
+    $dest{timeout} = $fw_timeout;
 
     if($dest_id)
     {

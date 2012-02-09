@@ -99,7 +99,9 @@
                       <input type="radio" id="dest_sipuri" value="sipuri" name="dest_target" class="radio"
                           [% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" %] checked="checked"[% END %]/>
                       <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
-                      <input type="text" id="dest_sipuritxt" name="dest_sipuri" size="25" value="[% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" %][% dest.destination %][% END %]"/>
+                      <input type="text" id="dest_sipuritxt" name="dest_sipuri" size="20" value="[% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" %][% dest.destination %][% END %]"/>
+                      <label for="[% preference.key %]timeout">for </label>
+                      <input type="text" id="dest_timeout" name="dest_timeout" size="2" value="[% IF dest.timeout.defined %][% dest.timeout %][% ELSE %]300[% END %]"/><span>&nbsp;seconds</span>
                     </div>
                     <div class="span-1">
                       <button class="button-save">Save</button>
@@ -109,9 +111,9 @@
 		    </div>
                   </form>
                   [% ELSE %]
-                    <div class="span-5 last">[% dest.destination %]</div>
+                    <div class="span-9">[% dest.destination %][% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" %] <em>for</em> [% dest.timeout.defined ? dest.timeout : "300" %] <em>seconds</em>[% END %]</div>
                     [% UNLESS Catalyst.session.admin.read_only %]
-                      <div class="prepend-7 span-1">
+                      <div class="prepend-3 span-1">
                         <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]&teditid=[% dest.id %]"><span class="button-edit">Edit</span></a>
                       </div>
                       <div class="span-1 last">
@@ -153,7 +155,9 @@
                       [% END %]
                       <input type="radio" id="dest_sipuri" value="sipuri" name="dest_target" class="radio" checked="checked"/>
                       <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
-                      <input type="text" id="dest_sipuritxt" name="dest_sipuri" size="25"/>
+                      <input type="text" id="dest_sipuritxt" name="dest_sipuri" size="20"/>
+                      <label for="[% preference.key %]timeout">for </label>
+                      <input type="text" id="dest_timeout" name="dest_timeout" size="2" value="300"/><span>&nbsp;seconds</span>
                     </div>
                     <div class="span-1 last">
                       <button class="button-add">Add</button>
