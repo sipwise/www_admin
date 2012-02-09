@@ -192,6 +192,8 @@ sub detail : Local {
             if defined $c->session->{restore_subscriber_input}{password};
         $c->stash->{subscriber}{edit_webpass} = $c->session->{restore_subscriber_input}{webpassword}
             if defined $c->session->{restore_subscriber_input}{webpassword};
+        $c->stash->{subscriber}{selected_domain} = $c->session->{restore_subscriber_input}{selected_domain}
+            if defined $c->session->{restore_subscriber_input}{selected_domain};
         delete $c->session->{restore_subscriber_input};
     }
 
@@ -337,6 +339,7 @@ sub update_subscriber : Local {
         $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id&edit_subscriber=1");
     } else {
         $c->session->{restore_subscriber_input}{username} = $$subscriber{username};
+        $c->session->{restore_subscriber_input}{selected_domain} = $$subscriber{domain};
         $c->response->redirect("/subscriber/detail?account_id=". $$subscriber{account_id} ."&new=1");
     }
     return;

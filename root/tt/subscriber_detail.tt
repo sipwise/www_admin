@@ -179,7 +179,11 @@
                   @
                   <select size="1" name="domain">
                   [% FOREACH sdom = domains %]
-                    <option>[% sdom.domain %]</option>
+                    [% IF subscriber.selected_domain && (subscriber.selected_domain == sdom.domain) %]
+                      <option selected="selected">[% sdom.domain %]</option>
+                    [% ELSE %]
+                      <option>[% sdom.domain %]</option>
+                    [% END %]
                   [% END %]
                   </select>
                 </div>
