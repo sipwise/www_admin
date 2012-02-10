@@ -154,7 +154,6 @@
 
           [% IF messages.cfmsg %]<div class="success">[% messages.cfmsg %]</div>[% END %]
           [% IF messages.cferr %]<div class="error">[% messages.cferr %]</div>[% END %]
-          [% IF meditid && prov_error %]<div class="error">[% prov_error %]</div>[% END %]
 
         [% UNLESS Catalyst.session.admin.read_only %]
           <a href="edit_cf?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-transfer">Edit Destination Sets</span></a>
