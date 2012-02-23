@@ -558,6 +558,42 @@ sub expire : Local {
     {
         $c->session->{messages}{contmsg} = 'Server.Voip.RemovedRegisteredContact';
         $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
+	return;
+    }
+
+    $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
+}
+
+sub add_permanent_contact : Local {
+    my ( $self, $c ) = @_;
+
+    my $subscriber;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $contact = $c->request->params->{contact};
+
+    unless($contact =~ /^sip\:[a-zA-Z0-9\-\_\.\!\~\*\'\(\)\%]+\@[a-zA-Z0-9\-\.\[\]\:]+(\:\d{1,5})?$/) {
+        $c->session->{messages}{conterr} = 'Client.Syntax.MalformedUri';
+        $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
+        return;
+    }
+
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'add_subscriber_registered_device',
+                                             { username => $$subscriber{username},
+                                               domain   => $$subscriber{domain},
+                                               contact  => $contact,
+                                             },
+                                             undef
+                                           ))
+    {
+        $c->session->{messages}{contmsg} = 'Server.Voip.AddedRegisteredContact';
+        $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
+	return;
     }
 
     $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");

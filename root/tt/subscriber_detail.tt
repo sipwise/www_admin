@@ -237,10 +237,11 @@
         <h3 id="activeregs">Active Device Registrations</h3>
 
         [% IF messages.contmsg %]<div class="success">[% messages.contmsg %]</div>[% END %]
+        [% IF messages.conterr %]<div class="error">[% messages.conterr %]</div>[% END %]
 
+        <ul class="cleanlist">
         [% IF subscriber.registered_contacts.0 %]
           [% FOREACH regcon = subscriber.registered_contacts %]
-            <ul class="cleanlist">
               <li class="ui-state-default ui-state-quad">
                 <div class="span-5">User Agent:</div>
                 <div class="span-11 last"> [% regcon.user_agent %]</div>
@@ -249,16 +250,25 @@
                 <div class="span-5">NAT</div>
                 <div class="span-11 last">[% IF regcon.nat %]yes[% ELSE %]no[% END %]</div>
                 <div class="span-5">Expires</div>
-                <div class="span-4">[% regcon.expires %]</div>
-                <div class="span-7 last"><a href="expire?subscriber_id=[% subscriber.subscriber_id %]&amp;contact_id=[% regcon.id %]"><span class="button-delete">Expire Now</span></a></div>
+                <div class="span-7">[% regcon.expires %]</div>
+                <div class="span-1 last"><a href="expire?subscriber_id=[% subscriber.subscriber_id %]&amp;contact_id=[% regcon.id %]"><span class="button-delete">Expire Now</span></a></div>
               </li>
-            </ul><br clear="all" /><br clear="all" />
           [% END %]
         [% ELSE %]
-          <ul class="cleanlist">
             <li class="ui-state-default"><div>None</div></li>
-          </ul>
         [% END %]
+        [% UNLESS Catalyst.session.admin.read_only %]
+            <li class="ui-state-default">
+              <form method="post" action="add_permanent_contact">
+                <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]"/>
+                <div class="span-4">Add permanent Contact:</div>
+                <div class="span-1"><span class="ui-icon ui-icon-help help" title="Inserts a permanent registration entry. Use this if your SIP Client doesn't have the capabilities to register. Required input is a full SIP URI in form <i>sip:user@ip:port</i>"></span></div>
+                <div class="span-7"><input type="text" size="35" name="contact" value="" title="Full SIP URI in form sip:user@ip:port" /></div>
+                <div class="span-1 last"><button class="button-add">Add</button></div>
+              </form>
+            </li>
+        [% END %]
+        </ul>
 
         <div class="hspace-20"></div>
         <h3 id="activeregs">Active Peer Registration</h3>
