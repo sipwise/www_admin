@@ -1,0 +1,41 @@
+        <h3> Subscriber
+          <a class="noarrow" href="detail?subscriber_id=[% subscriber.subscriber_id %]">
+            [% subscriber.username %]@[% subscriber.domain %]</a>
+        </h3>
+        
+        <div class="topsubmenu">
+        <ul>
+          <li><a href="detail?subscriber_id=[% subscriber.subscriber_id %]"><span>User</span></a></li>
+          <li><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]"><span>Preferences</span></a></li>
+        [% IF Catalyst.session.admin.call_data %]
+          <li><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]"><span>CDRs</span></a></li>
+        [% END %]
+        [% IF Catalyst.config.voisniff_features %]
+          <li class="selected"><a href="sipstats?subscriber_id=[% subscriber.subscriber_id %]"><span>SIP Stats</span></a></li>
+        [% END %]
+        </ul>
+        </div>
+        <div class="topsubmenudivider"> </div>
+
+        <h3 id="calldata">Captured Call-IDs</h3>
+
+        <ul class="cleanlist">
+        [% IF !calls.defined || calls.size == 0 %]
+          <li class="ui-state-default">
+            <div class="span-14">No Call-IDs found.</div>
+          </li>
+        [% ELSE %]
+          <li class="ui-state-default">
+            <div class="span-4">Timestamp</div>
+            <div class="span-10">Call-ID</div>
+            <div class="span-2 last">Method</div>
+          </li>
+        [% END %]
+        [% FOREACH call IN calls %]
+          <li class="ui-state-default">
+            <div class="span-4">[% call.timestamp %]</div>
+            <div class="span-10"><a href="sipstats_pcap?subscriber_id=[% subscriber.subscriber_id %]&callid=[% call.call_id %]">[% IF call.call_id.length > 50 %][% call.call_id.substr(0, 50) %]...[% ELSE %][% call.call_id %][% END %]</a></div>
+            <div class="span-2 last">[% call.method %]</div>
+          </li>
+        [% END %]
+        </ul>

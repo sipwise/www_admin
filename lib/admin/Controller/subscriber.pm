@@ -1312,6 +1312,62 @@ sub call_data : Local {
     return;
 }
 
+sub sipstats : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_sipstats.tt';
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+    $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+
+    my $calls;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_calls',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                        },
+                                                        \$calls
+                                                      );
+    $c->stash->{calls} = $calls;
+
+    return;
+}
+
+sub sipstats_pcap : Local {
+    my ( $self, $c ) = @_;
+
+    $c->stash->{template} = 'tt/subscriber_sipstats.tt';
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $callid = $c->request->params->{callid};
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+    $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+
+    my $packets;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_packets',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                          callid   => $callid,
+                                                        },
+                                                        \$packets
+                                                      );
+    my $pcap = admin::Utils::generate_pcap($packets);
+    my $filename = $callid . '.pcap';
+    $c->stash->{current_view} = 'Plain';
+    $c->stash->{content_type} = 'application/octet-stream';
+    $c->stash->{content_disposition} = qq[attachment; filename="$filename"];
+    $c->stash->{content} = eval { $pcap };
+    return;
+}
+
 sub edit_cf : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_callforward.tt';
@@ -1669,8 +1725,6 @@ sub edit_cf_updatepriority : Local {
     return;
 }
 
-# fooooooooo
-
 sub edit_cf_times : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_callforward_times.tt';
@@ -1821,8 +1875,6 @@ sub edit_cf_times_createset : Local {
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id");
 }
-
-# fooooo
 
 sub edit_cf_times_saveperiod : Local {
     my ( $self, $c ) = @_;

@@ -22,6 +22,8 @@ sub process {
     my ( $self, $c ) = @_;
 
     $c->response->content_type($c->stash->{content_type});
+    $c->res->header('Content-Disposition', $c->stash->{content_disposition})
+        if(defined $c->stash->{content_disposition});
     $c->response->body($c->stash->{content});
 
     return 1;

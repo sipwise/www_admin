@@ -11,6 +11,9 @@
         [% IF Catalyst.session.admin.call_data %]
           <li><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]"><span>CDRs</span></a></li>
         [% END %]
+        [% IF Catalyst.config.voisniff_features %]
+          <li><a href="sipstats?subscriber_id=[% subscriber.subscriber_id %]"><span>SIP Stats</span></a></li>
+        [% END %]
         </ul>
         </div>
         <div class="topsubmenudivider"> </div>
