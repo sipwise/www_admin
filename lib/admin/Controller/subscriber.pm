@@ -192,6 +192,8 @@ sub detail : Local {
             if defined $c->session->{restore_subscriber_input}{password};
         $c->stash->{subscriber}{edit_webpass} = $c->session->{restore_subscriber_input}{webpassword}
             if defined $c->session->{restore_subscriber_input}{webpassword};
+        $c->stash->{subscriber}{selected_domain} = $c->session->{restore_subscriber_input}{selected_domain}
+            if defined $c->session->{restore_subscriber_input}{selected_domain};
         delete $c->session->{restore_subscriber_input};
     }
 
@@ -337,6 +339,7 @@ sub update_subscriber : Local {
         $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id&edit_subscriber=1");
     } else {
         $c->session->{restore_subscriber_input}{username} = $$subscriber{username};
+        $c->session->{restore_subscriber_input}{selected_domain} = $$subscriber{domain};
         $c->response->redirect("/subscriber/detail?account_id=". $$subscriber{account_id} ."&new=1");
     }
     return;
@@ -555,6 +558,42 @@ sub expire : Local {
     {
         $c->session->{messages}{contmsg} = 'Server.Voip.RemovedRegisteredContact';
         $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
+	return;
+    }
+
+    $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
+}
+
+sub add_permanent_contact : Local {
+    my ( $self, $c ) = @_;
+
+    my $subscriber;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $contact = $c->request->params->{contact};
+
+    unless($contact =~ /^sip\:[a-zA-Z0-9\-\_\.\!\~\*\'\(\)\%]+\@[a-zA-Z0-9\-\.\[\]\:]+(\:\d{1,5})?$/) {
+        $c->session->{messages}{conterr} = 'Client.Syntax.MalformedUri';
+        $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
+        return;
+    }
+
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'add_subscriber_registered_device',
+                                             { username => $$subscriber{username},
+                                               domain   => $$subscriber{domain},
+                                               contact  => $contact,
+                                             },
+                                             undef
+                                           ))
+    {
+        $c->session->{messages}{contmsg} = 'Server.Voip.AddedRegisteredContact';
+        $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
+	return;
     }
 
     $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id");
@@ -1265,11 +1304,67 @@ sub call_data : Local {
                                                             );
     }
 
-    $c->stash->{call_list} = admin::Utils::prepare_call_list($c, $calls, $listfilter, $bilprof);
+    $c->stash->{call_list} = admin::Utils::prepare_call_list($c, $$subscriber{username}, $$subscriber{domain}, $calls, $listfilter, $bilprof);
     $c->stash->{subscriber}{list_filter} = $listfilter if defined $listfilter;
 
     undef $c->stash->{call_list} unless eval { @{$c->stash->{call_list}} };
 
+    return;
+}
+
+sub sipstats : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_sipstats.tt';
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+    $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+
+    my $calls;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_calls',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                        },
+                                                        \$calls
+                                                      );
+    $c->stash->{calls} = $calls;
+
+    return;
+}
+
+sub sipstats_pcap : Local {
+    my ( $self, $c ) = @_;
+
+    $c->stash->{template} = 'tt/subscriber_sipstats.tt';
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $callid = $c->request->params->{callid};
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+    $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+
+    my $packets;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_packets',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                          callid   => $callid,
+                                                        },
+                                                        \$packets
+                                                      );
+    my $pcap = admin::Utils::generate_pcap($packets);
+    my $filename = $callid . '.pcap';
+    $c->stash->{current_view} = 'Plain';
+    $c->stash->{content_type} = 'application/octet-stream';
+    $c->stash->{content_disposition} = qq[attachment; filename="$filename"];
+    $c->stash->{content} = eval { $pcap };
     return;
 }
 
@@ -1467,6 +1562,7 @@ sub edit_cf_savedst : Local {
     my $fmdom = $c->config->{fax2mail_domain};
     my $confdom = $c->config->{conference_domain};
 
+    my $fw_timeout = $c->request->params->{'dest_timeout'} || 300;
     my $fw_target_select = $c->request->params->{'dest_target'} || 'disable';
     my $fw_target;
     if($fw_target_select eq 'sipuri') {
@@ -1511,6 +1607,7 @@ sub edit_cf_savedst : Local {
 
     $dest{destination} = $fw_target;
     $dest{priority} = $prio;
+    $dest{timeout} = $fw_timeout;
 
     if($dest_id)
     {
@@ -1627,8 +1724,6 @@ sub edit_cf_updatepriority : Local {
     $c->response->redirect("/");
     return;
 }
-
-# fooooooooo
 
 sub edit_cf_times : Local {
     my ( $self, $c ) = @_;
@@ -1780,8 +1875,6 @@ sub edit_cf_times_createset : Local {
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id");
 }
-
-# fooooo
 
 sub edit_cf_times_saveperiod : Local {
     my ( $self, $c ) = @_;

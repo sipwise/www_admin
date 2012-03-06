@@ -26,11 +26,18 @@ function suffixFormatter(val, axis) {
 		return val.toFixed(axis.tickDecimals) + " B";
 }
 
-function rrdFlot(html_id, rrd_file, graph_options, ds_graph_options, si_suffix) {
+function rrdFlot(html_id, rrd_file, graph_options, ds_graph_options, si_suffix, tz_offset) {
   if(si_suffix==null)
-	this.si_suffix = false;
+    this.si_suffix = false;
   else
-	this.si_suffix = si_suffix;
+    this.si_suffix = si_suffix;
+
+  // tz_offset: offset of timezone in seconds
+  if(tz_offset==null)
+    this.tz_offset = 0;
+  else
+    this.tz_offset = tz_offset;
+
   this.html_id=html_id;
   this.rrd_file=rrd_file;
   this.graph_options=graph_options;
@@ -180,9 +187,10 @@ rrdFlot.prototype.drawFlotGraph = function() {
 	}
 	ds_colors[ds_name]=i;
   } 
-
+  
   var flot_obj=rrdRRAStackFlotObj(this.rrd_file,rra_idx,
-				  ds_positive_stack_list,ds_negative_stack_list,ds_single_list);
+    ds_positive_stack_list,ds_negative_stack_list,ds_single_list,
+    this.tz_offset);
 
   for (var i=0; i<flot_obj.data.length; i++) {
     var name=flot_obj.data[i].label;

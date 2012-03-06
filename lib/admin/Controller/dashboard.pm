@@ -60,6 +60,7 @@ sub system : Local {
 
     $c->stash->{ctx} = "system";
     $c->stash->{plotdata} = \@plotdata;
+    $c->stash->{tz_offset} = admin::Utils::tz_offset();
 
     return 1;
 }
@@ -80,6 +81,7 @@ sub voip : Local {
 
     $c->stash->{ctx} = "voip";
     $c->stash->{plotdata} = \@plotdata;
+    $c->stash->{tz_offset} = admin::Utils::tz_offset();
 
     return 1;
 }

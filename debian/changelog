@@ -1,3 +1,20 @@
+ngcp-www-admin (3.3.3) unstable; urgency=low
+
+  [dtiefnig]
+  * fix subscriber matching in call lists
+
+  [agranig]
+  * Add timeout to CF destinations.
+  * Implement adding a permanent location entry.
+  * Implement basic sipstats feature.
+
+  [cveigl]
+  * make stats timezone-aware
+  * remember selected domain on failure (mantis 1253)
+  * only display most specific error message (mantis 1257)
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Tue, 06 Mar 2012 17:56:20 +0100
+
 ngcp-www-admin (3.3.2) unstable; urgency=low
 
   [ agranig ]

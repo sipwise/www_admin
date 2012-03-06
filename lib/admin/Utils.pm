@@ -5,6 +5,7 @@ use warnings;
 use Time::Local;
 use HTML::Entities;
 use POSIX;
+use DateTime::TimeZone::OffsetOnly;
 
 # Takes a search result total count, an offset and a limit and returns
 # an array containing offset values for a pagination link list
@@ -129,7 +130,7 @@ sub get_qualified_number_for_subscriber {
 # as returned by the prov. interface and returns a reference to an
 # array suited for TT display
 sub prepare_call_list {
-    my ($c, $call_list, $filter, $bilprof) = @_;
+    my ($c, $username, $domain, $call_list, $filter, $bilprof) = @_;
     my $callentries = [];
 
     my @time = localtime time;
@@ -174,8 +175,8 @@ sub prepare_call_list {
         }
 
         if(defined $$call{source_user}
-           and $$call{source_user} eq $c->session->{subscriber}{username}
-           and $$call{source_domain} eq $c->session->{subscriber}{domain})
+           and $$call{source_user} eq $username
+           and $$call{source_domain} eq $domain)
         {
             if($$call{call_status} eq 'ok') {
                 $callentry{direction_icon} = 'anruf_aus_small.gif';
@@ -193,8 +194,8 @@ sub prepare_call_list {
             $callentry{partner_number} = $callentry{partner};
 
         } elsif(defined $$call{destination_user}
-                and $$call{destination_user} eq $c->session->{subscriber}{username}
-                and $$call{destination_domain} eq $c->session->{subscriber}{domain})
+                and $$call{destination_user} eq $username
+                and $$call{destination_domain} eq $domain)
         {
             if($$call{call_status} eq 'ok') {
                 $callentry{direction_icon} = 'anruf_ein_small.gif';
@@ -542,6 +543,54 @@ sub addel_iplist {
     }
 
     return 1;
+}
+
+=head2 tz_offset
+
+Returns localhost's offset to GMT in seconds
+
+=cut
+
+sub tz_offset {
+    use DateTime::TimeZone::OffsetOnly;
+    my $tz_offset = DateTime::TimeZone::OffsetOnly->new ( offset => strftime("%z", localtime(time())) );
+    return $tz_offset->{offset} ;
+}
+
+=head2 generate_pcap
+
+Returns pcap data from packets
+
+=cut
+
+sub generate_pcap {
+    my $packets = shift;
+
+    my $pcap = pack("LSSlLLL",
+        0xa1b2c3d4,     # magic number
+        2, 4,           # major/minor version number
+        0, 0,           # gmt offset and timestamp accuracy
+        0xffff,         # snap length
+        192,            # data link type (http://www.tcpdump.org/linktypes.html)
+        );
+
+    foreach my $pkg(@{$packets}) {
+        my($ts_sec, $ts_usec) = $pkg->{timestamp} =~ /^(\d+)\.(\d+)$/;
+        my $packet_type = 1;
+        $pkg->{was_fragmented} and $packet_type = 101;
+        my $ppi = pack("CCvV", 0, 0, 8, $packet_type);
+        my $len = length($pkg->{header}) + length($pkg->{payload}) + length($pkg->{trailer}) + length($ppi);
+
+        $pcap .= pack("LLLLa*a*a*a*",
+                $ts_sec, $ts_usec,      # timestamp
+                $len, $len,             # bytes on-wire/off-wire
+                $ppi,
+                $pkg->{header},
+                $pkg->{payload},
+                $pkg->{trailer},
+                );
+    }
+    return $pcap;
 }
 
 1;
