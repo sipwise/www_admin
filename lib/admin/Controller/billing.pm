@@ -262,6 +262,10 @@ sub do_edit_bilprof : Local {
     $settings{interval_unit} = $c->request->params->{interval_unit} || 'month';
     $settings{interval_count} = $c->request->params->{interval_count} || 1;
 
+    if (length $settings{name} > 31) {
+        $messages{name} = 'Client.Syntax.ProfileNameTooLong';
+    }
+
     $settings{interval_charge} = $c->request->params->{interval_charge};
     if(length $settings{interval_charge}) {
         if($settings{interval_charge} =~ /^[+]?\d+(?:[.,]\d\d?)?$/) {
