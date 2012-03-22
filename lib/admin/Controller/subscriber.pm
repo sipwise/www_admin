@@ -693,7 +693,7 @@ sub preferences : Local {
                                                         { username => $$subscriber{username},
                                                           domain   => $$subscriber{domain},
                                                         },
-                                                        $$subscriber{reminder}
+                                                        \$$subscriber{reminder}
                                                       );
 
     $c->stash->{cf_dsets} = $cf_dsets;
