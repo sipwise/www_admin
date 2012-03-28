@@ -520,3 +520,5 @@
 
     [% END %]
 
+    <a name="trusted_sources">&nbsp;</a>
+    [% INCLUDE tt/trusted_peer.tt %]

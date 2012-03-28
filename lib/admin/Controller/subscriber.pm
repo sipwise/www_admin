@@ -617,6 +617,7 @@ sub preferences : Local {
     my $cf_dsets;
     my $cf_tsets;
     my $cf_maps;
+    my $trusted_sources;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
@@ -650,6 +651,12 @@ sub preferences : Local {
                                                           domain => $$subscriber{domain},
                                                         },
                                                         \$cf_tsets,
+                                                      );
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_trusted_sources',
+                                                        { username => $$subscriber{username},
+                                                          domain => $$subscriber{domain},
+                                                        },
+                                                        \$trusted_sources,
                                                       );
 
     # voicebox requires a number
@@ -701,10 +708,13 @@ sub preferences : Local {
     $c->stash->{cf_maps} = $cf_maps;
     $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+
     $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
-                                                                                     config->{VARIABLES}{site_config}{language},
-                                                                             'Web.Subscriber.Lock'.$$preferences{lock})
-        if $$preferences{lock};
+        config->{VARIABLES}{site_config}{language},
+        'Web.Subscriber.Lock'.$$preferences{lock})
+    if $$preferences{lock};
+
+    $c->stash->{trusted_sources} = $trusted_sources;
 
     my $db_prefs;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
@@ -748,6 +758,26 @@ sub preferences : Local {
             $c->stash->{subscriber}{reminder} = $c->session->{restore_reminder_input};
         }
         delete $c->session->{restore_reminder_input};
+    }
+    
+    $c->stash->{tsrc_edit_id} = $c->request->params->{tsrc_edit_id};
+    if(ref $c->session->{restore_trusted_source} eq 'HASH') {
+        my $done = 0;
+
+        for my $ts (@{$c->stash->{trusted_sources}}) {
+            next if ($ts->{id} != $c->stash->{tsrc_edit_id} );
+
+            for my $key (keys %{$c->session->{restore_trusted_source}}) {
+                $ts->{$key} = $c->session->{restore_trusted_source}{$key};
+            }
+            $done++;
+        }
+        if (!$done) {
+            for my $key (keys %{$c->session->{restore_trusted_source}}) {
+                $c->stash->{$key} = $c->session->{restore_trusted_source}{$key};
+            }
+        }
+        delete $c->session->{restore_trusted_source};
     }
 
     ### build preference array for TT ###
@@ -827,6 +857,7 @@ sub preferences : Local {
     $c->stash->{edit_fax} = $c->request->params->{edit_fax};
     $c->stash->{edit_reminder} = $c->request->params->{edit_reminder};
     $c->stash->{meditid} = $c->request->params->{meditid};
+    # $c->stash->{tsrc_edit_id} = $c->request->params->{tsrc_edit_id};
 
     return 1;
 }
@@ -2164,6 +2195,111 @@ sub edit_cf_time_delperiod : Local {
     }
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/edit_cf_times?subscriber_id=$subscriber_id#".$tset_id."set");
+}
+
+sub save_trusted_source : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_preferences.tt';
+    
+    my %ts;
+    my $tsrc_id = $c->request->params->{tsrc_edit_id} || 0;
+    
+    for ('src_ip', 'protocol', 'from_pattern') {
+        $ts{$_} = $c->request->params->{$_};
+        $ts{$_} =~ s/^\s+//; 
+        $ts{$_} =~ s/\s+$//; 
+    }
+
+    my ( %messages, $checkresult );
+    $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ip', $ts{src_ip}, \$checkresult);
+    $messages{src_ip_err} = 'Client.Syntax.MalformedIP' unless $checkresult;
+
+    $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_transport_protocol', $ts{protocol}, \$checkresult);
+    $messages{protocol_err} = 'Client.Syntax.UnknownProtocol' unless $checkresult;
+
+    $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sipuri', $ts{from_pattern}, \$checkresult);
+    $messages{from_pattern_err} = 'Client.Syntax.MalformedUri' unless $checkresult;
+    
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
+        { subscriber_id => $c->request->params->{subscriber_id} },
+        \$subscriber
+    );
+    
+    # restore action
+    if (keys %messages) {
+        $c->session->{messages} = \%messages;
+        $c->session->{restore_trusted_source} = { 
+            src_ip => $c->request->params->{src_ip},
+            protocol => $c->request->params->{protocol},
+            from_pattern => $c->request->params->{from_pattern},
+        };
+        if (defined $tsrc_id && $tsrc_id != 0) {
+            $c->response->redirect( '/subscriber/preferences?subscriber_id='. $subscriber->{subscriber_id} .'&tsrc_edit_id='. $tsrc_id .'#trusted_sources')
+        }
+        else {
+            $c->response->redirect('/subscriber/preferences?subscriber_id=' . $subscriber->{subscriber_id} . '#trusted_sources');
+        }
+        $c->detach;
+    } 
+
+    my $ret;
+    if (defined $tsrc_id && $tsrc_id != 0) {
+        $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'update_subscriber_trusted_source',
+            { username => $subscriber->{username},
+              domain => $subscriber->{domain},
+              id => $tsrc_id, 
+              data => \%ts,
+            },
+            undef,
+        );
+    }
+    else {
+        $ret = $c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_trusted_source',
+            { username => $subscriber->{username},
+              domain => $subscriber->{domain},
+              data => \%ts,
+            },
+            undef,
+        );
+    }
+    
+    if ($ret) {
+        $messages{tsrc_msg} = 'Server.Voip.SavedSettings';
+    }
+    else {
+        $messages{tsrc_err} = 'Client.Voip.InputErrorFound';
+    }
+    
+    $c->response->redirect('/subscriber/preferences?subscriber_id=' . $subscriber->{subscriber_id} . '#trusted_sources');
+}
+
+sub delete_trusted_source : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_preferences.tt';
+   
+    $c->stash->{subscriber_id} = $c->request->params->{subscriber_id};
+    
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
+        { subscriber_id => $c->stash->{subscriber_id} },
+        \$subscriber
+    );
+    
+    my %messages;
+    if (! $c->model('Provisioning')->call_prov( 
+        $c, 'voip', 'delete_subscriber_trusted_source',
+        { username => $subscriber->{username},
+          domain => $subscriber->{domain},
+          id => $c->request->params->{tsrc_id}, 
+        },
+        undef ))
+    {
+        $messages{tsrc_err} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect('/subscriber/preferences?subscriber_id=' . $c->stash->{subscriber_id} . '#trusted_sources');
 }
 
 sub edit_list : Local {
