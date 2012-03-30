@@ -68,7 +68,7 @@
               <li class="ui-state-default">
                 <div class="span-3">Interval Free Cash:</div>
                 <div class="span-6">
-                  <input type="text" name="interval_free_cash" title="float, specifying Euro"
+                  <input type="text" name="interval_free_cash" title="float, specifying EUR, USD, etc."
                          value="[% bilprof.data.interval_free_cash %]" />
                 </div>
                 <div class="span-6 last">
@@ -76,6 +76,46 @@
                 </div>
               </li>
               [% IF messages.free_cash %]<div class="error">[% messages.free_cash %]</div>[% END %]
+
+              <li class="ui-state-default">
+                <div class="span-3">Fraud Limit:</div>
+                <div class="span-6">
+                  <input type="text" name="fraud_interval_limit" title="float, specifying EUR, USD, etc."
+                         value="[% bilprof.data.fraud_interval_limit %]" />
+                </div>
+                <div class="span-6 last">
+                  fraud detection threshold, per month
+                </div>
+              </li>
+              [% IF messages.fraud_interval_limit %]<div class="error">[% messages.fraud_interval_limit %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-3">Fraud Lock:</div>
+                <div class="span-6">
+                  <select size="1" name="fraud_interval_lock" title="the lock level">
+                    <option value="none" [% IF bilprof.data.fraud_interval_lock == 'none' %]selected="selected"[% END %]>none</option>
+                    <option value="foreign" [% IF bilprof.data.fraud_interval_lock == 'foreign' %]selected="selected"[% END %]>foreign</option>
+                    <option value="outgoing" [% IF bilprof.data.fraud_interval_lock == 'outgoing' %]selected="selected"[% END %]>outgoing</option>
+                    <option value="incoming" [% IF bilprof.data.fraud_interval_lock == 'incoming' %]selected="selected"[% END %]>incoming</option>
+                    <option value="global" [% IF bilprof.data.fraud_interval_lock == 'global' %]selected="selected"[% END %]>global</option>
+                  </select>
+                </div>
+                <div class="span-6 last">
+                  lock accounts if the limit is exceeded
+                </div>
+              </li>
+              [% IF messages.fraud_interval_lock %]<div class="error">[% messages.fraud_interval_lock %]</div>[% END %]
+              <li class="ui-state-default">
+                <div class="span-3">Fraud Notify:</div>
+                <div class="span-6">
+                  <input type="text" name="fraud_interval_notify" title="string, a list of e-mail addreses separated by comma"
+                         value="[% bilprof.data.fraud_interval_notify %]" />
+                </div>
+                <div class="span-6 last">
+                  e-mail addresses where notifications about fraud detections are sent to
+                </div>
+              </li>
+              [% IF messages.fraud_interval_notify %]<div class="error">[% messages.fraud_interval_notify %]</div>[% END %]
+
               <li class="ui-state-default">
                 <div class="span-3">Currency:</div>
                 <div class="span-6">

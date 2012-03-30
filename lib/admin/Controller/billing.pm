@@ -223,6 +223,10 @@ sub edit_bilprof : Local {
             sprintf "%.2f", $c->stash->{bilprof}{data}{interval_charge} /= 100;
         $c->stash->{bilprof}{data}{interval_free_cash} =
             sprintf "%.2f", $c->stash->{bilprof}{data}{interval_free_cash} /= 100;
+        $c->stash->{bilprof}{data}{fraud_interval_limit} =
+            sprintf "%.2f", $c->stash->{bilprof}{data}{fraud_interval_limit} /= 100;
+        $c->stash->{bilprof}{data}{fraud_interval_notify} =
+            eval { join ', ', @{$c->stash->{bilprof}{data}{fraud_interval_notify}} };
     } elsif($bilprof) {
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
                                                             { handle => $bilprof },
@@ -232,6 +236,10 @@ sub edit_bilprof : Local {
             sprintf "%.2f", $c->stash->{bilprof}{data}{interval_charge} /= 100;
         $c->stash->{bilprof}{data}{interval_free_cash} =
             sprintf "%.2f", $c->stash->{bilprof}{data}{interval_free_cash} /= 100;
+        $c->stash->{bilprof}{data}{fraud_interval_limit} =
+            sprintf "%.2f", $c->stash->{bilprof}{data}{fraud_interval_limit} /= 100;
+        $c->stash->{bilprof}{data}{fraud_interval_notify} =
+            eval { join ', ', @{$c->stash->{bilprof}{data}{fraud_interval_notify}} };
     }
 
     $c->stash->{handle} = $bilprof if $bilprof;
@@ -297,6 +305,28 @@ sub do_edit_bilprof : Local {
         }
     } else {
         $settings{interval_free_cash} = 0;
+    }
+
+    $settings{fraud_interval_limit} = $c->request->params->{fraud_interval_limit};
+    if(length $settings{fraud_interval_limit}) {
+        if($settings{fraud_interval_limit} =~ /^[+]?\d+(?:[.,]\d\d?)?$/) {
+            $settings{fraud_interval_limit} =~ s/^\+//;
+            $settings{interval_free_cash} =~ s/,/./;
+            $settings{fraud_interval_limit} *= 100;
+        } else {
+            $messages{fraud_interval_limit} = 'Client.Syntax.CashValue';
+        }
+    } else {
+        delete $settings{fraud_interval_limit};
+    }
+
+    $settings{fraud_interval_lock} = $c->request->params->{fraud_interval_lock}
+        if $c->request->params->{fraud_interval_lock};
+
+    $settings{fraud_interval_notify} = $c->request->params->{fraud_interval_notify}
+        if $c->request->params->{fraud_interval_notify};
+    if(length $settings{fraud_interval_notify}) {
+        @{$settings{fraud_interval_notify}} = split /\s*,\s*/, $settings{fraud_interval_notify};
     }
 
     $settings{currency} = $c->request->params->{currency} || '';
