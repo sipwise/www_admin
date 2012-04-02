@@ -326,6 +326,7 @@ sub do_edit_bilprof : Local {
     $settings{fraud_interval_notify} = $c->request->params->{fraud_interval_notify}
         if $c->request->params->{fraud_interval_notify};
     if(length $settings{fraud_interval_notify}) {
+        no strict "refs";
         @{$settings{fraud_interval_notify}} = split /\s*,\s*/, $settings{fraud_interval_notify};
     }
 
