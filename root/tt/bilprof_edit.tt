@@ -111,7 +111,7 @@
                          value="[% bilprof.data.fraud_interval_notify %]" />
                 </div>
                 <div class="span-6 last">
-                  e-mail addresses where notifications about fraud detections are sent to
+                  where e-mail notifications are sent
                 </div>
               </li>
               [% IF messages.fraud_interval_notify %]<div class="error">[% messages.fraud_interval_notify %]</div>[% END %]
