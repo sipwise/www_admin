@@ -352,6 +352,8 @@ sub do_edit_bilprof : Local {
                 $c->response->redirect("/billing#bilprof");
                 return;
             }
+            $c->session->{messages}{fraud_interval_notify} = $c->session->{prov_error}
+                if $c->session->{prov_error} eq 'Client.Syntax.Email';
             $c->session->{restore_bilprof_input} = \%settings;
             $c->response->redirect("/billing/edit_bilprof?bilprof=$bilprof");
             return;
