@@ -323,11 +323,8 @@ sub do_edit_bilprof : Local {
     $settings{fraud_interval_lock} = $c->request->params->{fraud_interval_lock}
         if $c->request->params->{fraud_interval_lock};
 
-    $settings{fraud_interval_notify} = $c->request->params->{fraud_interval_notify}
-        if $c->request->params->{fraud_interval_notify};
-    if(length $settings{fraud_interval_notify}) {
-        no strict "refs";
-        @{$settings{fraud_interval_notify}} = split /\s*,\s*/, $settings{fraud_interval_notify};
+    if(length $c->request->params->{fraud_interval_notify}) {
+        @{$settings{fraud_interval_notify}} = split /\s*,\s*/, $c->request->params->{fraud_interval_notify};
     }
 
     $settings{currency} = $c->request->params->{currency} || '';
