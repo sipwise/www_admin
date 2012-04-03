@@ -325,6 +325,8 @@ sub do_edit_bilprof : Local {
 
     if(length $c->request->params->{fraud_interval_notify}) {
         @{$settings{fraud_interval_notify}} = split /\s*,\s*/, $c->request->params->{fraud_interval_notify};
+    } else {
+        $settings{fraud_interval_notify} = [];
     }
 
     $settings{currency} = $c->request->params->{currency} || '';
