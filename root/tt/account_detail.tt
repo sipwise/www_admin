@@ -209,8 +209,11 @@
           [% FOREACH subscriber = account.subscribers %]
             <li class="ui-state-default">
               <div class="span-6">
-              [% IF subscriber.subscriber_id %]
+              [% IF subscriber.status == "active" %]
                 <a href="/subscriber/detail?subscriber_id=[% subscriber.subscriber_id %]">
+                  [% subscriber.username %]@[% subscriber.domain %]</a>
+              [% ELSIF subscriber.status == "locked" %]
+                <a class="red" href="/subscriber/detail?subscriber_id=[% subscriber.subscriber_id %]">
                   [% subscriber.username %]@[% subscriber.domain %]</a>
               [% ELSE %]
                 [% subscriber.username %]@[% subscriber.domain %]
