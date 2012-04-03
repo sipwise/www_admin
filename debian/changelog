@@ -7,6 +7,12 @@ ngcp-www-admin (3.3.4) unstable; urgency=low
   [dtiefnig]
   * add fraud parameters to billing profile web form
   * call_prov() expects a ref for returning data
+  * billing.pm: allow fraud_interval_notify string to be on-the-fly replaced by array ref
+  * billing.pm: fix fraud notify array reference handling
+  * billing.pm: print error message on invalid notification e-mail addresses
+  * bilprof_edit.tt: fix notification web help text
+  * admin.css,account_detail.tt: "unlink" terminated and mark locked subscribers in account view
+  * billing.pm: allow fraud notify address field to be unset
 
  -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Mon, 02 Apr 2012 12:21:35 +0200
 
