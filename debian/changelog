@@ -1,11 +1,11 @@
 ngcp-www-admin (3.3.4) unstable; urgency=low
 
   [cveigl]
-  * add fraud parameters to billing profile web form
+  * enforce billing profile name limit (mantis:969)
   * avoid get_subscriber_by_id where possible
 
   [dtiefnig]
-  * enforce billing profile name limit (mantis:969)
+  * add fraud parameters to billing profile web form
   * call_prov() expects a ref for returning data
   * billing.pm: allow fraud_interval_notify string to be on-the-fly replaced by array ref
   * billing.pm: fix fraud notify array reference handling
