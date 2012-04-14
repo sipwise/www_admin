@@ -691,7 +691,7 @@ sub process_callmap {
         #print "adding new dst elem ".$packet->{dst_ip}.':'.$packet->{dst_port}."\n";
         $ext_uas{$packet->{dst_ip}.':'.$packet->{dst_port}} = 1;
         # TODO: prefix "proto:" as well
-        push @uas, $packet->{src_ip}.':'.$packet->{src_port};
+        push @uas, $packet->{dst_ip}.':'.$packet->{dst_port};
       }
     }
     push @uas, ('lb', 'sbc', 'proxy');
