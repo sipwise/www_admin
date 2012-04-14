@@ -1400,6 +1400,101 @@ sub sipstats_pcap : Local {
     return;
 }
 
+sub sipstats_callmap_png : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_sipstats_call.tt';
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $callid = $c->request->params->{callid};
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+    $c->stash->{callid} = $callid;
+    $c->stash->{subscriber} = $subscriber;
+    $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+
+    my $calls;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_packets',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                          callid   => $callid,
+                                                        },
+                                                        \$calls
+                                                      );
+    my $png = admin::Utils::generate_callmap_png($c, $calls);
+    my $filename = $callid . '.png';
+    $c->stash->{current_view} = 'Plain';
+    $c->stash->{content_type} = 'image/png';
+    $c->stash->{content_disposition} = qq[attachment; filename="$filename"];
+    $c->stash->{content} = eval { $png };
+
+    return;
+}
+
+sub sipstats_callmap : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_sipstats_call.tt';
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $callid = $c->request->params->{callid};
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+    $c->stash->{callid} = $callid;
+    $c->stash->{subscriber} = $subscriber;
+    $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+
+    my $calls;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_packets',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                          callid   => $callid,
+                                                        },
+                                                        \$calls
+                                                      );
+    $c->stash->{canvas} = admin::Utils::generate_callmap($c, $calls);
+
+    return;
+}
+
+sub sipstats_packet : Local {
+    my ( $self, $c ) = @_;
+    #$c->stash->{template} = 'tt/subscriber_sipstats_call.tt';
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    my $pkgid = $c->request->params->{pkgid};
+    my $subscriber;
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+    $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
+
+    my $pkg;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_packet',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                          packetid   => $pkgid,
+                                                        },
+                                                        \$pkg
+                                                      );
+
+    $pkg->{payload} = encode_entities($pkg->{payload});
+    $pkg->{payload} =~ s/^([^\n]+)\n/<b>$1<\/b>\n/;
+    $pkg->{payload} =~ s/\n([a-zA-Z0-9\-_]+\:)/\n<b>$1<\/b>/g;
+    $pkg->{payload} =~ s/\r?\n/<br\/>/g;
+    $c->stash->{current_view} = 'Plain';
+    $c->stash->{content_type} = 'text/html';
+    $c->stash->{content} = eval { $pkg->{payload} };
+
+    return;
+}
+
 sub edit_cf : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/subscriber_callforward.tt';

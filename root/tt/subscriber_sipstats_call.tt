@@ -1,0 +1,41 @@
+        <h3> Subscriber
+          <a class="noarrow" href="detail?subscriber_id=[% subscriber.subscriber_id %]">
+            [% subscriber.username %]@[% subscriber.domain %]</a>
+        </h3>
+        
+        <div class="topsubmenu">
+        <ul>
+          <li><a href="detail?subscriber_id=[% subscriber.subscriber_id %]"><span>User</span></a></li>
+          <li><a href="preferences?subscriber_id=[% subscriber.subscriber_id %]"><span>Preferences</span></a></li>
+        [% IF Catalyst.session.admin.call_data %]
+          <li><a href="call_data?subscriber_id=[% subscriber.subscriber_id %]"><span>CDRs</span></a></li>
+        [% END %]
+        [% IF Catalyst.config.voisniff_features %]
+          <li class="selected"><a href="sipstats?subscriber_id=[% subscriber.subscriber_id %]"><span>SIP Stats</span></a></li>
+        [% END %]
+        </ul>
+        </div>
+        <div class="topsubmenudivider"> </div>
+
+        <script type="text/javascript" src="/js/modal.popup.js"></script>
+        <script type="text/javascript">
+          function pkgPopup(pkgid) {
+            // http://www.jquerypopup.com/documentation.php
+            modalPopup("center", 100, 640, 10, "#666666", 40, "#FFFFFF", "#000000", 4, 5, 300,
+              "sipstats_packet?subscriber_id=[% subscriber.subscriber_id %]&pkgid="+pkgid,
+              "/static/images/loader.gif");
+          }
+        </script>
+
+        <h3 id="calldata">Call Details for Call-ID [% callid %]</h3>
+
+        <a href="sipstats?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-back">Back</span></a>
+
+        <a href="sipstats_pcap?subscriber_id=[% subscriber.subscriber_id %]&callid=[% callid %]"><span class="button-download">Download PCAP</span></a>
+
+        <image src="sipstats_callmap_png?subscriber_id=[% subscriber.subscriber_id %]&callid=[% callid %]" width="[% canvas.width %]" height="[% canvas.height %]" usemap="#diamap" />
+        <map name="diamap">
+        [% FOREACH area IN canvas.areas %]
+          <area shape="rect" coords="[% area.coords %]" href="javascript:pkgPopup([% area.id %])" />
+        [% END %]
+        </map>

@@ -34,7 +34,7 @@
         [% FOREACH call IN calls %]
           <li class="ui-state-default">
             <div class="span-4">[% call.timestamp %]</div>
-            <div class="span-10"><a href="sipstats_pcap?subscriber_id=[% subscriber.subscriber_id %]&callid=[% call.call_id %]">[% IF call.call_id.length > 50 %][% call.call_id.substr(0, 50) %]...[% ELSE %][% call.call_id %][% END %]</a></div>
+            <div class="span-10"><a href="sipstats_callmap?subscriber_id=[% subscriber.subscriber_id %]&callid=[% call.call_id %]">[% IF call.call_id.length > 50 %][% call.call_id.substr(0, 50) %]...[% ELSE %][% call.call_id %][% END %]</a></div>
             <div class="span-2 last">[% call.method %]</div>
           </li>
         [% END %]

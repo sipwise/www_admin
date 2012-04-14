@@ -86,6 +86,7 @@
            { name = "transfer", icon="transferthick-e-w" },
            { name = "cart", icon="cart" },
            { name = "browse", icon="folder-open" },
+           { name = "download", icon="disk" },
          ]
       %]
       [% FOREACH b = buttons %]
