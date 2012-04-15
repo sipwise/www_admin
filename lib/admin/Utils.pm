@@ -637,6 +637,7 @@ sub process_callmap {
     my $packets = shift;
     my $r_png = shift;
     my $r_info = shift;
+    my $i = 0;
 
     my %int_uas = (
       $c->config->{sipstats}->{lb_int}, 'lb',
@@ -651,14 +652,14 @@ sub process_callmap {
 
     my $canvas_elem_line_width = 2;
     my $canvas_elem_line_color = 'darkgray';
-    my $canvas_elem_font = gdMediumBoldFont;
-    my $canvas_elem_font_size = 12;
+    my $canvas_elem_font = 'Courier:bold';
+    my $canvas_elem_font_size = 8;
     my $canvas_elem_font_color = 'darkgray';
 
     my $canvas_pkg_line_width = 2;
     my $canvas_pkg_line_color = 'green';
-    my $canvas_pkg_font = gdMediumBoldFont;
-    my $canvas_pkg_font_size = 0;
+    my $canvas_pkg_font = 'Courier:bold';
+    my $canvas_pkg_font_size = 8;
     my $canvas_pkg_font_color = 'dimgray';
 
     my $html_padding = 5;
@@ -698,7 +699,7 @@ sub process_callmap {
 
     ### calculate x position of all uas
     my %uas_pos_x = ();
-    my $i = 0;
+    $i = 0;
     foreach my $ua(@uas) {
       my $name = $ua;
       foreach my $k(keys %int_uas) {
@@ -733,12 +734,15 @@ sub process_callmap {
 
     ### draw arrows
     my $y_offset = $canvas_margin + $canvas_pkg_distance;
+    $i = 1;
     foreach my $packet(@{$packets}) {
       my $from_x = $uas_pos_x{$packet->{src_ip}.':'.$packet->{src_port}};
       my $to_x = $uas_pos_x{$packet->{dst_ip}.':'.$packet->{dst_port}};
       #print "arrow from ".$packet->{src_ip}.':'.$packet->{src_port}." to ".$packet->{dst_ip}.':'.$packet->{dst_port}.": $from_x - $to_x\n";
       draw_arrow($canvas, $from_x, $y_offset, $to_x, $y_offset, $canvas_pkg_line_width, $canvas_pkg_line_color);
-      my $txt = $packet->{method}; # TODO: also append cseq
+      $packet->{payload} =~ /\ncseq:\s*(\d+)\s+[a-zA-Z]+/i;
+      my $cseq = $1 ? $1 : '?';
+      my $txt = $i.'. '.$packet->{method}.' ('.$cseq.')' ;
       my @bounds = $canvas->stringBounds($txt); # get bounds for text centering
       if($from_x < $to_x) {
         $from_x = $from_x+int($canvas_elem_distance/2)-int($bounds[0]/2);
@@ -752,6 +756,7 @@ sub process_callmap {
       push @{$r_info->{areas}}, {"id", $packet->{id}, "coords", ($from_x-$html_padding).','.($y_offset-abs($bounds[1])-$html_padding).','.($from_x+abs($bounds[0])+$html_padding).','.($y_offset)};
 
       $y_offset += $canvas_pkg_distance;
+      ++$i;
     }
     $$r_png = $canvas->png;
 }

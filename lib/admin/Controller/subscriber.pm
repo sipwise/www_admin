@@ -1486,6 +1486,7 @@ sub sipstats_packet : Local {
 
     $pkg->{payload} = encode_entities($pkg->{payload});
     $pkg->{payload} =~ s/^([^\n]+)\n/<b>$1<\/b>\n/;
+    $pkg->{payload} = $pkg->{src_ip}.':'.$pkg->{src_port}.' &rarr; '. $pkg->{dst_ip}.':'.$pkg->{dst_port}.'<br/><br/>'.$pkg->{payload};
     $pkg->{payload} =~ s/\n([a-zA-Z0-9\-_]+\:)/\n<b>$1<\/b>/g;
     $pkg->{payload} =~ s/\r?\n/<br\/>/g;
     $c->stash->{current_view} = 'Plain';
