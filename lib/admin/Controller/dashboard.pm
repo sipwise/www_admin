@@ -86,6 +86,31 @@ sub voip : Local {
     return 1;
 }
 
+sub sipstats: Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/dashboard.tt';
+    my $stats;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sipstat_24h',
+                                                        undef,
+                                                        \$stats,
+                                                      );
+    $c->stash->{stats} = $stats;
+
+    my @plotdata = ();
+    push @plotdata, {name=>"numpacketsperday", title=>"Captured SIP Packets per Day", 
+        url=>"/rrd/get?path=ngcp/sipstats_num_packets_perday.rrd", si=>0};
+    push @plotdata, {name=>"numpackets", title=>"Overall Available SIP Packets", 
+        url=>"/rrd/get?path=ngcp/sipstats_num_packets.rrd", si=>0};
+    push @plotdata, {name=>"partsize", title=>"Size of Capture Table", 
+        url=>"/rrd/get?path=ngcp/sipstats_partition_size.rrd", si=>1};
+
+    $c->stash->{ctx} = "sipstats";
+    $c->stash->{plotdata} = \@plotdata;
+    $c->stash->{tz_offset} = admin::Utils::tz_offset();
+
+    return 1;
+}
+
 =head1 BUGS AND LIMITATIONS
 
 =over

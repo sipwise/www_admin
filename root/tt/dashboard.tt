@@ -6,6 +6,7 @@
     <script type="text/javascript" src="/js/jsrrd/jsrrd/rrdFlot.js"></script>
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.js"></script>
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.selection.js"></script>
+    <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.pie.js"></script>
     
     <h3 id="title">Dashboard</h3>
 
@@ -13,9 +14,132 @@
       <ul>
         <li [% "class=\"selected\"" IF ctx=="system" %]><a href="system"><span>System</span></a></li>
         <li [% "class=\"selected\"" IF ctx == "voip" %]><a href="voip"><span>Voip</span></a></li>
+        [% IF Catalyst.config.voisniff_features %]
+        <li [% "class=\"selected\"" IF ctx == "sipstats" %]><a href="sipstats"><span>SIP Statistics</span></a></li>
+        [% END %]
       </ul>
     </div>
     <div class="topsubmenudivider"> </div>
+
+    [% IF ctx == "sipstats" %]
+      <h4>Statistics of last 24 hours</h4>
+      <div class="span-14 last">
+        <div class="span-4"><b>Overall SIP packets:</b></div>
+        <div class="span-10 last">[% stats.req_count + stats.res_count %]</div>
+      </div>
+      <div class="span-14 last">
+        <div class="span-4"><b>Requests:</b></div>
+        <div class="span-10 last">[% stats.req_count %]</div>
+      </div>
+      <div class="span-14 last">
+        <div class="span-4"><b>Responses:</b></div>
+        <div class="span-10 last">[% stats.res_count %]</div>
+      </div>
+
+      <script type="text/javascript">
+
+        var req_data = [
+          [% FOREACH req IN stats.req.pairs %]
+            [% k = req.key %]
+            { label: "[% req.key %]", data: [% req.value %], },
+          [% END %]
+        ];
+        var res_data = [
+          [% FOREACH res IN stats.res.pairs %]
+            { label: "[% res.key %]", data: [% res.value %], },
+          [% END %]
+        ];
+
+        function pieHover(event, pos, obj, elem) 
+        {
+          if (!obj)
+            return;
+	  percent = parseFloat(obj.series.percent).toFixed(2);
+	  $(elem).html('<span>'+obj.series.label+': '+obj.series.data[0][1]+' packets ('+percent+'%)</span>');
+        }
+
+        $(document).ready(function(){
+          $.plot($("#req_pie"), req_data,
+          {
+            series: {
+              pie: {
+                show: true,
+                combine: {
+                  color: '#999',
+                  threshold: 0.03,
+                },
+              },
+            },
+            legend: {
+              show: false,
+            },
+            grid: {
+              hoverable: true,
+              clickable: false,
+            },
+          });
+          $("#req_pie").bind("plothover", function(event, pos, obj){pieHover(event, pos, obj, "#req_hover");});
+
+          $.plot($("#res_pie"), res_data,
+          {
+            series: {
+              pie: {
+                show: true,
+                combine: {
+                  color: '#999',
+                  threshold: 0.03,
+                },
+              },
+            },
+            legend: {
+              show: false,
+            },
+            grid: {
+              hoverable: true,
+              clickable: false,
+            },
+          });
+          $("#res_pie").bind("plothover", function(event, pos, obj){pieHover(event, pos, obj, "#res_hover");});
+
+        });
+      </script>
+
+      <div style="clear:both"></div>
+      <div class="hspace-20"></div>
+      
+      <div class="span-18 last"><b>Requests</b></div>
+      <div class="span-18 last">
+        <div class="span-9">
+          <div id="req_hover" class="span-9 last">&nbsp;</div>
+          <div id="req_pie" class="span-9 last" style="width:350px;height:350px;"></div>
+        </div>
+        <div class="span-9 last" style="padding-top:70px;">
+          [% FOREACH req IN stats.req.pairs %]
+            <div class="span-3">[% req.key %]:</div>
+            <div class="span-6 last">[% req.value%]</div>
+          [% END %]
+        </div>
+      </div>
+      <div style="clear:both"></div>
+
+      <div class="span-18 last"><b>Responses</b></div>
+      <div class="span-18 last">
+        <div class="span-9">
+          <div id="res_hover" class="span-9 last">&nbsp;</div>
+          <div id="res_pie" class="span-9 last" style="width:350px;height:350px;"></div>
+        </div>
+        <div class="span-9 last" style="padding-top:70px;">
+          [% FOREACH res IN stats.res.pairs %]
+            <div class="span-3">[% res.key %]:</div>
+            <div class="span-6 last">[% res.value%]</div>
+          [% END %]
+        </div>
+      </div>
+
+      <div style="clear:both"></div>
+      <div class="hspace-20"></div>
+      <h4>Packet Analyzer Statistics</h4>
+    [% END %]
 
     <p>Click&amp;Drag on the graphs to zoom individual ranges.</p> 
 	
