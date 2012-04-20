@@ -154,10 +154,10 @@
               <li class="ui-state-default">
                 <div class="span-5">Alias Numbers:</div>
                 <div class="span-10">
-                  [% IF subscriber.aliases %]
+                  [% IF subscriber.alias_numbers %]
                     <select size="1">
-                    [% FOREACH alias_number = subscriber.aliases %]
-                      <option>+[% alias_number %]</option>
+                    [% FOREACH alias_number = subscriber.alias_numbers %]
+                      <option>+[% alias_number.cc %] [% alias_number.ac %] [% alias_number.sn %]</option>
                     [% END %]
                     </select>
                   [% ELSE %]

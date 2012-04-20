@@ -161,8 +161,8 @@ sub detail : Local {
             $$regpeer{contacts_short} =~ s/>/\&gt;/g;
             $$subscriber{registered_peer} = $regpeer;
         }
-
-        eval { $$subscriber{aliases} = [ sort @{$$subscriber{aliases}} ] };
+        
+        eval { $$subscriber{alias_numbers} = [ sort @{$$subscriber{alias_numbers}} ] };
         $c->stash->{subscriber} = $subscriber;
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
         $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
