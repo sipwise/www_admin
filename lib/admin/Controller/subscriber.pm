@@ -2313,9 +2313,14 @@ sub save_trusted_source : Local {
     $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_transport_protocol', $ts{protocol}, \$checkresult);
     $messages{protocol_err} = 'Client.Syntax.UnknownProtocol' unless $checkresult;
 
-    $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sipuri', $ts{from_pattern}, \$checkresult);
-    $messages{from_pattern_err} = 'Client.Syntax.MalformedUri' unless $checkresult;
-    
+    if (length $ts{from_pattern}) { # allow empty sipuri
+        $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sipuri', $ts{from_pattern}, \$checkresult);
+        $messages{from_pattern_err} = 'Client.Syntax.MalformedUri' unless $checkresult;
+    }
+    else {
+         $ts{from_pattern} = undef;
+    }
+
     my $subscriber;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
         { subscriber_id => $c->request->params->{subscriber_id} },
