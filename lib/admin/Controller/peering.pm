@@ -217,7 +217,8 @@ sub create_rule : Local {
 
     my $grpid = $c->request->params->{grpid};
     my $callee_prefix = $c->request->params->{callee_prefix};
-    my $caller_prefix = $c->request->params->{caller_prefix};
+    my $callee_pattern = $c->request->params->{callee_pattern};
+    my $caller_pattern = $c->request->params->{caller_pattern};
     my $description = $c->request->params->{description};
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
@@ -228,7 +229,8 @@ sub create_rule : Local {
                                                  { group_id => $grpid,
                                                    data     => {
                                                        callee_prefix  => $callee_prefix,
-                                                       caller_prefix  => $caller_prefix,
+                                                       callee_pattern => $callee_pattern,
+                                                       caller_pattern => $caller_pattern,
                                                        description    => $description
                                                    },
                                                  },
@@ -310,7 +312,8 @@ sub edit_rule : Local {
     my $grpid = $c->request->params->{grpid};
     my $ruleid = $c->request->params->{ruleid};
     my $callee_prefix = $c->request->params->{callee_prefix};
-    my $caller_prefix = $c->request->params->{caller_prefix};
+    my $callee_pattern = $c->request->params->{callee_pattern};
+    my $caller_pattern = $c->request->params->{caller_pattern};
     my $description = $c->request->params->{description};
 
 #    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
@@ -321,7 +324,8 @@ sub edit_rule : Local {
                                                  { id   => $ruleid,
                                                    data => {
                                                        callee_prefix => $callee_prefix,
-                                                       caller_prefix => $caller_prefix,
+                                                       callee_pattern => $callee_pattern,
+                                                       caller_pattern => $caller_pattern,
                                                        description   => $description
                                                    },
                                                  },

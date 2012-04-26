@@ -135,10 +135,14 @@
                              name="callee_prefix" value="[% rule.callee_prefix %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, caller pattern"
-                             name="caller_prefix" value="[% rule.caller_prefix %]" />
+                      <input type="text" size="14" id="addtxt" title="string, callee pattern"
+                             name="callee_pattern" value="[% rule.callee_pattern %]" />
                     </div>
-                    <div class="span-4 append-3">
+                    <div class="span-4">
+                      <input type="text" size="14" id="addtxt" title="string, caller pattern"
+                             name="caller_pattern" value="[% rule.caller_pattern %]" />
+                    </div>
+                    <div class="span-4">
                       <input type="text" size="14" id="addtxt" title="string, rule description"
                              name="description" value="[% rule.description %]" />
                     </div>
@@ -151,8 +155,9 @@
                   </div>
                 [% ELSE %]
                   <div class="span-4">[% rule.callee_prefix %]</div>
-                  <div class="span-4">[% rule.caller_prefix %]</div>
-                  <div class="span-4 append-3">[% rule.description %]</div>
+                  <div class="span-4">[% rule.callee_pattern %]</div>
+                  <div class="span-4">[% rule.caller_pattern %]</div>
+                  <div class="span-4">[% rule.description %]</div>
                   <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
                       <a href="/peering/detail?group_id=[% grp.group.id %]&reditid=[% rule.id %]"><span class="button-edit">Edit</span></a>
@@ -180,10 +185,14 @@
                              name="callee_prefix" value="" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, caller pattern"
-                             name="caller_prefix" value="" />
+                      <input type="text" size="14" id="addtxt" title="string, callee pattern"
+                             name="callee_pattern" value="" />
                     </div>
-                    <div class="span-4 append-3">
+                    <div class="span-4">
+                      <input type="text" size="14" id="addtxt" title="string, caller pattern"
+                             name="caller_pattern" value="" />
+                    </div>
+                    <div class="span-4">
                       <input type="text" size="14" id="addtxt" title="string, rule description"
                              name="description" value="" />
                     </div>
