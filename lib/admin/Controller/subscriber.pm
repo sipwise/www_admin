@@ -810,6 +810,18 @@ sub preferences : Local {
         {
           eval { @{$$preferences{$$pref{preference}}} = map { s/^([1-9])/+$1/; $_ } @{$$preferences{$$pref{preference}}} };
         }
+        elsif ($$pref{data_type} eq 'enum') {
+
+            my $enum_options;
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_enum_options', 
+                { preference_id => $$pref{id} }, 
+                \$enum_options );
+
+            $$preferences{$$pref{preference}} = { 
+                selected => $$preferences{$$pref{preference}},
+                options => $enum_options,
+            } if eval { @$enum_options };
+        }
 
         push @stashprefs,
              { key         => $$pref{preference},
@@ -933,6 +945,11 @@ sub update_preferences : Local {
             }
         } elsif($$db_pref{data_type} eq 'boolean') {
             $$preferences{$$db_pref{preference}} = $c->request->params->{$$db_pref{preference}} ? 1 : undef;
+        } elsif($$db_pref{data_type} eq 'enum') {
+            # 'NOTSET' means, user chose to not set this property for that subscriber (hardcoded in database)
+            $$preferences{$$db_pref{preference}} = ($c->request->params->{$$db_pref{preference}} eq 'NOTSET')
+                ?  undef
+                :  $c->request->params->{$$db_pref{preference}};
         } else {
             # wtf? ignoring invalid preference
         }
