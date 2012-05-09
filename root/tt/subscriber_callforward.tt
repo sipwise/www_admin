@@ -41,8 +41,8 @@
                 <form action="/subscriber/edit_cf_saveset" method="post">
                   <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
                   <input type="hidden" name="seditid" value="[% dset.id %]"/>
-                  <div class="span-4"><input type="text" size="20" name="dsetname" value="[% dset.name %]"/></div>
-                  <div class="prepend-10 span-1"><button class="button-save">Save</button></div>
+                  <div class="span-11"><input type="text" size="20" name="dsetname" value="[% dset.name %]"/></div>
+                  <div class="prepend-3 span-1"><button class="button-save">Save</button></div>
                   <div class="span-1">
                     <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]#dset[% dset.id %]"><span class="button-cancel">Cancel</span></a>
                   </div>
@@ -50,8 +50,8 @@
               [% ELSIF Catalyst.session.admin.read_only %]
                 <div class="span-4 last">[% dset.name %]</div>
               [% ELSE %]
-                <div class="span-4">[% dset.name %]</div>
-                <div class="prepend-10 span-1">
+                <div class="span-11">[% dset.name %]</div>
+                <div class="prepend-3 span-1">
                   <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]&seditid=[% dset.id %]#dset[% dset.id %]"><span class="button-edit">Edit</span></a>
                 </div>
                 <div class="span-1 last">
@@ -173,8 +173,8 @@
             <li class="ui-state-default">
                 <form action="/subscriber/edit_cf_createset" method="post">
                   <input type="hidden" name="subscriber_id" value="[% subscriber_id %]"/>
-                  <div class="span-4"><input type="text" size="20" name="dsetname" value="" title="enter a name for the destination set" /></div>
-                  <div class="prepend-10 span-1 last"><button class="button-add">Add</button></div>
+                  <div class="span-11"><input type="text" size="20" name="dsetname" value="" title="enter a name for the destination set" /></div>
+                  <div class="prepend-3 span-1 last"><button class="button-add">Add</button></div>
                 </form>
             </li>
             [% END %]
