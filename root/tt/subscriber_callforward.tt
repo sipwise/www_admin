@@ -48,7 +48,7 @@
                   </div>
                 </form>
               [% ELSIF Catalyst.session.admin.read_only %]
-                <div class="span-4 last">[% dset.name %]</div>
+                <div class="span-11 last">[% dset.name %]</div>
               [% ELSE %]
                 <div class="span-11">[% dset.name %]</div>
                 <div class="prepend-3 span-1">
