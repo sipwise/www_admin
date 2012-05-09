@@ -109,11 +109,11 @@
                       <input type="text" size="15 id="addtxt" title="string, match pattern"
                              name="match_pattern" value="[% rule.match_pattern %]" />
                     </div>
-                    <div class="span-4">
+                    <div class="span-5">
                       <input type="text" size="15" id="addtxt" title="string, replacement pattern"
                              name="replace_pattern" value="[% rule.replace_pattern %]" />
                     </div>
-                    <div class="span-4 append-1">
+                    <div class="span-5">
                       <input type="text" size="15" id="addtxt" title="string, rewrite rule description"
                              name="description" value="[% rule.description %]" />
                     </div>
@@ -121,13 +121,13 @@
                         <button class="button-save" id="[% rw.tag %]save[% id %]">Save</button>
                     </div>
                   </form>
-                  <div class="prepend-1 span-1 last">
+                  <div class="span-1 last">
                       <a href="/rewrite/detail?set_id=[% set.rewrite_set.id %]#[% rw.id %]"><span class="button-cancel">Cancel</span></a>
                   </div>
                 [% ELSE %]
                   <div class="span-4">[% rule.match_pattern %]</div>
-                  <div class="span-4">[% rule.replace_pattern %]</div>
-                  <div class="span-4 append-1">[% rule.description %]</div>
+                  <div class="span-5">[% rule.replace_pattern %]</div>
+                  <div class="span-5">[% rule.description %]</div>
                   <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
                       <a href="/rewrite/detail?set_id=[% set.rewrite_set.id %]&editid=[% rule.id %]#[% rw.id %]"><span class="button-edit">Edit</span></a>
@@ -138,7 +138,7 @@
                     <input type="hidden" name="rewriteid" value="[% rule.id %]" />
                     <input type="hidden" name="direction" value="[% rule.direction %]" />
                     <input type="hidden" name="field" value="[% rule.field %]" />
-                    <div class="prepend-1 span-1 last">
+                    <div class="span-1 last">
                     [% UNLESS Catalyst.session.admin.read_only %]
                         <button id="[% rw.tag %]del[% id %]" class="button-delete">Delete</button>
                     [% END %]
@@ -163,15 +163,15 @@
                     <input type="text" size="15" id="addtxt" title="string, match pattern"
                            name="match_pattern" value="" />
                   </div>
-                  <div class="span-4">
+                  <div class="span-5">
                     <input type="text" size="15" id="addtxt" title="string, replacement pattern"
                            name="replace_pattern" value="" />
                   </div>
-                  <div class="span-4 append-1">
+                  <div class="span-5">
                     <input type="text" size="15" id="addtxt" title="string, rule description"
                            name="description" value="" />
                   </div>
-                  <div class="span-1 append-2 last">
+                  <div class="span-1 append-1 last">
                       <button class="button-add" id="[% rw.tag %]add">Add</button>
                   </div>
                 </form>
