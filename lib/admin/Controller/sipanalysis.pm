@@ -164,10 +164,12 @@ sub packet : Local {
                                                       );
 
     $pkg->{payload} = encode_entities($pkg->{payload});
+    $pkg->{payload} =~ s/\r//g;
+    $pkg->{payload} =~ s/([^\n]{120})/$1<br\/>/g;
     $pkg->{payload} =~ s/^([^\n]+)\n/<b>$1<\/b>\n/;
     $pkg->{payload} = $pkg->{src_ip}.':'.$pkg->{src_port}.' &rarr; '. $pkg->{dst_ip}.':'.$pkg->{dst_port}.'<br/><br/>'.$pkg->{payload};
     $pkg->{payload} =~ s/\n([a-zA-Z0-9\-_]+\:)/\n<b>$1<\/b>/g;
-    $pkg->{payload} =~ s/\r?\n/<br\/>/g;
+    $pkg->{payload} =~ s/\n/<br\/>/g;
     $c->stash->{current_view} = 'Plain';
     $c->stash->{content_type} = 'text/html';
     $c->stash->{content} = eval { $pkg->{payload} };
