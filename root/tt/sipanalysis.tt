@@ -1,0 +1,93 @@
+        <h3>Find SIP Sessions</h3>
+	<ul class="cleanlist">
+          <form action="/sipanalysis/search" method="post">
+	  <li class="ui-state-default">
+            <div class="span-3">
+              <label class="search_label" for="search_by_uuid">UUID:</label>
+            </div>
+            <div class="span-5">
+              <input type="text" size="50" id="search_by_uuid" name="search_uuid" value="[% search_uuid %]"
+                   title="search by source or destination UUID" />
+            </div>
+	  </li>
+	  <li class="ui-state-default">
+            <div class="span-3">
+              <label class="search_label" for="search_by_call_id">Call-ID:</label>
+            </div>
+
+            <div class="span-5">
+              <input type="text" size="50" id="search_by_call_id" name="search_call_id" value="[% search_callid %]"
+                   title="search by the SIP Call-ID" />
+            </div>
+	  </li>
+	</ul>
+	<div class="hspace-20"></div>
+        <button name="submit" class="button-search">Search</button>
+        </form>
+	<br/>
+
+	<div class="hspace-20"></div>
+        [% IF searched %]
+        <h3>SIP Sessions</h3>
+        <ul class="cleanlist">
+        [% IF !calls.defined || calls.size == 0 %]
+          <li class="ui-state-default">
+            <div class="span-14">No SIP sessions found.</div>
+          </li>
+        [% ELSE %]
+          <li class="ui-state-default">
+            <div class="span-4">Timestamp</div>
+            <div class="span-10">Call-ID</div>
+            <div class="span-2 last">Method</div>
+          </li>
+        [% END %]
+        [% FOREACH call IN calls %]
+          <li class="ui-state-default">
+            <div class="span-4">[% call.timestamp %]</div>
+            <div class="span-10"><a href="callmap?callid=[% call.call_id %]">[% IF call.call_id.length > 50 %][% call.call_id.substr(0, 50) %]...[% ELSE %][% call.call_id %][% END %]</a></div>
+            <div class="span-2 last">[% call.method %]</div>
+          </li>
+        [% END %]
+        </ul>
+
+[% IF 0 %]
+            [% IF pagination %]
+            <div class="pagination">
+              <ul>
+                [% IF offset == 0 %]
+                  <li class="disablepage">&#171; prev</li>
+                [% ELSE %]
+                  <li class="nextpage">
+                    <a href="/subscriber/search?use_session=1&amp;offset=[% offset - 1 %]">&#171; prev</a>
+                  </li>
+                [% END %]
+                [% FOREACH pagine = pagination %]
+                  [% IF pagine.offset == offset %]
+                    <li class="currentpage">
+                      [% pagine.offset + 1 %]
+                    </li>
+                  [% ELSIF pagine.offset == -1 %]
+                     ...
+                  [% ELSE %]
+                    <li>
+                      <a href="/subscriber/search?use_session=1&amp;offset=[% pagine.offset %]">[% pagine.offset + 1 %]</a>
+                    </li>
+                  [% END %]
+                [% END %]
+                [% IF offset >= max_offset %]
+                  <li class="disablepage">
+                    next &#187;
+                  </li>
+                [% ELSE %]
+                  <li class="nextpage">
+                    <a href="/subscriber/search?use_session=1&amp;offset=[% offset + 1 %]">next &#187;</a>
+                  </li>
+                [% END %]
+              </ul>
+            </div>
+            [% END %]
+[% END %]
+
+
+         [% END %]
+

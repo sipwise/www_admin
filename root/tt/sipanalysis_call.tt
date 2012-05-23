@@ -1,0 +1,23 @@
+        <script type="text/javascript" src="/js/modal.popup.js"></script>
+        <script type="text/javascript">
+          function pkgPopup(pkgid) {
+            // http://www.jquerypopup.com/documentation.php
+            modalPopup("center", 100, 640, 10, "#666666", 40, "#FFFFFF", "#000000", 4, 5, 300,
+              "packet?pkgid="+pkgid,
+              "/static/images/loader.gif");
+          }
+        </script>
+
+        <h3 id="calldata">Call Details for Call-ID [% callid %]</h3>
+
+        <div style="clear:both"></div>
+        <a href="/sipanalysis"><span class="button-back">Back</span></a>
+        <a href="pcap?callid=[% callid %]"><span class="button-download">Download PCAP</span></a>
+        <div style="clear:both"></div>
+
+        <image src="callmap_png?callid=[% callid %]" width="[% canvas.width %]" height="[% canvas.height %]" usemap="#diamap" />
+        <map name="diamap">
+        [% FOREACH area IN canvas.areas %]
+          <area shape="rect" coords="[% area.coords %]" href="javascript:pkgPopup([% area.id %])" />
+        [% END %]
+        </map>

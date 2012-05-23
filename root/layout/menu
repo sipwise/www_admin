@@ -8,6 +8,9 @@
             [% IF Catalyst.config.dashboard.enabled %]
             <li [% 'class="active_menu"' IF menu.active == "dashboard" %]><a href="/dashboard">Statistics</a></li>
             [% END %]
+            [% IF Catalyst.config.voisniff_features %]
+            <li [% 'class="active_menu"' IF menu.active == "sipanalysis" %]><a href="/sipanalysis">SIP Traffic Analysis</a></li>
+            [% END %]
           </ul>
         </div>
 
