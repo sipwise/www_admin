@@ -647,7 +647,7 @@ sub process_callmap {
     );
 
     my $canvas_margin = 100; # enough free space around diagram for text etc
-    my $canvas_elem_distance = 150; # horizontal distance between element lines
+    my $canvas_elem_distance = 220; # horizontal distance between element lines
     my $canvas_pkg_distance = 30; # vertical distance between packet arrows
 
     my $canvas_elem_line_width = 2;
