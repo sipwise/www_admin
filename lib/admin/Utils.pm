@@ -733,16 +733,19 @@ sub process_callmap {
     }
 
     ### draw arrows
+    my $last_timestamp = undef;
     my $y_offset = $canvas_margin + $canvas_pkg_distance;
     $i = 1;
     foreach my $packet(@{$packets}) {
+      my $time_offset = defined $last_timestamp ? ($packet->{timestamp} - $last_timestamp) : 0;
+      $last_timestamp = $packet->{timestamp};
       my $from_x = $uas_pos_x{$packet->{src_ip}.':'.$packet->{src_port}};
       my $to_x = $uas_pos_x{$packet->{dst_ip}.':'.$packet->{dst_port}};
       #print "arrow from ".$packet->{src_ip}.':'.$packet->{src_port}." to ".$packet->{dst_ip}.':'.$packet->{dst_port}.": $from_x - $to_x\n";
       draw_arrow($canvas, $from_x, $y_offset, $to_x, $y_offset, $canvas_pkg_line_width, $canvas_pkg_line_color);
       $packet->{payload} =~ /\ncseq:\s*(\d+)\s+[a-zA-Z]+/i;
       my $cseq = $1 ? $1 : '?';
-      my $txt = $i.'. '.$packet->{method}.' ('.$cseq.')' ;
+      my $txt = sprintf($i.'. '.$packet->{method}.' ('.$cseq.', +%0.3fs)', $time_offset);
       my @bounds = $canvas->stringBounds($txt); # get bounds for text centering
       if($from_x < $to_x) {
         $from_x = $from_x+int($canvas_elem_distance/2)-int($bounds[0]/2);
