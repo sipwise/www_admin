@@ -126,6 +126,24 @@ sub preferences : Local {
                                                         undef, \$db_prefs
                                                       );
     $db_prefs = [ grep { $$_{dom_pref} } @$db_prefs ] if eval { @$db_prefs };
+    
+    foreach my $pref (@$db_prefs) {
+        # need to find and provide avaiable options for enum types
+        if ($$pref{data_type} eq 'enum') {
+            
+            my $enum_options;
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_enum_options', 
+                { preference_id => $$pref{id},
+                  pref_type => 'dom',
+                }, 
+                \$enum_options );
+
+            $$preferences{$$pref{preference}} = { 
+                selected => $$preferences{$$pref{preference}},
+                options => $enum_options,
+            } if eval { @$enum_options };
+        }
+    }
 
     ### restore data entered by the user ###
 

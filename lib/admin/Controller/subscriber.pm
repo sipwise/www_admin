@@ -814,7 +814,9 @@ sub preferences : Local {
 
             my $enum_options;
             return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_enum_options', 
-                { preference_id => $$pref{id} }, 
+                { preference_id => $$pref{id},
+                  pref_type => 'usr', 
+                }, 
                 \$enum_options );
 
             $$preferences{$$pref{preference}} = { 
@@ -946,10 +948,10 @@ sub update_preferences : Local {
         } elsif($$db_pref{data_type} eq 'boolean') {
             $$preferences{$$db_pref{preference}} = $c->request->params->{$$db_pref{preference}} ? 1 : undef;
         } elsif($$db_pref{data_type} eq 'enum') {
-            # 'NOTSET' means, user chose to not set this property for that subscriber (hardcoded in database)
-            $$preferences{$$db_pref{preference}} = ($c->request->params->{$$db_pref{preference}} eq 'NOTSET')
-                ?  undef
-                :  $c->request->params->{$$db_pref{preference}};
+            # zero length value means user chose to not set this preference
+            $$preferences{$$db_pref{preference}} = (length($c->request->params->{$$db_pref{preference}}) > 0 )
+                ?  $c->request->params->{$$db_pref{preference}}
+                :  undef
         } else {
             # wtf? ignoring invalid preference
         }

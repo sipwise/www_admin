@@ -109,7 +109,6 @@
                   <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
                   <div class="span-10 last">
                     <select size="1" name="[% preference.key %]" [% IF !edit_preferences %]disabled="disabled"[% END %] />
-                        <option value="NOTSET">Use domain default</option>
                         [% FOREACH option IN preference.value.options %]
                             <option value="[% option.value %]"
                                 [% IF option.value == preference.value.selected %]

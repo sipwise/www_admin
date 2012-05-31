@@ -402,6 +402,11 @@ sub prepare_db_prefs {
             }
         } elsif($$db_pref{data_type} eq 'boolean') {
             $$preferences{$$db_pref{preference}} = $c->request->params->{$$db_pref{preference}} ? 1 : undef;
+        } elsif($$db_pref{data_type} eq 'enum') {
+            # zero length value means user chose to not set this preference 
+            $$preferences{$$db_pref{preference}} = (length($c->request->params->{$$db_pref{preference}}) > 0 )
+                ?  $c->request->params->{$$db_pref{preference}}
+                :  undef
         } else {
             # wtf? ignoring invalid preference
         }
