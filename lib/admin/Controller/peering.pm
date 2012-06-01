@@ -546,8 +546,19 @@ sub preferences : Local {
                                                       );
     $db_prefs = [ grep { $$_{peer_pref} } @$db_prefs ] if eval { @$db_prefs };
     
+    ### restore data entered by the user ###
+
+    if(ref $c->session->{restore_preferences_input} eq 'HASH') {
+        if(ref $preferences eq 'HASH') {
+            $preferences = { %$preferences, %{$c->session->{restore_preferences_input}} };
+        } else {
+            $preferences = $c->session->{restore_preferences_input};
+        }
+        delete $c->session->{restore_preferences_input};
+    }
+    
+    # need to find and provide avaiable options for enum types
     foreach my $pref (@$db_prefs) {
-        # need to find and provide avaiable options for enum types
         if ($$pref{data_type} eq 'enum') {
             
             my $enum_options;
@@ -562,17 +573,6 @@ sub preferences : Local {
                 options => $enum_options,
             } if eval { @$enum_options };
         }
-    }
-
-    ### restore data entered by the user ###
-
-    if(ref $c->session->{restore_preferences_input} eq 'HASH') {
-        if(ref $preferences eq 'HASH') {
-            $preferences = { %$preferences, %{$c->session->{restore_preferences_input}} };
-        } else {
-            $preferences = $c->session->{restore_preferences_input};
-        }
-        delete $c->session->{restore_preferences_input};
     }
 
     if(eval { @$db_prefs }) {
