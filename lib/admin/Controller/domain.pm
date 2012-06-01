@@ -127,8 +127,19 @@ sub preferences : Local {
                                                       );
     $db_prefs = [ grep { $$_{dom_pref} } @$db_prefs ] if eval { @$db_prefs };
     
+    ### restore data entered by the user ###
+
+    if(ref $c->session->{restore_preferences_input} eq 'HASH') {
+        if(ref $preferences eq 'HASH') {
+            $preferences = { %$preferences, %{$c->session->{restore_preferences_input}} };
+        } else {
+            $preferences = $c->session->{restore_preferences_input};
+        }
+        delete $c->session->{restore_preferences_input};
+    }
+    
+    # need to find and provide avaiable options for enum types
     foreach my $pref (@$db_prefs) {
-        # need to find and provide avaiable options for enum types
         if ($$pref{data_type} eq 'enum') {
             
             my $enum_options;
@@ -145,16 +156,6 @@ sub preferences : Local {
         }
     }
 
-    ### restore data entered by the user ###
-
-    if(ref $c->session->{restore_preferences_input} eq 'HASH') {
-        if(ref $preferences eq 'HASH') {
-            $preferences = { %$preferences, %{$c->session->{restore_preferences_input}} };
-        } else {
-            $preferences = $c->session->{restore_preferences_input};
-        }
-        delete $c->session->{restore_preferences_input};
-    }
 
     if(eval { @$db_prefs }) {
         $c->stash->{preferences_array} = admin::Utils::prepare_tt_prefs($c, $db_prefs, $preferences);
