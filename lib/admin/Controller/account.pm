@@ -185,6 +185,7 @@ sub detail : Local {
                                                                     \$product
                                                                   );
                 $$voip_account{product_name} = $$product{data}{name};
+                $$voip_account{currency} = $$product{data}{currency};
             }
             if(defined $$voip_account{billing_profile}) {
                 my $profile;
@@ -193,6 +194,7 @@ sub detail : Local {
                                                                     \$profile
                                                                   );
                 $$voip_account{billing_profile_name} = $$profile{data}{name};
+                $$voip_account{currency} = $$profile{data}{currency};
             }
         }
 
