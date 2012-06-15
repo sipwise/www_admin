@@ -824,6 +824,17 @@ sub preferences : Local {
                 options => $enum_options,
             } if eval { @$enum_options };
         }
+        elsif ($$pref{preference} eq 'sound_set') {
+            my $sound_sets;
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sound_sets_flat', 
+                {},
+                \$sound_sets );
+
+            $$preferences{$$pref{preference}} = { 
+                selected => $$preferences{$$pref{preference}},
+                options => $sound_sets,
+            } if eval { @$sound_sets };
+        }
 
         push @stashprefs,
              { key         => $$pref{preference},

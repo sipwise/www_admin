@@ -26,7 +26,7 @@ Description: Configuration templates for the web-based admin interface
 
 Package: ngcp-www-admin
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, ngcp-ossbss-billing (>= 2.1.1), ngcp-ossbss-voip (>= 3.1.0), libcatalyst-perl, libcatalyst-modules-perl, libcatalyst-engine-apache-perl, ngcp-templates-www-admin, libgd-gd2-perl
+Depends: ${shlibs:Depends}, ${misc:Depends}, ngcp-ossbss-billing (>= 2.1.1), ngcp-ossbss-voip (>= 3.1.0), libcatalyst-perl, libcatalyst-modules-perl, libcatalyst-engine-apache-perl, ngcp-templates-www-admin, libgd-gd2-perl, libfile-type-perl
 Description: administration framework to configure the Sipwise NGCP
  This package provides an administration framework which is used to
  configure the Sipwise NGCP.
