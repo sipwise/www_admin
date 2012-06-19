@@ -15,12 +15,12 @@
     </li>
         <li class="ui-state-default">
             <div class="span-5">
-                [% count = set.mapped.domains + set.mapped.users + set.mapped.peers %]
-                [% plural = 's' IF count > 1 %]
                 [% set.name %]
-                 [% IF set.mapped %]
-                     <font class="small"><i>(mapped [% count %] time[% plural %])</i></font>
-                 [% END %]
+                [% count = set.mapped.domains + set.mapped.subscribers + set.mapped.peers %]
+                [% IF count > 0 %]
+                    [% plural = 's' IF count > 1 %]
+                    <font class="small"><i>(mapped [% count %] time[% plural %])</i></font>
+                [% END %]
             </div>
         </li>
 
