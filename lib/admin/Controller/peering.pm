@@ -245,6 +245,10 @@ sub create_rule : Local {
 		else
 		{
         	$messages{erulerr} = 'Client.Voip.InputErrorFound';
+            if ($c->session->{prov_error_object}) {
+                # put into flash (read-once), %messages is translated which will not work here.
+                $c->flash->{erulerr_detail} = $c->session->{prov_error_object};
+            } 
 		}
     } else {
 		# TODO: add proper values here and set them in tt
