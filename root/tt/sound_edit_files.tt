@@ -1,0 +1,54 @@
+<h3>Manage sound sets</h3>
+
+<a href="/sound"><span class="button-back">Back</span></a>
+<div class="hspace-20"</div>
+
+<h3>Edit sound files</h3>
+[% IF messages.sound_set_err %]<div class="error">[% messages.sound_set_err %]</div>[% END %]
+[% IF messages.sound_set_msg %]<div class="success">[% messages.sound_set_msg %]</div>[% END %]
+
+<ul class="cleanlist">
+    <li class="ui-state-default">
+        <div class="span-2">Setname</div>
+        <div class="prepend-1 span-2">Handle</div>
+        <div class="prepend-1 span-2">Filename</div>
+    </li>
+        <li class="ui-state-default">
+            <div class="span-5">
+                [% count = set.mapped.domains + set.mapped.users + set.mapped.peers %]
+                [% plural = 's' IF count > 1 %]
+                [% set.name %]
+                 [% IF set.mapped %]
+                     <font class="small"><i>(mapped [% count %] time[% plural %])</i></font>
+                 [% END %]
+            </div>
+        </li>
+
+        [% FOREACH h IN set.handles %]
+            <li class="ui-state-default">
+                <div class="span-2"></div>
+                <div class="prepend-1 span-2">[% h.name %]</div>
+                
+                [% IF h.filename.length AND NOT h.err %]
+                    <div class="prepend-1 span-2"><a href="/sound/set/[% set.id %]/handle/[% h.id %]/soundfile/get">[% h.filename %]</a></div>
+                    <form action="/sound/set/[% set.id %]/handle/[% h.id %]/delete" method="post">
+                        <div class="prepend-6 span-1">
+                            [% UNLESS Catalyst.session.admin.read_only %]
+                                <button class="button-delete" id="setdel[% id %]">Delete</button>
+                            [% END %]
+                    </form> 
+                    </div>
+                [% ELSE %]
+                    <form action="/sound/set/[% set.id %]/handle/[% h.id %]/soundfile/upload" method="post" enctype="multipart/form-data">
+                        <div class="prepend-1 span-4">
+                            [%# value='' is ignored by browsers for security reasons for file-input-fields %]
+                            <input id="soundfile" name="soundfile" class="file" type="file" size="10" value="[% IF h.filename.length %][% h.filename %][% END %]">
+                        </div>
+                        <div class="prepend-4 span-1">
+                            <button class="button-add" id="soundadd" />
+                        </div>
+                    </form> 
+                [% END %]
+        </li>
+        [% END %]
+</ul> 

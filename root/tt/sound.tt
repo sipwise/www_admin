@@ -1,21 +1,30 @@
 <h3>Manage sound sets</h3>
 
+[% IF messages.sound_set_err %]<div class="error">[% messages.sound_set_err %]</div>[% END %]
+[% IF messages.sound_set_msg %]<div class="success">[% messages.sound_set_msg %]</div>[% END %]
+
 <ul class="cleanlist">
+    
     <li class="ui-state-default">
-        <div class="prepend-3 span-3">Handle</div>
-        <div class="prepend-1 span-2 last">Filename</div>
+        <div class="span-6">Name</div>
+        <div class="prepend-1 span-6">Description</div>
+        <div class="prepend-1 span-1 last"></div>
     </li>
+
     [% FOREACH set IN sets %]
 
-        <li class="ui-state-default"><a name="set_[% set.id %]"></a></li>
+        <div class="ui-state-default"><a name="set_[% set.id %]"></a></div>
 
-        [% IF set.id == edit_set_id %]
+        [% IF set.id == set_id %]
                 <li class="ui-state-default">
                 <form action="/sound/set/[% set.id %]/save#set_[% set.id %]" method="post">
                     <div class="span-6">
                         <input type="text" name="set_name" value="[% set.name %]" size="10"/>
                     </div>
-                    <div class="prepend-8 span-1">
+                    <div class="prepend-1 span-6">
+                        <input type="text" name="set_description" value="[% set.description %]" size="10"/>
+                    </div>
+                    <div class="prepend-1 span-1">
                         <button class="button-save" id="setsave[% id %]">Save</button>
                     </div>
                     <div class="span-1 last">
@@ -23,49 +32,24 @@
                     </div>
                 </form>
                 </li>
-
-                [% FOREACH h IN set.handles %]
-                    <li class="ui-state-default">
-                        <div class="prepend-3 span-3">[% h.name %]</div>
-                        
-                            [% IF h.filename.length AND NOT h.err %]
-                                <div class="prepend-1 span-4">[% h.filename %]</div>
-                                <form action="/sound/set/[% set.id %]/handle/[% h.id %]/delete" method="post">
-                                    <div class="prepend-4 span-1">
-                                        [% UNLESS Catalyst.session.admin.read_only %]
-                                            <button class="button-delete" id="setdel[% id %]">Delete</button>
-                                        [% END %]
-                                </form> 
-                                </div>
-                            [% ELSE %]
-                                <form action="/sound/set/[% set.id %]/handle/[% h.id %]/soundfile/upload" method="post" enctype="multipart/form-data">
-                                    <div class="prepend-1 span-4">
-                                        [%# value='' is ignored by browsers for security reasons for file-input-fields %]
-                                        <input id="soundfile" name="soundfile" class="file" type="file" size="10" value="[% IF h.filename.length %][% h.filename %][% END %]">
-                                    </div>
-                                    <div class="prepend-4 span-1">
-                                        <button class="button-add" id="soundadd" />
-                                    </div>
-                                </form> 
-                            [% END %]
-                    </li>
-                [% END %]
-                [% IF messages.file_err %]
-                    <div class="error">[% messages.file_err %]</div> 
-                [% END %]
         [% ELSE %]
             [% count = set.mapped.domains + set.mapped.users + set.mapped.peers %]
             [% plural = 's' IF count > 1 %]
 
             <li class="ui-state-default">
                 <div class="span-6">
-                    [% set.name %]
+                    <a href="/sound/set/[% set.id %]/editfiles">[% set.name %]</a>
                     [% IF set.mapped %]
                         <font class="small"><i>(mapped [% count %] time[% plural %])</i></font>
                     [% END %]
                 </div>
+                <div class="prepend-1 span-6">
+                    [% IF set.description.length %] [% set.description %] 
+                    [% ELSE %] ---
+                    [% END %]
+                </div>
             
-                <div class="prepend-8 span-1">
+                <div class="prepend-1 span-1">
                 [% UNLESS Catalyst.session.admin.read_only %]
                     <a href="/sound/set/[% set.id %]/edit#set_[% set.id %]"><span class="button-edit">Edit</span></a>
                 [% END %]
@@ -82,24 +66,21 @@
                 </div>
             </li>
 
-            [% FOREACH h IN set.handles %]
-                <li class="ui-state-default">
-                    <div class="prepend-3 span-3">[% h.name %]</div>
-                    <div class="prepend-1 span-4"><a href="/sound/set/[% set.id %]/handle/[% h.id %]/soundfile/get">[% h.filename %]</a></div> 
-                </li>
-            [% END %]
         [% END %]
-    <br>
     [% END %]
 </ul> 
 
-<hr>
+<div class="hspace-20"</div>
+
 <ul class="cleanlist">
     <li class="ui-state-default">
     <form action="/sound/set/0/save" method="post">
-        <div class="prepend-7 span-3">New soundset</div>
+        <div class="prepend-2 span-3">New soundset</div>
         <div class="span-5">
             <input type="text" name="set_name" value="" size="10"/>
+        </div>
+        <div class="span-5">
+            <input type="text" name="set_description" value="" size="10"/>
         </div>
         <div class="span-1">
             <button class="button-add" id="setsave">Add soundset</button>
