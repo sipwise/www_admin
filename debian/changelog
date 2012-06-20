@@ -1,3 +1,10 @@
+ngcp-www-admin (3.2.1) unstable; urgency=low
+
+  [cveigl]
+  * propagate syntax error in regex (mantis:1733)  
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Wed, 20 Jun 2012 09:54:40 +0200
+
 ngcp-www-admin (3.2.0) unstable; urgency=low
 
   * support for subscriber alias numbers
