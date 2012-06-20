@@ -13,10 +13,11 @@
           <ul class="cleanlist">
             <li class="ui-state-default">
               <div class="span-4">Name</div>
-              <div class="span-4">IP Address</div>
-              <div class="span-4">Hostname</div>
+              <div class="span-3">IP Address</div>
+              <div class="span-3">Hostname</div>
               <div class="span-2">Port</div>
-              <div class="span-2 last">Weight</div>
+              <div class="span-2">Protocol</div>
+              <div class="span-1 last">Weight</div>
             </li>
             [% id = 0 %]
             [% FOREACH peer = grp.peers %]
@@ -26,20 +27,27 @@
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="peerid" value="[% peer.id %]" />
                     <div class="span-4">
-                      <input type="text" size="14 id="addtxt" title="string, peer name"
+                      <input type="text" size="10 id="addtxt" title="string, peer name"
                              name="name" value="[% peer.name %]" />
                     </div>
-                    <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, peer ip address"
+                    <div class="span-3">
+                      <input type="text" size="10" id="addtxt" title="string, peer ip address"
                              name="ip" value="[% peer.ip %]" />
                     </div>
-                    <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, peer hostname (optional)"
+                    <div class="span-3">
+                      <input type="text" size="10" id="addtxt" title="string, peer hostname (optional)"
                              name="host" value="[% peer.host %]" />
                     </div>
                     <div class="span-2">
-                      <input type="text" size="5" id="addtxt" title="int, peer port (1-65535)"
+                      <input type="text" size="2" id="addtxt" title="int, peer port (1-65535)"
                              name="port" value="[% peer.port %]" />
+                    </div>
+                    <div class="span-2">
+			<select size="1" name="transport" title="Transport protocol (UDP, TCP, TLS)">
+			  <option value="UDP" [% IF peer.transport == 'UDP' %]selected="selected"[% END %]>UDP</option>
+			  <option value="TCP" [% IF peer.transport == 'TCP' %]selected="selected"[% END %]>TCP</option>
+			  <option value="TLS" [% IF peer.transport == 'TLS' %]selected="selected"[% END %]>TLS</option>
+			</select>
                     </div>
                     <div class="span-1">
                       <input type="text" size="1" id="addtxt" title="int, peer weight (0-255)"
@@ -54,9 +62,10 @@
                   </div>
                 [% ELSE %]
                   <div class="span-4"><a href="/peering/preferences?peerid=[% peer.id%]" class="aaction">[% peer.name %]</a></div>
-                  <div class="span-4">[% peer.ip %]</div>
-                  <div class="span-4">[% peer.host %]</div>
+                  <div class="span-3">[% peer.ip %]</div>
+                  <div class="span-3">[% peer.host %]</div>
                   <div class="span-2">[% peer.port %]</div>
+                  <div class="span-2">[% peer.transport %]</div>
                   <div class="span-1">[% peer.weight %]</div>
                   <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
@@ -81,20 +90,27 @@
                   <form action="/peering/create_peer" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, peer name"
+                      <input type="text" size="10" id="addtxt" title="string, peer name"
                              name="name" value="" />
                     </div>
-                    <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, peer ip address"
+                    <div class="span-3">
+                      <input type="text" size="10" id="addtxt" title="string, peer ip address"
                              name="ip" value="" />
                     </div>
-                    <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, peer hostname (optional)"
+                    <div class="span-3">
+                      <input type="text" size="10" id="addtxt" title="string, peer hostname (optional)"
                              name="host" value="" />
                     </div>
                     <div class="span-2">
-                      <input type="text" size="5" id="addtxt" title="int, peer port (1-65535)"
+                      <input type="text" size="2" id="addtxt" title="int, peer port (1-65535)"
                              name="port" value="5060" />
+                    </div>
+                    <div class="span-2">
+		      <select size="1" name="transport" title="Transport protocol (UDP, TCP, TLS)">
+		        <option value="UDP" [% IF peer.transport == 'UDP' %]selected="selected"[% END %]>UDP</option>
+		        <option value="TCP" [% IF peer.transport == 'TCP' %]selected="selected"[% END %]>TCP</option>
+		        <option value="TLS" [% IF peer.transport == 'TLS' %]selected="selected"[% END %]>TLS</option>
+		      </select>
                     </div>
                     <div class="span-1">
                       <input type="text" size="1" id="addtxt" title="int, peer weight (0-255)"
@@ -139,15 +155,15 @@
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="ruleid" value="[% rule.id %]" />
                     <div class="span-4">
-                      <input type="text" size="14 id="addtxt" title="string, callee prefix"
+                      <input type="text" size="10 id="addtxt" title="string, callee prefix"
                              name="callee_prefix" value="[% rule.callee_prefix %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, callee pattern"
+                      <input type="text" size="10" id="addtxt" title="string, callee pattern"
                              name="callee_pattern" value="[% rule.callee_pattern %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, caller pattern"
+                      <input type="text" size="10" id="addtxt" title="string, caller pattern"
                              name="caller_pattern" value="[% rule.caller_pattern %]" />
                     </div>
                     <div class="span-3">
@@ -189,15 +205,15 @@
                   <form action="/peering/create_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, callee prefix"
+                      <input type="text" size="10" id="addtxt" title="string, callee prefix"
                              name="callee_prefix" value="" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, callee pattern"
+                      <input type="text" size="10" id="addtxt" title="string, callee pattern"
                              name="callee_pattern" value="" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="14" id="addtxt" title="string, caller pattern"
+                      <input type="text" size="10" id="addtxt" title="string, caller pattern"
                              name="caller_pattern" value="" />
                     </div>
                     <div class="span-3">
