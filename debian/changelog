@@ -1,3 +1,10 @@
+ngcp-www-admin (3.3.5) unstable; urgency=low
+
+  [cveigl]
+  * propagate syntax error in regex (mantis:1733) 
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Wed, 20 Jun 2012 09:50:54 +0200
+
 ngcp-www-admin (3.3.4) unstable; urgency=low
 
   [cveigl]

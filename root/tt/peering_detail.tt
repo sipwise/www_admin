@@ -115,7 +115,14 @@
 
 	  [% IF !grp.rules || grp.rules.size == 0 %]<div class="notice">Peering Servers of this Peering Group will not be used until at least one Peering Rule is added!</div>[% END %]
           [% IF messages.erulmsg %]<div class="success">[% messages.erulmsg %]</div>[% END %]
-          [% IF messages.erulerr %]<div class="error">[% messages.erulerr %]</div>[% END %]
+          [% IF messages.erulerr %]
+              <div class="error">[% messages.erulerr %]
+              [% IF erulerr_detail %]
+                  <br />
+                  [% erulerr_detail %]
+              [% END %]
+              </div>
+          [% END %]
 
           <ul class="cleanlist">
             <li class="ui-state-default">
