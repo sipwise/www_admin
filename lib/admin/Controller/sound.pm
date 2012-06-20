@@ -45,6 +45,11 @@ sub handle : Chained('set') PathPart('handle') CaptureArgs(1) {
     $c->stash->{handle_id} = $handle_id;
 }
 
+sub edit_handle : Chained('handle') PathPart('edit') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'tt/sound_edit_files.tt';
+}
+
 sub upload_soundfile : Chained('handle') PathPart('soundfile/upload') Args(0) {
     my ($self, $c) = @_;
     my %messages;
@@ -91,8 +96,7 @@ sub upload_soundfile : Chained('handle') PathPart('soundfile/upload') Args(0) {
     }
     
     $c->session->{messages} = \%messages;
-    # $c->response->redirect('/sound/set/' . $c->stash->{set_id} . '/edit#set_' . $c->stash->{set_id});
-    $c->response->redirect('/sound/set/' . $c->stash->{set_id} . '/editfiles');
+    $c->response->redirect('/sound/set/' . $c->stash->{set_id} . '/edithandles');
 }
 
 sub get_soundfile : Chained('handle') PathPart('soundfile/get') Args(0) {
@@ -117,7 +121,7 @@ sub edit_set : Chained('set') PathPart('edit') Args(0) {
     $c->stash->{template} = 'tt/sound.tt';
 }
 
-sub edit_files : Chained('set') PathPart('editfiles') Args(0) {
+sub edit_files : Chained('set') PathPart('edithandles') Args(0) {
     my ($self, $c) = @_;
     $c->stash->{template} = 'tt/sound_edit_files.tt';
 }
@@ -161,8 +165,7 @@ sub delete_handle : Chained('handle') PathPart('delete') Args(0) {
         $messages{sound_set_err} = 'Client.Voip.InputErrorFound';
     }
     
-    # $c->response->redirect('/sound/set/' . $c->stash->{set_id} . '/edit#set_' . $c->stash->{set_id});
-    $c->response->redirect('/sound/set/' . $c->stash->{set_id} . '/editfiles');
+    $c->response->redirect('/sound/set/' . $c->stash->{set_id} . '/edithandles');
 }
 
 sub save_set : Chained('set') PathPart('save') Args(0) {
@@ -200,6 +203,29 @@ sub save_set : Chained('set') PathPart('save') Args(0) {
  
     $messages{sound_set_err} = 'Client.Voip.InputErrorFound';
     $c->response->redirect("/sound");
+}
+
+sub save_handle : Chained('handle') PathPart('save') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'tt/sound_edit_files.tt';
+    my %messages;
+
+    if ($c->model('Provisioning')->call_prov($c, 'voip',
+        'update_sound_handle',
+        { set_id => $c->stash->{set_id},
+          handle_id => $c->stash->{handle_id},
+          loopplay => $c->request->params->{loopplay} eq 'on' ? 1 : 0,
+        },
+        undef))
+    {
+        $messages{sound_set_msg} = 'Server.Voip.SavedSettings';
+    }
+    else {
+        $messages{sound_set_err} = 'Client.Voip.InputErrorFound';
+    }
+    
+    $c->session->{messages} = \%messages;
+    $c->response->redirect('/sound/set/' . $c->stash->{set_id} . '/edithandles');
 }
 
 sub load_sets :Private {

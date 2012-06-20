@@ -37,7 +37,7 @@
 
             <li class="ui-state-default">
                 <div class="span-6">
-                    <a href="/sound/set/[% set.id %]/editfiles">[% set.name %]</a>
+                    <a href="/sound/set/[% set.id %]/edithandles">[% set.name %]</a>
                     [% IF count > 0 %]
                         [% plural = 's' IF count > 1 %]
                         <font class="small"><i>(mapped [% count %] time[% plural %])</i></font>

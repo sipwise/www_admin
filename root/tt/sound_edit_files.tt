@@ -11,7 +11,8 @@
     <li class="ui-state-default">
         <div class="span-2">Setname</div>
         <div class="prepend-1 span-2">Handle</div>
-        <div class="prepend-1 span-2">Filename</div>
+        <div class="prepend-1 span-1">Loopplay</div>
+        <div class="prepend-1 span-4">Filename</div>
     </li>
         <li class="ui-state-default">
             <div class="span-5">
@@ -28,25 +29,41 @@
             <li class="ui-state-default">
                 <div class="span-2"></div>
                 <div class="prepend-1 span-2">[% h.name %]</div>
-                
-                [% IF h.filename.length AND NOT h.err %]
-                    <div class="prepend-1 span-2"><a href="/sound/set/[% set.id %]/handle/[% h.id %]/soundfile/get">[% h.filename %]</a></div>
-                    <form action="/sound/set/[% set.id %]/handle/[% h.id %]/delete" method="post">
-                        <div class="prepend-6 span-1">
-                            [% UNLESS Catalyst.session.admin.read_only %]
-                                <button class="button-delete" id="setdel[% id %]">Delete</button>
-                            [% END %]
-                    </form> 
-                    </div>
-                [% ELSE %]
+
+                [% IF NOT h.filename.length %] [%# kein file %]
                     <form action="/sound/set/[% set.id %]/handle/[% h.id %]/soundfile/upload" method="post" enctype="multipart/form-data">
-                        <div class="prepend-1 span-4">
+                        <div class="prepend-1 span-1"></div>
+                        <div class="prepend-1 span-6">
                             [%# value='' is ignored by browsers for security reasons for file-input-fields %]
                             <input id="soundfile" name="soundfile" class="file" type="file" size="10" value="[% IF h.filename.length %][% h.filename %][% END %]">
                         </div>
-                        <div class="prepend-4 span-1">
+                        <div class="prepend-1 span-1">
                             <button class="button-add" id="soundadd" />
                         </div>
+                    </form> 
+                [% ELSIF handle_id == h.id %] [%# edit %]
+                    <form action="/sound/set/[% set.id %]/handle/[% h.id %]/save" method="post">
+                        <div class="prepend-1 span-1"><input type="checkbox" class="checkbox" id="loopplay_"[% h.id %] name="loopplay" [% IF h.loopplay %]checked="checked"[% END %]></div>
+                        <div class="prepend-1 span-4">[% h.filename %]</div>
+                        <div class="prepend-3 span-1">
+                            <button class="button-save" id="handlesave[% id %]">Save</button>
+                        </div>
+                        <div class="span-1">
+                            <a href="/sound/set/[% set.id %]/edithandles"><span class="button-cancel">Cancel</span></a>
+                        </div>
+                    </form>
+                [% ELSE %] [%# view %]
+                    <div class="prepend-1 span-1"><input type="checkbox" class="checkbox" id="loopplay_"[% h.id %] name="loopplay" [% IF h.loopplay %]checked="checked"[% END %] disabled="disabled"></div>
+                    <div class="prepend-1 span-4"><a href="/sound/set/[% set.id %]/handle/[% h.id %]/soundfile/get">[% h.filename %]</a></div>
+                    <form action="/sound/set/[% set.id %]/handle/[% h.id %]/delete" method="post">
+                        [% UNLESS Catalyst.session.admin.read_only %]
+                            <div class="prepend-3 span-1">
+                                <a href="/sound/set/[% set.id %]/handle/[% h.id %]/edit"><span class="button-edit">Edit</span></a>
+                            </div>
+                            <div class="span-1">
+                                <button class="button-delete" id="setdel[% id %]">Delete</button>
+                            </div>
+                        [% END %]
                     </form> 
                 [% END %]
         </li>
