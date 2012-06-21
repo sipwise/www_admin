@@ -50,49 +50,40 @@ sub edit_handle : Chained('handle') PathPart('edit') Args(0) {
     $c->stash->{template} = 'tt/sound_edit_files.tt';
 }
 
-sub upload_soundfile : Chained('handle') PathPart('soundfile/upload') Args(0) {
+sub save_handle : Chained('handle') PathPart('save') Args(0) {
     my ($self, $c) = @_;
     my %messages;
 
+    my ($soundfile, $filename);
     my $upload = $c->req->upload('soundfile');
-    my ($file, $filename);
+
     if (defined $upload) {
-        $file = eval { $upload->slurp };
+        $soundfile = eval { $upload->slurp };
         $filename = eval { $upload->filename };
+        
+        use File::Type;
+        my $ft = File::Type->new();
+
+        unless ($ft->checktype_contents($soundfile) eq 'audio/x-wav') {
+            $messages{sound_set_err} = 'Client.Syntax.InvalidFileType';
+            $c->session->{refill} = { set_id => $c->stash->{set_id}, handle_id => $c->stash->{handle_id}, filename => $filename };
+            return;
+        }
     }
 
-# ne radi :(
-#     my $checkresult; 
-#     return unless $c->model('Provisioning')->call_prov( $c, 'voip',
-#         'check_filetype',
-#         { filetype => 'audio/x-wav',
-#           file => $file,
-#         },
-#         \$checkresult
-#     );
- 
-    # if ($checkresult) {
-    use File::Type;
-    my $ft = File::Type->new();
-    if ($ft->checktype_contents($file) eq 'audio/x-wav') {
-        
-        if ($c->model('Provisioning')->call_prov($c, 'voip',
-            'add_sound_file',
-            { set_id => $c->stash->{set_id},
-              handle_id => $c->stash->{handle_id},
-              soundfile => $file,
-              filename => $filename,
-            },
-            undef))
-        {
-            $messages{sound_set_msg} = 'Server.Voip.SavedSettings';
-        } else {
-            $messages{sound_set_err} = 'Client.Voip.InputErrorFound';
-        }
-    } 
-    else {
-        $messages{sound_set_err} = 'Client.Syntax.InvalidFileType';
-        $c->session->{refill} = { set_id => $c->stash->{set_id}, handle_id => $c->stash->{handle_id}, filename => $filename };
+    if ($c->model('Provisioning')->call_prov($c, 'voip',
+        'update_sound_handle',
+        { set_id => $c->stash->{set_id},
+          handle_id => $c->stash->{handle_id},
+          soundfile => $soundfile,
+          filename => $filename, 
+          loopplay => $c->request->params->{loopplay} eq 'on' ? 1 : 0,
+        },
+        undef))
+    {
+        $messages{sound_set_msg} = 'Server.Voip.SavedSettings';
+    } else {
+        $messages{sound_set_err} = 'Client.Voip.InputErrorFound';
     }
     
     $c->session->{messages} = \%messages;
@@ -203,29 +194,6 @@ sub save_set : Chained('set') PathPart('save') Args(0) {
  
     $messages{sound_set_err} = 'Client.Voip.InputErrorFound';
     $c->response->redirect("/sound");
-}
-
-sub save_handle : Chained('handle') PathPart('save') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'tt/sound_edit_files.tt';
-    my %messages;
-
-    if ($c->model('Provisioning')->call_prov($c, 'voip',
-        'update_sound_handle',
-        { set_id => $c->stash->{set_id},
-          handle_id => $c->stash->{handle_id},
-          loopplay => $c->request->params->{loopplay} eq 'on' ? 1 : 0,
-        },
-        undef))
-    {
-        $messages{sound_set_msg} = 'Server.Voip.SavedSettings';
-    }
-    else {
-        $messages{sound_set_err} = 'Client.Voip.InputErrorFound';
-    }
-    
-    $c->session->{messages} = \%messages;
-    $c->response->redirect('/sound/set/' . $c->stash->{set_id} . '/edithandles');
 }
 
 sub load_sets :Private {
