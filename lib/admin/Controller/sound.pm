@@ -53,6 +53,7 @@ sub edit_handle : Chained('handle') PathPart('edit') Args(0) {
 sub save_handle : Chained('handle') PathPart('save') Args(0) {
     my ($self, $c) = @_;
     my %messages;
+    $c->stash->{template} = 'tt/sound_edit_files.tt';
 
     my ($soundfile, $filename);
     my $upload = $c->req->upload('soundfile');
@@ -65,7 +66,8 @@ sub save_handle : Chained('handle') PathPart('save') Args(0) {
         my $ft = File::Type->new();
 
         unless ($ft->checktype_contents($soundfile) eq 'audio/x-wav') {
-            $messages{sound_set_err} = 'Client.Syntax.InvalidFileType';
+            ##$messages{sound_set_err} = 'Client.Syntax.InvalidFileType';
+            $c->session->{messages} = {sound_set_err => 'Client.Syntax.InvalidFileType'};
             $c->session->{refill} = { set_id => $c->stash->{set_id}, handle_id => $c->stash->{handle_id}, filename => $filename };
             return;
         }
