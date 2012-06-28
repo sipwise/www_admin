@@ -720,7 +720,8 @@ sub preferences : Local {
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_preferences',
                                                         undef, \$db_prefs
                                                       );
-    my $voip_preferences = [ grep { $$_{usr_pref} } @$db_prefs ] if eval { @$db_prefs };
+    my $voip_preferences;
+    $voip_preferences = [ grep { $$_{usr_pref} } @$db_prefs ] if eval { @$db_prefs };
 
     ### restore data entered by the user ###
 
@@ -808,7 +809,7 @@ sub preferences : Local {
         } elsif($$pref{preference} eq 'block_in_list' or $$pref{preference} eq 'block_out_list' or
                 $$pref{preference} eq 'adm_block_in_list' or $$pref{preference} eq 'adm_block_out_list')
         {
-          eval { @{$$preferences{$$pref{preference}}} = map { s/^([1-9])/+$1/; $_ } @{$$preferences{$$pref{preference}}} };
+          eval { @{$$preferences{$$pref{preference}}} = map { s/^([1-9])/+$1/; $_ } @{$$preferences{$$pref{preference}}} }; ## no critic ProhibitMutatingListFunctions
         }
         elsif ($$pref{data_type} eq 'enum') {
 

@@ -995,7 +995,7 @@ sub _normalize_destination : Private {
         $destination =~ s/\./\\./g;
         $destination = '^'. $destination .'$';
     } else {
-        return undef;
+        return;
     }
 
     return $destination;
