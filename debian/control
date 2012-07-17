@@ -8,7 +8,7 @@ Homepage: http://sipwise.com/
 
 Package: ngcp-templates-ce-www-admin
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, ngcp-templates-ce-config
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts: ngcp-templates-pro-www-admin
 Provides: ngcp-templates-www-admin
 Description: Configuration templates for the web-based admin interface
@@ -17,7 +17,7 @@ Description: Configuration templates for the web-based admin interface
 
 Package: ngcp-templates-pro-www-admin
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, ngcp-templates-pro-config
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts: ngcp-templates-ce-www-admin
 Provides: ngcp-templates-www-admin
 Description: Configuration templates for the web-based admin interface
