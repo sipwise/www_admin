@@ -114,7 +114,7 @@ sub callmap_png : Local {
     $c->stash->{callid} = $callid;
 
     my $calls;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sipstat_packets',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sipstat_messages',
                                                         { 
                                                           callid   => $callid,
                                                         },
@@ -138,7 +138,7 @@ sub callmap : Local {
     $c->stash->{callid} = $callid;
 
     my $calls;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sipstat_packets',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sipstat_messages',
                                                         { 
                                                           callid   => $callid,
                                                         },
@@ -156,7 +156,7 @@ sub packet : Local {
     my $pkgid = $c->request->params->{pkgid};
 
     my $pkg;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sipstat_packet',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sipstat_message',
                                                         { 
                                                           packetid   => $pkgid,
                                                         },

@@ -1436,7 +1436,7 @@ sub sipstats_callmap_png : Local {
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
 
     my $calls;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_packets',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_messages',
                                                         { username => $$subscriber{username},
                                                           domain   => $$subscriber{domain},
                                                           callid   => $callid,
@@ -1469,7 +1469,7 @@ sub sipstats_callmap : Local {
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
 
     my $calls;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_packets',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_messages',
                                                         { username => $$subscriber{username},
                                                           domain   => $$subscriber{domain},
                                                           callid   => $callid,
@@ -1496,7 +1496,7 @@ sub sipstats_packet : Local {
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
 
     my $pkg;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_packet',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_sipstat_message',
                                                         { username => $$subscriber{username},
                                                           domain   => $$subscriber{domain},
                                                           packetid   => $pkgid,
