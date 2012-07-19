@@ -577,20 +577,16 @@ sub generate_pcap {
         2, 4,           # major/minor version number
         0, 0,           # gmt offset and timestamp accuracy
         0xffff,         # snap length
-        192,            # data link type (http://www.tcpdump.org/linktypes.html)
+        1,		# data link type (http://www.tcpdump.org/linktypes.html)
         );
 
     foreach my $pkg(@{$packets}) {
         my($ts_sec, $ts_usec) = $pkg->{timestamp} =~ /^(\d+)\.(\d+)$/;
-        my $packet_type = 1;
-        $pkg->{was_fragmented} and $packet_type = 101;
-        my $ppi = pack("CCvV", 0, 0, 8, $packet_type);
-        my $len = length($pkg->{header}) + length($pkg->{payload}) + length($pkg->{trailer}) + length($ppi);
+        my $len = length($pkg->{header}) + length($pkg->{payload}) + length($pkg->{trailer});
 
         $pcap .= pack("LLLLa*a*a*a*",
                 $ts_sec, $ts_usec,      # timestamp
                 $len, $len,             # bytes on-wire/off-wire
-                $ppi,
                 $pkg->{header},
                 $pkg->{payload},
                 $pkg->{trailer},
