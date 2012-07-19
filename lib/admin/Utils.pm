@@ -584,7 +584,7 @@ sub generate_pcap {
         my($ts_sec, $ts_usec) = $pkg->{timestamp} =~ /^(\d+)\.(\d+)$/;
         my $len = length($pkg->{header}) + length($pkg->{payload}) + length($pkg->{trailer});
 
-        $pcap .= pack("LLLLa*a*a*a*",
+        $pcap .= pack("LLLLa*a*a*",
                 $ts_sec, $ts_usec,      # timestamp
                 $len, $len,             # bytes on-wire/off-wire
                 $pkg->{header},
