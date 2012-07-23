@@ -2341,8 +2341,8 @@ sub save_trusted_source : Local {
     $messages{protocol_err} = 'Client.Syntax.UnknownProtocol' unless $checkresult;
 
     if (length $ts{from_pattern}) { # allow empty sipuri
-        $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sipuri', $ts{from_pattern}, \$checkresult);
-        $messages{from_pattern_err} = 'Client.Syntax.MalformedUri' unless $checkresult;
+        $messages{from_pattern_err} = 'Client.Syntax.MalformedUri'
+            unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_pattern', $ts{from_pattern}, \$checkresult));
     }
     else {
          $ts{from_pattern} = undef;
