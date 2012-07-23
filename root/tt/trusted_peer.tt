@@ -30,7 +30,7 @@
                     <option [% IF tsrc.protocol == 'ANY' %]selected="selected"[% END %]>ANY</option>
                     </select>
                 </div>
-                <div class="span-6"> <input type="text" name="from_pattern" title="From-pattern" size="5" value="[% tsrc.from_pattern %]"/></div>
+                <div class="span-6"> <input type="text" name="from_pattern" title="A regex including the leading 'sip:' if ^ is included (eg: '^sip:user@domain.com$')" size="5" value="[% tsrc.from_pattern %]"/></div>
                 <div class="span-1">
                 <button class="button-save ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" role="button" aria-disabled="false" title="Save">
                 <span class="ui-button-icon-primary ui-icon ui-icon-check"></span>
@@ -86,7 +86,7 @@
                 <option [% IF protocol == 'ANY' %]selected="selected"[% END %]>ANY</option>
                 </select>
             </div>
-            <div class="span-6"> <input type="text" name="from_pattern" title="From-pattern" size="5" value="[% from_pattern IF from_pattern.defined %]"/></div>
+            <div class="span-6"> <input type="text" name="from_pattern" title="A regex including the leading 'sip:' if ^ is included (eg: '^sip:user@domain.com$')" size="5" value="[% from_pattern IF from_pattern.defined %]"/></div>
 
             <button class="button-add ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" role="button" aria-disabled="false" title="Add">
             <span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>
