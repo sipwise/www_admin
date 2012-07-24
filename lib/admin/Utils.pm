@@ -659,6 +659,7 @@ sub process_callmap {
 
     my $canvas_pkg_line_width = 2;
     my $canvas_pkg_line_color = 'green';
+    my %canvas_pkg_line_colors = (TCP => 'blue');
     my $canvas_pkg_font = 'Courier:bold';
     my $canvas_pkg_font_size = 8;
     my $canvas_pkg_font_color = 'dimgray';
@@ -743,7 +744,8 @@ sub process_callmap {
       my $from_x = $uas_pos_x{$packet->{src_ip}.':'.$packet->{src_port}};
       my $to_x = $uas_pos_x{$packet->{dst_ip}.':'.$packet->{dst_port}};
       #print "arrow from ".$packet->{src_ip}.':'.$packet->{src_port}." to ".$packet->{dst_ip}.':'.$packet->{dst_port}.": $from_x - $to_x\n";
-      draw_arrow($canvas, $from_x, $y_offset, $to_x, $y_offset, $canvas_pkg_line_width, $canvas_pkg_line_color);
+      draw_arrow($canvas, $from_x, $y_offset, $to_x, $y_offset, $canvas_pkg_line_width,
+      	$canvas_pkg_line_colors{$packet->{transport}} || $canvas_pkg_line_color);
       $packet->{payload} =~ /\ncseq:\s*(\d+)\s+[a-zA-Z]+/i;
       my $cseq = $1 ? $1 : '?';
       my $txt = sprintf($i.'. '.$packet->{method}.' ('.$cseq.', +%0.3fs)', $time_offset);
