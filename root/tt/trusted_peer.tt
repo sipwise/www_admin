@@ -5,7 +5,14 @@
 [% IF messages.tsrc_msg %]<div class="msgor">[% messages.tsrc_msg %]</div>[% END %]
 [% IF messages.src_ip_err %]<div class="error">[% messages.src_ip_err %]</div>[% END %]
 [% IF messages.protocol_err %]<div class="error">[% messages.protocol_err %]</div>[% END %]
-[% IF messages.from_pattern_err %]<div class="error">[% messages.from_pattern_err %]</div>[% END %]
+[% IF messages.from_pattern_err %]
+    <div class="error">[% messages.from_pattern_err %]
+    [% IF from_pattern_err_detail %]
+        <br />
+        [% from_pattern_err_detail %]
+    [% END %]
+    </div>
+[% END %]
 
 <ul class="cleanlist">
 <li class="ui-state-default">
