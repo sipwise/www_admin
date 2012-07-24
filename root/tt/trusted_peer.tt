@@ -29,7 +29,7 @@
             <form method="post" action="save_trusted_source">
                 <input type="hidden" value="[% subscriber.subscriber_id %]" name="subscriber_id">
                 <input type="hidden" value="[% tsrc_edit_id %]" name="tsrc_edit_id">
-                <div class="span-4"> <input type="text" name="src_ip" title="Source IP" size="5" maxlength="46" value="[% tsrc.src_ip %]"/></div>
+                <div class="span-4"> <input type="text" name="src_ip" title="Source IP" size="5" maxlength="46" value="[% tsrc.src_ip %]" style="width:120px"/></div>
                 <div class="span-2"> <select name="protocol" title="Protocol">
                     <option [% IF tsrc.protocol == 'TCP' %]selected="selected"[% END %]>TCP</option>
                     <option [% IF tsrc.protocol == 'UDP' %]selected="selected"[% END %]>UDP</option>
@@ -37,7 +37,8 @@
                     <option [% IF tsrc.protocol == 'ANY' %]selected="selected"[% END %]>ANY</option>
                     </select>
                 </div>
-                <div class="span-6"> <input type="text" name="from_pattern" title="A regex including the leading '^sip:' (eg: '^sip:user@domain.com$')" size="5" value="[% tsrc.from_pattern %]"/></div>
+
+                <div class="span-6"> <input type="text" name="from_pattern" title="A regex including the leading 'sip:' if matching from the beginning (eg: '^sip:user@example\.org$')" size="5" value="[% tsrc.from_pattern %]" style="width:120px"/></div>
                 <div class="span-1">
                 <button class="button-save ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" role="button" aria-disabled="false" title="Save">
                 <span class="ui-button-icon-primary ui-icon ui-icon-check"></span>
@@ -85,7 +86,7 @@
     <li class="ui-state-default" id="ts_0">
         <form method="post" action="save_trusted_source">
             <input type="hidden" value="[% subscriber.subscriber_id %]" name="subscriber_id">
-            <div class="span-4"> <input type="text" name="src_ip" title="Source IP" size="5" maxlength="46" value="[% src_ip IF src_ip.defined %]"/></div>
+            <div class="span-4"> <input type="text" name="src_ip" title="Source IP" size="5" maxlength="46" value="[% src_ip IF src_ip.defined %]" style="width:120px"/></div>
             <div class="span-2"> <select name="protocol" title="Protocol">
                 <option [% IF protocol == 'TCP' %]selected="selected"[% END %]>TCP</option>
                 <option [% IF protocol == 'UDP' %]selected="selected"[% END %]>UDP</option>
@@ -93,7 +94,7 @@
                 <option [% IF protocol == 'ANY' %]selected="selected"[% END %]>ANY</option>
                 </select>
             </div>
-            <div class="span-6"> <input type="text" name="from_pattern" title="A regex including the leading '^sip:' (eg: '^sip:user@domain.com$')" size="5" value="[% from_pattern IF from_pattern.defined %]"/></div>
+            <div class="span-6"> <input type="text" name="from_pattern" title="A regex including the leading 'sip:' if matching from the beginning (eg: '^sip:user@example\.org$')" size="5" value="[% from_pattern IF from_pattern.defined %]" style="width:120px"/></div>
 
             <button class="button-add ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" role="button" aria-disabled="false" title="Add">
             <span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>
