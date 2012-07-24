@@ -68,21 +68,15 @@
 
         [% END %]
     [% END %]
-</ul> 
-
-<div class="hspace-20"</div>
-
-<ul class="cleanlist">
     <li class="ui-state-default">
     <form action="/sound/set/0/save" method="post">
-        <div class="prepend-2 span-3">New soundset</div>
-        <div class="span-5">
+        <div class="span-6">
             <input type="text" name="set_name" value="" size="10"/>
         </div>
-        <div class="span-5">
+        <div class="prepend-1 span-6">
             <input type="text" name="set_description" value="" size="10"/>
         </div>
-        <div class="span-1">
+        <div class="prepend-1 span-1">
             <button class="button-add" id="setsave">Add soundset</button>
         </div>
     </form>
