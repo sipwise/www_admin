@@ -224,6 +224,10 @@ sub save_rule : Local {
     my $rule_id  = $c->request->params->{ruleid} //= undef;
     my $group_id = $c->request->params->{grpid} //= undef;
 
+    $settings->{callee_prefix} =~ s/^\s+|\s+$//g;
+    $settings->{callee_pattern} =~ s/^\s+|\s+$//g;
+    $settings->{caller_pattern} =~ s/^\s+|\s+$//g;
+
     unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_prefix', $settings->{callee_prefix}, \$checkresult)) {
         $messages{rule_callee_prefix_err} = 'Client.Syntax.MalformedUri';
         $c->flash->{rule_callee_prefix_err_detail} = $c->session->{prov_error_object} if ($c->session->{prov_error_object});
