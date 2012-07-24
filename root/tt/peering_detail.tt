@@ -130,6 +130,7 @@
         <h3>Peering Rules</h3>
 
 	  [% IF !grp.rules || grp.rules.size == 0 %]<div class="notice">Peering Servers of this Peering Group will not be used until at least one Peering Rule is added!</div>[% END %]
+
           [% IF messages.erulmsg %]<div class="success">[% messages.erulmsg %]</div>[% END %]
           [% IF messages.erulerr %]
               <div class="error">[% messages.erulerr %]
@@ -137,6 +138,22 @@
                   <br />
                   [% erulerr_detail %]
               [% END %]
+              </div>
+          [% END %]
+
+          [% IF messages.rule_callee_prefix_err %]
+              <div class="error">Callee prefix: [% messages.rule_callee_prefix_err %]
+              [% IF rule_callee_prefix_err_detail %]<br />[% rule_callee_prefix_err_detail %][% END %]
+              </div>
+          [% END %]
+          [% IF messages.rule_callee_pattern_err %]
+              <div class="error">Callee pattern: [% messages.rule_callee_pattern_err %]
+              [% IF rule_callee_pattern_err_detail %]<br />[% rule_callee_pattern_err_detail %][% END %]
+              </div>
+          [% END %]
+          [% IF messages.rule_caller_pattern_err %]
+              <div class="error">Caller pattern: [% messages.rule_caller_pattern_err %]
+              [% IF rule_caller_pattern_err_detail %]<br />[% rule_caller_pattern_err_detail %][% END %]
               </div>
           [% END %]
 
@@ -151,24 +168,24 @@
             [% FOREACH rule = grp.rules %]
               <li class="ui-state-default">
                 [% IF rule.id == reditid && !Catalyst.session.admin.read_only %]
-                  <form action="/peering/edit_rule" method="post">
+                  <form action="/peering/save_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="ruleid" value="[% rule.id %]" />
                     <div class="span-4">
-                      <input type="text" size="10 id="addtxt" title="string, callee prefix"
-                             name="callee_prefix" value="[% rule.callee_prefix %]" />
+                      <input type="text" size="10 id="addtxt" title="Callee prefix, eg: ^43 (must not include leading 'sip:'"
+                             name="callee_prefix" value="[% restore_rule.callee_prefix or rule.callee_prefix %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="string, callee pattern"
-                             name="callee_pattern" value="[% rule.callee_pattern %]" />
+                      <input type="text" size="10" id="addtxt" title="A regex including the leading 'sip:' if ^ is included (eg: '^sip:user@domain.com$')"
+                             name="callee_pattern" value="[% restore_rule.callee_pattern or rule.callee_pattern %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="string, caller pattern"
-                             name="caller_pattern" value="[% rule.caller_pattern %]" />
+                      <input type="text" size="10" id="addtxt" title="A regex including the leading 'sip:' if ^ is included (eg: '^sip:user@domain.com$')"
+                             name="caller_pattern" value="[% restore_rule.caller_pattern or rule.caller_pattern %]" />
                     </div>
                     <div class="span-3">
                       <input type="text" size="12" id="addtxt" title="string, rule description"
-                             name="description" value="[% rule.description %]" />
+                             name="description" value="[% restore_rule.description or rule.description %]" />
                     </div>
                     <div class="span-1">
                         <button class="button-save" id="rsave[% id %]">Save</button>
@@ -202,23 +219,23 @@
             [% END %]
             [% UNLESS Catalyst.session.admin.read_only %]
             <li class="ui-state-default">
-                  <form action="/peering/create_rule" method="post">
+                  <form action="/peering/save_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="string, callee prefix"
-                             name="callee_prefix" value="" />
+                      <input type="text" size="10" id="addtxt" title="Callee prefix, eg: ^43 (must not include leading 'sip:'"
+                             name="callee_prefix" value="[% IF not rule.id == reditid %][% restore_rule.callee_prefix %][% END %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="string, callee pattern"
-                             name="callee_pattern" value="" />
+                      <input type="text" size="10" id="addtxt" title="A regex including the leading 'sip:' if ^ is included (eg: '^sip:user@domain.com$')"
+                             name="callee_pattern" value="[% IF not rule.id == reditid %][% restore_rule.callee_pattern %][% END %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="string, caller pattern"
-                             name="caller_pattern" value="" />
+                      <input type="text" size="10" id="addtxt" title="A regex including the leading 'sip:' if ^ is included (eg: '^sip:user@domain.com$')"
+                             name="caller_pattern" value="[% IF not rule.id == reditid %][% restore_rule.caller_pattern %][% END %]" />
                     </div>
                     <div class="span-3">
                       <input type="text" size="12" id="addtxt" title="string, rule description"
-                             name="description" value="" />
+                             name="description" value="[% IF not rule.id == reditid %][% restore_rule.description %][% END %]" />
                     </div>
                     <div class="span-1 last">
                             <button class="button-add" id="radd">Add</button>

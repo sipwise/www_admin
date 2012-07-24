@@ -208,60 +208,77 @@ Create a peering rule for a given group
 
 =cut
 
-sub create_rule : Local {
+sub save_rule : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/peering_detail.tt';
 
     my %messages;
-    my %settings;
+    my $checkresult;
 
-    my $grpid = $c->request->params->{grpid};
-    my $callee_prefix = $c->request->params->{callee_prefix};
-    my $callee_pattern = $c->request->params->{callee_pattern};
-    my $caller_pattern = $c->request->params->{caller_pattern};
-    my $description = $c->request->params->{description};
+    my $settings = {
+        callee_prefix  => $c->request->params->{callee_prefix} //= undef,
+        callee_pattern => $c->request->params->{callee_pattern} //= undef,
+        caller_pattern => $c->request->params->{caller_pattern} //= undef,
+        description    => $c->request->params->{description} //= undef,
+    };
+    my $rule_id  = $c->request->params->{ruleid} //= undef;
+    my $group_id = $c->request->params->{grpid} //= undef;
 
-#    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
-#        unless $callee_prefix =~ /^[a-zA-Z0-9_\.\-\@\:]+/;
-
-    unless(keys %messages) {
-        if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_rule',
-                                                 { group_id => $grpid,
-                                                   data     => {
-                                                       callee_prefix  => $callee_prefix,
-                                                       callee_pattern => $callee_pattern,
-                                                       caller_pattern => $caller_pattern,
-                                                       description    => $description
-                                                   },
-                                                 },
-                                                 undef
-                                               ))
-        {
-            $messages{erulmsg} = 'Server.Voip.SavedSettings';
-            $c->session->{messages} = \%messages;
-            $c->response->redirect("/peering/detail?group_id=$grpid");
-            return;
-		}
-		else
-		{
-        	$messages{erulerr} = 'Client.Voip.InputErrorFound';
-            if ($c->session->{prov_error_object}) {
-                # put into flash (read-once), %messages is translated which will not work here.
-                $c->flash->{erulerr_detail} = $c->session->{prov_error_object};
-            } 
-		}
-    } else {
-		# TODO: add proper values here and set them in tt
-		my %arefill = ();
-#		$arefill{name} = $grpname;
-#		$arefill{desc} = $grpdesc;
-
-		$c->stash->{arefill} = \%arefill;
+    unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_prefix', $settings->{callee_prefix}, \$checkresult)) {
+        $messages{rule_callee_prefix_err} = 'Client.Syntax.MalformedUri';
+        $c->flash->{rule_callee_prefix_err_detail} = $c->session->{prov_error_object} if ($c->session->{prov_error_object});
+    }
+    unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_pattern', $settings->{callee_pattern}, \$checkresult)) {
+        $messages{rule_callee_pattern_err} = 'Client.Syntax.MalformedUri';
+        $c->flash->{rule_callee_pattern_err_detail} = $c->session->{prov_error_object} if ($c->session->{prov_error_object});
+    }
+    unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_pattern', $settings->{caller_pattern}, \$checkresult)) {
+        $messages{rule_caller_pattern_err} = 'Client.Syntax.MalformedUri';
+        $c->flash->{rule_caller_pattern_err_detail} = $c->session->{prov_error_object} if ($c->session->{prov_error_object});
     }
 
-    $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering/detail?group_id=$grpid");
-    return;
+    if (keys %messages) {
+        $c->session->{messages} = \%messages;
+        $c->flash->{restore_rule} = $settings;
+    
+        if (defined $rule_id and length ($rule_id)) {
+            $c->response->redirect("/peering/detail?group_id=$group_id&reditid=$rule_id");
+        }
+        else {
+            $c->response->redirect("/peering/detail?group_id=$group_id");
+        }
+        $c->detach;
+    }
+
+    # data ok, save it
+    my $result;
+
+    if (defined $rule_id and length ($rule_id)) {
+        $result = $c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_rule',
+            { id   => $rule_id,
+              data => $settings,
+            },
+            undef,
+        );
+    }
+    else {
+        $result = $c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_rule',
+            { group_id => $group_id,
+              data     => $settings,
+            },
+            undef,
+        );
+    }
+
+    if ($result) {
+        $messages{erulmsg} = 'Server.Voip.SavedSettings';
+        $c->session->{messages} = \%messages;
+        $c->response->redirect("/peering/detail?group_id=$group_id");
+        return;
+	}
+	else {
+    	$messages{erulerr} = 'Client.Voip.InputErrorFound';
+	}
 }
 
 =head2 delete_rule
@@ -293,65 +310,6 @@ sub delete_rule : Local {
             return;
 		}
     } else {
-    }
-
-    $c->session->{messages} = \%messages;
-    $c->response->redirect("/peering/detail?group_id=$grpid");
-    return;
-}
-
-=head2 edit_rule
-
-Edit a peering rule
-
-=cut
-
-sub edit_rule : Local {
-    my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/peering_detail.tt';
-
-    my %messages;
-    my %settings;
-
-    my $grpid = $c->request->params->{grpid};
-    my $ruleid = $c->request->params->{ruleid};
-    my $callee_prefix = $c->request->params->{callee_prefix};
-    my $callee_pattern = $c->request->params->{callee_pattern};
-    my $caller_pattern = $c->request->params->{caller_pattern};
-    my $description = $c->request->params->{description};
-
-#    $messages{crulerr} = 'Client.Syntax.MalformedPeerGroupName'
-#        unless $callee_prefix =~ /^[a-zA-Z0-9_\.\-\@\:]+/;
-
-    unless(keys %messages) {
-        if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_rule',
-                                                 { id   => $ruleid,
-                                                   data => {
-                                                       callee_prefix => $callee_prefix,
-                                                       callee_pattern => $callee_pattern,
-                                                       caller_pattern => $caller_pattern,
-                                                       description   => $description
-                                                   },
-                                                 },
-                                                 undef
-                                               ))
-        {
-            $messages{erulmsg} = 'Server.Voip.SavedSettings';
-            $c->session->{messages} = \%messages;
-            $c->response->redirect("/peering/detail?group_id=$grpid");
-            return;
-		}
-		else
-		{
-        	$messages{erulerr} = 'Client.Voip.InputErrorFound';
-		}
-    } else {
-		# TODO: add proper values here and set them in tt
-		my %arefill = ();
-#		$arefill{name} = $grpname;
-#		$arefill{desc} = $grpdesc;
-
-		$c->stash->{arefill} = \%arefill;
     }
 
     $c->session->{messages} = \%messages;
