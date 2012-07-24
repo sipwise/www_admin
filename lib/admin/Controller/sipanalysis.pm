@@ -172,7 +172,8 @@ sub packet : Local {
     $pkg->{payload} =~ s/([^\n]{120})/$1<br\/>/g;
     $pkg->{payload} =~ s/^([^\n]+)\n/<b>$1<\/b>\n/;
     $pkg->{payload} = $tstamp.' ('.$pkg->{timestamp}.')<br/>'.
-      $pkg->{src_ip}.':'.$pkg->{src_port}.' &rarr; '. $pkg->{dst_ip}.':'.$pkg->{dst_port}.'<br/><br/>'.
+      $pkg->{src_ip}.':'.$pkg->{src_port}.' &rarr; '. $pkg->{dst_ip}.':'.$pkg->{dst_port}.
+      ' ('.$pkg->{transport}.')<br/><br/>'.
       $pkg->{payload};
     $pkg->{payload} =~ s/\n([a-zA-Z0-9\-_]+\:)/\n<b>$1<\/b>/g;
     $pkg->{payload} =~ s/\n/<br\/>/g;
