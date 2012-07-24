@@ -9,32 +9,30 @@
 
 <ul class="cleanlist">
     <li class="ui-state-default">
-        <div class="span-2">Handle</div>
-        <div class="prepend-1 span-1">Loopplay</div>
-        <div class="prepend-1 span-4">Filename</div>
+        <div class="span-5">Handle</div>
+        <div class="span-2">Loop</div>
+        <div class="span-6">Filename</div>
     </li>
 
         [% FOREACH h IN set.handles %]
-            <li class="ui-state-default">
-                <div class="span-2">[% h.name %]</div>
+            <li class="ui-state-default" [% IF handle_id == h.id %]style="border:1px solid #459e00"[% END %]>
+                <div class="span-5">[% h.name %]</div>
 
                 [% IF NOT h.filename.length %] [%# kein file %]
                     <form action="/sound/set/[% set.id %]/handle/[% h.id %]/save" method="post" enctype="multipart/form-data">
-                        <div class="prepend-1 span-1"><input type="checkbox" class="checkbox" id="loopplay_"[% h.id %] name="loopplay"></div>
-                        <div class="prepend-1 span-2"></div>
-                        <div class="prepend-1 span-6">
-                            <input id="soundfile" name="soundfile" class="file" type="file" size="10" value="">
+                        <div class="span-2"><input type="checkbox" class="checkbox" id="loopplay_"[% h.id %] name="loopplay"></div>
+                        <div class="span-6">
+                            <input id="soundfile" name="soundfile" class="file" type="file" size="10" value=""/>
                         </div>
                         <div class="prepend-1 span-1">
-                            <button class="button-add" id="soundadd" />
+                            <button class="button-add" id="soundadd">Add</button>
                         </div>
                     </form>
                 [% ELSIF handle_id == h.id %] [%# edit %]
                     <form action="/sound/set/[% set.id %]/handle/[% h.id %]/save" method="post" enctype="multipart/form-data">
-                        <div class="prepend-1 span-1"><input type="checkbox" class="checkbox" id="loopplay_"[% h.id %] name="loopplay" [% IF h.loopplay %]checked=
+                        <div class="span-2"><input type="checkbox" class="checkbox" id="loopplay_"[% h.id %] name="loopplay" [% IF h.loopplay %]checked=
 "checked"[% END %]></div>
-                        <div class="prepend-1 span-2">[% h.filename %]</div>
-                        <div class="prepend-1 span-6">
+                        <div class="span-6">
                             [%# value='' is ignored by browsers for security reasons for file-input-fields %]
                             <input id="soundfile" name="soundfile" class="file" type="file" size="10" value="">
                         </div>
@@ -46,12 +44,10 @@
                         </div>
                     </form>
                 [% ELSE %] [%# view %]
-                    <div class="prepend-1 span-1"><input type="checkbox" class="checkbox" id="loopplay_"[% h.id %] name="loopplay" [% IF h.loopplay %]checked="che
-cked"[% END %] disabled="disabled"></div>
-                    <div class="prepend-1 span-2"><a href="/sound/set/[% set.id %]/handle/[% h.id %]/soundfile/get">[% h.filename %]</a></div>
+                    <div class="span-2"><input type="checkbox" class="checkbox" id="loopplay_"[% h.id %] name="loopplay" [% IF h.loopplay %]checked="checked"[% END %] disabled="disabled"></div>
+                    <div class="span-6"><a href="/sound/set/[% set.id %]/handle/[% h.id %]/soundfile/get">[% h.filename %]</a></div>
                     <form action="/sound/set/[% set.id %]/handle/[% h.id %]/delete" method="post">
                         [% UNLESS Catalyst.session.admin.read_only %]
-                            <div class="prepend-1 span-6"></div>
                             <div class="prepend-1 span-1">
                                 <a href="/sound/set/[% set.id %]/handle/[% h.id %]/edit"><span class="button-edit">Edit</span></a>
                             </div>
