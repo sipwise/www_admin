@@ -1,0 +1,23 @@
+<h2> Bans </h2>
+
+[% IF messages.ban_err %]<div class="error">[% messages.ban_err %]</div>[% END %]
+[% IF messages.ban_msg %]<div class="success">[% messages.ban_msg %]</div>[% END %]
+        
+<div class="topsubmenu">
+    <ul>
+        <li><a href="/bans/users"><span>Users</span></a></li>
+        <li class="selected"><a href="/bans/ips"><span>IPs</span></a></li>
+    </ul>
+</div>
+<div class="topsubmenudivider"> </div>
+
+<ul class="cleanlist">
+    
+    <li class="ui-state-default">
+        <div class="span-3">IP</div>
+    </li>
+    [% FOREACH ip IN banned_ips %]
+        <li class="ui-state-default">[% ip.ip %]</li>
+    [% END %]
+
+</ul> 
