@@ -4,29 +4,28 @@
         </h3>
 
         <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#faxprefs"><span class="button-back">Back</span></a>
-        <div class="p1">
+        <div class="hspace-20"></div>
           <div class="list_explanation">
-            The fax messages and/or notifications will be distributed to the following list of email addresses and phone numbers.
+            The fax messages and/or notifications will be sent to the following list of email addresses and phone numbers.
           </div>
+        <div class="hspace-20"></div>
 
-          <table>
-            <tr class="table_header">
-              <td>destination</td>
-              <td>filetype</td>
-              <td class="tdcenter">CC</td>
-              <td class="tdcenter">incoming</td>
-              <td class="tdcenter">outgoing</td>
-              <td class="tdcenter">status</td>
-              <td />
-              <td />
-            </tr>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-4">Destination</div>
+              <div class="span-3">File Format</div>
+              <div class="span-2">CC</div>
+              <div class="span-2">Incoming</div>
+              <div class="span-2">Outgoing</div>
+              <div class="span-2">Status</div>
+            </li>
+
             [% FOREACH listentry = list_data %]
-<!--              <tr class="[% listentry.background %]"> -->
             [% IF listentry.destination == edit_dest %]
-              <tr>
+              <li class="ui-state-default">
                 <form action="do_edit_destlist" method="post">
-                  <td> [% listentry.destination %] </td>
-                  <td>
+                  <div class="span-4">[% listentry.destination %]</div>
+                  <div class="span-3">
                     <select size="1" name="filetype"
                             title="for fax2mail: select the file format for fax message delivery"
                     >
@@ -35,80 +34,73 @@
                       <option [% IF listentry.filetype == "PDF" %]selected="selected"[% END %]>PDF</option>
                       <option [% IF listentry.filetype == "PDF14" %]selected="selected"[% END %]>PDF14</option>
                     </select>
-                  </td>
-                  <td class="tdcenter"><input type="checkbox" class="checkbox" name="cc"
+                  </div>
+                  <div class="span-2"><input type="checkbox" class="checkbox" name="cc"
                               title="for fax2mail: if checked, the address will be written to the CC header"
-                              [% IF listentry.cc %]checked="checked"[% END %] /></td>
-                  <td class="tdcenter"><input type="checkbox" class="checkbox" name="incoming"
+                              [% IF listentry.cc %]checked="checked"[% END %] /></div>
+                  <div class="span-2"><input type="checkbox" class="checkbox" name="incoming"
                               title="if checked, incoming fax messages will be delivered to this destination"
-                              [% IF listentry.incoming %]checked="checked"[% END %] /></td>
-                  <td class="tdcenter"><input type="checkbox" class="checkbox" name="outgoing"
+                              [% IF listentry.incoming %]checked="checked"[% END %] /></div>
+                  <div class="span-2"><input type="checkbox" class="checkbox" name="outgoing"
                               title="if checked, outgoing fax messages will be delivered to this destination"
-                              [% IF listentry.outgoing %]checked="checked"[% END %] /></td>
-                  <td class="tdcenter"><input type="checkbox" class="checkbox" name="status"
+                              [% IF listentry.outgoing %]checked="checked"[% END %] /></div>
+                  <div class="span-2"><input type="checkbox" class="checkbox" name="status"
                               title="if checked, status information for outgoing fax messages will be delivered to this destination"
-                              [% IF listentry.status %]checked="checked"[% END %] /></td>
-                  <td>
+                              [% IF listentry.status %]checked="checked"[% END %] /></div>
+                  <div class="span-1">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     <input type="hidden" name="list_del" value="[% listentry.destination %]" />
                     <input type="hidden" name="list_add" value="[% listentry.destination %]" />
-                    <button class="button-add" id="listedit[% listentry.id %]">Add</button>
-                  </td>
+                    <button class="button-save" id="listedit[% listentry.id %]">Save</button>
+                  </div>
                 </form>
-                <form action="edit_destlist" method="post">
-                  <td>
-                    <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
-                    <input type="hidden" name="list_name" value="[% list_name %]" />
-                    <button class="button-delete" id="listdel[% listentry.id %]">Delete</button>
-                  </td>
-                </form>
-              </tr>
+                <div class="span-1 last">
+                   <a href="edit_destlist?subscriber_id=[% subscriber_id %]&amp;list_name=destinations"><span class="button-cancel">Cancel</span></a>
+                </div>
+              </li>
             [% ELSE %]
-              <tr>
-                <td> [% listentry.destination %] </td>
-                <td> [% listentry.filetype %] </td>
-                <td class="tdcenter"><input type="checkbox" class="checkbox" disabled="disabled"
-                            [% IF listentry.cc %]checked="checked"[% END %] /></td>
-                <td class="tdcenter"><input type="checkbox" class="checkbox" disabled="disabled"
-                            [% IF listentry.incoming %]checked="checked"[% END %] /></td>
-                <td class="tdcenter"><input type="checkbox" class="checkbox" disabled="disabled"
-                            [% IF listentry.outgoing %]checked="checked"[% END %] /></td>
-                <td class="tdcenter"><input type="checkbox" class="checkbox" disabled="disabled"
-                            [% IF listentry.status %]checked="checked"[% END %] /></td>
+              <li class="ui-state-default">
+                <div class="span-4">[% listentry.destination %]</div>
+                <div class="span-3">[% listentry.filetype %]</div>
+                <div class="span-2"><input type="checkbox" class="checkbox" disabled="disabled"
+                            [% IF listentry.cc %]checked="checked"[% END %] /></div>
+                <div class="span-2"><input type="checkbox" class="checkbox" disabled="disabled"
+                            [% IF listentry.incoming %]checked="checked"[% END %] /></div>
+                <div class="span-2"><input type="checkbox" class="checkbox" disabled="disabled"
+                            [% IF listentry.outgoing %]checked="checked"[% END %] /></div>
+                <div class="span-2"><input type="checkbox" class="checkbox" disabled="disabled"
+                            [% IF listentry.status %]checked="checked"[% END %] /></div>
                 <form action="edit_destlist" method="post">
-                  <td>
+                  <div class="span-1">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     <input type="hidden" name="list_edit" value="[% listentry.destination %]" />
                     <button class="button-edit" id="listedit[% listentry.id %]">Edit</button>
-                  </td>
+                  </div>
                 </form>
                 <form action="do_edit_destlist" method="post">
-                  <td>
+                  <div class="span-1 last">
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="list_name" value="[% list_name %]" />
                     <input type="hidden" name="list_del" value="[% listentry.destination %]" />
                     <button class="button-delete" id="listdel[% listentry.id %]">Delete</button>
-                  </td>
+                  </div>
                 </form>
-              </tr>
+              </li>
             [% END %]
             [% END %]
 
-            <tr>
-            <td>&nbsp;</td><td /><td /><td /><td /><td /><td /><td />
-            </tr>
-            <tr>
+            <li class="ui-state-default">
               <form action="/subscriber/do_edit_destlist" method="post">
-                <td>
+                <div class="span-4">
                   <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                   <input type="hidden" name="list_name" value="[% list_name %]" />
-                  <input type="text" size="20" name="list_add" id="listaddtxt" value="[% arefill.destination %]"
+                  <input type="text" size="15" name="list_add" id="listaddtxt" value="[% arefill.destination %]"
                          title="enter a phone number or email address"
                   />
-                </td>
-                <td>
+                </div>
+                <div class="span-3">
                   <select size="1" name="filetype"
                           title="for fax2mail: select the file format for fax message delivery"
                   >
@@ -117,35 +109,33 @@
                     <option [% IF arefill.filetype == "PDF" %]selected="selected"[% END %]>PDF</option>
                     <option [% IF arefill.filetype == "PDF14" %]selected="selected"[% END %]>PDF14</option>
                   </select>
-                </td>
-                <td class="tdcenter">
+                </div>
+                <div class="span-2">
                   <input type="checkbox" class="checkbox" name="cc"
                          title="for fax2mail: if checked, the address will be written to &quot;Cc&quot; instead of &quot;To&quot;"
                          [% IF arefill.cc %]checked="checked"[% END %] />
-                </td>
-                <td class="tdcenter">
+                </div>
+                <div class="span-2">
                   <input type="checkbox" class="checkbox" name="incoming"
                          title="if checked, incoming fax messages will be delivered to this destination"
                          [% IF arefill.incoming %]checked="checked"[% END %] />
-                </td>
-                <td class="tdcenter">
+                </div>
+                <div class="span-2">
                   <input type="checkbox" class="checkbox" name="outgoing"
                          title="if checked, outgoing fax messages will be delivered to this destination"
                          [% IF arefill.outgoing %]checked="checked"[% END %] />
-                </td>
-                <td class="tdcenter">
+                </div>
+                <div class="span-2">
                   <input type="checkbox" class="checkbox" name="status"
                          title="if checked, status information for outgoing fax messages will be delivered to this destination"
                          [% IF arefill.status %]checked="checked"[% END %] />
-                </td>
-                <td colspan="2">
+                </div>
+                <div class="span-2">
                     <button class="button-add" id="listadd">Add</button>
-                  </div>
-                </td>
+                </div>
               </form>
-            </tr>
-          </table>
+            </li>
+          </ul>
           [% IF messages.msgadd %]<div class="error">[% messages.msgadd %]</div>[% END %]
 
-        </div>
 
