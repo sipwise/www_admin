@@ -172,15 +172,15 @@
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <input type="hidden" name="ruleid" value="[% rule.id %]" />
                     <div class="span-4">
-                      <input type="text" size="10 id="addtxt" title="Callee prefix, eg: 43 (must not include leading 'sip:'"
+                      <input type="text" size="10 id="addtxt" title="Callee prefix, eg: 43"
                              name="callee_prefix" value="[% restore_rule.callee_prefix or rule.callee_prefix %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="A regex including the leading '^sip:' (eg: '^sip:user@domain.com$')"
+                      <input type="text" size="10" id="addtxt" title="A regex matching against 'user@domain' (e.g. '^.+@example\.org$')"
                              name="callee_pattern" value="[% restore_rule.callee_pattern or rule.callee_pattern %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="A regex including the leading '^sip:' (eg: '^sip:user@domain.com$')"
+                      <input type="text" size="10" id="addtxt" title="A regex matching against 'user@domain' (e.g. '^.+@example\.org$')"
                              name="caller_pattern" value="[% restore_rule.caller_pattern or rule.caller_pattern %]" />
                     </div>
                     <div class="span-3">
@@ -222,15 +222,15 @@
                   <form action="/peering/save_rule" method="post">
                     <input type="hidden" name="grpid" value="[% grp.group.id %]" />
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="Callee prefix, eg: ^43 (must not include leading 'sip:'"
+                      <input type="text" size="10" id="addtxt" title="Callee prefix, eg: 43"
                              name="callee_prefix" value="[% IF not rule.id == reditid %][% restore_rule.callee_prefix %][% END %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="A regex including the leading '^sip:' (eg: '^sip:user@domain.com$')"
+                      <input type="text" size="10" id="addtxt" title="A regex matching against 'user@domain' (e.g. '^.+@example\.org$')"
                              name="callee_pattern" value="[% IF not rule.id == reditid %][% restore_rule.callee_pattern %][% END %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="10" id="addtxt" title="A regex including the leading '^sip:' (eg: '^sip:user@domain.com$')"
+                      <input type="text" size="10" id="addtxt" title="A regex matching against 'user@domain' (e.g. '^.+@example\.org$')"
                              name="caller_pattern" value="[% IF not rule.id == reditid %][% restore_rule.caller_pattern %][% END %]" />
                     </div>
                     <div class="span-3">
