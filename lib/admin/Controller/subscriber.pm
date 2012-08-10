@@ -584,7 +584,7 @@ sub add_permanent_contact : Local {
                                                         \$subscriber
                                                       );
 
-    if($c->model('Provisioning')->call_prov( $c, 'voip', 'add_subscriber_registered_device',
+    if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_subscriber_registered_device',
                                              { username => $$subscriber{username},
                                                domain   => $$subscriber{domain},
                                                contact  => $contact,
