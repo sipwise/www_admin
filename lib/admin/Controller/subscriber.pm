@@ -795,10 +795,6 @@ sub preferences : Local {
                                                               \$rules
                                                             );
           $c->stash->{rewrite_rule_sets} = $rules if eval { @$rules };
-        } elsif($$pref{preference} eq 'block_in_list' or $$pref{preference} eq 'block_out_list' or
-                $$pref{preference} eq 'adm_block_in_list' or $$pref{preference} eq 'adm_block_out_list')
-        {
-          eval { @{$$preferences{$$pref{preference}}} = map { s/^([1-9])/+$1/; $_ } @{$$preferences{$$pref{preference}}} };
         }
         elsif ($$pref{data_type} eq 'enum') {
 
@@ -906,16 +902,21 @@ sub update_preferences : Local {
         delete $$preferences{$$db_pref{preference}}, next
             if $$db_pref{read_only};
 
-        if($$db_pref{preference} eq 'cli') {
-            $$preferences{cli} = $c->request->params->{cli} or undef;
-            if(defined $$preferences{cli} and $$preferences{cli} =~ /^\+?\d+$/) {
-                $$preferences{cli} = admin::Utils::get_qualified_number_for_subscriber($c, $$preferences{cli});
-                my $checkresult;
-                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $$preferences{cli}, \$checkresult);
-                $messages{cli} = 'Client.Voip.MalformedNumber'
-                    unless $checkresult;
+        for (qw/cli user_cli emergency_cli/) {
+            next unless defined $$preferences{$_};
+
+            if ($$db_pref{preference} eq $_) {
+                $$preferences{$_} = $c->request->params->{$_} or undef;
+                if(defined $$preferences{$_} and $$preferences{$_} ne '') {
+                    my $checkresult;
+                    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $$preferences{$_}, \$checkresult);
+                    $messages{$_} = 'Client.Syntax.InvalidE164Number'
+                        unless $checkresult;
+                }
             }
-        } elsif($$db_pref{preference} eq 'cc') {
+        }
+
+        if($$db_pref{preference} eq 'cc') {
             $$preferences{$$db_pref{preference}} = $c->request->params->{$$db_pref{preference}} || undef;
             if(defined $$preferences{$$db_pref{preference}}) {
                 my $checkresult;
@@ -2459,7 +2460,6 @@ sub edit_list : Local {
         my @block_list_to_sort;
         foreach my $blockentry (@$block_list) {
             my $active = $blockentry =~ s/^#// ? 0 : 1;
-            $blockentry =~ s/^([1-9])/+$1/;
             push @block_list_to_sort, { entry => $blockentry, active => $active };
         }
         my $bg = '';
@@ -2494,6 +2494,7 @@ sub edit_list : Local {
 
 sub do_edit_list : Local {
     my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_edit_list.tt';
 
     my %messages;
     my $subscriber;
@@ -2512,45 +2513,29 @@ sub do_edit_list : Local {
                                                       );
     my $list = $c->request->params->{list_name};
 
-    # input text field to add new entry to block list
     my $add = $c->request->params->{block_add};
-    if(defined $add) {
-        if($add =~ /^\+?[?*0-9\[\]-]+$/) {
-            my $ccdp = $c->config->{cc_dial_prefix};
-            my $acdp = $c->config->{ac_dial_prefix};
-            if($add =~ /^\*/ or $add =~ /^\?/ or $add =~ /^\[/) {
-                # do nothing
-            } elsif($add =~ s/^\+// or $add =~ s/^$ccdp//) {
-                # nothing more to do
-            } elsif($add =~ s/^$acdp//) {
-                $add = $$subscriber{cc} . $add;
-            } else {
-                $add = $$subscriber{cc} . $$subscriber{ac} . $add;
-            }
+    my $del = $c->request->params->{block_del};
+    my $act = $c->request->params->{block_act};
+
+    if (defined $add) { # input text field to add new entry to block list
+        my $checkresult;
+        $add =~ s/^ *//;
+        $add =~ s/ *$//;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_simple_pattern', $add, \$checkresult);
+        if ($checkresult) {
             my $blocklist = $$preferences{$list};
             $blocklist = [] unless defined $blocklist;
             $blocklist = [ $blocklist ] unless ref $blocklist;
             $$preferences{$list} = [ @$blocklist, $add ];
-        } else {
-            $messages{msgadd} = 'Client.Voip.MalformedNumberPattern';
+        }
+        else {
+            $messages{msgadd} = 'Client.Syntax.InvalidE164Pattern';
             $c->session->{blockaddtxt} = $add;
         }
     }
-
-    # delete link next to entries in block list
-    my $del = $c->request->params->{block_del};
-    if(defined $del) {
+    elsif (defined $del) { # delete link next to entries in block list
         my $blocklist = $$preferences{$list};
-        if(defined $blocklist) {
-            my $ccdp = $c->config->{cc_dial_prefix};
-            my $acdp = $c->config->{ac_dial_prefix};
-            if($del =~ /^\*/ or $del =~ /^\?/ or $del =~ /^\[/) {
-                # do nothing
-            } elsif($del =~ s/^\+// or $del =~ s/^$ccdp//) {
-                # nothing more to do
-            } elsif($del =~ s/^$acdp//) {
-                $del = $$subscriber{cc} . $del;
-            }
+        if (defined $blocklist) {
             $blocklist = [ $blocklist ] unless ref $blocklist;
             if($c->request->params->{block_stat}) {
                 $$preferences{$list} = [ grep { $_ ne $del } @$blocklist ];
@@ -2559,21 +2544,9 @@ sub do_edit_list : Local {
             }
         }
     }
-
-    # activate/deactivate link next to entries in block list
-    my $act = $c->request->params->{block_act};
-    if(defined $act) {
+    elsif (defined $act) { # activate/deactivate link next to entries in block list
         my $blocklist = $$preferences{$list};
-        if(defined $blocklist) {
-            my $ccdp = $c->config->{cc_dial_prefix};
-            my $acdp = $c->config->{ac_dial_prefix};
-            if($act =~ /^\*/ or $act =~ /^\?/ or $act =~ /^\[/) {
-                # do nothing
-            } elsif($act =~ s/^\+// or $act =~ s/^$ccdp//) {
-                # nothing more to do
-            } elsif($act =~ s/^$acdp//) {
-                $act = $$subscriber{cc} . $act;
-            }
+        if (defined $blocklist) {
             $blocklist = [ $blocklist ] unless ref $blocklist;
             if($c->request->params->{block_stat}) {
                 $$preferences{$list} = [ grep { $_ ne $act } @$blocklist ];
@@ -2587,21 +2560,20 @@ sub do_edit_list : Local {
 
     unless(keys %messages) {
         $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_preferences',
-                                              { username => $$subscriber{username},
-                                                domain   => $$subscriber{domain},
-                                                preferences => {
-                                                                 $list => $$preferences{$list},
-                                                               },
-                                              },
-                                              undef
-                                            );
+            { username => $$subscriber{username},
+              domain   => $$subscriber{domain},
+              preferences => {
+                $list => $$preferences{$list},
+              },
+            },
+            undef
+        );
     } else {
         $messages{numerr} = 'Client.Voip.InputErrorFound';
     }
 
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/edit_list?subscriber_id=$subscriber_id&list_name=$list");
-
 }
 
 sub edit_iplist : Local {

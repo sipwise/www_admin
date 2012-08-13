@@ -85,7 +85,7 @@
                   <input type="hidden" name="list_name" value="[% list_name %]" />
                   <div class="span-14">
                     <input type="text" size="20" name="block_add" id="blockaddtxt" value="[% blockaddtxt %]"
-                      title="E.164 number string with shell pattern wildcards (*, ?), with international prefix or as local number, will be normalized to international format" />
+                      title="E.164 number string with shell pattern wildcards (*, ? and '[x-y]' with 'x' and 'y' representing numbers from 0 to 9). 0 is invalid at the beginning" />
                   </div>
                   <div class="span-1 last">
                     <button class="button-add" id="blockadd">Add</button>
