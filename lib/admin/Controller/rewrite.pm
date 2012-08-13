@@ -190,6 +190,9 @@ sub create_rewrite : Local {
     my $direction = $c->request->params->{direction};
     my $field = $c->request->params->{field};
     my $priority = $c->request->params->{priority};
+    
+    $match_pattern   =~ s/ //g;
+    $replace_pattern =~ s/ //g;
 
     my $a = "";
     if($field eq 'caller') { $a = 'caller'.$a; }
@@ -353,6 +356,9 @@ sub edit_rewrite : Local {
     my $direction = $c->request->params->{direction};
     my $field = $c->request->params->{field};
     my $priority = $c->request->params->{priority};
+    
+    $match_pattern   =~ s/ //g;
+    $replace_pattern =~ s/ //g;
 
 	my $a = "";
 	if($field eq 'caller') { $a = 'caller'.$a; }
