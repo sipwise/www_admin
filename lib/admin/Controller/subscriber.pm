@@ -903,16 +903,14 @@ sub update_preferences : Local {
             if $$db_pref{read_only};
 
         for (qw/cli user_cli emergency_cli/) {
-            next unless defined $$preferences{$_};
+            next unless (defined $c->request->params->{$_} and $c->request->params->{$_} ne '');
 
             if ($$db_pref{preference} eq $_) {
                 $$preferences{$_} = $c->request->params->{$_} or undef;
-                if(defined $$preferences{$_} and $$preferences{$_} ne '') {
-                    my $checkresult;
-                    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $$preferences{$_}, \$checkresult);
-                    $messages{$_} = 'Client.Syntax.InvalidE164Number'
-                        unless $checkresult;
-                }
+                my $checkresult;
+                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username', $$preferences{$_}, \$checkresult);
+                $messages{$_} = 'Client.Syntax.InvalidSipUsername'
+                    unless $checkresult;
             }
         }
 
@@ -1565,8 +1563,6 @@ sub edit_cf : Local {
           $dest->{destination} = 'fax2mail';
         } elsif($dest->{destination} =~ /\@$confdom$/) {
           $dest->{destination} = 'conference';
-        } elsif($dest->{destination} =~ /^sip:\+?[0-9]+\@/) {
-          $dest->{destination} =~ s/^sip:([^\@]+)\@.+$/$1/;
         }
       }
     }
@@ -1721,29 +1717,17 @@ sub edit_cf_savedst : Local {
     my $fw_timeout = $c->request->params->{'dest_timeout'} || 300;
     my $fw_target_select = $c->request->params->{'dest_target'} || 'disable';
     my $fw_target;
+
+    my ($check_sip_uri, $check_sip_username);
     if($fw_target_select eq 'sipuri') {
-      $fw_target = $c->request->params->{'dest_sipuri'};
-
-      # normalize, so we can do some checks.
-      $fw_target =~ s/^sip://i;
-
-      if($fw_target =~ /^\+?\d+$/) {
-        $fw_target = admin::Utils::get_qualified_number_for_subscriber($c, $fw_target);
-        my $checkresult;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $fw_target, \$checkresult);
-        unless($checkresult) {
-          $messages{edesterr} = 'Client.Voip.MalformedNumber'
-        } else {
-          $fw_target = 'sip:'.$fw_target.'@'.$$subscriber{domain};
-        }
-      } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+(:\d{1,5})?$/i) {
-        $fw_target = 'sip:'. lc $fw_target;
-      } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+$/) {
-        $fw_target = 'sip:'. lc($fw_target) .'@'. $$subscriber{domain};
-      } else {
-        $messages{edesterr} = 'Client.Voip.MalformedTarget';
         $fw_target = $c->request->params->{'dest_sipuri'};
-      } 
+
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri', $fw_target, \$check_sip_uri);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username', $fw_target, \$check_sip_username);
+
+        $messages{edesterr} = 'Client.Voip.MalformedTarget'
+            unless ($check_sip_uri or $check_sip_username);
+
     } elsif($fw_target_select eq 'voicebox') {
       $fw_target = 'sip:vmu'.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$vbdom";
     } elsif($fw_target_select eq 'fax2mail') {
@@ -2519,9 +2503,9 @@ sub do_edit_list : Local {
 
     if (defined $add) { # input text field to add new entry to block list
         my $checkresult;
-        $add =~ s/^ *//;
-        $add =~ s/ *$//;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_simple_pattern', $add, \$checkresult);
+        $add =~ s/ //g;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username_shell_pattern', $add, \$checkresult);
+
         if ($checkresult) {
             my $blocklist = $$preferences{$list};
             $blocklist = [] unless defined $blocklist;
@@ -2529,7 +2513,7 @@ sub do_edit_list : Local {
             $$preferences{$list} = [ @$blocklist, $add ];
         }
         else {
-            $messages{msgadd} = 'Client.Syntax.InvalidE164Pattern';
+            $messages{msgadd} = 'Client.Syntax.InvalidSipUsernamePattern';
             $c->session->{blockaddtxt} = $add;
         }
     }
@@ -2786,24 +2770,13 @@ sub do_edit_speed_dial_slots : Local {
     my $add_destination = $c->request->params->{add_destination};
     if(defined $add_slot) {
 
-        my $checkadd_slot;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $add_slot, \$checkadd_slot);
-        my $checkadd_destination;
-        my $destination;
-        if ($add_destination =~ /^\+?\d+$/) {
-            $add_destination = admin::Utils::get_qualified_number_for_subscriber($c, $add_destination);
-            my $checkresult;
-            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $add_destination, \$checkresult);
-            $destination = 'sip:'. $add_destination .'@'. $$subscriber{domain}
-                if $checkresult;
-        } else {
-            $destination = $add_destination;
-        }
-        if ($destination =~ /^sip:.+\@.+$/) {
-            $checkadd_destination = 1;
-        }
+        my ($check_slot, $check_sip_username, $check_sip_uri);
+        
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $add_slot, \$check_slot);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri', $add_destination, \$check_sip_uri);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username', $add_destination, \$check_sip_username);
 
-        if($checkadd_slot and $checkadd_destination) {
+        if ($check_slot and ($check_sip_username or $check_sip_uri)) {
             $c->model('Provisioning')->call_prov( $c, 'voip', 'create_speed_dial_slot',
                                                   { username => $$subscriber{username},
                                                     domain   => $$subscriber{domain},
@@ -2815,18 +2788,16 @@ sub do_edit_speed_dial_slots : Local {
                                                   undef
                                                 );
         } else {
-            unless ($checkadd_destination) {
+            unless ($check_sip_username or $check_sip_uri) { 
                 $c->session->{adddestinationtxt} = $add_destination;
-                $messages{msgadd} = 'Client.Syntax.MalformedSpeedDialDestination';
+                $messages{msgadd} = 'Client.Syntax.MalformedSpeedDialDestination'
             }
-            #we display the slot error in case of both errors occurring at the same time
-            #since it should never occur (dropdown box selection of valid vsc strings)
-            #and would thus be more severe (system config misconfiguration).
-            #we should consider displaying an internal error at all...
-            unless ($checkadd_slot) {
+
+            unless ($check_slot) {
                 $c->session->{addslottxt} = $add_slot;
                 $messages{msgadd} = 'Client.Syntax.MalformedVSC';
             }
+            
             $messages{numerr} = 'Client.Voip.InputErrorFound';
         }
 

@@ -98,7 +98,7 @@
                       [% END %]
                       <input type="radio" id="dest_sipuri" value="sipuri" name="dest_target" class="radio"
                           [% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" %] checked="checked"[% END %]/>
-                      <label for="[% preference.key %]sipuri">Number or SIP-URI:</label>
+                      <label for="[% preference.key %]sipuri">SIP-URI/username</label>
                       <input type="text" id="dest_sipuritxt" name="dest_sipuri" size="20" value="[% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" %][% dest.destination %][% END %]"/>
                       <label for="[% preference.key %]timeout">for </label>
                       <input type="text" id="dest_timeout" name="dest_timeout" size="2" value="[% IF dest.timeout.defined %][% dest.timeout %][% ELSE %]300[% END %]"/><span>&nbsp;seconds</span>

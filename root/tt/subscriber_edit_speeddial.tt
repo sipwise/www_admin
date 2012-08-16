@@ -4,6 +4,12 @@
         </h3>
 
         <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#speeddial"><span class="button-back">Back</span></a>
+          
+          <div class="hspace-20"></div>
+          <div class="list_explanation">
+          Destination can be one of: a whole SIP URI (eg. "sip:user@example.com") or just the SIP username (the localpart of the SIP URI, eg., "user" in the previous example).
+          </div>
+
           [% IF messages.nummsg %]<div class="success">[% messages.nummsg %]</div>[% END %]
           [% IF messages.numerr %]<div class="error">[% messages.numerr %]</div>[% END %]
           <div class="hspace-20"></div>
@@ -21,7 +27,7 @@
                     <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
                     <input type="hidden" name="update_id" value="[% sdentry.id %]" />
                     <input type="hidden" name="slot" value="[% sdentry.slot %]" />
-                    <input type="text" size="20" name="destination" id="destinationtxt" value="[% sdentry.destination %]" />
+                    <input type="text" size="20" name="destination" id="destinationtxt" value="[% sdentry.destination %]" />xx
                   </div>
                   <div class="span-1 append-7">
                       <button class="button-save" id="listupdate[% sdentry.id %]">Update</button>
