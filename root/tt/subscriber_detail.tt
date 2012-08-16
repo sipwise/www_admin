@@ -37,6 +37,7 @@
         <h3 id="master">Master Data</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]
+        <div id="buttonbox" style="position:relative;">
         [% IF subscriber.subscriber_id && !edit_subscriber %]
           <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_subscriber=1"><span class="button-edit">Edit</span></a>
         [% END %]
@@ -51,13 +52,14 @@
           <a id="lock" href="javascript:;" onclick="javascript:openclose();" onkeypress="javascript:openclose();"><span class="button-lock-sub">Lock</span></a>
           <span id="lock_menu" class="floating" onmouseout="javascript:openclose();">
             <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=none" class="aaction">unlock</a><br />
-            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=foreign" class="aaction">foreign</a><br />
-            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=outgoing" class="aaction">all outgoing</a><br />
+            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=foreign" class="aaction">foreign calls</a><br />
+            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=outgoing" class="aaction">all outgoing calls</a><br />
             <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=incoming" class="aaction">incoming and outgoing</a><br />
-            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=global" class="aaction">global</a><br />
+            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=global" class="aaction">global (including CSC)</a><br />
           </span>
           <a href="terminate?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-terminate">Terminate</span></a>
         [% END %]
+        </div>
       [% END %]
 
         [% IF subscriber.is_locked %]

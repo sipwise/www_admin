@@ -207,10 +207,10 @@ float: none;
 	z-index: 100;
 	display: none;
 	position: absolute;
-	top: 255px;
-	left: 343px;
+	top: 22px;
+	left: 26px;
 	border: 1px solid #006600;
-	background-color: #DDFFDD;
+	background-color: #EEEEEE;
 	padding: 3px 10px 3px 5px;
 }
 
