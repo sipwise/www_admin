@@ -266,7 +266,7 @@
                 <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]"/>
                 <div class="span-4">Add permanent Contact:</div>
                 <div class="span-1"><span class="ui-icon ui-icon-help help" title="Inserts a permanent registration entry. Use this if your SIP Client doesn't have the capabilities to register. Required input is a full SIP URI in form <i>sip:user@ip:port</i>"></span></div>
-                <div class="span-7"><input type="text" size="35" name="contact" value="" title="Full SIP URI in form sip:user@ip:port" /></div>
+                <div class="span-10"><input type="text" size="35" name="contact" value="" title="Full SIP URI in form sip:user@ip:port" /></div>
                 <div class="span-1 last"><button class="button-add">Add</button></div>
               </form>
             </li>
