@@ -92,15 +92,15 @@
 
             <ul class="cleanlist">
               <li class="ui-state-default">
-                <div class="span-9">SIP URI</div>
+                <div class="span-11">SIP URI</div>
                 <div class="span-2">Account ID</div>
-                <div class="span-5 last">Primary Number</div>
+                <div class="span-3-4 last">Primary Number</div>
               </li>
 
             [% FOREACH subscriber = subscriber_list %]
 
               <li class="ui-state-default">
-                <div class="span-9">
+                <div class="span-11">
                 [% IF subscriber.subscriber_id %]
                   <a href="/subscriber/detail?subscriber_id=[% subscriber.subscriber_id %]">
                     [% subscriber.username %]@[% subscriber.domain %]</a>
@@ -112,7 +112,7 @@
                   <a href="/account/detail?account_id=[% subscriber.account_id %]">
                     [% subscriber.account_id %]</a>
                 </div>
-                <div class="span-5 last">
+                <div class="span-3-4 last">
                   [% IF subscriber.sn %]
                     +[% subscriber.cc %] [% subscriber.ac %] [% subscriber.sn %]
                   [% END %]
