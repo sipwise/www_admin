@@ -156,7 +156,7 @@ sub preferences : Local {
         }
         elsif ($$pref{preference} eq 'sound_set') {
             my $sound_sets;
-            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sound_sets_flat', 
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sound_sets', 
                 {},
                 \$sound_sets );
 

@@ -33,7 +33,7 @@ sub list : Chained('base') PathPart('') Args(0) {
 sub set : Chained('base') PathPart('set') CaptureArgs(1) {
     my ($self, $c, $set_id) = @_;
     $c->stash->{set_id} = $set_id if ($set_id != 0);
-    $c->stash->{set} = $c->forward ('load_single_set') if ($set_id != 0);
+    $c->stash->{set} = $c->forward ('load_set') if ($set_id != 0);
 }
 
 sub set_add : Chained('base') PathPart('set') CaptureArgs(0) {
@@ -66,7 +66,6 @@ sub save_handle : Chained('handle') PathPart('save') Args(0) {
         my $ft = File::Type->new();
 
         unless ($ft->checktype_contents($soundfile) eq 'audio/x-wav') {
-            ##$messages{sound_set_err} = 'Client.Syntax.InvalidFileType';
             $c->session->{messages} = {sound_set_err => 'Client.Syntax.InvalidFileType'};
             $c->session->{refill} = { set_id => $c->stash->{set_id}, handle_id => $c->stash->{handle_id}, filename => $filename };
             return;
@@ -74,12 +73,12 @@ sub save_handle : Chained('handle') PathPart('save') Args(0) {
     }
 
     if ($c->model('Provisioning')->call_prov($c, 'voip',
-        'update_sound_handle',
+        'update_sound_file',
         { set_id => $c->stash->{set_id},
           handle_id => $c->stash->{handle_id},
           soundfile => $soundfile,
           filename => $filename, 
-          loopplay => $c->request->params->{loopplay} eq 'on' ? 1 : 0,
+          loopplay => (defined $c->request->params->{loopplay} and $c->request->params->{loopplay} eq 'on') ? 1 : 0,
         },
         undef))
     {
@@ -213,14 +212,14 @@ sub load_sets :Private {
     return $sets;
 }
 
-sub load_single_set :Private {
+sub load_set :Private {
     my ($self, $c) = @_;
 
     my $set;
     return unless $c->model('Provisioning')->call_prov(
         $c,
         'voip',
-        'get_single_sound_set',
+        'get_sound_set',
         { set_id => $c->stash->{set_id} },
         \$set,
     );
