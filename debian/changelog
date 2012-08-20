@@ -1,3 +1,16 @@
+ngcp-www-admin (3.4.0) unstable; urgency=low
+
+  * added trusted peers frontend
+  * added sound set/files frontend
+  * added banned user/IPs frontend
+  * added sipstats frontend for PRO
+  * support for new caller and callee patterns in peering rules
+  * support for three-state booleans true/false/default
+  * some layout fixes, specially for long item names
+  * some general bugfixes, improved syntax checks and error messages
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Mon, 20 Aug 2012 16:17:27 +0200
+
 ngcp-www-admin (3.3.5) unstable; urgency=low
 
   [cveigl]
