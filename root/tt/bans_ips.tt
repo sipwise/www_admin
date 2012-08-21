@@ -1,4 +1,4 @@
-<h2> Bans </h2>
+<h2>Banned IP Addresses</h2>
 
 [% IF messages.ban_err %]<div class="error">[% messages.ban_err %]</div>[% END %]
 [% IF messages.ban_msg %]<div class="success">[% messages.ban_msg %]</div>[% END %]

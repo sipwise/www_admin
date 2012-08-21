@@ -1,6 +1,6 @@
 [% USE date %]
 
-<h2> Bans </h2>
+<h2>Banned Users</h2>
 
 [% IF messages.ban_err %]<div class="error">[% messages.ban_err %]</div>[% END %]
 [% IF messages.ban_msg %]<div class="success">[% messages.ban_msg %]</div>[% END %]
@@ -17,8 +17,8 @@
     
     <li class="ui-state-default">
         <div class="span-6">Subscriber</div>
-        <div class="span-5">Last auth</div>
-        <div class="span-2 last">Auth count</div>
+        <div class="span-5">Last Authentication</div>
+        <div class="span-2 last">Attempts</div>
     </li>
 
     [% FOREACH user IN banned_users %]
