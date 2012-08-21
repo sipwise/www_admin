@@ -142,24 +142,6 @@
                     [% END %]
                   </div>
                 </li>
-                [% ELSIF preference.key == "sound_set" AND Catalyst.config.domain.audiofile_features %]
-                <li class="ui-state-default">
-                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
-                  <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
-                  <div class="span-10 last">
-                    <select size="1" name="[% preference.key %]" [% IF !edit_preferences %]disabled="disabled"[% END %] />
-                        <option value=""></option>
-                        [% FOREACH option IN preference.value.options %]
-                            <option value="[% option.id %]"
-                                [% IF option.id == preference.value.selected %]
-                                    selected="selected"
-                                [% END %]>
-                                [% option.name %]
-                            </option>
-                        [% END %]
-                    </select>
-                  </div>
-                </li>
                 [% ELSIF preference.data_type == "boolean" %]
                 <li class="ui-state-default">
                   <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>

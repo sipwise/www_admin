@@ -39,10 +39,8 @@
             <li [% 'class="active_menu"' IF menu.active == "peering" %]><a href="/peering">SIP Peerings</a></li>
             [% END %]
             <li [% 'class="active_menu"' IF menu.active == "rewrite" %]><a href="/rewrite">Rewrite Rule Sets</a></li>
-            [% IF Catalyst.config.domain.audiofile_features %]
-              <li [% 'class="active_menu"' IF menu.active == "sound" %]><a href="/sound">Sound sets</a></li>
-            [% END %]
-            <li [% 'class="active_menu"' IF menu.active == "bans" %]><a href="/bans/users">Bans</a></li>
+            <li [% 'class="active_menu"' IF menu.active == "sound" %]><a href="/sound">Sound Sets</a></li>
+            <li [% 'class="active_menu"' IF menu.active == "bans" %]><a href="/bans/users">Security Bans</a></li>
           </ul>
         </div>
 
