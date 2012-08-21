@@ -73,10 +73,10 @@
       [% END %]
 
         [% IF subscriber.is_locked %]
-          <div class="alert">[% subscriber.is_locked %]</div>
+          <div class="alert hspace-20">[% subscriber.is_locked %]</div>
         [% END %]
-          [% IF messages.submsg %]<div class="success">[% messages.submsg %]</div>[% END %]
-          [% IF messages.suberr %]<div class="error">[% messages.suberr %]</div>[% END %]
+          [% IF messages.submsg %]<div class="success hspace-20">[% messages.submsg %]</div>[% END %]
+          [% IF messages.suberr %]<div class="error hspace-20">[% messages.suberr %]</div>[% END %]
           <form action="update_subscriber" method="post">
             <input type="hidden" name="subscriber_id" value="[% subscriber.subscriber_id %]" />
             <input type="hidden" name="account_id" value="[% account_id %]" />
