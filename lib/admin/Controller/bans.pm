@@ -77,7 +77,7 @@ sub ips : Chained('base') PathPart('ips') Args(0) {
 sub unban_ip : Chained('base') PathPart('unban_ip')  Args(0) {
     my ($self, $c) = @_;
 
-    my $user = $c->request->params->{'ip'} || '';
+    my $ip = $c->request->params->{'ip'} || '';
 
     $c->model('Provisioning')->call_prov(
         $c,
