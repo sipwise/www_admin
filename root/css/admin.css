@@ -369,8 +369,8 @@ display:none;
   color:#fff;
 }
 
-.success {
-  margin-top: 20px;
+.error, .alert, .notice, .success, .info {
+  margin-top: 1em;
 }
 
 .content li.ui-state-quad {
