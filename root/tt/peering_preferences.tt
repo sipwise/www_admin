@@ -97,7 +97,7 @@
                   [% END %]
                   </div>
                 </li>
-                [% IF preference.value.error %]<div class="error">[% preference.value.error %]</div>[% END %]
+                [% IF preference.value.error %]<li class="error">[% preference.value.error %]</li>[% END %]
                 [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
                 <li class="ui-state-default">
                   <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
@@ -140,24 +140,6 @@
                     [% ELSE %]
                       [% IF edit_preferences %]no rewrite rule sets defined[% END %]
                     [% END %]
-                  </div>
-                </li>
-                [% ELSIF preference.key == "sound_set" AND Catalyst.config.domain.audiofile_features %]
-                <li class="ui-state-default">
-                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
-                  <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
-                  <div class="span-10 last">
-                    <select size="1" name="[% preference.key %]" [% IF !edit_preferences %]disabled="disabled"[% END %] />
-                        <option value=""></option>
-                        [% FOREACH option IN preference.value.options %]
-                            <option value="[% option.id %]"
-                                [% IF option.id == preference.value.selected %]
-                                    selected="selected"
-                                [% END %]>
-                                [% option.name %]
-                            </option>
-                        [% END %]
-                    </select>
                   </div>
                 </li>
                 [% ELSIF preference.data_type == "boolean" %]
@@ -227,7 +209,7 @@
                 </div>
               </li>
               [% END %]
-              [% IF preference.error %]<div class="error">[% preference.error %]</div>[% END %]
+              [% IF preference.error %]<li class="error">[% preference.error %]</li>[% END %]
             [% END %]
             </ul>
           [% IF edit_preferences %]

@@ -1,3 +1,19 @@
+ngcp-www-admin (3.4.1) unstable; urgency=low
+
+  [ dtiefnig ]
+  * bilprof_edit.tt: use same locklevel texts as for subscriber lock
+  * subscriber.pm,subscriber_detail.tt: hide active lock level in subscriber lock drop-down
+  * admin.css: add some space above notifications
+  * admin.css,tt/: use <li> instead of <div> for errors in lists
+
+  [ agranig ]
+  * admin.conf,menu,tt/: Remove audiofile_feature config option.
+  * bans.pm,bans_ips.tt,bans_users.tt: Fix IP ban handling and add delete function.
+  * bans.pm: Fix syntax error.
+  * bans_ips.tt,bans_users.tt: Cosmetical fixes.
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Tue, 21 Aug 2012 17:14:08 +0200
+
 ngcp-www-admin (3.4.0) unstable; urgency=low
 
   * added trusted peers frontend

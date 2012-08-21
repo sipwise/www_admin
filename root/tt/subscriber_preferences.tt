@@ -93,24 +93,6 @@
                     [% END %]
                   </div>
                 </li>
-                [% ELSIF preference.key == "sound_set" AND Catalyst.config.domain.audiofile_features %]
-                <li class="ui-state-default">
-                  <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
-                  <div class="span-1"><span class="ui-icon ui-icon-help help" title="[% preference.description %]"></span></div>
-                  <div class="span-10 last">
-                    <select size="1" name="[% preference.key %]" [% IF !edit_preferences %]disabled="disabled"[% END %] />
-                        <option value=""></option>
-                        [% FOREACH option IN preference.value.options %]
-                            <option value="[% option.id %]"
-                                [% IF option.id == preference.value.selected %]
-                                    selected="selected"
-                                [% END %]>
-                                [% option.name %]
-                            </option>
-                        [% END %]
-                    </select>
-                  </div>
-                </li>
                 [% ELSIF preference.data_type == "boolean" %]
                 <li class="ui-state-default">
                   <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
@@ -178,7 +160,7 @@
                 </div>
               </li>
               [% END %]
-              [% IF preference.error %]<div class="error">[% preference.error %]</div>[% END %]
+              [% IF preference.error %]<li class="error">[% preference.error %]</li>[% END %]
             [% END %]
             </ul>
           [% IF edit_preferences %]
@@ -392,7 +374,7 @@
                     value="[% subscriber.voicebox_preferences.password %]" />
                 </div>
               </li>
-              [% IF messages.vpin %]<div class="error">[% messages.vpin %]</div>[% END %]
+              [% IF messages.vpin %]<li class="error">[% messages.vpin %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-4">E-Mail:</div>
                 <div class="span-10 last">
@@ -401,7 +383,7 @@
                     value="[% subscriber.voicebox_preferences.email %]" />
                 </div>
               </li>
-              [% IF messages.vemail %]<div class="error">[% messages.vemail %]</div>[% END %]
+              [% IF messages.vemail %]<li class="error">[% messages.vemail %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-4">Attach WAV:</div>
                 <div class="span-10 last">
@@ -452,7 +434,7 @@
                          value="[% subscriber.fax_preferences.name %]" />
                 </div>
               </li>
-              [% IF messages.faxname %]<li class="ui-state-default"><div class="span-14 error">[% messages.faxname %]</div></li>[% END %]
+              [% IF messages.faxname %]<li class="error">[% messages.faxname %]</li>[% END %]
 
               <li class="ui-state-default">
                 <div class="span-4">Password:</div>
@@ -478,7 +460,7 @@
                 [% END %]
                 </div>
               </li>
-              [% IF messages.faxpass %]<li class="ui-state-default"><div class="span-14 error">[% messages.faxpass %]</div></li>[% END %]
+              [% IF messages.faxpass %]<li class="error">[% messages.faxpass %]</li>[% END %]
 
               <li class="ui-state-default">
                 <div class="span-4">Active:</div>

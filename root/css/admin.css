@@ -369,8 +369,14 @@ display:none;
   color:#fff;
 }
 
-.success {
-  margin-top: 20px;
+.error, .alert, .notice, .success, .info {
+  margin-top: 1em;
+}
+
+/* this is just here to overrule "ul.cleanlist li" */
+ul li.error, ul li.alert, ul li.notice, ul li.success, ul li.info {
+  margin-top: 0.9em;
+  margin-bottom: 1em;
 }
 
 .content li.ui-state-quad {

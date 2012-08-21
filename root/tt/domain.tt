@@ -13,8 +13,6 @@
                 <div class="span-7">
                   [% IF Catalyst.config.domain.preference_features %]
                     <a href="/domain/preferences?domain=[% domain.domain %]">[% domain.domain %]</a>
-                  [% ELSIF Catalyst.config.domain.audiofile_features %]
-                    <a href="/domain/audio?domain=[% domain.domain %]">[% domain.domain %]</a>
                   [% ELSE %]
                     [% domain.domain %]
                   [% END %]

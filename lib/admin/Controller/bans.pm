@@ -41,6 +41,22 @@ sub users : Chained('base') PathPart('users') Args(0) {
     $c->stash->{banned_users} = $banned_users;
 }
 
+sub unban_user : Chained('base') PathPart('unban_user')  Args(0) {
+    my ($self, $c) = @_;
+
+    my $user = $c->request->params->{'user'} || '';
+
+    $c->model('Provisioning')->call_prov(
+        $c,
+        'voip',
+        'unban_user',
+        { user => $user },
+        undef,
+    );
+
+    $c->response->redirect("/bans/users");
+}
+
 sub ips : Chained('base') PathPart('ips') Args(0) {
     my ($self, $c) = @_;
     
@@ -56,6 +72,22 @@ sub ips : Chained('base') PathPart('ips') Args(0) {
     );
     
     $c->stash->{banned_ips} = $banned_ips;
+}
+
+sub unban_ip : Chained('base') PathPart('unban_ip')  Args(0) {
+    my ($self, $c) = @_;
+
+    my $ip = $c->request->params->{'ip'} || '';
+
+    $c->model('Provisioning')->call_prov(
+        $c,
+        'voip',
+        'unban_ip',
+        { ip => $ip },
+        undef,
+    );
+
+    $c->response->redirect("/bans/ips");
 }
 
 # Ends, some people will rob their mothers for the ends ...

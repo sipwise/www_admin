@@ -50,11 +50,11 @@
               </form>
             </li>
             [% IF messages.number_cc OR messages.number_ac OR messages.number_sn %]
-              <div class="error">
+              <li class="error">
                 [% messages.number_cc IF messages.number_cc %]
                 [% messages.number_ac IF messages.number_ac %]
                 [% messages.number_sn IF messages.number_sn %]
-              </div>
+              </li>
             [% END %]
           </ul>
 
