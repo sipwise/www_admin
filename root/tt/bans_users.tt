@@ -17,15 +17,23 @@
     
     <li class="ui-state-default">
         <div class="span-6">Subscriber</div>
-        <div class="prepend-1 span-5 last">Last auth</div>
-        <div class="prepend-1 span-2">Auth count</div>
+        <div class="span-5">Last auth</div>
+        <div class="span-2 last">Auth count</div>
     </li>
 
     [% FOREACH user IN banned_users %]
         <li class="ui-state-default">
             <div class="span-6">[% user.username %]</div>
-            <div class="prepend-1 span-5">[% date.format (user.last_auth) %]</div>
-            <div class="prepend-1 span-2">[% user.auth_count %]</div>
+            <div class="span-5">[% date.format (user.last_auth) %]</div>
+            <div class="span-2">[% user.auth_count %]</div>
+            [% UNLESS Catalyst.session.admin.read_only %]
+              <div class="prepend-2 span-1 last">
+                <form action="/bans/unban_user" method="POST">
+                  <input type="hidden" name="user" value="[% user.username %]"/>
+                  <button class="button-delete">Delete</button>
+                </form>
+              </div>
+            [% END %]
         </li>
     [% END %]
 
