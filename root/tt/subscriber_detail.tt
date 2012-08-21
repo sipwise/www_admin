@@ -51,11 +51,21 @@
           <script language="JavaScript" src="/js/openclose.js" type="text/javascript"></script>
           <a id="lock" href="javascript:;" onclick="javascript:openclose();" onkeypress="javascript:openclose();"><span class="button-lock-sub">Lock</span></a>
           <span id="lock_menu" class="floating" onmouseout="javascript:openclose();">
-            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=none" class="aaction">unlock</a><br />
-            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=foreign" class="aaction">foreign calls</a><br />
-            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=outgoing" class="aaction">all outgoing calls</a><br />
-            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=incoming" class="aaction">incoming and outgoing</a><br />
-            <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=global" class="aaction">global (including CSC)</a><br />
+            [% UNLESS subscriber.lock  == 'none' %]
+              <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=none" class="aaction">unlock</a><br />
+            [% END %]
+            [% UNLESS subscriber.lock  == 'foreign' %]
+              <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=foreign" class="aaction">foreign calls</a><br />
+            [% END %]
+            [% UNLESS subscriber.lock  == 'outgoing' %]
+              <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=outgoing" class="aaction">all outgoing calls</a><br />
+            [% END %]
+            [% UNLESS subscriber.lock  == 'incoming' %]
+              <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=incoming" class="aaction">incoming and outgoing</a><br />
+            [% END %]
+            [% UNLESS subscriber.lock  == 'global' %]
+              <a href="lock?subscriber_id=[% subscriber.subscriber_id %]&amp;lock=global" class="aaction">global (including CSC)</a><br />
+            [% END %]
           </span>
           <a href="terminate?subscriber_id=[% subscriber.subscriber_id %]"><span class="button-terminate">Terminate</span></a>
         [% END %]

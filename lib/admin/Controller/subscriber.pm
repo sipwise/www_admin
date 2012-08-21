@@ -169,6 +169,7 @@ sub detail : Local {
                                                                                          config->{VARIABLES}{site_config}{language},
                                                                                  'Web.Subscriber.Lock'.$$preferences{lock})
             if $$preferences{lock};
+        $c->stash->{subscriber}{lock} = $$preferences{lock} or 'none';
 
     } else {
         $c->stash->{account_id} = $c->request->params->{account_id};
