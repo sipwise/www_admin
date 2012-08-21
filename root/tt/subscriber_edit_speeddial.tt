@@ -40,8 +40,8 @@
                     <button class="button-delete" id="listdel[% sdentry.id %]">Delete</button>
                   </div>
                 </form>
-                [% IF sdentry.error %]</li><li><div class="error">[% sdentry.error %]</div>[% END %]
               </li>
+              [% IF sdentry.error %]<li class="error">[% sdentry.error %]</li>[% END %]
             [% END %]
           [% END %]
 

@@ -160,7 +160,7 @@
                 </div>
               </li>
               [% END %]
-              [% IF preference.error %]<div class="error">[% preference.error %]</div>[% END %]
+              [% IF preference.error %]<li class="error">[% preference.error %]</li>[% END %]
             [% END %]
             </ul>
           [% IF edit_preferences %]
@@ -374,7 +374,7 @@
                     value="[% subscriber.voicebox_preferences.password %]" />
                 </div>
               </li>
-              [% IF messages.vpin %]<div class="error">[% messages.vpin %]</div>[% END %]
+              [% IF messages.vpin %]<li class="error">[% messages.vpin %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-4">E-Mail:</div>
                 <div class="span-10 last">
@@ -383,7 +383,7 @@
                     value="[% subscriber.voicebox_preferences.email %]" />
                 </div>
               </li>
-              [% IF messages.vemail %]<div class="error">[% messages.vemail %]</div>[% END %]
+              [% IF messages.vemail %]<li class="error">[% messages.vemail %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-4">Attach WAV:</div>
                 <div class="span-10 last">
@@ -434,7 +434,7 @@
                          value="[% subscriber.fax_preferences.name %]" />
                 </div>
               </li>
-              [% IF messages.faxname %]<li class="ui-state-default"><div class="span-14 error">[% messages.faxname %]</div></li>[% END %]
+              [% IF messages.faxname %]<li class="error">[% messages.faxname %]</li>[% END %]
 
               <li class="ui-state-default">
                 <div class="span-4">Password:</div>
@@ -460,7 +460,7 @@
                 [% END %]
                 </div>
               </li>
-              [% IF messages.faxpass %]<li class="ui-state-default"><div class="span-14 error">[% messages.faxpass %]</div></li>[% END %]
+              [% IF messages.faxpass %]<li class="error">[% messages.faxpass %]</li>[% END %]
 
               <li class="ui-state-default">
                 <div class="span-4">Active:</div>

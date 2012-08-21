@@ -36,8 +36,8 @@
                          title="CSV field order: [% field_order %]" /> <br />
                 </div>
               </li>
+              [% IF messages.feefileerr %]<li class="error">[% messages.feefileerr %]</li>[% END %]
               <li class="ui-state-default">
-                [% IF messages.feefileerr %]<div class="error">[% messages.feefileerr %]</div>[% END %]
                 <div class="span-5">
                   <input type="checkbox" class="checkbox" id="purge_existing" name="purge_existing"
                          title="remove all existing fees before creating new ones"

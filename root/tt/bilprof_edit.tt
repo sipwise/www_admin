@@ -21,7 +21,7 @@
                   </div><div class="span-6 last">unique identifier string</div>
                 [% END %]
               </li>
-              [% IF messages.handle %]<div class="error">[% messages.handle %]</div>[% END %]
+              [% IF messages.handle %]<li class="error">[% messages.handle %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-3">Name:</div>
                 <div class="span-6">
@@ -32,7 +32,7 @@
                   human readable profile name
                 </div>
               </li>
-              [% IF messages.name %]<div class="error">[% messages.name %]</div>[% END %]
+              [% IF messages.name %]<li class="error">[% messages.name %]</li>[% END %]
               [% IF Catalyst.config.prepaid_features %]
               <li class="ui-state-default">
                 <div class="span-3">prepaid:</div>
@@ -53,7 +53,7 @@
                   base fee charged per billing interval
                 </div>
               </li>
-              [% IF messages.charge %]<div class="error">[% messages.charge %]</div>[% END %]
+              [% IF messages.charge %]<li class="error">[% messages.charge %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-3">Interval Free Time:</div>
                 <div class="span-6">
@@ -64,7 +64,7 @@
                   included time per billing interval
                 </div>
               </li>
-              [% IF messages.free_time %]<div class="error">[% messages.free_time %]</div>[% END %]
+              [% IF messages.free_time %]<li class="error">[% messages.free_time %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-3">Interval Free Cash:</div>
                 <div class="span-6">
@@ -75,7 +75,7 @@
                   included money per billing interval
                 </div>
               </li>
-              [% IF messages.free_cash %]<div class="error">[% messages.free_cash %]</div>[% END %]
+              [% IF messages.free_cash %]<li class="error">[% messages.free_cash %]</li>[% END %]
 
               <li class="ui-state-default">
                 <div class="span-3">Fraud Limit:</div>
@@ -87,7 +87,7 @@
                   fraud detection threshold, per month
                 </div>
               </li>
-              [% IF messages.fraud_interval_limit %]<div class="error">[% messages.fraud_interval_limit %]</div>[% END %]
+              [% IF messages.fraud_interval_limit %]<li class="error">[% messages.fraud_interval_limit %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-3">Fraud Lock:</div>
                 <div class="span-6">
@@ -103,7 +103,7 @@
                   lock accounts if the limit is exceeded
                 </div>
               </li>
-              [% IF messages.fraud_interval_lock %]<div class="error">[% messages.fraud_interval_lock %]</div>[% END %]
+              [% IF messages.fraud_interval_lock %]<li class="error">[% messages.fraud_interval_lock %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-3">Fraud Notify:</div>
                 <div class="span-6">
@@ -114,7 +114,7 @@
                   where e-mail notifications are sent
                 </div>
               </li>
-              [% IF messages.fraud_interval_notify %]<div class="error">[% messages.fraud_interval_notify %]</div>[% END %]
+              [% IF messages.fraud_interval_notify %]<li class="error">[% messages.fraud_interval_notify %]</li>[% END %]
 
               <li class="ui-state-default">
                 <div class="span-3">Currency:</div>
@@ -126,7 +126,7 @@
                   currency symbol or ISO code
                 </div>
               </li>
-              [% IF messages.currency %]<div class="error">[% messages.currency %]</div>[% END %]
+              [% IF messages.currency %]<li class="error">[% messages.currency %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-3">VAT Rate:</div>
                 <div class="span-6">
@@ -137,7 +137,7 @@
                   %
                 </div>
               </li>
-              [% IF messages.vat_rate %]<div class="error">[% messages.vat_rate %]</div>[% END %]
+              [% IF messages.vat_rate %]<li class="error">[% messages.vat_rate %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-3">VAT Included:</div>
                 <div class="span-6">

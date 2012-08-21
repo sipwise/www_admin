@@ -28,7 +28,7 @@
 		</div>
                 [% END %]
               </li>
-	      [% IF messages.destination %]<div class="error">[% messages.destination %]</div>[% END %]
+	      [% IF messages.destination %]<li class="error">[% messages.destination %]</li>[% END %]
 
               <li class="ui-state-default">
                 <div class="span-5">Zone:</div>
@@ -40,7 +40,7 @@
                   existing or new zone name
                 </div>
               </li>
-	      [% IF messages.zone %]<div class="error">[% messages.zone %]</div>[% END %]
+	      [% IF messages.zone %]<li class="error">[% messages.zone %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Zone Detail:</div>
                 <div class="span-6">
@@ -51,7 +51,7 @@
                   existing or new zone detail
 		</div>
               </li>
-	      [% IF messages.zone_detail %]<div class="error">[% messages.zone_detail %]</div>[% END %]
+	      [% IF messages.zone_detail %]<li class="error">[% messages.zone_detail %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Onpeak Init Rate:</div>
                 <div class="span-6">
@@ -62,7 +62,7 @@
                   rate in cent per second
                 </div>
               </li>
-	      [% IF messages.onpeak_init_rate %]<div class="error">[% messages.onpeak_init_rate %]</div>[% END %]
+	      [% IF messages.onpeak_init_rate %]<li class="error">[% messages.onpeak_init_rate %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Onpeak Init Interval:</div>
                 <div class="span-6">
@@ -73,7 +73,7 @@
                   interval in seconds
                 </div>
               </li>
-	      [% IF messages.onpeak_init_interval %]<div class="error">[% messages.onpeak_init_interval %]</div>[% END %]
+	      [% IF messages.onpeak_init_interval %]<li class="error">[% messages.onpeak_init_interval %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Onpeak Follow Rate:</div>
                 <div class="span-6">
@@ -84,7 +84,7 @@
                   rate in cent per second
                 </div>
               </li>
-	      [% IF messages.onpeak_follow_rate %]<div class="error">[% messages.onpeak_follow_rate %]</div>[% END %]
+	      [% IF messages.onpeak_follow_rate %]<li class="error">[% messages.onpeak_follow_rate %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Onpeak Follow Interval:</div>
                 <div class="span-6">
@@ -95,7 +95,7 @@
                   interval in seconds
                 </div>
               </li>
-	      [% IF messages.onpeak_follow_interval %]<div class="error">[% messages.onpeak_follow_interval %]</div>[% END %]
+	      [% IF messages.onpeak_follow_interval %]<li class="error">[% messages.onpeak_follow_interval %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Offpeak Init Rate:</div>
                 <div class="span-6">
@@ -106,7 +106,7 @@
                   rate in cent per second
                 </div>
               </li>
-	      [% IF messages.offpeak_init_rate %]<div class="error">[% messages.offpeak_init_rate %]</div>[% END %]
+	      [% IF messages.offpeak_init_rate %]<li class="error">[% messages.offpeak_init_rate %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Offpeak Init Interval:</div>
                 <div class="span-6">
@@ -117,7 +117,7 @@
                   interval in seconds
                 </div>
               </li>
-	      [% IF messages.offpeak_init_interval %]<div class="error">[% messages.offpeak_init_interval %]</div>[% END %]
+	      [% IF messages.offpeak_init_interval %]<li class="error">[% messages.offpeak_init_interval %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Offpeak Follow Rate:</div>
                 <div class="span-6">
@@ -128,7 +128,7 @@
                   rate in cent per seconds
                 </div>
               </li>
-	      [% IF messages.offpeak_follow_rate %]<div class="error">[% messages.offpeak_follow_rate %]</div>[% END %]
+	      [% IF messages.offpeak_follow_rate %]<li class="error">[% messages.offpeak_follow_rate %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Offpeak Follow Interval:</div>
                 <div class="span-6">
@@ -139,7 +139,7 @@
                   interval in seconds
                 </div>
               </li>
-	      [% IF messages.offpeak_follow_interval %]<div class="error">[% messages.offpeak_follow_interval %]</div>[% END %]
+	      [% IF messages.offpeak_follow_interval %]<li class="error">[% messages.offpeak_follow_interval %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Use Free Time:</div>
                 <div class="span-6 last">

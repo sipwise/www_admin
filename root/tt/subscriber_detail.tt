@@ -107,7 +107,7 @@
                 [% END %]
                 </div>
               </li>
-              [% IF messages.webusername %]<div class="error">[% messages.webusername %]</div>[% END %]
+              [% IF messages.webusername %]<li class="error">[% messages.webusername %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Web Password:</div>
                 <div class="span-10">
@@ -130,7 +130,7 @@
                   [% END %]
                 [% END %]
               </li>
-              [% IF messages.webpassword %]<div class="error">[% messages.webpassword %]</div>[% END %]
+              [% IF messages.webpassword %]<li class="error">[% messages.webpassword %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">E.164 Number:</div>
                 [% IF edit_subscriber %]
@@ -158,10 +158,10 @@
                   </div>
                 [% END %]
               </li>
-              [% IF messages.number %]<div class="error">[% messages.number %]</div>[% END %]
-              [% IF messages.number_cc %]<div class="error">[% messages.number_cc %]</div>[% END %]
-              [% IF messages.number_ac %]<div class="error">[% messages.number_ac %]</div>[% END %]
-              [% IF messages.number_sn %]<div class="error">[% messages.number_sn %]</div>[% END %]
+              [% IF messages.number %]<li class="error">[% messages.number %]</li>[% END %]
+              [% IF messages.number_cc %]<li class="error">[% messages.number_cc %]</li>[% END %]
+              [% IF messages.number_ac %]<li class="error">[% messages.number_ac %]</li>[% END %]
+              [% IF messages.number_sn %]<li class="error">[% messages.number_sn %]</li>[% END %]
 
               <li class="ui-state-default">
                 <div class="span-5">Alias Numbers:</div>
@@ -227,7 +227,7 @@
                   [% END %]
                 [% END %]
               </li>
-              [% IF messages.password %]<div class="error">[% messages.password %]</div>[% END %]
+              [% IF messages.password %]<li class="error">[% messages.password %]</li>[% END %]
               <li class="ui-state-default">
                 <div class="span-5">Administrative:</div>
                 <div class="span-11 last">

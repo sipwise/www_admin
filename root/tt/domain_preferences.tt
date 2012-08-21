@@ -94,7 +94,7 @@
                   [% END %]
                   </div>
                 </li>
-                [% IF preference.value.error %]<div class="error">[% preference.value.error %]</div>[% END %]
+                [% IF preference.value.error %]<li class="error">[% preference.value.error %]</li>[% END %]
                 [% ELSIF preference.key == "ncos" || preference.key == "adm_ncos"%]
                 <li class="ui-state-default">
                   <div class="span-5" title="[% preference.description %]">[% preference.key %]:</div>
@@ -206,7 +206,7 @@
                 </div>
               </li>
               [% END %]
-              [% IF preference.error %]<div class="error">[% preference.error %]</div>[% END %]
+              [% IF preference.error %]<li class="error">[% preference.error %]</li>[% END %]
             [% END %]
             </ul>
           [% IF edit_preferences %]
