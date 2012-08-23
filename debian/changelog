@@ -1,3 +1,16 @@
+ngcp-www-admin (3.4.2) unstable; urgency=low
+
+  [ mprokop ]
+  * rules,admin.pm: Adjust VERSION string on the fly during package build
+
+  [ agranig ]
+  * domain_preferences.tt,peering_preferences.tt,subscriber_preferences.tt: Partly revert r10429.
+
+  [ cveigl ]
+  * admin.pm: remove debug-switch
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Thu, 23 Aug 2012 21:21:53 +0200
+
 ngcp-www-admin (3.4.1) unstable; urgency=low
 
   [ dtiefnig ]
