@@ -31,6 +31,8 @@ Verify user is logged in.
 sub auto : Private {
     my ($self, $c) = @_;
 
+    $c->stash->{build_version} = $admin::BUILD_VERSION;
+
     if ($c->controller =~ /^admin::Controller::Root\b/
         or $c->controller =~ /^admin::Controller::login\b/)
     {
