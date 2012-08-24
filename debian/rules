@@ -10,13 +10,16 @@
 # export DH_VERBOSE=1
 
 b=$(CURDIR)/debian/build
-VERSION:=$(shell dpkg-parsechangelog | awk '/Version: / { print $$2 }')
+VERSION:=$(shell dpkg-parsechangelog | awk '/Version: / { print $$2 }' | sed 's/+.*//')
+BUILD_VERSION:=$(shell dpkg-parsechangelog | awk '/Version: / { print $$2 }')
 
 build: build-stamp
 
 build-stamp:
 	dh_testdir
-	egrep -q "VERSION = 'UNRELEASED'" lib/admin.pm || \
+	egrep -q "\$VERSION = 'VERSION'" lib/admin.pm || \
+                          (echo "Wrong version in lib/csc.pm" && exit 2)
+	egrep -q "\$BUILD_VERSION = 'BUILD_VERSION'" lib/admin.pm || \
                           (echo "Wrong version in lib/csc.pm" && exit 2)
 	mkdir -p pro/etc/ngcp-www-admin pro/etc/apache2/sites-available
 	mkdir -p ce/etc/ngcp-www-admin ce/etc/apache2/sites-available
@@ -47,7 +50,8 @@ ngcp-www-admin:
 	dh_installdocs       -p$@ -P$(b)/$@
 	dh_installchangelogs -p$@ -P$(b)/$@
 	dh_install           -p$@ -P$(b)/$@
-	sed -i -e "s/VERSION = 'UNRELEASED'/VERSION = '$(VERSION)'/" $(b)/$@/usr/share/ngcp-www-admin/lib/admin.pm
+	sed -i -e "s/VERSION = 'VERSION'/VERSION = '$(VERSION)'/" $(b)/$@/usr/share/ngcp-www-admin/lib/admin.pm
+	sed -i -e "s/BUILD_VERSION = 'BUILD_VERSION'/BUILD_VERSION = '$(BUILD_VERSION)'/" $(b)/$@/usr/share/ngcp-www-admin/lib/admin.pm
 	dh_installexamples   -p$@ -P$(b)/$@
 	dh_installman        -p$@ -P$(b)/$@
 	# drop svn files:
