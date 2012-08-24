@@ -1,3 +1,10 @@
+ngcp-www-admin (3.4.4) UNRELEASED; urgency=low
+
+  [ Christian Veigl ]
+  * check if peering rule already exists beforehand (mantis:1873)
+
+ -- Michael Prokop <mprokop@sipwise.com>  Fri, 24 Aug 2012 19:01:20 +0200
+
 ngcp-www-admin (3.4.3) unstable; urgency=low
 
   [ Michael Prokop ]
