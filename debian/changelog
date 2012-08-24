@@ -1,3 +1,14 @@
+ngcp-www-admin (3.4.3) unstable; urgency=low
+
+  [ Michael Prokop ]
+  * Update debian packaging regarding VERSION/BUILD_VERSION
+
+  [ Christian Veigl ]
+  * fix precedence hickup
+  * make $admin::VERSION UNIVERSAL-compatible
+
+ -- Michael Prokop <mprokop@sipwise.com>  Fri, 24 Aug 2012 18:38:23 +0200
+
 ngcp-www-admin (3.4.2) unstable; urgency=low
 
   [ mprokop ]

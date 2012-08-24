@@ -21,7 +21,11 @@ use Catalyst qw/ConfigLoader Static::Simple Unicode
                 Session Session::Store::FastMmap Session::State::Cookie
                /;
 
-our $VERSION = 'UNRELEASED';
+# $VERSION and $BUILD_VERSION will be set during the build-process of the debian package
+# In addition to the known $VERSION the variable $BUILD_VERSION may contain more information
+# about the build. A much more relaxed syntax is possible here. See also: debian/rules.
+our $VERSION = 'VERSION';
+our $BUILD_VERSION = 'BUILD_VERSION';
 
 # Configure the application. 
 #
