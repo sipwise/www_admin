@@ -250,6 +250,7 @@ sub save_rule : Local {
     
     if (my ($tmp_rule) = grep ({
             ($_->{callee_prefix}  eq $settings->{callee_prefix}) and
+            ($_->{callee_pattern} eq $settings->{callee_pattern}) and
             ($_->{caller_pattern} eq $settings->{caller_pattern})
         } @{$peer_details->{rules}}))
     {
