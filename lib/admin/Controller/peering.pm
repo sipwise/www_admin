@@ -248,12 +248,13 @@ sub save_rule : Local {
           \$peer_details
     );
     
-    if (scalar grep ({
+    if (my ($tmp_rule) = grep ({
             ($_->{callee_prefix}  eq $settings->{callee_prefix}) and
             ($_->{caller_pattern} eq $settings->{caller_pattern})
         } @{$peer_details->{rules}}))
     {
-        $messages{erulerr} = 'Client.Voip.DuplicatePeeringRule';
+        $messages{erulerr} = 'Client.Voip.DuplicatePeeringRule'
+            unless defined $rule_id and $$tmp_rule{id} == $rule_id;
 
     }
 
