@@ -1,3 +1,19 @@
+ngcp-www-admin (3.4.5) unstable; urgency=low
+
+  [ dtiefnig ]
+  * peering.pm: don't treat peering rule updates as duplicates
+  * peering.pm: also check callee pattern to detect duplicates
+  * peering_detail.tt: fix layout for peering servers and rules
+  * rewrite_detail.tt: fix layout for rewrite rules and optimize space usage
+
+  [ agranig ]
+  * admin.conf,Utils.pm: Add asterisk to call graphs.
+
+  [ apogrebennyk ]
+  * account_detail.tt: replace hardcoded Euro currency with account.currency
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Fri, 31 Aug 2012 21:16:15 +0200
+
 ngcp-www-admin (3.4.4) UNRELEASED; urgency=low
 
   [ Christian Veigl ]
