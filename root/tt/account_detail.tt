@@ -155,7 +155,7 @@
                     add
                     <input type="text" name="add_cash" value="[% balanceadd.cash %]"
                            title="amount of money to add, float" />
-                    Euro
+                    [% account.currency %]
                 [% END %]
                 </div>
               </li>
