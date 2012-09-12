@@ -26,6 +26,7 @@
       <h2> Rewrite Rule Set [% set.rewrite_set.name %] </h2>
 
       <a href="/rewrite"><span class="button-back">Back</span></a><br /><br />
+      <p>Very long entries are truncated and suffixed with "...". Hoover over them to see the full entry.</p>
 
         [%
           rewrites = [
@@ -125,9 +126,10 @@
                       <a href="/rewrite/detail?set_id=[% set.rewrite_set.id %]#[% rw.id %]"><span class="button-cancel">Cancel</span></a>
                   </div>
                 [% ELSE %]
-                  <div class="span-5">[% rule.match_pattern %]</div>
-                  <div class="span-5">[% rule.replace_pattern %]</div>
-                  <div class="span-4">[% rule.description %]</div>
+                  <div class="span-5" title="[% rule.match_pattern %]">[% PROCESS shorten string = rule.match_pattern %]</div>
+                  <div class="span-5" title="[% rule.replace_pattern %]">[% PROCESS shorten string = rule.replace_pattern %]</div>
+                  <div class="span-4" title="[% rule.description %]" class="span-5">[% PROCESS shorten string = rule.description %]</div>
+
                   <div class="span-1">
                   [% UNLESS Catalyst.session.admin.read_only %]
                       <a href="/rewrite/detail?set_id=[% set.rewrite_set.id %]&editid=[% rule.id %]#[% rw.id %]"><span class="button-edit">Edit</span></a>
@@ -181,4 +183,12 @@
             [% END %]
 
         [% END %]
+
+[% BLOCK shorten %]
+    [% IF string.length > 20 %]
+        [% string.substr(0, 20) _ '...' %]
+    [% ELSE %]
+        [% string %]
+    [% END %]
+[% END %]
 
