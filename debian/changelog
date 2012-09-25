@@ -1,4 +1,9 @@
-ngcp-www-admin (3.4.5) unstable; urgency=low
+ngcp-www-admin (3.4.4) unstable; urgency=low
+
+  [ Christian Veigl ]
+  * peering.pm: check if peering rule already exists beforehand
+  * rewrite_detail.tt: truncate long patterns and suffix with "..."
+  * bans_ips.tt: access the actual ip with the correct key
 
   [ dtiefnig ]
   * peering.pm: don't treat peering rule updates as duplicates
@@ -12,14 +17,7 @@ ngcp-www-admin (3.4.5) unstable; urgency=low
   [ apogrebennyk ]
   * account_detail.tt: replace hardcoded Euro currency with account.currency
 
- -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Fri, 31 Aug 2012 21:16:15 +0200
-
-ngcp-www-admin (3.4.4) UNRELEASED; urgency=low
-
-  [ Christian Veigl ]
-  * check if peering rule already exists beforehand (mantis:1873)
-
- -- Michael Prokop <mprokop@sipwise.com>  Fri, 24 Aug 2012 19:01:20 +0200
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 26 Sep 2012 01:43:14 +0200
 
 ngcp-www-admin (3.4.3) unstable; urgency=low
 
