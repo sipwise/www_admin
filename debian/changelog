@@ -1,3 +1,24 @@
+ngcp-www-admin (3.4.4) unstable; urgency=low
+
+  [ Christian Veigl ]
+  * peering.pm: check if peering rule already exists beforehand
+  * rewrite_detail.tt: truncate long patterns and suffix with "..."
+  * bans_ips.tt: access the actual ip with the correct key
+
+  [ dtiefnig ]
+  * peering.pm: don't treat peering rule updates as duplicates
+  * peering.pm: also check callee pattern to detect duplicates
+  * peering_detail.tt: fix layout for peering servers and rules
+  * rewrite_detail.tt: fix layout for rewrite rules and optimize space usage
+
+  [ agranig ]
+  * admin.conf,Utils.pm: Add asterisk to call graphs.
+
+  [ apogrebennyk ]
+  * account_detail.tt: replace hardcoded Euro currency with account.currency
+
+ -- Daniel Tiefnig <dtiefnig@sipwise.com>  Wed, 26 Sep 2012 01:43:14 +0200
+
 ngcp-www-admin (3.4.3) unstable; urgency=low
 
   [ Michael Prokop ]

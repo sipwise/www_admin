@@ -645,6 +645,7 @@ sub process_callmap {
       $c->config->{sipstats}->{lb_ext}, 'lb',
       $c->config->{sipstats}->{proxy},  'proxy',
       $c->config->{sipstats}->{sbc},    'sbc',
+      $c->config->{sipstats}->{app},    'app',
     );
 
     my $canvas_margin = 100; # enough free space around diagram for text etc
@@ -697,7 +698,7 @@ sub process_callmap {
         push @uas, $packet->{dst_ip}.':'.$packet->{dst_port};
       }
     }
-    push @uas, ('lb', 'sbc', 'proxy');
+    push @uas, ('lb', 'sbc', 'proxy', 'app');
 
     ### calculate x position of all uas
     my %uas_pos_x = ();

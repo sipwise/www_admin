@@ -241,10 +241,28 @@ sub save_rule : Local {
         $c->flash->{rule_caller_pattern_err_detail} = $c->session->{prov_error_object} if ($c->session->{prov_error_object});
     }
 
+    # check if peering rule already exists beforehand
+    my $peer_details;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_peer_group_details',
+	    { id => $group_id },
+          \$peer_details
+    );
+    
+    if (my ($tmp_rule) = grep ({
+            ($_->{callee_prefix}  eq $settings->{callee_prefix}) and
+            ($_->{callee_pattern} eq $settings->{callee_pattern}) and
+            ($_->{caller_pattern} eq $settings->{caller_pattern})
+        } @{$peer_details->{rules}}))
+    {
+        $messages{erulerr} = 'Client.Voip.DuplicatePeeringRule'
+            unless defined $rule_id and $$tmp_rule{id} == $rule_id;
+
+    }
+
     if (keys %messages) {
         $c->session->{messages} = \%messages;
         $c->flash->{restore_rule} = $settings;
-    
+
         if (defined $rule_id and length ($rule_id)) {
             $c->response->redirect("/peering/detail?group_id=$group_id&reditid=$rule_id");
         }
@@ -277,12 +295,13 @@ sub save_rule : Local {
     if ($result) {
         $messages{erulmsg} = 'Server.Voip.SavedSettings';
         $c->session->{messages} = \%messages;
-        $c->response->redirect("/peering/detail?group_id=$group_id");
-        return;
 	}
 	else {
+        $c->flash->{restore_rule} = $settings;
     	$messages{erulerr} = 'Client.Voip.InputErrorFound';
 	}
+    
+    $c->response->redirect("/peering/detail?group_id=$group_id");
 }
 
 =head2 delete_rule
