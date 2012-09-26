@@ -26,7 +26,7 @@
       <h2> Rewrite Rule Set [% set.rewrite_set.name %] </h2>
 
       <a href="/rewrite"><span class="button-back">Back</span></a><br /><br />
-      <p>Very long entries are truncated and suffixed with "...". Hoover over them to see the full entry.</p>
+      <p>Very long entries are truncated and suffixed with "...". Hover over them to see the full entry.</p>
 
         [%
           rewrites = [
