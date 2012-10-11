@@ -167,6 +167,7 @@ sub packet : Local {
       localtime($pkg->{timestamp});
     my $tstamp = sprintf("%04i-%02i-%02i %02i:%02i:%02i.%03i",
       $year+1900, $mon+1, $mday, $hour, $min, $sec, int(($pkg->{timestamp}-int($pkg->{timestamp}))*1000));
+    utf8::decode($pkg->{payload});
     $pkg->{payload} = encode_entities($pkg->{payload});
     $pkg->{payload} =~ s/\r//g;
     $pkg->{payload} =~ s/([^\n]{120})/$1<br\/>/g;
