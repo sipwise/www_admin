@@ -228,15 +228,15 @@ sub save_rule : Local {
     $settings->{callee_pattern} =~ s/^\s+|\s+$//g;
     $settings->{caller_pattern} =~ s/^\s+|\s+$//g;
 
-    unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_prefix', $settings->{callee_prefix}, \$checkresult)) {
+    unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_prefix', { prefix => $settings->{callee_prefix} }, \$checkresult)) {
         $messages{rule_callee_prefix_err} = 'Client.Syntax.MalformedUri';
         $c->flash->{rule_callee_prefix_err_detail} = $c->session->{prov_error_object} if ($c->session->{prov_error_object});
     }
-    unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_pattern', $settings->{callee_pattern}, \$checkresult)) {
+    unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_pattern', { pattern => $settings->{callee_pattern} }, \$checkresult)) {
         $messages{rule_callee_pattern_err} = 'Client.Syntax.MalformedUri';
         $c->flash->{rule_callee_pattern_err_detail} = $c->session->{prov_error_object} if ($c->session->{prov_error_object});
     }
-    unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_pattern', $settings->{caller_pattern}, \$checkresult)) {
+    unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_pattern', { pattern =>$settings->{caller_pattern} }, \$checkresult)) {
         $messages{rule_caller_pattern_err} = 'Client.Syntax.MalformedUri';
         $c->flash->{rule_caller_pattern_err_detail} = $c->session->{prov_error_object} if ($c->session->{prov_error_object});
     }

@@ -230,13 +230,13 @@ sub update_subscriber : Local {
 
         $$subscriber{username} = $c->request->params->{username};
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_username',
-                                                            $$subscriber{username}, \$checkresult
+                                                            { username => $$subscriber{username}}, \$checkresult
                                                           );
         $messages{username} = 'Client.Syntax.MalformedUsername' unless($checkresult);
 
         $$subscriber{domain} = $c->request->params->{domain};
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_domain',
-                                                            $$subscriber{domain}, \$checkresult
+                                                            { domain => $$subscriber{domain} }, \$checkresult
                                                           );
         $messages{domain} = 'Client.Syntax.MalformedDomain' unless($checkresult);
     }
@@ -266,7 +266,7 @@ sub update_subscriber : Local {
     if(length $settings{webusername}) {
         my $checkresult;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_username',
-                                                            $settings{webusername}, \$checkresult
+                                                            { username => $settings{webusername} }, \$checkresult
                                                           );
         $messages{webusername} = 'Client.Syntax.MalformedUsername' unless($checkresult);
     } else {
@@ -283,17 +283,17 @@ sub update_subscriber : Local {
         $settings{sn} = $sn;
         my $checkresult;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
-                                                            $cc, \$checkresult
+                                                            { cc => $cc }, \$checkresult
                                                           );
         $messages{number_cc} = 'Client.Voip.MalformedCc'
             unless $checkresult;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
-                                                            $ac, \$checkresult
+                                                            { ac => $ac }, \$checkresult
                                                           );
         $messages{number_ac} = 'Client.Voip.MalformedAc'
             unless $checkresult;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sn',
-                                                            $sn, \$checkresult
+                                                            { sn => $sn }, \$checkresult
                                                           );
         $messages{number_sn} = 'Client.Voip.MalformedSn'
             unless $checkresult;
@@ -428,17 +428,17 @@ sub do_edit_aliases : Local {
         my $checkresult;
 
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
-                                                            $cc, \$checkresult
+                                                            { cc => $cc }, \$checkresult
                                                           );
         $messages{number_cc} = 'Client.Voip.MalformedCc'
             unless $checkresult;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
-                                                            $ac, \$checkresult
+                                                            { ac => $ac }, \$checkresult
                                                           );
         $messages{number_ac} = 'Client.Voip.MalformedAc'
             unless $checkresult;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sn',
-                                                            $sn, \$checkresult
+                                                            { sn => $sn }, \$checkresult
                                                           );
         $messages{number_sn} = 'Client.Voip.MalformedSn'
             unless $checkresult;
@@ -909,7 +909,7 @@ sub update_preferences : Local {
             if ($$db_pref{preference} eq $_) {
                 $$preferences{$_} = $c->request->params->{$_} or undef;
                 my $checkresult;
-                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username', $$preferences{$_}, \$checkresult);
+                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username', { sip_username => $$preferences{$_} }, \$checkresult);
                 $messages{$_} = 'Client.Syntax.InvalidSipUsername'
                     unless $checkresult;
             }
@@ -920,7 +920,7 @@ sub update_preferences : Local {
             if(defined $$preferences{$$db_pref{preference}}) {
                 my $checkresult;
                 return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
-                                                                    $$preferences{$$db_pref{preference}}, \$checkresult
+                                                                    { cc => $$preferences{$$db_pref{preference}} }, \$checkresult
                                                                   );
                 $messages{$$db_pref{preference}} = 'Client.Voip.MalformedCc'
                     unless $checkresult;
@@ -933,7 +933,7 @@ sub update_preferences : Local {
             if(defined $$preferences{$$db_pref{preference}}) {
                 my $checkresult;
                 return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
-                                                                    $$preferences{$$db_pref{preference}}, \$checkresult
+                                                                    { ac => $$preferences{$$db_pref{preference}} }, \$checkresult
                                                                   );
                 $messages{$$db_pref{preference}} = 'Client.Voip.MalformedAc'
                     unless $checkresult;
@@ -1156,7 +1156,7 @@ sub update_voicebox : Local {
     if(defined $$vboxprefs{email} and length $$vboxprefs{email}) {
         my $checkresult;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_email',
-                                                            $$vboxprefs{email}, \$checkresult
+                                                            { email => $$vboxprefs{email} }, \$checkresult
                                                           );
         $messages{vemail} = 'Client.Syntax.Email' unless($checkresult);
     } else {
@@ -1723,8 +1723,8 @@ sub edit_cf_savedst : Local {
     if($fw_target_select eq 'sipuri') {
         $fw_target = $c->request->params->{'dest_sipuri'};
 
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri', $fw_target, \$check_sip_uri);
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username', $fw_target, \$check_sip_username);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri', { sip_uri => $fw_target }, \$check_sip_uri);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username', { sip_username => $fw_target }, \$check_sip_username);
 
         $messages{edesterr} = 'Client.Voip.MalformedTarget'
             unless ($check_sip_uri or $check_sip_username);
@@ -2320,14 +2320,14 @@ sub save_trusted_source : Local {
     }
 
     my ( %messages, $checkresult );
-    $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ip', $ts{src_ip}, \$checkresult);
+    $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ip', { ip => $ts{src_ip} }, \$checkresult);
     $messages{src_ip_err} = 'Client.Syntax.MalformedIP' unless $checkresult;
 
-    $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_transport_protocol', $ts{protocol}, \$checkresult);
+    $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_transport_protocol', { protocol => $ts{protocol} }, \$checkresult);
     $messages{protocol_err} = 'Client.Syntax.UnknownProtocol' unless $checkresult;
 
     if (length $ts{from_pattern}) { # allow empty sipuri
-        unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_pattern', $ts{from_pattern}, \$checkresult)) {
+        unless ($c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri_pattern', { pattern => $ts{from_pattern} }, \$checkresult)) {
             $messages{from_pattern_err} = 'Client.Syntax.MalformedUri';
             $c->flash->{from_pattern_err_detail} = $c->session->{prov_error_object} if ($c->session->{prov_error_object});
         }
@@ -2505,7 +2505,7 @@ sub do_edit_list : Local {
     if (defined $add) { # input text field to add new entry to block list
         my $checkresult;
         $add =~ s/ //g;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username_shell_pattern', $add, \$checkresult);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username_shell_pattern', { pattern => $add }, \$checkresult);
 
         if ($checkresult) {
             my $blocklist = $$preferences{$list};
@@ -2632,7 +2632,7 @@ sub do_edit_iplist : Local {
     my $add = $c->request->params->{list_add};
     if(defined $add) {
         my $checkresult;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ipnet', $add, \$checkresult);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ipnet', { ipnet => $add }, \$checkresult);
         if($checkresult) {
             my $iplist = $$preferences{$list};
             $iplist = [] unless defined $iplist;
@@ -2773,9 +2773,9 @@ sub do_edit_speed_dial_slots : Local {
 
         my ($check_slot, $check_sip_username, $check_sip_uri);
         
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $add_slot, \$check_slot);
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri', $add_destination, \$check_sip_uri);
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username', $add_destination, \$check_sip_username);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', { slot => $add_slot }, \$check_slot);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_uri', { sip_uri => $add_destination }, \$check_sip_uri);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username', { sip_username => $add_destination }, \$check_sip_username);
 
         if ($check_slot and ($check_sip_username or $check_sip_uri)) {
             $c->model('Provisioning')->call_prov( $c, 'voip', 'create_speed_dial_slot',
@@ -2823,13 +2823,13 @@ sub do_edit_speed_dial_slots : Local {
     if(defined $update_slotid) {
 
         my $checkupdate_slot;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', $update_slot, \$checkupdate_slot);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_vsc_format', { slot => $update_slot }, \$checkupdate_slot);
         my $checkupdate_destination;
         my $destination;
         if ($update_destination =~ /^\+?\d+$/) {
             $update_destination = admin::Utils::get_qualified_number_for_subscriber($c, $update_destination);
             my $checkresult;
-            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $update_destination, \$checkresult);
+            return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', { e164number => $update_destination }, \$checkresult);
             $destination = 'sip:'. $update_destination .'@'. $$subscriber{domain}
                 if $checkresult;
         } else {
@@ -3013,9 +3013,9 @@ sub do_edit_destlist : Local {
         my $checkresult;
         if($add =~ /^\+?\d+$/) {
           $add = admin::Utils::get_qualified_number_for_subscriber($c, $add);
-          return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $add, \$checkresult);
+          return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', { e164number => $add }, \$checkresult);
         } else {
-          return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_email', $add, \$checkresult);
+          return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_email', { email => $add }, \$checkresult);
         }
         unless($checkresult) {
             $messages{msgadd} = 'Client.Voip.MalformedFaxDestination';

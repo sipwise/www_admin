@@ -204,7 +204,7 @@ sub create_customer : Local {
         $settings{shopuser} = $c->request->params->{shopuser};
         my $checkresult;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_username',
-                                                            $settings{shopuser}, \$checkresult
+                                                            { username => $settings{shopuser} }, \$checkresult
                                                           );
         $messages{username} = 'Client.Syntax.MalformedUsername' unless $checkresult;
     } elsif(length $c->request->params->{shoppass}) {
@@ -274,7 +274,7 @@ sub update_customer : Local {
         $settings{shopuser} = $c->request->params->{shopuser};
         my $checkresult;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_username',
-                                                            $settings{shopuser}, \$checkresult
+                                                            { username => $settings{shopuser} }, \$checkresult
                                                           );
         $messages{username} = 'Client.Syntax.MalformedUsername' unless $checkresult;
     } elsif(length $c->request->params->{shoppass}) {

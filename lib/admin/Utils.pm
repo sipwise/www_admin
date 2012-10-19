@@ -337,7 +337,7 @@ sub prepare_db_prefs {
                 if($fw_target =~ /^\+?\d+$/) {
                     $fw_target = admin::Utils::get_qualified_number_for_subscriber($c, $fw_target);
                     my $checkresult;
-                    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $fw_target, \$checkresult);
+                    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', { e164number => $fw_target }, \$checkresult);
                     $c->session->{messages}{$fwtype} = 'Client.Voip.MalformedNumber'
                         unless $checkresult;
                 } elsif($fw_target =~ /^[a-z0-9&=+\$,;?\/_.!~*'()-]+\@[a-z0-9.-]+(:\d{1,5})?$/i) {
@@ -365,7 +365,7 @@ sub prepare_db_prefs {
             if(defined $$preferences{cli} and $$preferences{cli} =~ /^\+?\d+$/) {
                 $$preferences{cli} = admin::Utils::get_qualified_number_for_subscriber($c, $$preferences{cli});
                 my $checkresult;
-                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', $$preferences{cli}, \$checkresult);
+                return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_E164_number', { e164number => $$preferences{cli} }, \$checkresult);
                 $c->session->{messages}{cli} = 'Client.Voip.MalformedNumber'
                     unless $checkresult;
             }
@@ -374,7 +374,7 @@ sub prepare_db_prefs {
             if(defined $$preferences{$$db_pref{preference}}) {
                 my $checkresult;
                 return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_cc',
-                                                                    $$preferences{$$db_pref{preference}}, \$checkresult
+                                                                    { cc => $$preferences{$$db_pref{preference}} }, \$checkresult
                                                                   );
                 $c->session->{messages}{$$db_pref{preference}} = 'Client.Voip.MalformedCc'
                     unless $checkresult;
@@ -387,7 +387,7 @@ sub prepare_db_prefs {
             if(defined $$preferences{$$db_pref{preference}}) {
                 my $checkresult;
                 return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ac',
-                                                                    $$preferences{$$db_pref{preference}}, \$checkresult
+                                                                    { ac => $$preferences{$$db_pref{preference}} }, \$checkresult
                                                                   );
                 $c->session->{messages}{$$db_pref{preference}} = 'Client.Voip.MalformedAc'
                     unless $checkresult;
@@ -528,7 +528,7 @@ sub addel_iplist {
 
     if(defined $add) {
         my $checkresult;
-        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ipnet', $add, \$checkresult);
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_ipnet', { ipnet => $add }, \$checkresult);
         if($checkresult) {
             my $iplist = $$preferences{$list};
             $iplist = [] unless defined $iplist;
