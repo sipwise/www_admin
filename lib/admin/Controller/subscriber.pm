@@ -574,7 +574,7 @@ sub add_permanent_contact : Local {
     my $subscriber_id = $c->request->params->{subscriber_id};
     my $contact = $c->request->params->{contact};
 
-    unless($contact =~ /^sip\:[a-zA-Z0-9\-\_\.\!\~\*\'\(\)\%\+]+\@[a-zA-Z0-9\-\.\[\]\:]+(\:\d{1,5})?$/) {
+    unless($contact =~ /^sip\:[a-zA-Z0-9\-\_\.\!\~\*\'\(\)\%\+]+(:.+?)?\@[a-zA-Z0-9\-\.\[\]\:]+(\:\d{1,5})?(;[^;=?]+?=[^;=?]+?)*(\?[^;=?]+?=[^;=?]+?(&[^;=?]+?=[^;=?]+?)?)?$/) {
         $c->session->{messages}{conterr} = 'Client.Syntax.MalformedUri';
         $c->response->redirect("/subscriber/detail?subscriber_id=$subscriber_id#activeregs");
         return;
