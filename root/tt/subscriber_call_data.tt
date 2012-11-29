@@ -1,4 +1,11 @@
-        <h3> Subscriber
+<script type="text/javascript">
+  $(function() {
+    [% FOREACH i IN [0 .. cdr_list.max] %]
+    $('#cdrdialog[% i %]').dialog({autoOpen:false, width:640, title:'CDR Details'});
+    [% END %]
+  });
+</script>
+       <h3> Subscriber
           <a class="noarrow" href="detail?subscriber_id=[% subscriber.subscriber_id %]">
             [% subscriber.username %]@[% subscriber.domain %]</a>
         </h3>
@@ -30,6 +37,21 @@
             <img src="/static/images/anruf_aus_err_small.gif" width="14" height="13" alt=""> failed
           </p>
 
+          [% FOREACH i IN [0 .. call_list.max] %]
+	  [% 
+	      cdrentry = cdr_list.$i
+	  %]
+            <div id="cdrdialog[% i %]">
+	      <table>
+              [% FOREACH key IN cdrentry.keys.sort %]
+              <tr>
+                <td>[% key %]:</td><td>[% cdrentry.$key %]</td>
+              </tr>
+              [% END %]
+	      </table>
+            </div>
+          [% END %]
+
           <table class="calllist">
 
           [% IF call_list %]
@@ -42,9 +64,14 @@
               <td class="callfee">charges</td>
             [% END %]
               <td class="calldate">date</td>
+              <td/>
             </tr>
 
-            [% FOREACH callentry = call_list %]
+            [% FOREACH i IN [0 .. call_list.max] %]
+	    [% 
+	      callentry = call_list.$i
+	      cdrentry = cdr_list.$i
+	    %]
             <tr class="[% callentry.background %]">
               <td class="calltype"><img src="/static/images/[% callentry.direction_icon %]" width="14" height="13" alt=""></td>
               <td class="callnumber">[% callentry.partner %]</td>
@@ -53,14 +80,15 @@
               <td class="callfee">[% callentry.call_fee %]</td>
               [% END %]
               <td class="calldate">[% callentry.date %]</td>
+              <td><a href="#" onclick="$('#cdrdialog[% i %]').dialog('open');">Details</a></td>
             </tr>
             [% END %]
 
           [% ELSE %]
 
-            <tr class="calllistheader"><td colspan="6" /></tr>
+            <tr class="calllistheader"><td colspan="7" /></tr>
             <tr class="alt">
-              <td colspan="6">No matching calls found.</td>
+              <td colspan="7">No matching calls found.</td>
             </tr>
 
           [% END %]
