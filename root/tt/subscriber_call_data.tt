@@ -44,8 +44,8 @@
             <div id="cdrdialog[% i %]">
 	      <table>
               [% FOREACH key IN cdrentry.keys.sort %]
-              <tr>
-                <td>[% key %]:</td><td>[% cdrentry.$key %]</td>
+              <tr style="padding:0;margin:0;">
+                <td style="padding:0;margin:0;">[% key %]:</td><td style="padding:0;margin:0;">[% cdrentry.$key %]</td>
               </tr>
               [% END %]
 	      </table>
@@ -80,7 +80,7 @@
               <td class="callfee">[% callentry.call_fee %]</td>
               [% END %]
               <td class="calldate">[% callentry.date %]</td>
-              <td><a href="#" onclick="$('#cdrdialog[% i %]').dialog('open');">Details</a></td>
+              <td><a href="javascript:$('#cdrdialog[% i %]').dialog('open');">Details</a></td>
             </tr>
             [% END %]
 
