@@ -170,7 +170,7 @@ sub prepare_call_list {
 
         if(defined $$call{customer_cost}) {
             # money is allways returned as cents
-            $callentry{call_fee} = sprintf $$bilprof{data}{currency} . " %.04f", $$call{call_fee}/100;
+            $callentry{call_fee} = sprintf $$bilprof{data}{currency} . " %.04f", $$call{customer_cost}/100;
         } else {
             $callentry{call_fee} = '';
         }
