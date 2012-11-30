@@ -1162,7 +1162,7 @@ sub call_data : Local {
     }
 
     my $calls;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_calls',
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cdrs',
                                                         { username => $$subscriber{username},
                                                           domain   => $$subscriber{domain},
                                                           filter   => { start_date => $sdate,
@@ -1185,6 +1185,7 @@ sub call_data : Local {
                                                             );
     }
 
+    $c->stash->{cdr_list} = $calls;
     $c->stash->{call_list} = admin::Utils::prepare_call_list($c, $calls, $listfilter, $bilprof);
     $c->stash->{subscriber}{list_filter} = $listfilter if defined $listfilter;
 

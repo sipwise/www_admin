@@ -166,9 +166,9 @@ sub prepare_call_list {
             $callentry{duration} = '00:00';
         }
 
-        if(defined $$call{call_fee}) {
+        if(defined $$call{customer_cost}) {
             # money is allways returned as cents
-            $callentry{call_fee} = sprintf $$bilprof{data}{currency} . " %.04f", $$call{call_fee}/100;
+            $callentry{call_fee} = sprintf $$bilprof{data}{currency} . " %.04f", $$call{customer_cost}/100;
         } else {
             $callentry{call_fee} = '';
         }
@@ -201,12 +201,11 @@ sub prepare_call_list {
             } else {
                 $callentry{direction_icon} = 'anruf_ein_err_small.gif';
             }
-            if(!defined $$call{source_cli} or !length $$call{source_cli}
-               or $$call{source_cli} !~ /^\+?\d+$/)
-            {
-                if(!defined $$call{source_user} or !length $$call{source_user}) {
-                    $callentry{partner} = 'anonym';
-                } elsif($$call{source_user} =~ /^\+?\d+$/) {
+	    if(!$$call{source_clir})
+	    {
+              if($$call{source_cli} !~ /^\+?\d+$/)
+              {
+                if($$call{source_user} =~ /^\+?\d+$/) {
                     my $partner = $$call{source_user};
                     $partner =~ s/^$ccdp/+/;
                     $partner =~ s/^\+*/+/;
@@ -214,12 +213,17 @@ sub prepare_call_list {
                 } else {
                     $callentry{partner} = $$call{source_user} .'@'. $$call{source_domain};
                 }
-            } else {
+              } else {
                 my $partner = $$call{source_cli};
                 $partner =~ s/^$ccdp/+/;
                 $partner =~ s/^\+*/+/;
                 $callentry{partner} = $partner;
-            }
+              }
+	    }
+            else
+	    {
+	        $callentry{partner} = 'anonymous';
+	    }
             $callentry{partner_number} = $callentry{partner};
 
         } else {
