@@ -166,7 +166,9 @@ sub edit_grp : Local {
     $settings{description} = $c->request->params->{grpdesc};
     $settings{peering_contract_id} = $c->request->params->{peering_contract_id} || undef;
 
-#$c->log->debug('*** edit grp');
+    unless(defined $settings{peering_contract_id}) {
+        $messages{epeererr} = 'Client.Voip.NoPeerContract';
+    }
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_group',
