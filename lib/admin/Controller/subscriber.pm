@@ -619,6 +619,7 @@ sub preferences : Local {
     my $cf_tsets;
     my $cf_maps;
     my $trusted_sources;
+    my $callthru_clis;
 
     my $subscriber_id = $c->request->params->{subscriber_id};
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
@@ -659,7 +660,12 @@ sub preferences : Local {
                                                         },
                                                         \$trusted_sources,
                                                       );
-
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_ccmap_entries',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                        },
+                                                        \$callthru_clis
+                                                      );
     # voicebox requires a number
     if(length $$subscriber{sn} && $c->config->{voicemail_features}) {
       return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_voicebox_preferences',
@@ -696,6 +702,7 @@ sub preferences : Local {
     $c->stash->{cf_dsets} = $cf_dsets;
     $c->stash->{cf_tsets} = $cf_tsets;
     $c->stash->{cf_maps} = $cf_maps;
+    $c->stash->{callthru_clis} = $callthru_clis;
     $c->stash->{subscriber} = $subscriber;
     $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
 
@@ -3057,6 +3064,102 @@ sub do_edit_destlist : Local {
 
     $c->session->{messages} = \%messages;
     $c->response->redirect("/subscriber/edit_destlist?subscriber_id=$subscriber_id&list_name=$list");
+}
+
+sub edit_callthru_list : Local {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'tt/subscriber_edit_callthru_list.tt';
+
+    my %messages;
+    my $subscriber;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+    $c->stash->{subscriber} = $subscriber;
+    $c->stash->{subscriber_id} = $subscriber_id;
+
+    my $callthru_clis;
+    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_ccmap_entries',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                        },
+                                                        \$callthru_clis
+                                                      );
+    $c->stash->{callthru_clis} = $callthru_clis;
+    $c->stash->{editid} = $c->request->params->{editid};
+
+    return 1;
+}
+
+sub do_edit_callthru_list : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my $subscriber;
+
+    my $subscriber_id = $c->request->params->{subscriber_id};
+    $c->response->redirect("/subscriber/edit_callthru_list?subscriber_id=$subscriber_id") unless
+        $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_subscriber_by_id',
+                                                        { subscriber_id => $subscriber_id },
+                                                        \$subscriber
+                                                      );
+    
+    my $action = $c->request->params->{action};
+
+    if($action eq "add") {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_ccmap_entry',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                          auth_key => $c->request->params->{auth_key},
+                                                        },
+                                                      ))
+        {
+            $messages{msg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/subscriber/edit_callthru_list?subscriber_id=$subscriber_id");
+            return;
+        } else {
+            $messages{err} = 'Client.Voip.InputErrorFound';
+        }
+    } elsif($action eq "delete") {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'delete_ccmap_entry',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                          id => $c->request->params->{editid},
+                                                        },
+                                                      ))
+        {
+            $messages{msg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/subscriber/edit_callthru_list?subscriber_id=$subscriber_id");
+            return;
+        } else {
+            $messages{err} = 'Client.Voip.InputErrorFound';
+        }
+    } elsif($action eq "save") {
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_ccmap_authkey',
+                                                        { username => $$subscriber{username},
+                                                          domain   => $$subscriber{domain},
+                                                          id => $c->request->params->{editid},
+                                                          auth_key => $c->request->params->{auth_key},
+                                                        },
+                                                      ))
+        {
+            $messages{msg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/subscriber/edit_callthru_list?subscriber_id=$subscriber_id");
+            return;
+        } else {
+            $messages{err} = 'Client.Voip.InputErrorFound';
+        }
+    }
+    
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/subscriber/edit_callthru_list?subscriber_id=$subscriber_id");
+
 }
 
 =head1 BUGS AND LIMITATIONS

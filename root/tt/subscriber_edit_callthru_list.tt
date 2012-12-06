@@ -1,0 +1,59 @@
+        <h3>Edit Call Through CLIs for
+          <a class="noarrow" href="detail?subscriber_id=[% subscriber_id %]">
+            [% subscriber.username %]@[% subscriber.domain %]</a>
+        </h3>
+
+          <a href="preferences?subscriber_id=[% subscriber_id %]&amp;#callthru"><span class="button-back">Back</span></a>
+          [% IF messages.msg %]<div class="success">[% messages.msg %]</div>[% END %]
+          [% IF messages.err %]<div class="error">[% messages.err %]</div>[% END %]
+
+          <div class="hspace-20"></div>
+          <ul class="cleanlist">
+            [% FOREACH ccli = callthru_clis %]
+              <li class="ui-state-default">
+                  [% IF editid == ccli.id  && !Catalyst.session.admin.read_only %]
+                  <form action="do_edit_callthru_list" method="post">
+                  <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                  <input type="hidden" name="editid" value="[% ccli.id %]" />
+                  <input type="hidden" name="action" value="save" />
+                  <div class="span-14">
+                    <input type="text" size="20" name="auth_key" value="[% ccli.auth_key %]" title="E.164 number string" />
+                  </div>
+                  <div class="span-1">
+                    <button class="button-save" id="save[% ccli.id %]">Save</button>
+                  </div>
+                  <div class="span-1 last">
+                    <a href="/subscriber/edit_callthru_list?subscriber_id=[% subscriber_id %]"><span class="button-cancel">Cancel</span></a>
+                  </div>
+                  </form>
+                  [% ELSE %]
+                  <div class="span-14">[% ccli.auth_key %]</div>
+                  [% UNLESS Catalyst.session.admin.read_only %]
+                  <div class="span-1">
+                    <form action="do_edit_callthru_list" method="post">
+                      <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                      <input type="hidden" name="editid" value="[% ccli.id %]" />
+                      <input type="hidden" name="action" value="delete" />
+                      <button class="button-delete" name="delete_key" id="del[% ccli.id %]">Delete</button>
+                    </form>
+                  </div>
+                  <div class="span-1 last">
+                    <a href="/subscriber/edit_callthru_list?subscriber_id=[% subscriber_id %]&editid=[% ccli.id %]"><span class="button-edit">Edit</span></a>
+                  </div>
+                  [% END %]
+                  [% END %]
+              </li>
+            [% END %]
+              <li class="ui-state-default">
+                <form action="do_edit_callthru_list" method="post">
+                  <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                  <input type="hidden" name="action" value="add" />
+                  <div class="span-14">
+                    <input type="text" size="20" name="auth_key" value="" title="E.164 number string" />
+                  </div>
+                  <div class="span-1 last">
+                    <button class="button-add" id="add">Add</button>
+                  </div>
+                </form>
+              </li>
+          </ul>

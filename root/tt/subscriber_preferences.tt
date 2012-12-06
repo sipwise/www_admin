@@ -366,6 +366,28 @@
             </li>
           </ul>
 
+    [% IF Catalyst.config.callthru_features %]
+        <div class="hspace-20"></div>
+        <h3 id="callthru">Call Through</h3>
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-4">Allowed CLIs:</div>
+              <div class="span-11">
+                <select size="1" name="speed_dial_slots">
+                [% FOREACH cc_cli = callthru_clis %]
+                    <option>[% cc_cli.auth_key %]</option>
+                [% END %]
+                </select>
+              </div>
+              <div class="span-1 last">
+                [% UNLESS Catalyst.session.admin.read_only %]
+                    <a href="edit_callthru_list?subscriber_id=[% subscriber.subscriber_id %]&amp;"><span class="button-edit">Edit List</span></a>
+                [% END %]
+              </div>
+            </li>
+          </ul>
+    [% END %]
+
     [% IF subscriber.voicebox_preferences %]
 
         <div class="hspace-20"></div>
