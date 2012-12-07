@@ -1572,8 +1572,8 @@ sub edit_cf : Local {
           $dest->{destination} = 'fax2mail';
         } elsif($dest->{destination} =~ /\@$confdom$/) {
           $dest->{destination} = 'conference';
-        } elsif($dest->{destination} =~ /^callthrough\@app\.local$/) {
-          $dest->{destination} = 'callthru';
+        } elsif($dest->{destination} =~ /^sip:callthrough\@app\.local$/) {
+          $dest->{destination} = 'callthrough';
 	}
       }
     }

@@ -98,14 +98,14 @@
                       [% END %]
                       [% IF Catalyst.config.callthru_features %]
                         <input type="radio" id="dest_callthru" value="callthru" name="dest_target" class="radio"
-                          [% IF dest.destination == "callthru" %] checked="checked"[% END %]/>
+                          [% IF dest.destination == "callthrough" %] checked="checked"[% END %]/>
                         <label for="dest_callthru">Call Through</label>
                         <br clear="all" />
                       [% END %]
                       <input type="radio" id="dest_sipuri" value="sipuri" name="dest_target" class="radio"
-                          [% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" && dest.destination != "callthru" %] checked="checked"[% END %]/>
+                          [% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" && dest.destination != "callthrough" %] checked="checked"[% END %]/>
                       <label for="[% preference.key %]sipuri">SIP-URI/username</label>
-                      <input type="text" id="dest_sipuritxt" name="dest_sipuri" size="20" value="[% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" && dest.destination != "callthru" %][% dest.destination %][% END %]"/>
+                      <input type="text" id="dest_sipuritxt" name="dest_sipuri" size="20" value="[% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" && dest.destination != "callthrough" %][% dest.destination %][% END %]"/>
                       <label for="[% preference.key %]timeout">for </label>
                       <input type="text" id="dest_timeout" name="dest_timeout" size="2" value="[% IF dest.timeout.defined %][% dest.timeout %][% ELSE %]300[% END %]"/><span>&nbsp;seconds</span>
                     </div>
@@ -117,7 +117,7 @@
 		    </div>
                   </form>
                   [% ELSE %]
-                    <div class="span-9">[% dest.destination %][% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" && dest.destination != "callthru" %] <em>for</em> [% dest.timeout.defined ? dest.timeout : "300" %] <em>seconds</em>[% END %]</div>
+                    <div class="span-9">[% dest.destination %][% IF dest.destination != "conference" && dest.destination != "voicebox" && dest.destination != "fax2mail" && dest.destination != "callthrough" %] <em>for</em> [% dest.timeout.defined ? dest.timeout : "300" %] <em>seconds</em>[% END %]</div>
                     [% UNLESS Catalyst.session.admin.read_only %]
                       <div class="prepend-3 span-1">
                         <a href="/subscriber/edit_cf?subscriber_id=[% subscriber_id %]&teditid=[% dest.id %]"><span class="button-edit">Edit</span></a>
@@ -161,7 +161,7 @@
                       [% END %]
                       [% IF Catalyst.config.callthru_features %]
                         <input type="radio" id="dest_callthru" value="callthru" name="dest_target" class="radio"
-                          [% IF dest.destination == "callthru" %] checked="checked"[% END %]/>
+                          [% IF dest.destination == "callthrough" %] checked="checked"[% END %]/>
                         <label for="dest_callthru">Call Through</label>
                         <br clear="all" />
                       [% END %]
