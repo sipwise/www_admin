@@ -3117,7 +3117,9 @@ sub do_edit_callthru_list : Local {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_ccmap_entry',
                                                         { username => $$subscriber{username},
                                                           domain   => $$subscriber{domain},
-                                                          auth_key => $c->request->params->{auth_key},
+							  data => {
+                                                             auth_key => $c->request->params->{auth_key},
+							  },
                                                         },
                                                       ))
         {
@@ -3144,11 +3146,13 @@ sub do_edit_callthru_list : Local {
             $messages{err} = 'Client.Voip.InputErrorFound';
         }
     } elsif($action eq "save") {
-        if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_ccmap_authkey',
+        if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_ccmap_entry',
                                                         { username => $$subscriber{username},
                                                           domain   => $$subscriber{domain},
                                                           id => $c->request->params->{editid},
-                                                          auth_key => $c->request->params->{auth_key},
+							  data => {
+                                                              auth_key => $c->request->params->{auth_key},
+							  },
                                                         },
                                                       ))
         {
