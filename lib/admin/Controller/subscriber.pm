@@ -1572,7 +1572,9 @@ sub edit_cf : Local {
           $dest->{destination} = 'fax2mail';
         } elsif($dest->{destination} =~ /\@$confdom$/) {
           $dest->{destination} = 'conference';
-        }
+        } elsif($dest->{destination} =~ /^callthrough\@app\.local$/) {
+          $dest->{destination} = 'callthru';
+	}
       }
     }
 
@@ -1743,6 +1745,8 @@ sub edit_cf_savedst : Local {
       $fw_target = 'sip:'.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$fmdom";
     } elsif($fw_target_select eq 'conference') {
       $fw_target = 'sip:conf='.$$subscriber{cc}.$$subscriber{ac}.$$subscriber{sn}."\@$confdom";
+    } elsif($fw_target_select eq 'callthru') {
+      $fw_target = 'sip:callthrough@app.local';
     }
 
     my $prio = $c->request->params->{priority};
