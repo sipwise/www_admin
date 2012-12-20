@@ -227,6 +227,10 @@ sub edit_bilprof : Local {
             sprintf "%.2f", $c->stash->{bilprof}{data}{fraud_interval_limit} /= 100;
         $c->stash->{bilprof}{data}{fraud_interval_notify} =
             eval { join ', ', @{$c->stash->{bilprof}{data}{fraud_interval_notify}} };
+        $c->stash->{bilprof}{data}{fraud_daily_limit} =
+            sprintf "%.2f", $c->stash->{bilprof}{data}{fraud_daily_limit} /= 100;
+        $c->stash->{bilprof}{data}{fraud_daily_notify} =
+            eval { join ', ', @{$c->stash->{bilprof}{data}{fraud_daily_notify}} };
     } elsif($bilprof) {
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
                                                             { handle => $bilprof },
@@ -240,6 +244,10 @@ sub edit_bilprof : Local {
             sprintf "%.2f", $c->stash->{bilprof}{data}{fraud_interval_limit} /= 100;
         $c->stash->{bilprof}{data}{fraud_interval_notify} =
             eval { join ', ', @{$c->stash->{bilprof}{data}{fraud_interval_notify}} };
+        $c->stash->{bilprof}{data}{fraud_daily_limit} =
+            sprintf "%.2f", $c->stash->{bilprof}{data}{fraud_daily_limit} /= 100;
+        $c->stash->{bilprof}{data}{fraud_daily_notify} =
+            eval { join ', ', @{$c->stash->{bilprof}{data}{fraud_daily_notify}} };
     }
 
     $c->stash->{handle} = $bilprof if $bilprof;
@@ -329,6 +337,28 @@ sub do_edit_bilprof : Local {
         $settings{fraud_interval_notify} = [];
     }
 
+    $settings{fraud_daily_limit} = $c->request->params->{fraud_daily_limit};
+    if(length $settings{fraud_daily_limit}) {
+        if($settings{fraud_daily_limit} =~ /^[+]?\d+(?:[.,]\d\d?)?$/) {
+            $settings{fraud_daily_limit} =~ s/^\+//;
+            $settings{fraud_daily_limit} =~ s/,/./;
+            $settings{fraud_daily_limit} *= 100;
+        } else {
+            $messages{fraud_daily_limit} = 'Client.Syntax.CashValue';
+        }
+    } else {
+        delete $settings{fraud_daily_limit};
+    }
+
+    $settings{fraud_daily_lock} = $c->request->params->{fraud_daily_lock}
+        if $c->request->params->{fraud_daily_lock};
+
+    if(length $c->request->params->{fraud_daily_notify}) {
+        @{$settings{fraud_daily_notify}} = split /\s*,\s*/, $c->request->params->{fraud_daily_notify};
+    } else {
+        $settings{fraud_daily_notify} = [];
+    }
+
     $settings{currency} = $c->request->params->{currency} || '';
 
     $settings{vat_rate} = $c->request->params->{vat_rate};
@@ -345,7 +375,7 @@ sub do_edit_bilprof : Local {
         if($bilprof) {
             if($c->model('Provisioning')->call_prov( $c, 'billing', 'update_billing_profile',
                                                      { handle => $bilprof,
-                                                       data   => \%settings,
+                                                       data   => {%settings},
                                                      },
                                                      undef))
             {
@@ -356,13 +386,15 @@ sub do_edit_bilprof : Local {
             }
             $c->session->{messages}{fraud_interval_notify} = $c->session->{prov_error}
                 if $c->session->{prov_error} eq 'Client.Syntax.Email';
+            $c->session->{messages}{fraud_daily_notify} = $c->session->{prov_error}
+                if $c->session->{prov_error} eq 'Client.Syntax.Email';
             $c->session->{restore_bilprof_input} = \%settings;
             $c->response->redirect("/billing/edit_bilprof?bilprof=$bilprof");
             return;
         } else {
             if($c->model('Provisioning')->call_prov( $c, 'billing', 'create_billing_profile',
                                                      { handle => $handle,
-                                                       data   => \%settings,
+                                                       data   => {%settings},
                                                      },
                                                      undef))
             {
