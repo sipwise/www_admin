@@ -311,7 +311,7 @@ sub do_edit_bilprof : Local {
     if(length $settings{fraud_interval_limit}) {
         if($settings{fraud_interval_limit} =~ /^[+]?\d+(?:[.,]\d\d?)?$/) {
             $settings{fraud_interval_limit} =~ s/^\+//;
-            $settings{interval_free_cash} =~ s/,/./;
+            $settings{fraud_interval_limit} =~ s/,/./;
             $settings{fraud_interval_limit} *= 100;
         } else {
             $messages{fraud_interval_limit} = 'Client.Syntax.CashValue';
