@@ -1,3 +1,31 @@
+ngcp-www-admin (3.5.0) unstable; urgency=low
+
+  [ rfuchs ]
+  * sipanalysis.pm: attempt to decode utf8 payload for html display
+
+  [ dtiefnig ]
+  * rewrite_detail.tt: fix hoover/hover typo
+  * fee_edit.tt,peering_detail.tt: improve some help texts
+  * billing.pm: fix fraud_interval_limit number normalization
+  * billing.pm,bilprof_edit.tt: add daily fraud limit parameters
+
+  [ agranig ]
+  * subscriber.pm,Utils.pm,subscriber_call_data.tt: Show CDR details in Call list.
+  * subscriber_call_data.tt: Some styling tweaks.
+  * Utils.pm: Fix new fee field coming from CDR.
+  * peering.pm: Don't allow to save existing peer grp without contract id.
+  * subscriber.pm,subscriber_edit_callthru_list.tt,subscriber_preferences.tt: Add call-thru allowed-CLI management.
+  * admin.conf: Add config options for callthru/callingcard.
+  * subscriber.pm,subscriber_callforward.tt: Add callthru CF handling.
+  * subscriber.pm: Adapt to new ccmap interface.
+  * admin.css: Make CF options a bit higher to fit call-through.
+  * subscriber.pm,subscriber_callforward.tt: Fix callthru CF selection.
+
+  [ cveigl ]
+  * customer.pm,peering.pm,subscriber.pm,Utils.pm: public check_*() methods now also receive a %$data data structure instead of the old single scalar argument. update calls accordingly.
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Fri, 21 Dec 2012 12:17:26 +0100
+
 ngcp-www-admin (3.4.4) unstable; urgency=low
 
   [ Christian Veigl ]
