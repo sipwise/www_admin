@@ -329,6 +329,27 @@
           </form>
         </div>
 
+        <h3 id="userprefs">Speed Dial</h3>
+        <div class="p1">
+          <table>
+            <tr>
+              <td class="tdkey">Speed dial slots:</td>
+              <td>
+                <select size="1" name="speed_dial_slots">
+                [% FOREACH sdslot = speed_dial_slots %]
+                    <option>[% sdslot.label %]</option>
+                [% END %]
+                </select>
+                [% UNLESS Catalyst.session.admin.read_only %]
+                    &nbsp;
+                    <a href="edit_speed_dial_slots?subscriber_id=[% subscriber.subscriber_id %]&amp;"
+                       class="aaction">edit list</a>
+                [% END %]
+              </td>
+            </tr>
+          </table>
+        </div>
+
         <h3 id="vboxprefs">Voicebox Preferences</h3>
 
       [% UNLESS Catalyst.session.admin.read_only %]

@@ -1,0 +1,90 @@
+        <h3>Edit speed dial slots for
+          <a class="noarrow" href="detail?subscriber_id=[% subscriber_id %]">
+            [% subscriber.username %]@[% subscriber.domain %]</a>
+        </h3>
+
+        <div class="actions">
+          <a href="detail?subscriber_id=[% subscriber_id %]&amp;#userprefs" class="aaction">back</a>
+        </div>
+        <div class="p1">
+          [% IF messages.nummsg %]<div class="goodmsg">[% messages.nummsg %]</div>[% END %]
+          [% IF messages.numerr %]<div class="errormsg">[% messages.numerr %]</div>[% END %]
+          <div class="list_explanation">
+              [% IF speed_dial_slots %]
+                The following speed dial vertical service codes (slots) are defined:<br />
+              [% ELSE %]
+                No speed dial vertical service codes (slots) defined yet.<br />
+              [% END %]
+           </div>
+           [% IF speed_dial_slots %]
+          <table>
+            <tr class="table_header">
+              <td>VSC</td>
+              <td>destination</td>
+              <td />
+              <td />
+              <td />
+            </tr>
+            [% FOREACH sdentry = speed_dial_slots %]
+              <tr class="[% sdentry.background %]">
+                <td >[% sdentry.slot %]</td>
+                <form action="/subscriber/do_edit_sd_list" method="post">
+                  <td>
+                    <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                    <input type="hidden" name="update_id" value="[% sdentry.id %]" />
+                    <input type="hidden" name="slot" value="[% sdentry.slot %]" />
+                    <div class="postlink">
+                      <input type="text" size="20" name="destination" id="destinationtxt" value="[% sdentry.destination %]" /> &nbsp;
+                      <label for="listupdate[% sdentry.id %]">update</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="listupdate[% sdentry.id %]" />
+                    </div>
+                  </td>
+                </form>
+                <form action="/subscriber/do_edit_sd_list" method="post">
+                  [% IF sdentry.error %]
+                    <td>
+                  [% ELSE %]
+                    <td colspan="2">
+                  [% END %]
+                    <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+                    <input type="hidden" name="delete_id" value="[% sdentry.id %]" />
+                    <div class="postlink">
+                      <label for="listdel[% sdentry.id %]">delete</label>
+                      <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="listdel[% sdentry.id %]" />
+                    </div>
+                  </td>
+                </form>
+                [% IF sdentry.error %]<td><div class="errormsg">[% sdentry.error %]</div></td>[% END %]
+              </tr>
+            [% END %]
+          </table>
+          [% END %]
+
+          <br />
+
+          [% IF free_speed_dial_slots %]
+          <form action="/subscriber/do_edit_sd_list" method="post">
+            <input type="hidden" name="subscriber_id" value="[% subscriber_id %]" />
+            <label for="addslot">New entry:</label><br />
+            <div class="postlink">
+              VSC:&nbsp;<select size="1" name="add_slot" id="addslot">
+                [% FOREACH sdslot = free_speed_dial_slots %]
+                    [% IF sdslot.slot == addslottxt %]
+                         <option selected>[% sdslot.slot %]</option>
+                    [% ELSE %]
+                         <option>[% sdslot.slot %]</option>
+                    [% END %]
+                [% END %]
+              </select>
+              Destination:&nbsp;<input type="text" size="20" name="add_destination" id="adddestination" value="[% adddestinationtxt %]" /> &nbsp;
+              <label for="sdadd">Add entry</label>
+              <input type="image" class="hidden" src="/static/images/dot_trans.gif" alt="" id="sdadd" />
+              [% IF messages.msgadd %]<div class="errormsg">[% messages.msgadd %]</div>[% END %]
+            </div><br clear="all" />
+          </form>
+          [% ELSE %]
+            All allowed speed dial vertical service codes in use. Please delete or modify the exisitng ones.
+          [% END %]
+
+        </div>
+
