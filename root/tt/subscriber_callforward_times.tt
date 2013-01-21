@@ -275,7 +275,7 @@
           var month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
           var wdays = new Array(7);
-          var wday_names = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+          var wday_names = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
           var mdays = new Array(31);
           var hours = new Array(24);
           var minutes = new Array(60);
