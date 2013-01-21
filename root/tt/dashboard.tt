@@ -9,7 +9,31 @@
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.pie.js"></script>
     
     <h3 id="title">Dashboard</h3>
-
+    
+    <div id="host_selector">
+      <h4>[% selected_host %]</h4>
+      <form action="[% ctx %]" method="post">
+        <table>
+          <tr>
+            <td>
+              Please, choose a host to show:&nbsp;
+              <select name="server_to_show">
+                [% FOREACH host_name IN hosts %]
+                  [% IF host_name != selected_host %]
+                    <option value="[% host_name %]">[% host_name %]</option>
+                  [% ELSE %]
+                    <option value="[% host_name %]" selected="selected">[% host_name %]</option>
+                  [% END %]
+                [% END %]
+              </select>
+            </td>
+            <td style="width: 20px">&nbsp;</td>
+            <td><input type="submit" name="choose" value="Choose" /></td>
+          </tr>
+        </table>
+      </form>
+    </div>
+    
     <div class="topsubmenu">
       <ul>
         <li [% "class=\"selected\"" IF ctx=="system" %]><a href="system"><span>System</span></a></li>
