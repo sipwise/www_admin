@@ -41,12 +41,15 @@ sub index : Private {
 sub system : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/dashboard.tt';
+    
+    my $hosts;
+    return unless $c->model('Provisioning')->call_prov($c, 'system', 'get_host_list', undef, \$hosts);
+    
+    $c->stash->{hosts} = $hosts;
 
-    my @hosts = get_host_list();
-
-    $c->stash->{hosts} = \@hosts;
-
-    my $selected_host = grep($c->request->params->{server_to_show}, @hosts) ? $c->request->params->{server_to_show} : $hosts[0];
+    my $selected_host 
+        = grep($c->request->params->{server_to_show}, @$hosts) 
+        ? $c->request->params->{server_to_show} : $$hosts[0];
 
     $c->stash->{selected_host} = $selected_host;
 
@@ -76,11 +79,14 @@ sub voip : Local {
     my ( $self, $c ) = @_;
     $c->stash->{template} = 'tt/dashboard.tt';
 
-    my @hosts = get_host_list();
+    my $hosts;
+    return unless $c->model('Provisioning')->call_prov($c, 'system', 'get_host_list', undef, \$hosts);
+    
+    $c->stash->{hosts} = $hosts;
 
-    $c->stash->{hosts} = \@hosts;
-
-    my $selected_host = grep($c->request->params->{server_to_show}, @hosts) ? $c->request->params->{server_to_show} : $hosts[0];
+    my $selected_host 
+        = grep($c->request->params->{server_to_show}, @$hosts) 
+        ? $c->request->params->{server_to_show} : $$hosts[0];
 
     $c->stash->{selected_host} = $selected_host;
 
@@ -111,11 +117,14 @@ sub sipstats: Local {
                                                       );
     $c->stash->{stats} = $stats;
 
-    my @hosts = get_host_list();
+    my $hosts;
+    return unless $c->model('Provisioning')->call_prov($c, 'system', 'get_host_list', undef, \$hosts);
+    
+    $c->stash->{hosts} = $hosts;
 
-    $c->stash->{hosts} = \@hosts;
-
-    my $selected_host = grep($c->request->params->{server_to_show}, @hosts) ? $c->request->params->{server_to_show} : $hosts[0];
+    my $selected_host 
+        = grep($c->request->params->{server_to_show}, @$hosts) 
+        ? $c->request->params->{server_to_show} : $$hosts[0];
 
     $c->stash->{selected_host} = $selected_host;
 
@@ -134,20 +143,6 @@ sub sipstats: Local {
     return 1;
 }
 
-sub get_host_list {
-    my $rrd_dirs = '/var/lib/collectd/rrd';
-    my @hosts = qw();
-
-    open(RRD_DIRS, "find $rrd_dirs -mindepth 1 -maxdepth 1 -type d | sort |") || die "can't use find in $rrd_dirs";
-    while (<RRD_DIRS>) {
-      chomp;
-      s|.*/||;
-      push @hosts, $_;
-    }
-
-    return @hosts;
-}
-
 =head1 BUGS AND LIMITATIONS
 
 =over
@@ -163,10 +158,11 @@ Provisioning model, Sipwise::Provisioning::Billing, Catalyst
 =head1 AUTHORS
 
 Andreas Granig <agranig@sipwise.com>
+Roman Dieser <rdieser@sipwise.com>
 
 =head1 COPYRIGHT
 
-The dashboard controller is Copyright (c) 2010 Sipwise GmbH, Austria.
+The dashboard controller is Copyright (c) 2010-2013 Sipwise GmbH, Austria.
 You should have received a copy of the licences terms together with the
 software.
 
