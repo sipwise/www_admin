@@ -18,14 +18,15 @@
  */
 
 function suffixFormatter(val, axis) {
+	var tickDec = 2;
 	if (val > 1000000000)
-		return (val / 1000000000).toFixed(axis.tickDecimals) + "G";
+		return (val / 1000000000).toFixed(tickDec) + "G";
 	else if if (val > 1000000)
-		return (val / 1000000).toFixed(axis.tickDecimals) + "M";
+		return (val / 1000000).toFixed(tickDec) + "M";
 	else if (val > 1000)
-		return (val / 1000).toFixed(axis.tickDecimals) + "k";
+		return (val / 1000).toFixed(tickDec) + "k";
 	else
-		return val.toFixed(axis.tickDecimals);
+		return val.toFixed(tickDec);
 }
 
 function rrdFlot(html_id, rrd_file, graph_options, ds_graph_options, si_suffix, tz_offset) {
