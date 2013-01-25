@@ -8,13 +8,13 @@
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.selection.js"></script>
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.pie.js"></script>
     
-    <h3 id="title">Statistics Dashboard: [% selected_host %]</h3>
+    <h3 id="title">Statistics Dashboard for Host [% selected_host %]</h3>
 
     <div id="selection_form">
         <form action="dashboard" method="post">
             <table align="left" style="width: auto !important;">
                 <tr>
-                    <td>Please, choose a host to show:</td>
+                    <td>Host:</td>
                     <td>
                         <select name="server_to_show">
                         [% FOREACH host_name IN hosts %]
@@ -28,7 +28,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Please, choose a folder to show:</td>
+                    <td>Group:</td>
                     <td>
                         <select name="subfolder_to_show">
                         [% FOREACH subfolder IN subfolders %]
