@@ -101,15 +101,17 @@ sub index : Private {
             my $name = $rrd;      # name is used as html id attribute, 
                                   # hence should not contain dots and colons 
             $name =~ s/[\.:]/-/g; # in order to function properly with jQuery
+	    my $title = $rrd;
+	    $title =~ s/\.rrd$//;
             
             push @plotdata, {
                 name  => $name, 
-                title => $rrd,
+                title => $title,
                 url   => '/rrd/get?path='
                         . $c->stash->{selected_host}
                         . '/' . $c->stash->{selected_subfolder}
                         . '/' . $rrd, 
-                si    => 0
+                si    => 1
             };
         }
             

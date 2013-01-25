@@ -18,12 +18,14 @@
  */
 
 function suffixFormatter(val, axis) {
-	if (val > 1000000)
-		return (val / 1000000).toFixed(axis.tickDecimals) + " MB";
+	if (val > 1000000000)
+		return (val / 1000).toFixed(axis.tickDecimals) + "G";
+	else if if (val > 1000000)
+		return (val / 1000000).toFixed(axis.tickDecimals) + "M";
 	else if (val > 1000)
-		return (val / 1000).toFixed(axis.tickDecimals) + " kB";
+		return (val / 1000).toFixed(axis.tickDecimals) + "k";
 	else
-		return val.toFixed(axis.tickDecimals) + " B";
+		return val.toFixed(axis.tickDecimals);
 }
 
 function rrdFlot(html_id, rrd_file, graph_options, ds_graph_options, si_suffix, tz_offset) {
