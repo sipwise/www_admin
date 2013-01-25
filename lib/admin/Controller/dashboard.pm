@@ -5,6 +5,7 @@ use warnings;
 use base 'Catalyst::Controller';
 use Data::Dumper;
 use UNIVERSAL 'isa';
+use Sys::Hostname;
 
 
 =head1 NAME
@@ -13,135 +14,13 @@ admin::Controller::dashboard - Catalyst Controller
 
 =head1 DESCRIPTION
 
-Catalyst Controller.
+Catalyst controller for representation of the NGCP statistics dashboard.
 
 =head1 METHODS
 
 =head2 index
 
 Control the statistics dashboard.
-
-=cut
-
-sub index : Private {
-    my ( $self, $c ) = @_;
-
-    if($c->config->{dashboard}{enabled} == 1)
-    {
-        $c->response->redirect($c->uri_for('/dashboard/system'));
-    }
-    else
-    {
-        $c->response->redirect($c->uri_for('/'));
-    }
-
-    return 1;
-}
-
-sub system : Local {
-    my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/dashboard.tt';
-    
-    my $hosts;
-    return unless $c->model('Provisioning')->call_prov($c, 'system', 'get_host_list', undef, \$hosts);
-    
-    $c->stash->{hosts} = $hosts;
-
-    my $selected_host 
-        = grep($c->request->params->{server_to_show}, @$hosts) 
-        ? $c->request->params->{server_to_show} : $$hosts[0];
-
-    $c->stash->{selected_host} = $selected_host;
-
-    my @plotdata = ();
-    push @plotdata, {name=>"mem", title=>"Free Physical Memory", url=>[(
-    		"/rrd/get?path=$selected_host/memory/memory-free.rrd",
-    		"/rrd/get?path=$selected_host/memory/memory-cached.rrd",
-    		"/rrd/get?path=$selected_host/memory/memory-buffered.rrd"
-    )], si=>1};
-    push @plotdata, {name=>"swap", title=>"Free Swap Memory", 
-        url=>"/rrd/get?path=$selected_host/swap/swap-free.rrd", si=>1};
-    push @plotdata, {name=>"load", title=>"Load", 
-        url=>"/rrd/get?path=$selected_host/load/load.rrd", si=>0};
-    push @plotdata, {name=>"rdisk", title=>"Root Disk", 
-        url=>"/rrd/get?path=$selected_host/df/df-root.rrd", si=>1};
-    push @plotdata, {name=>"ldisk", title=>"Network Traffic", 
-        url=>"/rrd/get?path=$selected_host/interface/if_octets-eth0.rrd", si=>1};
-
-    $c->stash->{ctx} = "system";
-    $c->stash->{plotdata} = \@plotdata;
-    $c->stash->{tz_offset} = admin::Utils::tz_offset();
-
-    return 1;
-}
-
-sub voip : Local {
-    my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/dashboard.tt';
-
-    my $hosts;
-    return unless $c->model('Provisioning')->call_prov($c, 'system', 'get_host_list', undef, \$hosts);
-    
-    $c->stash->{hosts} = $hosts;
-
-    my $selected_host 
-        = grep($c->request->params->{server_to_show}, @$hosts) 
-        ? $c->request->params->{server_to_show} : $$hosts[0];
-
-    $c->stash->{selected_host} = $selected_host;
-
-    my @plotdata = ();
-    push @plotdata, {name=>"provsub", title=>"Provisioned Subscribers", 
-        url=>"/rrd/get?path=$selected_host/ngcp/oss_provisioned_subscribers.rrd", si=>0};
-    push @plotdata, {name=>"regsubs", title=>"Registered Subscribers", 
-        url=>"/rrd/get?path=$selected_host/ngcp/kam_usrloc_regusers.rrd", si=>0};
-    push @plotdata, {name=>"actdlg", title=>"Active Calls", 
-        url=>"/rrd/get?path=$selected_host/ngcp/kam_dialog_active.rrd", si=>0};
-    push @plotdata, {name=>"sipr", title=>"SIP Register Latency", 
-        url=>"/rrd/get?path=$selected_host/ngcp/sip_option.rrd", si=>0};
-
-    $c->stash->{ctx} = "voip";
-    $c->stash->{plotdata} = \@plotdata;
-    $c->stash->{tz_offset} = admin::Utils::tz_offset();
-
-    return 1;
-}
-
-sub sipstats: Local {
-    my ( $self, $c ) = @_;
-    $c->stash->{template} = 'tt/dashboard.tt';
-    my $stats;
-    return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_sipstat_24h',
-                                                        undef,
-                                                        \$stats,
-                                                      );
-    $c->stash->{stats} = $stats;
-
-    my $hosts;
-    return unless $c->model('Provisioning')->call_prov($c, 'system', 'get_host_list', undef, \$hosts);
-    
-    $c->stash->{hosts} = $hosts;
-
-    my $selected_host 
-        = grep($c->request->params->{server_to_show}, @$hosts) 
-        ? $c->request->params->{server_to_show} : $$hosts[0];
-
-    $c->stash->{selected_host} = $selected_host;
-
-    my @plotdata = ();
-    push @plotdata, {name=>"numpacketsperday", title=>"Captured SIP Packets per Day", 
-        url=>"/rrd/get?path=$selected_host/ngcp/sipstats_num_packets_perday.rrd", si=>0};
-    push @plotdata, {name=>"numpackets", title=>"Overall Available SIP Packets", 
-        url=>"/rrd/get?path=$selected_host/ngcp/sipstats_num_packets.rrd", si=>0};
-    push @plotdata, {name=>"partsize", title=>"Size of Capture Table", 
-        url=>"/rrd/get?path=$selected_host/ngcp/sipstats_partition_size.rrd", si=>1};
-
-    $c->stash->{ctx} = "sipstats";
-    $c->stash->{plotdata} = \@plotdata;
-    $c->stash->{tz_offset} = admin::Utils::tz_offset();
-
-    return 1;
-}
 
 =head1 BUGS AND LIMITATIONS
 
@@ -158,6 +37,7 @@ Provisioning model, Sipwise::Provisioning::Billing, Catalyst
 =head1 AUTHORS
 
 Andreas Granig <agranig@sipwise.com>
+
 Roman Dieser <rdieser@sipwise.com>
 
 =head1 COPYRIGHT
@@ -168,5 +48,80 @@ software.
 
 =cut
 
-# ende gelaende
+
+sub index : Private {
+    my ( $self, $c ) = @_;
+
+    if($c->config->{dashboard}{enabled} == 1) {
+
+        $c->stash->{template} = 'tt/dashboard.tt';
+        
+        my $hosts;
+        return unless $c->model('Provisioning')
+                        ->call_prov($c, 'system', 'get_host_list', undef, \$hosts);
+        
+        $c->stash->{hosts} = $hosts;
+
+        $c->stash->{selected_host} 
+            = grep($c->request->params->{server_to_show}, @$hosts) 
+            ? $c->request->params->{server_to_show} 
+            : (grep(hostname, @$hosts) ? hostname : $$hosts[0]);
+
+        my $subdirs;
+        return unless $c->model('Provisioning')
+                        ->call_prov($c, 
+                                    'system', 
+                                    'get_host_subdirs', 
+                                    { host => $c->stash->{selected_host} }, 
+                                    \$subdirs
+                                   );
+
+        $c->stash->{subfolders} = $subdirs;
+            
+        $c->stash->{selected_subfolder}
+            = grep($c->request->params->{subfolder_to_show}, @$subdirs)
+            ? $c->request->params->{subfolder_to_show} : $$subdirs[0];
+    
+        my $rrds;
+        return unless $c->model('Provisioning')
+                        ->call_prov($c, 
+                                    'system', 
+                                    'get_rrd_files', 
+                                    {
+                                        host   => $c->stash->{selected_host},
+                                        folder => $c->stash->{selected_subfolder} 
+                                    }, 
+                                    \$rrds
+                                   );
+
+        my @plotdata = qw();
+        
+        foreach my $rrd (@$rrds) {
+
+            my $name = $rrd;      # name is used as html id attribute, 
+                                  # hence should not contain dots and colons 
+            $name =~ s/[\.:]/-/g; # in order to function properly with jQuery
+            
+            push @plotdata, {
+                name  => $name, 
+                title => $rrd,
+                url   => '/rrd/get?path='
+                        . $c->stash->{selected_host}
+                        . '/' . $c->stash->{selected_subfolder}
+                        . '/' . $rrd, 
+                si    => 0
+            };
+        }
+            
+        $c->stash->{ctx}       = 'index';
+        $c->stash->{plotdata}  = \@plotdata;
+        $c->stash->{tz_offset} = admin::Utils::tz_offset();
+    }
+    else {
+        $c->response->redirect($c->uri_for('/'));
+    }
+
+    return 1;
+}
+
 1;
