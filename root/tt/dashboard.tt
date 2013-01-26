@@ -7,6 +7,13 @@
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.js"></script>
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.selection.js"></script>
     <script type="text/javascript" src="/js/jsrrd/flot/jquery.flot.pie.js"></script>
+    <script type="text/javascript" >
+        $(document).ready(function() {          
+            $('#host_selector').change(function() {
+                $('#folder_selector').load('dashboard/subdir_list', {host : $(this).attr('value')});
+            });
+        });
+    </script>
     
     <h3 id="title">Statistics Dashboard for Host [% selected_host %]</h3>
 
@@ -16,7 +23,7 @@
                 <tr>
                     <td>Host:</td>
                     <td>
-                        <select name="server_to_show">
+                        <select id="host_selector" name="server_to_show">
                         [% FOREACH host_name IN hosts %]
                           [% IF host_name != selected_host %]
                             <option value="[% host_name %]">[% host_name %]</option>
@@ -30,7 +37,7 @@
                 <tr>
                     <td>Group:</td>
                     <td>
-                        <select name="subfolder_to_show">
+                        <select id="folder_selector" name="subfolder_to_show">
                         [% FOREACH subfolder IN subfolders %]
                           [% IF subfolder != selected_subfolder %]
                             <option value="[% subfolder %]">[% subfolder %]</option>

@@ -127,4 +127,26 @@ sub index : Private {
     return 1;
 }
 
+sub subdir_list :Local {
+    my( $self, $c ) = @_;
+
+    my $subdirs;
+    return unless $c->model('Provisioning')
+                    ->call_prov($c, 
+                                'system', 
+                                'get_host_subdirs', 
+                                { host => $c->request->param('host') }, 
+                                \$subdirs
+                               );
+    my $options = qw();
+    
+    foreach my $option (@$subdirs) {
+        $options .= '<option value="' . $option. '">' . $option . "</option>\n";
+    }
+    
+    $c->response->body( $options );
+    
+    return 1; 
+}
+
 1;
