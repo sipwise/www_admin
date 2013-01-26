@@ -21,7 +21,7 @@ function suffixFormatter(val, axis) {
 	var tickDec = 2;
 	if (val > 1000000000)
 		return (val / 1000000000).toFixed(tickDec) + "G";
-	else if if (val > 1000000)
+	else if (val > 1000000)
 		return (val / 1000000).toFixed(tickDec) + "M";
 	else if (val > 1000)
 		return (val / 1000).toFixed(tickDec) + "k";
