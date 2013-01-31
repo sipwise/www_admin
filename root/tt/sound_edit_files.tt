@@ -1,11 +1,12 @@
-<h3>Manage sound sets</h3>
+<h3>Manage sound set [% set.name %]</h3>
 
 <a href="/sound"><span class="button-back">Back</span></a>
 <div class="hspace-20"</div>
-
-<h3>Edit sound files for sound set [% set.name %]</h3>
 [% IF messages.sound_set_err %]<div class="error">[% messages.sound_set_err %]</div>[% END %]
 [% IF messages.sound_set_msg %]<div class="success">[% messages.sound_set_msg %]</div>[% END %]
+
+[% FOREACH g IN set.groups.keys %]
+<h3> Sound Group [% g %]</h3>
 
 <ul class="cleanlist">
     <li class="ui-state-default">
@@ -14,7 +15,7 @@
         <div class="span-6">Filename</div>
     </li>
 
-        [% FOREACH h IN set.handles %]
+        [% FOREACH h IN set.groups.$g %]
             <li class="ui-state-default" [% IF handle_id == h.id %]style="border:1px solid #459e00"[% END %]>
                 <div class="span-5">[% h.name %]</div>
 
@@ -60,3 +61,5 @@
         </li>
     [% END %]
 </ul>
+<div class="hspace-20"</div>
+[% END %]
