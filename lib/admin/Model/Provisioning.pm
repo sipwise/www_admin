@@ -159,12 +159,8 @@ sub _translate {
                         )
     };
     unless(defined $translation) {
-        eval {
-            $self->call_prov( $c, 'voip', 'get_localized_string',
-                              { language => $lang, code => 'Server.Internal' },
-                              \$translation,
-                            )
-        };
+        # display error code if no translation is found
+        $translation = $code;
     }
 
     return $translation;
