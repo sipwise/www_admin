@@ -86,6 +86,70 @@
               </tr>
               [% IF messages.free_cash %]<tr><td /><td><div class="errormsg">[% messages.free_cash %]</div></td></tr>[% END %]
               <tr>
+                <td class="tdkey">fraud monthly limit:</td>
+                <td>
+                  <input type="text" name="fraud_interval_limit" title="float, specifying Euro"
+                         value="[% bilprof.data.fraud_interval_limit%]" />
+                  fraud detection threshold, per month
+                </td>
+              </tr>
+              [% IF messages.fraud_interval_limit %]<tr><td /><td><div class="errormsg">[% messages.fraud_interval_limit %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">fraud monthly lock:</td>
+                <td>
+                  <select size="1" name="fraud_interval_lock" title="the lock level">
+                    <option value="none" [% IF bilprof.data.fraud_interval_lock == 'none' %]selected="selected"[% END %]>none</option>
+                    <option value="foreign" [% IF bilprof.data.fraud_interval_lock == 'foreign' %]selected="selected"[% END %]>foreign calls</option>
+                    <option value="outgoing" [% IF bilprof.data.fraud_interval_lock == 'outgoing' %]selected="selected"[% END %]>all outgoing calls</option>
+                    <option value="incoming" [% IF bilprof.data.fraud_interval_lock == 'incoming' %]selected="selected"[% END %]>incoming and outgoing</option>
+                    <option value="global" [% IF bilprof.data.fraud_interval_lock == 'global' %]selected="selected"[% END %]>global (including CSC)</option>
+                  </select>
+                    lock accounts if the monthly limit is exceeded
+                </td>
+              </tr>
+              [% IF messages.fraud_interval_lock %]<tr><td /><td><div class="errormsg">[% messages.fraud_interval_lock %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">fraud monthly notify:</td>
+                <td>
+                  <input type="text" name="fraud_interval_notify" title="string, a list of e-mail addreses separated by comma"
+                         value="[% bilprof.data.fraud_interval_notify %]" />
+                  where e-mail notifications are sent
+                </td>
+              </tr>
+              [% IF messages.fraud_interval_notify %]<tr><td /><td><div class="errormsg">[% messages.fraud_interval_notify %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">fraud daily limit:</td>
+                <td>
+                  <input type="text" name="fraud_daily_limit" title="float, specifying Euro"
+                         value="[% bilprof.data.fraud_daily_limit%]" />
+                  fraud detection threshold, per day
+                </td>
+              </tr>
+              [% IF messages.fraud_daily_limit %]<tr><td /><td><div class="errormsg">[% messages.fraud_daily_limit %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">fraud daily lock:</td>
+                <td>
+                  <select size="1" name="fraud_daily_lock" title="the lock level">
+                    <option value="none" [% IF bilprof.data.fraud_daily_lock == 'none' %]selected="selected"[% END %]>none</option>
+                    <option value="foreign" [% IF bilprof.data.fraud_daily_lock == 'foreign' %]selected="selected"[% END %]>foreign calls</option>
+                    <option value="outgoing" [% IF bilprof.data.fraud_daily_lock == 'outgoing' %]selected="selected"[% END %]>all outgoing calls</option>
+                    <option value="incoming" [% IF bilprof.data.fraud_daily_lock == 'incoming' %]selected="selected"[% END %]>incoming and outgoing</option>
+                    <option value="global" [% IF bilprof.data.fraud_daily_lock == 'global' %]selected="selected"[% END %]>global (including CSC)</option>
+                  </select>
+                    lock accounts if the daily limit is exceeded
+                </td>
+              </tr>
+              [% IF messages.fraud_daily_lock %]<tr><td /><td><div class="errormsg">[% messages.fraud_daily_lock %]</div></td></tr>[% END %]
+              <tr>
+                <td class="tdkey">fraud daily notify:</td>
+                <td>
+                  <input type="text" name="fraud_daily_notify" title="string, a list of e-mail addreses separated by comma"
+                         value="[% bilprof.data.fraud_daily_notify %]" />
+                  where e-mail notifications are sent
+                </td>
+              </tr>
+              [% IF messages.fraud_daily_notify %]<tr><td /><td><div class="errormsg">[% messages.fraud_daily_notify %]</div></td></tr>[% END %]
+              <tr>
                 <td class="tdkey">currency:</td>
                 <td>
                   <input type="text" name="currency" title="string, will be used on invoices and webinterfaces"
