@@ -1,5 +1,5 @@
 [% TAGS [- -] %]
-[% IF www_admin.apache.port != 443 %]
+[% IF www_admin.apache.port != 443 && www_admin.apache.port != 80 %]
 Listen [% www_admin.apache.port %]
 [% END %]
 
