@@ -80,7 +80,7 @@
               <td class="callfee">[% callentry.call_fee %]</td>
               [% END %]
               <td class="calldate">[% callentry.date %]</td>
-              <td><a href="javascript:$('#cdrdialog[% i %]').dialog('open');">Details</a></td>
+              <td><a class="cdrpopup" id="[% i %]" href="#">Details</a></td>
             </tr>
             [% END %]
 
@@ -127,3 +127,10 @@
           </tr>
           </table>
 
+<script>
+	$(function () {
+		$('.cdrpopup').click(function(){
+			$('#cdrdialog'+$(this).attr('id')).dialog('open');
+		});
+	});
+</script>

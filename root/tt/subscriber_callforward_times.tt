@@ -282,6 +282,10 @@
 
           // from-year
           if(dropped.attr("id") == "drag-elem-year" || dropped.attr("id") == "drag-elem-year-range") {
+	    var y = d.getFullYear(); var py = parseInt(param);
+	    if(y > py) {
+	      $('<option value="' + py + '" selected="selected">' + py + '</option>').appendTo(from_select);
+	    }
             for(var i = 0; i < years.length; ++i) {
               var y = d.getFullYear() + i;
               $('<option value="' + y + '"' + ((param == y || from_param == y) ? 'selected="selected"' : '') + '>' + y + '</option>').appendTo(from_select);
