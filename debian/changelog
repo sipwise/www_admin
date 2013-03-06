@@ -1,3 +1,18 @@
+ngcp-www-admin (3.5.1) unstable; urgency=low
+
+  [ agranig ]
+  * Handle popups in a way to work with FF and IE out of the box.
+  * Fix handling of years older than current year.
+  * Fix wday mapping.
+  
+  [ dtiefnig ]
+  * Display error code if no translation is found.
+  
+  [ jbonilla ]
+  * Don't listen again if port 80.
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Wed, 06 Mar 2013 15:35:34 +0100
+
 ngcp-www-admin (3.5.0) unstable; urgency=low
 
   [ rfuchs ]
