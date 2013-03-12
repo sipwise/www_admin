@@ -1,3 +1,10 @@
+ngcp-www-admin (3.5.2) unstable; urgency=low
+
+  [ agranig ]
+  * Migrate IP infos in voipsniff config section to network.yml.
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Tue, 12 Mar 2013 11:38:01 +0100
+
 ngcp-www-admin (3.5.1) unstable; urgency=low
 
   [ agranig ]
