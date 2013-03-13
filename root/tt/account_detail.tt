@@ -191,6 +191,145 @@
           </ul>
       [% END %]
 
+
+      [% IF billing_features  && account.id %]
+
+        <div class="hspace-20"></div>
+        <h3 id="fraud">Account specific Fraud Limits</h3>
+
+        [% UNLESS account.terminate_timestamp || Catalyst.session.admin.read_only || edit_account %]
+          [% IF edit_fraud %]
+          <a href="detail?account_id=[% account.id %]#fraud"><span class="button-cancel">Cancel</span></a>
+          [% ELSE %]
+          <a href="detail?account_id=[% account.id %]&amp;edit_fraud=1#fraud"><span class="button-edit">Edit</span></a>
+            [% IF account.fraud.defined %]
+            <a href="delete_fraud?account_id=[% account.id %]"><span class="button-delete">Delete</span></a>
+            [% END %]
+          [% END %]
+        [% END %]
+          [% IF messages.fraudmsg %]<div class="success">[% messages.fraudmsg %]</div>[% END %]
+          [% IF messages.frauderr %]<div class="error">[% messages.frauderr %]</div>[% END %]
+          <div class="hspace-20"></div>
+          <form action="update_fraud" method="post">
+            <input type="hidden" name="account_id" value="[% account.id %]" />
+            <ul class="cleanlist">
+            <li class="ui-state-default"><div class="span-15">Monthly Settings:</div></li>
+              <li class="ui-state-default">
+                <div class="prepend-1 span-3">Limit:</div>
+                <div class="span-8 last">
+                [% IF edit_fraud %]
+                  <input type="text" name="fraud_interval_limit" value="[% account.fraud.fraud_interval_limit %]" title="interval limit in [% account.currency %], float"/>
+                [% ELSE %]
+                  [% IF account.fraud.defined %]
+                    [% IF account.fraud.fraud_interval_limit %]
+                      [% account.currency %] [% account.fraud.fraud_interval_limit %]
+                    [% ELSE %]
+                      none
+                    [% END %]
+                  [% ELSE %]
+                    billing profile default
+                  [% END %]
+                [% END %]
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="prepend-1 span-3">Lock:</div>
+                <div class="span-8 last">
+                [% IF edit_fraud %]
+                  <select size="1" name="fraud_interval_lock" title="the lock level">
+                    <option value="none" [% IF account.fraud.fraud_interval_lock == 'none' %]selected="selected"[% END %]>none</option>
+                    <option value="foreign" [% IF account.fraud.fraud_interval_lock == 'foreign' %]selected="selected"[% END %]>foreign calls</option>
+                    <option value="outgoing" [% IF account.fraud.fraud_interval_lock == 'outgoing' %]selected="selected"[% END %]>all outgoing calls</option>
+                    <option value="incoming" [% IF account.fraud.fraud_interval_lock == 'incoming' %]selected="selected"[% END %]>incoming and outgoing</option>
+                    <option value="global" [% IF account.fraud.fraud_interval_lock == 'global' %]selected="selected"[% END %]>global (including CSC)</option>
+                  </select>
+                [% ELSE %]
+                  [% IF account.fraud.defined %]
+                    [% account.fraud.fraud_interval_lock %]
+                  [% ELSE %]
+                    billing profile default
+                  [% END %]
+                [% END %]
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="prepend-1 span-3">Notify:</div>
+                <div class="span-8 last">
+                [% IF edit_fraud %]
+                  <input type="text" name="fraud_interval_notify" title="string, a list of e-mail addreses separated by comma"
+                         value="[% account.fraud.fraud_interval_notify %]" />
+                [% ELSE %]
+                  [% IF account.fraud.defined %]
+                    [% account.fraud.fraud_interval_notify %]
+                  [% ELSE %]
+                    billing profile default
+                  [% END %]
+                [% END %]
+                </div>
+              </li>
+            <li class="ui-state-default"><div class="span-15">Daily Settings:</div></li>
+              <li class="ui-state-default">
+                <div class="prepend-1 span-3">Limit:</div>
+                <div class="span-8 last">
+                [% IF edit_fraud %]
+                  <input type="text" name="fraud_daily_limit" value="[% account.fraud.fraud_daily_limit %]" title="interval limit in [% account.currency %], float"/>
+                [% ELSE %]
+                  [% IF account.fraud.defined %]
+                    [% IF account.fraud.fraud_daily_limit %]
+                      [% account.currency %] [% account.fraud.fraud_daily_limit %]
+                    [% ELSE %]
+                      none
+                    [% END %]
+                  [% ELSE %]
+                    billing profile default
+                  [% END %]
+                [% END %]
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="prepend-1 span-3">Lock:</div>
+                <div class="span-8 last">
+                [% IF edit_fraud %]
+                  <select size="1" name="fraud_daily_lock" title="the lock level">
+                    <option value="none" [% IF account.fraud.fraud_daily_lock == 'none' %]selected="selected"[% END %]>none</option>
+                    <option value="foreign" [% IF account.fraud.fraud_daily_lock == 'foreign' %]selected="selected"[% END %]>foreign calls</option>
+                    <option value="outgoing" [% IF account.fraud.fraud_daily_lock == 'outgoing' %]selected="selected"[% END %]>all outgoing calls</option>
+                    <option value="incoming" [% IF account.fraud.fraud_daily_lock == 'incoming' %]selected="selected"[% END %]>incoming and outgoing</option>
+                    <option value="global" [% IF account.fraud.fraud_daily_lock == 'global' %]selected="selected"[% END %]>global (including CSC)</option>
+                  </select>
+                [% ELSE %]
+                  [% IF account.fraud.defined %]
+                    [% account.fraud.fraud_daily_lock %]
+                  [% ELSE %]
+                    billing profile default
+                  [% END %]
+                [% END %]
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="prepend-1 span-3">Notify:</div>
+                <div class="span-8 last">
+                [% IF edit_fraud %]
+                  <input type="text" name="fraud_daily_notify" title="string, a list of e-mail addreses separated by comma"
+                         value="[% account.fraud.fraud_daily_notify %]" />
+                [% ELSE %]
+                  [% IF account.fraud.defined %]
+                    [% account.fraud.fraud_daily_notify %]
+                  [% ELSE %]
+                    billing profile default
+                  [% END %]
+                [% END %]
+                </div>
+              </li>
+            </ul>
+          [% IF edit_fraud %]
+            <div class="hspace-20"></div>
+            <button name="submit" class="button-save">Save</button>
+          [% END %]
+            </form>
+      [% END %]
+
+
       [% IF account.id %]
         <div class="hspace-20"></div>
         <h3>Subscribers</h3>

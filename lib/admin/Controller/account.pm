@@ -124,6 +124,7 @@ sub detail : Local {
         $$voip_account{customer_id} = $c->request->params->{customer_id} || undef;
     }
 
+    my $fraudpref = $self->_get_fraud_preferences($c, $account_id);
     $c->stash->{edit_account} = $c->request->params->{edit_account};
 
     if($c->config->{billing_features}) {
@@ -154,6 +155,7 @@ sub detail : Local {
         }
 
         $c->stash->{edit_balance} = $c->request->params->{edit_balance};
+        $c->stash->{edit_fraud} = $c->request->params->{edit_fraud};
 
         # we only use this to fill the drop-down lists
         if($c->request->params->{edit_account}) {
@@ -227,6 +229,7 @@ sub detail : Local {
     }
 
     $c->stash->{account} = $voip_account;
+    $c->stash->{account}->{fraud} = $fraudpref;
     $c->stash->{account}{is_locked} = 1 if $$voip_account{status} eq 'locked';
 
     return 1;
@@ -447,6 +450,140 @@ sub update_balance : Local {
         if defined $add_cash and length $add_cash;
     $c->response->redirect("/account/detail?account_id=$account_id&edit_balance=1");
     return;
+}
+
+=head2 update_fraud
+
+Update the VoIP account fraud preferences.
+
+=cut
+
+sub update_fraud : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+    my %settings;
+
+    my $account_id = $c->request->params->{account_id};
+
+    my %settings = ();
+   
+    $settings{fraud_interval_limit} = $c->request->params->{fraud_interval_limit};
+    if(length $settings{fraud_interval_limit}) {
+        if($settings{fraud_interval_limit} =~ /^[+]?\d+(?:[.,]\d\d?)?$/) {
+            $settings{fraud_interval_limit} =~ s/^\+//;
+            $settings{fraud_interval_limit} =~ s/,/./;
+            $settings{fraud_interval_limit} *= 100;
+        } else {
+            $messages{fraud_interval_limit} = 'Client.Syntax.CashValue';
+        }
+    } else {
+        delete $settings{fraud_interval_limit};
+    }
+
+    $settings{fraud_interval_lock} = $c->request->params->{fraud_interval_lock}
+        if $c->request->params->{fraud_interval_lock};
+
+    if(length $c->request->params->{fraud_interval_notify}) {
+        @{$settings{fraud_interval_notify}} = split /\s*,\s*/, $c->request->params->{fraud_interval_notify};
+    } else {
+        $settings{fraud_interval_notify} = [];
+    }
+
+    $settings{fraud_daily_limit} = $c->request->params->{fraud_daily_limit};
+    if(length $settings{fraud_daily_limit}) {
+        if($settings{fraud_daily_limit} =~ /^[+]?\d+(?:[.,]\d\d?)?$/) {
+            $settings{fraud_daily_limit} =~ s/^\+//;
+            $settings{fraud_daily_limit} =~ s/,/./;
+            $settings{fraud_daily_limit} *= 100;
+        } else {
+            $messages{fraud_daily_limit} = 'Client.Syntax.CashValue';
+        }
+    } else {
+        delete $settings{fraud_daily_limit};
+    }
+
+    $settings{fraud_daily_lock} = $c->request->params->{fraud_daily_lock}
+        if $c->request->params->{fraud_daily_lock};
+
+    if(length $c->request->params->{fraud_daily_notify}) {
+        @{$settings{fraud_daily_notify}} = split /\s*,\s*/, $c->request->params->{fraud_daily_notify};
+    } else {
+        $settings{fraud_daily_notify} = [];
+    } 
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_voip_account_fraud_preferences',
+                                                 { id => $account_id,
+                                                   data => \%settings,
+                                                 },
+                                                 undef))
+        {
+            $messages{fraudmsg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/account/detail?account_id=$account_id#fraud");
+            return;
+        }
+    } else {
+        $messages{frauderr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/account/detail?account_id=$account_id&edit_fraud=1#fraud");
+    return;
+}
+
+=head2 delete_fraud
+
+Deletes the Voip account fraud limits (aka reset to billing profile defaults)
+
+=cut
+
+sub delete_fraud : Local {
+    my ( $self, $c ) = @_;
+
+    my %messages;
+
+    my $account_id = $c->request->params->{account_id};
+
+    unless(keys %messages) {
+        if($c->model('Provisioning')->call_prov( $c, 'billing', 'reset_voip_account_fraud_preferences',
+                                                 { id => $account_id },
+                                                 undef))
+        {
+            $messages{fraudmsg} = 'Server.Voip.SavedSettings';
+            $c->session->{messages} = \%messages;
+            $c->response->redirect("/account/detail?account_id=$account_id#fraud");
+            return;
+        }
+    } else {
+        $messages{frauderr} = 'Client.Voip.InputErrorFound';
+    }
+
+    $c->session->{messages} = \%messages;
+    $c->response->redirect("/account/detail?account_id=$account_id#fraud");
+    return;
+}
+
+sub _get_fraud_preferences : Private {
+    my ( $self, $c, $account_id ) = @_;
+    my $fraud;
+    if($c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_fraud_preferences',
+                                             { id => $account_id },
+                                             \$fraud) && defined $fraud)
+    {
+        if(defined $fraud->{fraud_interval_limit}) {
+          $fraud->{fraud_interval_limit} = sprintf "%.2f", $fraud->{fraud_interval_limit} /= 100;
+        }
+        if(defined $fraud->{fraud_daily_limit}) {
+          $fraud->{fraud_daily_limit} = sprintf "%.2f", $fraud->{fraud_daily_limit} /= 100;
+        }
+        $fraud->{fraud_interval_notify} = eval { join ', ', @{$fraud->{fraud_interval_notify}} }; 
+        $fraud->{fraud_daily_notify} = eval { join ', ', @{$fraud->{fraud_daily_notify}} };
+        return $fraud;
+    } else {
+        return;
+    }
 }
 
 =head1 BUGS AND LIMITATIONS
