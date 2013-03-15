@@ -114,6 +114,7 @@ sub detail : Local {
     $c->stash->{template} = 'tt/account_detail.tt';
 
     my $voip_account;
+    my $fraudpref;
     my $account_id = $c->request->params->{account_id} || undef;
     if(defined $account_id) {
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_id',
@@ -124,7 +125,9 @@ sub detail : Local {
         $$voip_account{customer_id} = $c->request->params->{customer_id} || undef;
     }
 
-    my $fraudpref = $self->_get_fraud_preferences($c, $account_id);
+    if(defined $account_id) {
+      $fraudpref = $self->_get_fraud_preferences($c, $account_id);
+    }
     $c->stash->{edit_account} = $c->request->params->{edit_account};
 
     if($c->config->{billing_features}) {
