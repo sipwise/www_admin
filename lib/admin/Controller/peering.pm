@@ -122,13 +122,10 @@ sub create_grp : Local {
         unless $settings{name} =~ /^[a-zA-Z0-9_\-]+/;
     $settings{priority} = $c->request->params->{priority};
     $settings{description} = $c->request->params->{grpdesc};
-    $settings{outbound_peering_contract_id} = $c->request->params->{outbound_peering_contract_id}
-        if $c->request->params->{outbound_peering_contract_id};
+    $settings{peering_contract_id} = $c->request->params->{peering_contract_id}
+        if $c->request->params->{peering_contract_id};
     $messages{cpeererr} = 'Client.Voip.NoPeerContract'
-        unless (defined $settings{outbound_peering_contract_id} && $settings{outbound_peering_contract_id} =~ /^[0-9]+/);
-    # keep inbound peering contracts optional
-    $settings{inbound_peering_contract_id} = $c->request->params->{inbound_peering_contract_id}
-        if($c->request->params->{inbound_peering_contract_id} && $c->request->params->{inbound_peering_contract_id} =~ /^[0-9]+/);
+        unless (defined $settings{peering_contract_id} && $settings{peering_contract_id} =~ /^[0-9]+/);
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'create_peer_group',
@@ -167,13 +164,11 @@ sub edit_grp : Local {
     my $grpid = $c->request->params->{grpid};
     $settings{priority} = $c->request->params->{priority};
     $settings{description} = $c->request->params->{grpdesc};
-    $settings{outbound_peering_contract_id} = $c->request->params->{outbound_peering_contract_id} || undef;
-    $settings{inbound_peering_contract_id} = $c->request->params->{inbound_peering_contract_id} || undef;
+    $settings{peering_contract_id} = $c->request->params->{peering_contract_id} || undef;
 
-    unless(defined $settings{outbound_peering_contract_id}) {
+    unless(defined $settings{peering_contract_id}) {
         $messages{epeererr} = 'Client.Voip.NoPeerContract';
     }
-    # inbound peering contracts are optional
 
     unless(keys %messages) {
         if($c->model('Provisioning')->call_prov( $c, 'voip', 'update_peer_group',
