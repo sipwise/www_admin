@@ -573,17 +573,19 @@ sub _get_fraud_preferences : Private {
     my $fraud;
     if($c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_fraud_preferences',
                                              { id => $account_id },
-                                             \$fraud) && defined $fraud)
+                                             \$fraud) && @{ $fraud })
     {
-        if(defined $fraud->{fraud_interval_limit}) {
-          $fraud->{fraud_interval_limit} = sprintf "%.2f", $fraud->{fraud_interval_limit} /= 100;
+	foreach my $f(@{ $fraud }) {
+          if(defined $f->{fraud_interval_limit}) {
+            $f->{fraud_interval_limit} = sprintf "%.2f", $f->{fraud_interval_limit} /= 100;
+          }
+          if(defined $f->{fraud_daily_limit}) {
+            $f->{fraud_daily_limit} = sprintf "%.2f", $f->{fraud_daily_limit} /= 100;
+          }
+          $f->{fraud_interval_notify} = eval { join ', ', @{$f->{fraud_interval_notify}} }; 
+          $f->{fraud_daily_notify} = eval { join ', ', @{$f->{fraud_daily_notify}} };
         }
-        if(defined $fraud->{fraud_daily_limit}) {
-          $fraud->{fraud_daily_limit} = sprintf "%.2f", $fraud->{fraud_daily_limit} /= 100;
-        }
-        $fraud->{fraud_interval_notify} = eval { join ', ', @{$fraud->{fraud_interval_notify}} }; 
-        $fraud->{fraud_daily_notify} = eval { join ', ', @{$fraud->{fraud_daily_notify}} };
-        return $fraud;
+        return $fraud->[0];
     } else {
         return;
     }
