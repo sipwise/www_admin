@@ -48,12 +48,17 @@
           
           <ul class="cleanlist">
             <li class="ui-state-default">
-              <div class="span-5">Name</div>
+              <div class="span-4">Name</div>
               <div class="span-2">Priority</div>
-              <div class="span-5">Description</div>
+              <div class="span-4">Description</div>
+              <div class="span-2">
+              [% IF Catalyst.config.billing_features %]
+                <span style="font-size:9px;">Outbound Contract ID</span>
+              [% END %]
+              </div>
               <div class="span-2 last">
               [% IF Catalyst.config.billing_features %]
-                Contract ID
+                 <span style="font-size:9px;">Inbound Contract ID</span>
               [% END %]
               </div>
             </li>
@@ -61,7 +66,7 @@
             [% FOREACH grp = peer_groups %]
               <li class="ui-state-default">
                 [% IF grp.id == editid %]
-                  <div class="span-5">[% grp.name %]</div>
+                  <div class="span-4">[% grp.name %]</div>
                   <form action="/peering/edit_grp" method="post">
                     <input type="hidden" name="grpid" value="[% grp.id %]" />
                     <div class="span-2">
@@ -73,17 +78,29 @@
 						[% END %]
 					  </select>
                     </div>
-                    <div class="span-5">
-                      <input type="text" id="addtxt" title="string, description of group"
+                    <div class="span-4">
+                      <input type="text" size="15" id="addtxt" title="string, description of group"
                              name="grpdesc" value="[% grp.description %]" />
                     </div>
                     <div class="span-2">
                     [% IF Catalyst.config.billing_features %]
-                      <select size="1" name="peering_contract_id">
-                        <option value="0" [% UNLESS grp.peering_contract_id %]selected="selected"[% END %]>&nbsp;</option>
+                      <select size="1" name="outbound_peering_contract_id">
+                        <option value="0" [% UNLESS grp.outbound_peering_contract_id %]selected="selected"[% END %]>&nbsp;</option>
                         [% FOREACH contract = contracts %]
                           <option value="[% contract.id %]"
-                                  [% IF grp.peering_contract_id == contract.id %]selected="selected"[% END %]
+                                  [% IF grp.outbound_peering_contract_id == contract.id %]selected="selected"[% END %]
+                                 >[% contract.id %]</option>
+                        [% END %]
+                      </select>
+                    [% END %]
+                    </div>
+                    <div class="span-2">
+                    [% IF Catalyst.config.billing_features %]
+                      <select size="1" name="inbound_peering_contract_id">
+                        <option value="0" [% UNLESS grp.inbound_peering_contract_id %]selected="selected"[% END %]>&nbsp;</option>
+                        [% FOREACH contract = contracts %]
+                          <option value="[% contract.id %]"
+                                  [% IF grp.inbound_peering_contract_id == contract.id %]selected="selected"[% END %]
                                  >[% contract.id %]</option>
                         [% END %]
                       </select>
@@ -97,12 +114,17 @@
                       <a href="/peering"><span class="button-cancel">Cancel</span></a>
                   </div>
                 [% ELSE %]
-                  <div class="span-5"><a href="/peering/detail?group_id=[%grp.id%]">[% grp.name %]</a></div>
+                  <div class="span-4"><a href="/peering/detail?group_id=[%grp.id%]">[% grp.name %]</a></div>
                   <div class="span-2">[% grp.priority %]</div>
-                  <div class="span-5">[% grp.description %]</div>
+                  <div class="span-4">[% grp.description %]</div>
                   <div class="span-2">
                   [% IF Catalyst.config.billing_features %]
-                    [% grp.peering_contract_id %]
+                    [% grp.outbound_peering_contract_id %]
+                  [% END %]
+                  </div>
+                  <div class="span-2">
+                  [% IF Catalyst.config.billing_features %]
+                    [% grp.inbound_peering_contract_id %]
                   [% END %]
                   </div>
                   <div class="prepend-1 span-1">
@@ -126,8 +148,8 @@
       [% UNLESS Catalyst.session.admin.read_only %]
             <form action="/peering/create_grp" method="post">
               <li class="ui-state-default">
-                <div class="span-5">
-                  <input type="text" size="20" name="grpname" title="string, name of group"
+                <div class="span-4">
+                  <input type="text" size="15" name="grpname" title="string, name of group"
                          id="addtxt" value="[% garefill.name %]" />
                 </div>
                 <div class="span-2">
@@ -139,16 +161,27 @@
                     [% END %]
                   </select>
                 </div>
-                <div class="span-5">
-                  <input type="text" size="20" name="grpdesc" title="string, description of group"
+                <div class="span-4">
+                  <input type="text" size="15" name="grpdesc" title="string, description of group"
                          id="addtxt" value="[% garefill.description %]" />
                 </div>
                 <div class="span-2">
               [% IF Catalyst.config.billing_features %]
-                  <select size="1" name="peering_contract_id">
+                  <select size="1" name="outbound_peering_contract_id">
                     [% FOREACH contract = contracts %]
                       <option value="[% contract.id %]"
-                              [% IF garefill.peering_contract_id == contract.id %]selected="selected"[% END %]
+                              [% IF garefill.outbound_peering_contract_id == contract.id %]selected="selected"[% END %]
+                             >[% contract.id %]</option>
+                    [% END %]
+                  </select>
+              [% END %]
+                </div>
+                <div class="span-2">
+              [% IF Catalyst.config.billing_features %]
+                  <select size="1" name="inbound_peering_contract_id">
+                    [% FOREACH contract = contracts %]
+                      <option value="[% contract.id %]"
+                              [% IF garefill.inbound_peering_contract_id == contract.id %]selected="selected"[% END %]
                              >[% contract.id %]</option>
                     [% END %]
                   </select>
