@@ -458,11 +458,13 @@ sub search_fees : Local {
     $c->stash->{field_order} = join ', ', eval { @{$c->config->{fees_csv}{element_order}} };
 
     my $bilprof = $c->request->params->{bilprof};
+    my $prof;
 
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_billing_profile',
                                                         { handle => $bilprof },
-                                                        \$c->stash->{bilprof}
+                                                        \$prof
                                                       );
+    $c->stash->{bilprof} = $prof;
 
     my $limit = 10;
     my %filter;
@@ -478,7 +480,7 @@ sub search_fees : Local {
             delete $c->session->{feeerr};
         }
     } else {
-        foreach my $sf (qw(destination zone zone_detail)) {
+        foreach my $sf (qw(destination direction zone zone_detail)) {
             if((    defined $c->request->params->{'search_'.$sf}
                 and length $c->request->params->{'search_'.$sf})
                or $c->request->params->{'exact_'.$sf})
@@ -491,12 +493,12 @@ sub search_fees : Local {
         $c->session->{exact_filter} = { %exact };
     }
 
-    foreach my $sf (qw(destination zone zone_detail)) {
+    foreach my $sf (qw(destination direction zone zone_detail)) {
         # set values for webform
         $c->stash->{'exact_'.$sf} = $exact{$sf};
         $c->stash->{'search_'.$sf} = $filter{$sf};
 
-        next unless defined $filter{$sf};
+        next if !defined $filter{$sf} || $sf eq 'direction';
 
         # alter filter for SOAP call
         $filter{$sf} =~ s/\*/\%/g;
@@ -593,6 +595,11 @@ sub set_fees : Local {
             $c->session->{feeerr}{line} = $line;
             last;
         }
+        unless(defined $keyval{direction} && ($keyval{direction} eq 'in' || $keyval{direction} eq 'out')) {
+          $messages{feeerr} = 'Web.Fees.InvalidDirection';
+          $c->session->{feeerr}{line} = $line;
+          last;
+        }
         for(qw(zone zone_detail)) {
           if(length $keyval{$_}) {
             eval { $keyval{$_} = decode("utf8", $keyval{$_}, Encode::FB_CROAK) };
@@ -666,6 +673,7 @@ sub edit_fee : Local {
 
     my $bilprof = $c->stash->{bilprof} = $c->request->params->{bilprof};
     my $destination = $c->stash->{destination} = $c->request->params->{destination};
+    my $direction = $c->stash->{direction} = $c->request->params->{direction};
     $c->stash->{offset} = $c->request->params->{offset} || 0;
 
     $destination = $self->_normalize_destination($c, $destination) || $destination
@@ -674,11 +682,14 @@ sub edit_fee : Local {
     if(ref $c->session->{restore_fee_input} eq 'HASH') {
         $c->stash->{fee} = $c->session->{restore_fee_input};
         delete $c->session->{restore_fee_input};
-    } elsif(defined $destination) {
+    } elsif(defined $destination && defined $direction) {
         my $fee_list;
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'search_billing_profile_fees',
                                                             { handle => $bilprof,
-                                                              filter => { destination => $destination },
+                                                              filter => { 
+                                                                destination => $destination, 
+                                                                direction => $direction, 
+                                                              },
                                                             },
                                                             \$fee_list
                                                           );
@@ -725,6 +736,13 @@ sub do_edit_fee : Local {
             $messages{destination} = 'Web.Fees.InvalidDestination';
         }
     }
+   
+    $settings{direction} = $c->request->params->{new_direction} || $c->request->params->{direction};
+    unless($settings{direction} && 
+          ($settings{direction} eq 'in' || $settings{direction} eq 'out')) {
+        $messages{direction} = 'Web.Fees.InvalidDirection';
+    }
+
     $settings{zone} = $c->request->params->{zone};
     $messages{zone} = 'Web.Fees.InvalidZone' unless length $settings{zone};
     $settings{zone_detail} = $c->request->params->{zone_detail};
@@ -772,7 +790,7 @@ sub do_edit_fee : Local {
     $settings{destination} = $self->_denormalize_destination($c, $settings{destination})
         if defined $settings{destination};
     $c->session->{restore_fee_input} = \%settings;
-    $c->response->redirect("/billing/edit_fee?bilprof=$bilprof&offset=$offset&destination=".uri_escape($settings{destination}));
+    $c->response->redirect("/billing/edit_fee?bilprof=$bilprof&offset=$offset&direction=".$settings{direction}."&destination=".uri_escape($settings{destination}));
     return;
 }
 
@@ -787,13 +805,17 @@ sub do_delete_fee : Local {
 
     my $bilprof = $c->request->params->{bilprof};
     my $destination = $c->request->params->{destination};
+    my $direction = $c->request->params->{direction};
     my $offset = $c->request->params->{offset};
 
     $destination = $self->_normalize_destination($c, $destination) || $destination;
 
     if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_billing_profile_fees',
                                              { handle => $bilprof,
-                                               fees   => [ { destination => $destination } ],
+                                               fees   => [ { 
+                                                             destination => $destination,
+                                                             direction => $direction,
+                                                         } ],
                                                purge_existing => 0,
                                              },
                                              undef))

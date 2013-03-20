@@ -11,6 +11,7 @@
           <form action="do_edit_fee" method="post">
             <input type="hidden" name="bilprof" value="[% bilprof %]" />
             <input type="hidden" name="destination" value="[% fee.destination %]" />
+            <input type="hidden" name="direction" value="[% fee.direction %]" />
             <input type="hidden" name="offset" value="[% offset %]" />
 
 	    <ul class="cleanlist">
@@ -29,6 +30,25 @@
                 [% END %]
               </li>
 	      [% IF messages.destination %]<li class="error">[% messages.destination %]</li>[% END %]
+
+              <li class="ui-state-default">
+                <div class="span-5">Direction:</div>
+		<div class="span-6">
+                  [% IF direction %]
+                    [% direction %]
+                  [% ELSE %]
+                  <select name="new_direction">
+                    <option [% IF fee.direction == 'out' || !fee.direction %]selected="selected"[% END %] value="out">outbound</option>
+                    <option [% IF fee.direction == 'in' %]selected="selected"[% END %] value="in">inbound</option>
+                  </select>
+                  [% END %]
+                </div>
+		<div class="span-5 last">
+                  call direction to apply this fee for
+		</div>
+              </li>
+	      [% IF messages.direction %]<li class="error">[% messages.direction%]</li>[% END %]
+
 
               <li class="ui-state-default">
                 <div class="span-5">Zone:</div>
