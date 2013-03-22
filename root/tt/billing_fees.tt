@@ -62,6 +62,21 @@
             <ul class="cleanlist">
               <li class="ui-state-default">
                 <div class="span-3">
+                  <label class="search_label" for="search_by_source">Source:</label>
+                </div>
+                <div class="span-6">
+                  <input type="text" id="search_by_source" name="search_source" title="SQL wildcards allowed"
+                         value="[% search_source %]" />
+                </div>
+                <div class="span-6">
+                  <input type="checkbox" class="checkbox" id="exact_source" name="exact_source"
+                         [% IF exact_source %]checked="checked"[% END %] />
+                  <label for="exact_source">exact match</label>
+                </div>
+              </li>
+
+              <li class="ui-state-default">
+                <div class="span-3">
                   <label class="search_label" for="search_by_destination">Destination:</label>
                 </div>
                 <div class="span-6">
@@ -138,24 +153,24 @@
           [% IF messages.stfeemsg %]<div class="success">[% messages.stfeemsg %]</div>[% END %]
           <ul class="cleanlist">
             <li class="ui-state-default">
-              <div class="span-6">Destination</div>
+              <div class="span-5">Source</div>
+              <div class="span-5">Destination</div>
               <div class="span-1"><span class="ui-icon ui-icon-transfer-e-w"></span></div>
-              <div class="span-4">Zone</div>
-              <div class="span-4 last">Zone Detail</div>
+              <div class="span-4 last">Zone</div>
             </li>
 
           [% FOREACH fee = fee_list %]
             <li class="ui-state-default">
-              <div class="span-6" title="[% fee.destination %]" >[% fee.destination %]</div>
+              <div class="span-5" title="[% fee.source %]" >[% fee.source %]</div>
+              <div class="span-5" title="[% fee.destination %]" >[% fee.destination %]</div>
               <div class="span-1" title="[% fee.direction%]" >[% fee.direction %]</div>
               <div class="span-4" title="[% fee.zone %]" >[% fee.zone %]</div>
-              <div class="span-4" title="[% fee.zone_detail %]" >[% fee.zone_detail %]</div>
             [% UNLESS Catalyst.session.admin.read_only %]
               <div class="span-1">
-                <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.urlenc_destination %]&amp;direction=[% fee.direction %]&amp;offset=[% offset %]"><span class="button-edit">Edit</span></a>
+                <a href="/billing/edit_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.urlenc_destination %]&amp;source=[% fee.urlenc_source %]&amp;direction=[% fee.direction %]&amp;offset=[% offset %]"><span class="button-edit">Edit</span></a>
               </div>
               <div class="span-1 last">
-                <a href="/billing/do_delete_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.urlenc_destination %]&amp;direction=[% fee.direction %]&amp;offset=[% offset %][% IF last_one %]&amp;last_one=1[% END %]"><span class="button-delete">Delete</span></a>
+                <a href="/billing/do_delete_fee?bilprof=[% bilprof.handle %]&amp;destination=[% fee.urlenc_destination %]&amp;source=[% fee.urlenc_source %]&amp;direction=[% fee.direction %]&amp;offset=[% offset %][% IF last_one %]&amp;last_one=1[% END %]"><span class="button-delete">Delete</span></a>
               </div>
             [% ELSE %]
               <div class="span-1 last" />

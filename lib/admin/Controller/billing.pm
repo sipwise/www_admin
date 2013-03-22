@@ -480,7 +480,7 @@ sub search_fees : Local {
             delete $c->session->{feeerr};
         }
     } else {
-        foreach my $sf (qw(destination direction zone zone_detail)) {
+        foreach my $sf (qw(source destination direction zone zone_detail)) {
             if((    defined $c->request->params->{'search_'.$sf}
                 and length $c->request->params->{'search_'.$sf})
                or $c->request->params->{'exact_'.$sf})
@@ -493,7 +493,7 @@ sub search_fees : Local {
         $c->session->{exact_filter} = { %exact };
     }
 
-    foreach my $sf (qw(destination direction zone zone_detail)) {
+    foreach my $sf (qw(source destination direction zone zone_detail)) {
         # set values for webform
         $c->stash->{'exact_'.$sf} = $exact{$sf};
         $c->stash->{'search_'.$sf} = $filter{$sf};
@@ -527,6 +527,7 @@ sub search_fees : Local {
     if(ref $$fee_list{fees} eq 'ARRAY' and @{$$fee_list{fees}}) {
         for(@{$$fee_list{fees}}) {
             $$_{urlenc_destination} = uri_escape($$_{destination});
+            $$_{urlenc_source} = uri_escape($$_{source});
         }
         $c->stash->{fee_list} = $$fee_list{fees};
         $c->stash->{total_count} = $$fee_list{total_count};
@@ -538,9 +539,6 @@ sub search_fees : Local {
             if(@{$$fee_list{fees}} == 1) {
                 $c->stash->{last_one} = 1;
             }
-        }
-        foreach(@{$$fee_list{fees}}) {
-            $$_{destination} = $self->_denormalize_destination($c, $$_{destination});
         }
     }
 
@@ -588,13 +586,12 @@ sub set_fees : Local {
             last;
         }
         @keyval{@elements} = @values;
-        $keyval{destination} = $self->_normalize_destination($c, $keyval{destination}) || $keyval{destination}
-            if length $keyval{destination};
         unless(defined $keyval{destination}) {
             $messages{feeerr} = 'Web.Fees.InvalidDestination';
             $c->session->{feeerr}{line} = $line;
             last;
         }
+	$keyval{source} |= '';
         unless(defined $keyval{direction} && ($keyval{direction} eq 'in' || $keyval{direction} eq 'out')) {
           $messages{feeerr} = 'Web.Fees.InvalidDirection';
           $c->session->{feeerr}{line} = $line;
@@ -673,20 +670,19 @@ sub edit_fee : Local {
 
     my $bilprof = $c->stash->{bilprof} = $c->request->params->{bilprof};
     my $destination = $c->stash->{destination} = $c->request->params->{destination};
+    my $source = $c->stash->{source} = $c->request->params->{source} || '';
     my $direction = $c->stash->{direction} = $c->request->params->{direction};
     $c->stash->{offset} = $c->request->params->{offset} || 0;
-
-    $destination = $self->_normalize_destination($c, $destination) || $destination
-        if length $destination;
 
     if(ref $c->session->{restore_fee_input} eq 'HASH') {
         $c->stash->{fee} = $c->session->{restore_fee_input};
         delete $c->session->{restore_fee_input};
-    } elsif(defined $destination && defined $direction) {
+    } elsif(defined $source && defined $destination && defined $direction) {
         my $fee_list;
         return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'search_billing_profile_fees',
                                                             { handle => $bilprof,
                                                               filter => { 
+                                                                source => $source, 
                                                                 destination => $destination, 
                                                                 direction => $direction, 
                                                               },
@@ -700,7 +696,6 @@ sub edit_fee : Local {
                 $c->session->{messages}{feeerr} = 'Web.Fees.DuplicatedDestination';
             } else {
                 $c->stash->{fee} = $$fee_list{fees}[0];
-                $c->stash->{fee}{destination} = $self->_denormalize_destination($c, $c->stash->{fee}{destination});
             }
         } else {
             $c->session->{messages}{feeerr} = 'Web.Fees.NoSuchDestination';
@@ -725,15 +720,21 @@ sub do_edit_fee : Local {
     my $bilprof = $c->request->params->{bilprof};
     my $offset = $c->request->params->{offset};
     $settings{destination} = $c->request->params->{destination};
-    $settings{destination} = $self->_normalize_destination($c, $settings{destination}) || $settings{destination}
-        if length $settings{destination};
     if(defined $c->request->params->{new_destination}) {
         undef $settings{destination};
-        $settings{destination} = $self->_normalize_destination($c, $c->request->params->{new_destination})
-                                   || $c->request->params->{new_destination}
+        $settings{destination} = $c->request->params->{new_destination}
             if length $c->request->params->{new_destination};
         unless(defined $settings{destination}) {
             $messages{destination} = 'Web.Fees.InvalidDestination';
+        }
+    }
+
+    $settings{source} = $c->request->params->{source} || '';
+    if(defined $c->request->params->{new_source}) {
+        undef $settings{source};
+        $settings{source} = $c->request->params->{new_source};
+        unless(defined $settings{source}) {
+            $messages{source} = 'Web.Fees.InvalidDestination';
         }
     }
    
@@ -787,10 +788,8 @@ sub do_edit_fee : Local {
     }
     $c->session->{messages} = \%messages;
 
-    $settings{destination} = $self->_denormalize_destination($c, $settings{destination})
-        if defined $settings{destination};
     $c->session->{restore_fee_input} = \%settings;
-    $c->response->redirect("/billing/edit_fee?bilprof=$bilprof&offset=$offset&direction=".$settings{direction}."&destination=".uri_escape($settings{destination}));
+    $c->response->redirect("/billing/edit_fee?bilprof=$bilprof&offset=$offset&direction=".$settings{direction}."&destination=".uri_escape($settings{destination})."&source=".uri_escape($settings{source}));
     return;
 }
 
@@ -805,14 +804,14 @@ sub do_delete_fee : Local {
 
     my $bilprof = $c->request->params->{bilprof};
     my $destination = $c->request->params->{destination};
+    my $source = $c->request->params->{source} || '';
     my $direction = $c->request->params->{direction};
     my $offset = $c->request->params->{offset};
-
-    $destination = $self->_normalize_destination($c, $destination) || $destination;
 
     if($c->model('Provisioning')->call_prov( $c, 'billing', 'set_billing_profile_fees',
                                              { handle => $bilprof,
                                                fees   => [ { 
+                                                             source => $source,
                                                              destination => $destination,
                                                              direction => $direction,
                                                          } ],
@@ -1029,49 +1028,6 @@ sub do_edit_peaktime : Local {
     };
     return;
 }
-
-sub _normalize_destination : Private {
-    my ($self, $c, $destination) = @_;
-
-    if($destination =~ /^\d+$/) {
-        # E.164 number
-        $destination = '^' . $destination . '.*$';
-    } elsif($destination =~ /^(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]+$/i
-            or $destination =~ /^[012]?[0-9]?[0-9](?:\.[012]?[0-9]?[0-9]){3}$/)
-    {
-        # domain or IP address
-        $destination =~ s/\./\\./g;
-        $destination = '^.*@'. $destination .'$';
-    } elsif($destination =~ /^.+\@(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]+$/i
-            or $destination =~ /^.+\@[012]?[0-9]?[0-9](?:\.[012]?[0-9]?[0-9]){3}$/)
-    {
-        # SIP URI
-        $destination =~ s/\./\\./g;
-        $destination = '^'. $destination .'$';
-    } else {
-        return;
-    }
-
-    return $destination;
-}
-
-sub _denormalize_destination : Private {
-    my ($self, $c, $destination) = @_;
-
-    my $backup = $destination;
-    $destination =~ s/\\\././g;
-    $destination =~ s/\$$//;
-    $destination =~ s/^\^//;
-    $destination =~ s/\.\*$//;
-    $destination =~ s/^\.\*\@//;
-
-    if(defined $self->_normalize_destination($c, $destination)) {
-        return $destination;
-    } else {
-        return $backup;
-    }
-}
-
 
 =head1 BUGS AND LIMITATIONS
 

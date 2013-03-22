@@ -16,16 +16,32 @@
 
 	    <ul class="cleanlist">
               <li class="ui-state-default">
+                <div class="span-5">Source:</div>
+                [% IF destination %]
+		<div class="span-6 last">[% fee.source %]</div>
+                [% ELSE %]
+		<div class="span-6">
+                  <input type="text" name="new_source" title="string, empty or POSIX regular expression, e.g.: ^431.+$"
+                         value="[% fee.source %]" />
+		</div>
+		<div class="span-5 last">
+                  empty or POSIX regex
+		</div>
+                [% END %]
+              </li>
+	      [% IF messages.source %]<li class="error">[% messages.source %]</li>[% END %]
+
+              <li class="ui-state-default">
                 <div class="span-5">Destination:</div>
                 [% IF destination %]
 		<div class="span-6 last">[% fee.destination %]</div>
                 [% ELSE %]
 		<div class="span-6">
-                  <input type="text" name="new_destination" title="string, e.g.: 431; or POSIX regular expression, e.g.: ^431.+$"
+                  <input type="text" name="new_destination" title="string, POSIX regular expression, e.g.: ^431.+$"
                          value="[% fee.destination %]" />
 		</div>
 		<div class="span-5 last">
-                  E.164 prefix or SIP domain
+                  POSIX regex
 		</div>
                 [% END %]
               </li>
