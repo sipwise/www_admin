@@ -1,3 +1,12 @@
+ngcp-www-admin (3.6.0) unstable; urgency=low
+
+  [ agranig ]
+  * Implement termination rating in billing fees.
+  * Implement source pattern field in billing fees.
+  * Implement account-specific fraud limits.
+
+ -- Andreas Granig <agranig@sipwise.com>  Wed, 27 Mar 2013 10:30:34 +0100
+
 ngcp-www-admin (3.5.2) unstable; urgency=low
 
   [ agranig ]
