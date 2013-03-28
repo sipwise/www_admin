@@ -11,6 +11,7 @@
           <form action="do_edit_fee" method="post">
             <input type="hidden" name="bilprof" value="[% bilprof %]" />
             <input type="hidden" name="destination" value="[% fee.destination %]" />
+            <input type="hidden" name="source" value="[% fee.source %]" />
             <input type="hidden" name="direction" value="[% fee.direction %]" />
             <input type="hidden" name="offset" value="[% offset %]" />
 
