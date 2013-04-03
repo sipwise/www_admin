@@ -1,3 +1,10 @@
+ngcp-www-admin (3.6.2) unstable; urgency=low
+
+  [ agranig ]
+  * Fix handling of sip uri pattern checks and clarify format in tool-tips.
+
+ -- Andreas Granig <agranig@sipwise.com>  Wed, 03 Apr 2013 14:15:15 +0200
+
 ngcp-www-admin (3.6.1) unstable; urgency=low
 
   [ agranig ]
