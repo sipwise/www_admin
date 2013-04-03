@@ -178,11 +178,11 @@
                              name="callee_prefix" value="[% restore_rule.callee_prefix or rule.callee_prefix %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="A POSIX regex matching against 'user@domain' (e.g. '^.+@example\.org$' or '^431.+$')"
+                      <input type="text" size="15" id="addtxt" title="A POSIX regex matching against the full Request-URI (e.g. '^sip:.+@example\.org$' or '^sip:431')"
                              name="callee_pattern" value="[% restore_rule.callee_pattern or rule.callee_pattern %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="A POSIX regex matching against 'user@domain' (e.g. '^.+@example\.org$' or '^431.+$')"
+                      <input type="text" size="15" id="addtxt" title="A POSIX regex matching against 'sip:user@domain' (e.g. '^sip:.+@example\.org$' matching the whole URI, or '999' matching if the URI contains '999')"
                              name="caller_pattern" value="[% restore_rule.caller_pattern or rule.caller_pattern %]" />
                     </div>
                     <div class="span-4">
@@ -228,11 +228,11 @@
                              name="callee_prefix" value="[% IF not rule.id == reditid %][% restore_rule.callee_prefix %][% END %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="A POSIX regex matching against 'user@domain' (e.g. '^.+@example\.org$' or '^431.+$')"
+                      <input type="text" size="15" id="addtxt" title="A POSIX regex matching against the full Request-URI (e.g. '^sip:.+@example\.org$' or '^sip:431')"
                              name="callee_pattern" value="[% IF not rule.id == reditid %][% restore_rule.callee_pattern %][% END %]" />
                     </div>
                     <div class="span-4">
-                      <input type="text" size="15" id="addtxt" title="A POSIX regex matching against 'user@domain' (e.g. '^.+@example\.org$' or '^431.+$')"
+                      <input type="text" size="15" id="addtxt" title="A POSIX regex matching against 'sip:user@domain' (e.g. '^sip:.+@example\.org$' matching the whole URI, or '999' matching if the URI contains '999')"
                              name="caller_pattern" value="[% IF not rule.id == reditid %][% restore_rule.caller_pattern %][% END %]" />
                     </div>
                     <div class="span-4">
