@@ -1,3 +1,13 @@
+ngcp-www-admin (3.6.3) unstable; urgency=low
+
+  [ agranig ]
+  * subscriber.pm,Utils.pm: Use uuid instead of cli for call list matching.
+
+  [ apogrebennyk ]
+  * account.pm: fix warning: "my" variable %settings masks earlier declaration in same scope
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Tue, 23 Apr 2013 13:39:41 +0200
+
 ngcp-www-admin (3.6.2) unstable; urgency=low
 
   [ agranig ]

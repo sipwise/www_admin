@@ -465,7 +465,6 @@ sub update_fraud : Local {
     my ( $self, $c ) = @_;
 
     my %messages;
-    my %settings;
 
     my $account_id = $c->request->params->{account_id};
 
