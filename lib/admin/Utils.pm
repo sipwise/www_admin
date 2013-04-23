@@ -131,7 +131,7 @@ sub get_qualified_number_for_subscriber {
 # as returned by the prov. interface and returns a reference to an
 # array suited for TT display
 sub prepare_call_list {
-    my ($c, $username, $domain, $call_list, $filter, $bilprof) = @_;
+    my ($c, $subscriber, $call_list, $filter, $bilprof) = @_;
     my $callentries = [];
 
     my @time = localtime time;
@@ -175,9 +175,8 @@ sub prepare_call_list {
             $callentry{call_fee} = '';
         }
 
-        if(defined $$call{source_user}
-           and $$call{source_user} eq $username
-           and $$call{source_domain} eq $domain)
+        if(defined $$call{source_user_id}
+           and $$call{source_user_id} eq $subscriber->{uuid})
         {
             if($$call{call_status} eq 'ok') {
                 $callentry{direction_icon} = 'anruf_aus_small.gif';
@@ -194,9 +193,8 @@ sub prepare_call_list {
             }
             $callentry{partner_number} = $callentry{partner};
 
-        } elsif(defined $$call{destination_user}
-                and $$call{destination_user} eq $username
-                and $$call{destination_domain} eq $domain)
+        } elsif(defined $$call{destination_user_id}
+                and $$call{destination_user_id} eq $subscriber->{uuid})
         {
             if($$call{call_status} eq 'ok') {
                 $callentry{direction_icon} = 'anruf_ein_small.gif';
