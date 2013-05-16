@@ -1,3 +1,10 @@
+ngcp-www-admin (3.6.4) unstable; urgency=low
+
+  [ ldieckow ]
+  * subscriber: mantis #3057: unset admin property
+
+ -- Kirill Solomko <ksolomko@sipwise.com>  Thu, 16 May 2013 13:19:41 +0200
+
 ngcp-www-admin (3.6.3) unstable; urgency=low
 
   [ agranig ]
