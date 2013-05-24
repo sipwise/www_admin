@@ -1,0 +1,76 @@
+        [% IF contract.id %]
+          <h3>Reseller Contract [% contract.id %]</h3>
+        [% ELSE %]
+          <h3>New Reseller Contract</h3>
+        [% END %]
+
+        [% UNLESS contract.terminate_timestamp || Catalyst.session.admin.read_only %]
+        <div class="inlinecontainer">
+          <a href="/admin"><span class="button-back">Back</span></a>
+          [% IF edit_contract %]
+            [% IF contract.id %]
+              <a href="terminate_contract?contract_id=[% contract.id %]"><span class="button-terminate">Terminate</span></a>
+              <a href="delete_contract?contract_id=[% contract.id %]"><span class="button-delete">Delete</span></a>
+            [% END %]
+          [% END %]          
+        </div>
+        [% END %]
+
+          [% IF messages.conmsg %]<div class="success">[% messages.conmsg %]</div>[% END %]
+          [% IF messages.conerr %]<div class="error">[% messages.conerr %]</div>[% END %]
+
+          <div class="hspace-20"></div>
+          <form action="save_contract" method="post">
+            <input type="hidden" name="contract_id" value="[% contract.id %]" />
+            <ul class="cleanlist">
+            [% IF contract.id %]
+              <li class="ui-state-default"><div class="span-5">Contract ID:</div><div class="span-10 last">[% contract.id %]</div></li>
+            [% END %]
+
+            [% IF billing_features %]
+              <li class="ui-state-default">
+                <div class="span-5">Billing Profile:</div>
+                <div class="span-10 last">
+                [% IF edit_contract %]
+                  <select size="1" name="billing_profile">
+                  [% FOREACH profile = billing_profiles %]
+                    <option value="[% profile.handle %]"
+                          [% IF profile.handle == contract.billing_profile %]
+                            selected="selected"
+                          [% END %]>[% profile.data.name %]</option>
+                  [% END %]
+                  </select>
+                [% ELSE %]
+                  [% contract.billing_profile_name %]
+                [% END %]
+                </div>
+              </li>
+            [% END %]
+            
+            <li class="ui-state-default"><div class="span-14 last">Peering contact person or company:</div></li>
+            [% FOREACH contact_form_field = contact_form_fields %]
+            <li class="ui-state-default">
+                <div class="prepend-1 span-4">[% contact_form_field.label %]:</div>
+                <div class="span-10 last">
+                  [% IF edit_contract %]
+                    <input type="text" name="[% contact_form_field.field %]" value="[% contact_form_field.value %]" />
+                  [% ELSE %]
+                    [% contact_form_field.value %]
+                  [% END %]  
+                </div>
+              </li>
+            [% END %]
+
+            [% IF contract.id %]
+              <li class="ui-state-default"><div class="span-5">Created:</div><div class="span-10 last">[% contract.create_timestamp %]</div></li>
+              <li class="ui-state-default"><div class="span-5">Modified:</div><div class="span-10 last">[% contract.modify_timestamp %]</div></li>
+              [% IF contract.terminate_timestamp %]
+              <li class="ui-state-default"><div class="span-5">Terminated:</div><div class="span-10 last"><div class="alert">[% contract.terminate_timestamp %]</div></div></li>
+              [% END %]
+            [% END %]
+            </ul>
+            [% IF edit_contract %]
+              <div class="hspace-20"></div>
+              <button name="submit" class="button-save">Save</button>
+            [% END %]
+          </form>

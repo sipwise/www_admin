@@ -245,7 +245,7 @@ sub update_subscriber : Local {
         $settings{external_id} = $c->request->params->{external_id};
     }
 
-    $settings{admin} = 1 if $c->request->params->{admin};
+    $settings{admin} = $c->request->params->{admin} ? 1 : 0;
 
     my $password = $c->request->params->{password};
     if(length $password) {

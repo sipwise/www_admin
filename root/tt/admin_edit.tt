@@ -36,6 +36,20 @@
             [% IF messages.epass2 %]
               <li class="error">[% messages.epass2 %]</li>
             [% END %]
+            [% IF !Catalyst.session.admin.is_reseller %]
+            <li class="ui-state-default">
+              <div class="span-3">Reseller:</div>
+              <div class="span-10 last">
+                <select size="1" name="reseller_id" [% IF edit_admin == Catalyst.session.admin.login %]disabled="disabled"[% END %]>
+                  [% FOREACH reseller = resellers %]
+                    <option value="[% reseller.id %]"
+                            [% IF admin.reseller_id == reseller.id %]selected="selected"[% END %]
+                           >#[% reseller.id %] - [% reseller.name %]</option>
+                  [% END %]
+                </select>
+              </div>
+            </li>
+            [% END %]
             <li class="ui-state-default">
               <div class="span-3">Master:</div>
               <div class="span-10 last">

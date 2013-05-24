@@ -1,3 +1,81 @@
+    [% UNLESS Catalyst.session.admin.is_reseller %]
+        <h3 id="contract">Reseller Contracts</h3>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <a href="/admin/contract_detail?edit_contract=1"><span class="button-add">Add</span></a>
+      [% END %]
+
+        <div class="hspace-20"></div>
+        [% IF contracts %]
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-2">Contract ID</div>
+              <div class="span-4">Billing Profile</div>
+	      <div class="span-4">Contact</div>
+              <div class="span-4 last">Created</div>
+            </li>
+	    [% FOREACH contract = contracts %]
+            <li class="ui-state-default">
+              <div class="span-2">[% contract.id %]</div>
+              <div class="span-4">[% contract.billing_profile_name%]</div>
+	      <div class="span-4">[% contract.short_contact %]</div>
+              <div class="span-4 append-1">[% contract.create_timestamp %]</div>
+              <div class="span-1 last">
+              [% UNLESS Catalyst.session.admin.read_only %]
+                <a href="/admin/contract_detail?edit_contract=1&amp;contract_id=[% contract.id %]"><span class="button-edit">Edit</span></a>
+              [% END %]
+              </div>
+            </li>
+	    [% END %]
+          </ul>
+        [% ELSE %]
+          <div>
+            No reseller contracts created yet.
+          </div>
+        [% END %]
+
+
+        <div class="hspace-20"></div>
+        <h3 id="contract">Resellers</h3>
+
+      [% UNLESS Catalyst.session.admin.read_only %]
+        <a href="/admin/reseller_detail?edit_reseller=1"><span class="button-add">Add</span></a>
+      [% END %]
+
+        <div class="hspace-20"></div>
+        [% IF resellers %]
+          <ul class="cleanlist">
+            <li class="ui-state-default">
+              <div class="span-2">Reseller ID</div>
+              <div class="span-2">Contract ID</div>
+              <div class="span-4">Name</div>
+              <div class="span-4">Status</div>
+              <div class="span-1 last"></div>
+            </li>
+	    [% FOREACH reseller = resellers %]
+            <li class="ui-state-default">
+              <div class="span-2">[% reseller.id %]</div>
+              <div class="span-2">[% reseller.contract_id %]</div>
+              <div class="span-4">[% reseller.name %]</div>
+              <div class="span-4">[% reseller.status %]</div>
+              <div class="span-1 last">
+              [% UNLESS Catalyst.session.admin.read_only %]
+                <a href="/admin/reseller_detail?edit_reseller=1&amp;reseller_id=[% reseller.id %]"><span class="button-edit">Edit</span></a>
+              [% END %]
+              </div>
+            </li>
+	    [% END %]
+          </ul>
+        [% ELSE %]
+          <div>
+            No resellers created yet.
+          </div>
+        [% END %]
+
+
+    [% END %]
+
+        <div class="hspace-20"></div>
         <h3>Administrator Accounts</h3>
       
         [% IF ! Catalyst.session.admin.read_only && (Catalyst.session.admin.is_master || Catalyst.session.admin.is_superuser) %]

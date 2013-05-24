@@ -1,0 +1,55 @@
+        [% IF reseller.id %]
+          <h3>Reseller [% reseller.id %]</h3>
+        [% ELSE %]
+          <h3>New Reseller</h3>
+        [% END %]
+
+        <div class="inlinecontainer">
+          <a href="/admin"><span class="button-back">Back</span></a>
+        </div>
+
+          [% IF messages.conmsg %]<div class="success">[% messages.conmsg %]</div>[% END %]
+          [% IF messages.conerr %]<div class="error">[% messages.conerr %]</div>[% END %]
+
+          <div class="hspace-20"></div>
+          <form action="save_reseller" method="post">
+            <input type="hidden" name="reseller_id" value="[% reseller.id %]" />
+            <ul class="cleanlist">
+            [% IF reseller.id %]
+              <li class="ui-state-default"><div class="span-5">Reseller ID:</div><div class="span-10 last">[% reseller.id %]</div></li>
+            [% END %]
+
+              <li class="ui-state-default">
+                <div class="span-5">Contract ID:</div>
+                <div class="span-10 last">
+                [% IF edit_reseller %]
+                  <select size="1" name="contract_id">
+                  [% FOREACH contract = contracts %]
+                    <option value="[% contract.id %]"
+                          [% IF contract.id == reseller.contract_id %]
+                            selected="selected"
+                          [% END %]>[% contract.id %]</option>
+                  [% END %]
+                  </select>
+                [% ELSE %]
+                  [% reseller.contract_id %]
+                [% END %]
+                </div>
+              </li>
+              <li class="ui-state-default">
+                <div class="span-5">Name:</div>
+                <div class="span-10 last">
+                  [% IF edit_reseller %]
+                    <input type="text" name="name" value="[% reseller.name %]" />
+                  [% ELSE %]
+                    [% reseller.name %]
+                  [% END %]  
+                </div>
+              </li>
+            
+            </ul>
+            [% IF edit_reseller %]
+              <div class="hspace-20"></div>
+              <button name="submit" class="button-save">Save</button>
+            [% END %]
+          </form>
