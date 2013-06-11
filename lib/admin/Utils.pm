@@ -168,9 +168,9 @@ sub prepare_call_list {
             $callentry{duration} = '00:00';
         }
 
-        if(defined $$call{customer_cost}) {
+        if(defined $$call{source_customer_cost}) {
             # money is allways returned as cents
-            $callentry{call_fee} = sprintf $$bilprof{data}{currency} . " %.04f", $$call{customer_cost}/100;
+            $callentry{call_fee} = sprintf $$bilprof{data}{currency} . " %.04f", $$call{source_customer_cost}/100;
         } else {
             $callentry{call_fee} = '';
         }
