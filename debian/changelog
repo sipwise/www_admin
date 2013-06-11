@@ -1,3 +1,13 @@
+ngcp-www-admin (3.6.5) unstable; urgency=low
+
+  [ apogrebennyk ]
+  * 8118556 reflect renaming to source_customer_cost in 2.8 (mantis:3237)
+
+  [ alutay ]
+  * db8263c update the copyright date
+
+ -- Andrew Pogrebennyk <apogrebennyk@sipwise.com>  Tue, 11 Jun 2013 13:54:51 +0200
+
 ngcp-www-admin (3.6.4) unstable; urgency=low
 
   [ ldieckow ]
