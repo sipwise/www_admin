@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base 'Catalyst::Controller';
 use Data::Dumper;
-use UNIVERSAL 'isa';
+use UNIVERSAL::isa;
 use Sys::Hostname;
 
 
