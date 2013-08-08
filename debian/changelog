@@ -1,3 +1,9 @@
+ngcp-www-admin (3.7.2) unstable; urgency=low
+
+  * [2dc0454] Make apache restart graceful.
+
+ -- Andreas Granig <agranig@sipwise.com>  Thu, 08 Aug 2013 18:07:28 +0200
+
 ngcp-www-admin (3.7.1) unstable; urgency=low
 
   [ Andreas Granig ]
