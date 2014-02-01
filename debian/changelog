@@ -1,3 +1,12 @@
+ngcp-www-admin (3.7.2+0~mr3.2.1) unstable; urgency=low
+
+  [ Michael Prokop ]
+  * [abe9de6] Use invoke-rc.d interface in postinst maintainer script
+
+  [ Sipwise Jenkins Builder ]
+
+ -- Sipwise Jenkins Builder <jenkins@sipwise.com>  Sat, 01 Feb 2014 20:03:29 +0100
+
 ngcp-www-admin (3.7.2) unstable; urgency=low
 
   * [2dc0454] Make apache restart graceful.
