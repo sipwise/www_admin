@@ -1,11 +1,9 @@
-ngcp-www-admin (3.7.2+0~mr3.3) unstable; urgency=low
+ngcp-www-admin (3.8.0.0+0~mr3.3.0.0) unstable; urgency=low
 
   [ Michael Prokop ]
   * [abe9de6] Use invoke-rc.d interface in postinst maintainer script
 
-  [ Sipwise Jenkins Builder ]
-
- -- Sipwise Jenkins Builder <jenkins@sipwise.com>  Sat, 01 Feb 2014 20:03:21 +0100
+ -- Alexander Lutay <alutay@sipwise.com>  Fri, 21 Mar 2014 15:48:44 +0100
 
 ngcp-www-admin (3.7.2) unstable; urgency=low
 
