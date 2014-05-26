@@ -1339,6 +1339,8 @@ sub call_data : Local {
         }
     }
 
+    my $listlimit = $c->request->params->{list_limit} || 100;
+
     my $calls;
     return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'get_subscriber_cdrs',
                                                         { username => $$subscriber{username},
@@ -1349,6 +1351,8 @@ sub call_data : Local {
                                                         },
                                                         \$calls
                                                       );
+
+    splice @$calls, $listlimit if ($listlimit && $listlimit =~ /^[0-9]+$/);
 
     my $account;
     return unless $c->model('Provisioning')->call_prov( $c, 'billing', 'get_voip_account_by_id',
@@ -1366,6 +1370,7 @@ sub call_data : Local {
     $c->stash->{cdr_list} = $calls;
     $c->stash->{call_list} = admin::Utils::prepare_call_list($c, $subscriber, $calls, $listfilter, $bilprof);
     $c->stash->{subscriber}{list_filter} = $listfilter if defined $listfilter;
+    $c->stash->{subscriber}{list_limit}  = $listlimit  if defined $listlimit;
 
     undef $c->stash->{call_list} unless eval { @{$c->stash->{call_list}} };
 

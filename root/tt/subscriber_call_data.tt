@@ -120,6 +120,21 @@
               <br />
               <br />
 
+              [% limit_entries = [] -%]
+              [% limit_entries.push('100') -%]
+              [% limit_entries.push('1000') -%]
+              [% limit_entries.push('5000') -%]
+              [% limit_entries.push('10000') -%]
+              [% limit_entries.push('Unlimited') -%]
+              <label for="limit_filter">limit</label><br />
+              <select name="list_limit">
+                [% FOREACH limit IN limit_entries -%]
+                <option [% 'selected="selected"' IF limit == subscriber.list_limit %] value=[% limit %]>[% limit %]</option>
+                [% END -%]
+              </select>
+              <br />
+              <br />
+
               <button class="button-search" id="calllist_apply_filter">Search</button>
 
             </form>
