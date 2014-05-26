@@ -1,3 +1,15 @@
+ngcp-www-admin (3.9.0.0+0~mr3.4.0.0) unstable; urgency=low
+
+  [ Michael Prokop ]
+  * [1d78064] MT#6511 Bump Standards-Version to 3.9.5
+
+  [ Victor Seva ]
+  * [6451419] MT#7065 added some js sources
+
+  [ Sipwise Jenkins Builder ]
+
+ -- Sipwise Jenkins Builder <jenkins@sipwise.com>  Mon, 26 May 2014 16:07:44 +0200
+
 ngcp-www-admin (3.8.0.0+0~mr3.3.0.0) unstable; urgency=low
 
   [ Michael Prokop ]
