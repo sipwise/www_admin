@@ -1,3 +1,9 @@
+ngcp-www-admin (3.8.2.0+0~mr3.3.2.0) unstable; urgency=low
+
+  * New release.
+
+ -- Sipwise Jenkins Builder <jenkins@sipwise.com>  Thu, 19 Jun 2014 07:40:59 +0200
+
 ngcp-www-admin (3.8.1.0+0~mr3.3.1.0) unstable; urgency=low
 
   [ Michael Prokop ]
