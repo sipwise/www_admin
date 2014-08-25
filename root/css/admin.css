@@ -48,6 +48,10 @@
   margin-top: 30px;
 }
 
+#dataConfirmModal {
+    display: none;
+}
+
 a, a:visited, a:link,
 .content .ui-state-default a, .content .ui-state-default a:visited, 
 .content .ui-state-default a:link {
