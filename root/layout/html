@@ -63,6 +63,17 @@
         dateFormat: 'dd.mm.yy',
       });
 
+      $( "#dataConfirmModal" ).dialog({ autoOpen: false, modal: true });
+      $( "#dataConfirmCancel" ).button({ });
+      $( "#dataConfirmOK" ).button({ });
+      $( "#dataConfirmCancel").click(function(){ $( "#dataConfirmModal" ).dialog( "close" ); return false; });
+      $(".button-delete , .button-terminate").parents("a").click(function(){
+          //show dialog here
+          var href = $(this).attr('href');
+          $('#dataConfirmOK').attr('href', href);
+          $( "#dataConfirmModal" ).dialog("open");
+          return false;
+        });
 
       [% 
          buttons = [
@@ -109,6 +120,12 @@
 
 <body>
 [% content %]
+
+
+    <div id="dataConfirmModal" class="modal" title="Are you sure?">
+            <a id="dataConfirmCancel">Cancel</a>
+            <a id="dataConfirmOK">OK</a>
+    </div>
 </body>
 
 </html>
