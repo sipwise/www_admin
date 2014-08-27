@@ -1,3 +1,10 @@
+ngcp-www-admin (3.6.7) unstable; urgency=low
+
+  [ gjungwirth ]
+  * [52c165b] MT#6299 Introduce confirmation dialog
+
+ -- Gerhard Jungwirth <gjungwirth@sipwise.com>  Wed, 27 Aug 2014 16:48:03 +0300
+
 ngcp-www-admin (3.6.6) unstable; urgency=low
 
   * [e5ad7ff] MT#5303 Add a limit option for amount of CDRs shown
