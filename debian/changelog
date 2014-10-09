@@ -1,3 +1,12 @@
+ngcp-www-admin (3.11.0.0+0~mr3.6.0.0) unstable; urgency=low
+
+  [ Gerhard Jungwirth ]
+  * [3e2f21f] MT#6299 Introduce confirmation dialog
+
+  [ Sipwise Jenkins Builder ]
+
+ -- Sipwise Jenkins Builder <jenkins@sipwise.com>  Thu, 09 Oct 2014 17:03:11 +0200
+
 ngcp-www-admin (3.10.0.0+0~mr3.5.0.0) unstable; urgency=low
 
   * New release.
