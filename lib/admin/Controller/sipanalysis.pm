@@ -79,7 +79,7 @@ sub search : Local {
 
     # TODO: pagination goes here
 
-    $c->stash->{calls} = $calls;
+    $c->stash->{calls} = [ reverse @$calls ];
 
     return;
 }
