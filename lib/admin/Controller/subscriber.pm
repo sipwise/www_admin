@@ -161,8 +161,12 @@ sub detail : Local {
             $$regpeer{contacts_short} =~ s/>/\&gt;/g;
             $$subscriber{registered_peer} = $regpeer;
         }
+
+	# ksolomko no dropdown for alias numbers and allowed clis
+	$subscriber->{alias_numbers} = [];
+	$preferences->{allowed_clis} = [];
         
-        eval { $$subscriber{alias_numbers} = [ sort @{$$subscriber{alias_numbers}} ] };
+        #eval { $$subscriber{alias_numbers} = [ sort @{$$subscriber{alias_numbers}} ] };
         $c->stash->{subscriber} = $subscriber;
         $c->stash->{subscriber}{subscriber_id} = $subscriber_id;
         $c->stash->{subscriber}{is_locked} = $c->model('Provisioning')->localize($c, $c->view($c->config->{view})->
@@ -415,6 +419,16 @@ sub do_edit_aliases : Local {
         if(defined $aliaslist) {
             $$subscriber{alias_numbers} = [ grep { $$_{cc} ne $cc or $$_{ac} ne $ac or $$_{sn} ne $sn } @$aliaslist ];
         }
+        $c->model('Provisioning')->call_prov( $c, 'billing', 'delete_alias_numbers',
+                                              { 
+                                                username      => $$subscriber{username},
+                                                domain        => $$subscriber{domain},
+                                                alias_numbers => [ 
+							{ cc => $cc, ac => $ac, sn => $sn }
+						]
+                                              },
+                                              undef
+                                            );
     }
 
     # input text fields to add new entry to list
@@ -444,25 +458,20 @@ sub do_edit_aliases : Local {
             unless $checkresult;
 
         unless(keys %messages) {
-            my $aliaslist = $$subscriber{alias_numbers};
-            $aliaslist = [] unless defined $aliaslist;
-            $$subscriber{alias_numbers} = [ @$aliaslist, { cc => $cc, ac => $ac, sn => $sn } ];
-        } else {
-            $c->session->{aliasadd} = { cc => $cc, ac => $ac, sn => $sn };
+		$c->model('Provisioning')->call_prov( $c, 'billing', 'add_alias_numbers',
+						      { 
+							username      => $$subscriber{username},
+							domain        => $$subscriber{domain},
+							alias_numbers => [ 
+								{ cc => $cc, ac => $ac, sn => $sn }
+							]
+						      },
+						      undef
+						    );
         }
     }
 
-    unless(keys %messages) {
-        $c->model('Provisioning')->call_prov( $c, 'billing', 'update_voip_account_subscriber',
-                                              { id         => $acid,
-                                                subscriber => { username      => $$subscriber{username},
-                                                                domain        => $$subscriber{domain},
-                                                                alias_numbers => $$subscriber{alias_numbers},
-                                                              },
-                                              },
-                                              undef
-                                            );
-    } else {
+    if (keys %messages) {
         $messages{aliaserr} = 'Client.Voip.InputErrorFound';
     }
 
@@ -699,6 +708,10 @@ sub preferences : Local {
                                                         \$$subscriber{reminder}
                                                       );
 
+    # ksolomko no dropdown lists for these 2 prefs
+    $preferences->{allowed_clis} = [];
+    $subscriber->{alias_numbers} = [];
+
     $c->stash->{cf_dsets} = $cf_dsets;
     $c->stash->{cf_tsets} = $cf_tsets;
     $c->stash->{cf_maps} = $cf_maps;
@@ -908,7 +921,7 @@ sub update_preferences : Local {
 
         next unless $$db_pref{usr_pref};
         delete $$preferences{$$db_pref{preference}}, next
-            if $$db_pref{read_only};
+            if $$db_pref{read_only} or $$db_pref{preference} eq 'allowed_clis';
 
         for (qw/cli user_cli emergency_cli/) {
             next unless (defined $c->request->params->{$_} and $c->request->params->{$_} ne '');
@@ -1392,7 +1405,7 @@ sub sipstats : Local {
                                                         },
                                                         \$calls
                                                       );
-    $c->stash->{calls} = $calls;
+    $c->stash->{calls} = [ reverse @$calls ];
 
     return;
 }
@@ -2519,7 +2532,7 @@ sub do_edit_list : Local {
         $add =~ s/ //g;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username_shell_pattern', { pattern => $add }, \$checkresult);
 
-        if ($checkresult) {
+        if ($list eq 'outbound_prefixes' || $list eq 'rerouting_list' || $list eq 'custom_headers' || $checkresult) {
             my $blocklist = $$preferences{$list};
             $blocklist = [] unless defined $blocklist;
             $blocklist = [ $blocklist ] unless ref $blocklist;
@@ -2556,15 +2569,31 @@ sub do_edit_list : Local {
     }
 
     unless(keys %messages) {
-        $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_preferences',
-            { username => $$subscriber{username},
-              domain   => $$subscriber{domain},
-              preferences => {
-                $list => $$preferences{$list},
-              },
-            },
-            undef
-        );
+	if ($list eq 'allowed_clis') {
+		if ($add or $del) {
+			my $func_name = 'add_allowed_clis';
+			$func_name = 'delete_allowed_clis' if $del;
+			$c->model('Provisioning')->call_prov( $c, 'voip', $func_name,
+				{ username => $$subscriber{username},
+				  domain   => $$subscriber{domain},
+				  $list => [$add || $del]
+				},
+				undef
+			);
+		} else {
+            		$messages{msgadd} = 'Client.Function.Disabled';
+		}
+	} else {
+	    $c->model('Provisioning')->call_prov( $c, 'voip', 'set_subscriber_preferences',
+		{ username => $$subscriber{username},
+		  domain   => $$subscriber{domain},
+		  preferences => {
+		    $list => $$preferences{$list},
+		  },
+		},
+		undef
+	    );
+	}
     } else {
         $messages{numerr} = 'Client.Voip.InputErrorFound';
     }

@@ -36,7 +36,7 @@
 
         <h3 id="master">Master Data</h3>
 
-      [% UNLESS Catalyst.session.admin.read_only %]
+      [% IF 0 %]
         <div id="buttonbox" style="position:relative;">
         [% IF subscriber.subscriber_id && !edit_subscriber %]
           <a href="detail?subscriber_id=[% subscriber.subscriber_id %]&amp;edit_subscriber=1"><span class="button-edit">Edit</span></a>
