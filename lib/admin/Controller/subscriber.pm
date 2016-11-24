@@ -2532,7 +2532,7 @@ sub do_edit_list : Local {
         $add =~ s/ //g;
         return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username_shell_pattern', { pattern => $add }, \$checkresult);
 
-        if ($list eq 'outbound_prefixes' || $list eq 'rerouting_list' || $list eq 'custom_headers' || $checkresult) {
+        if ($list eq 'outbound_prefixes' || $list eq 'rerouting_list' || $list eq 'custom_headers' || $list eq 'advice_of_charge' || $checkresult) {
             my $blocklist = $$preferences{$list};
             $blocklist = [] unless defined $blocklist;
             $blocklist = [ $blocklist ] unless ref $blocklist;

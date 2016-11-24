@@ -253,12 +253,26 @@ sub edit_list : Local {
 
     if(defined $$preferences{$list}) {
         my $block_list = ref $$preferences{$list} ? $$preferences{$list} : [ $$preferences{$list} ];
-        $c->stash->{list_data} = admin::Utils::prepare_tt_list($c, $block_list);
+
+        my @block_list_to_sort;
+        foreach my $blockentry (@$block_list) {
+            my $active = $blockentry =~ s/^#// ? 0 : 1;
+            push @block_list_to_sort, { entry => $blockentry, active => $active };
+        }
+        my $bg = '';
+        my $i = 1;
+        foreach my $blockentry (sort {$a->{entry} cmp $b->{entry}} @block_list_to_sort) {
+            push @{$c->stash->{list_data}}, { number     => $$blockentry{entry},
+                                              background => $bg ? '' : 'tr_alt',
+                                              id         => $i++,
+                                              active     => $$blockentry{active},
+                                            };
+            $bg = !$bg;
+        }
     }
 
-    $c->stash->{list_name} = $list;
-
     my $list_mode = $list;
+    $c->stash->{list_name} = $list;
     $list_mode =~ s/list$/mode/;
     $c->stash->{list_mode} = $$preferences{$list_mode};
     $list_mode =~ s/mode$/clir/;
@@ -281,6 +295,7 @@ Update a number list preference in the database.
 sub do_edit_list : Local {
     my ( $self, $c ) = @_;
 
+    my %messages;
     my $domain = $c->request->params->{domain};
     $c->stash->{domain} = $domain;
 
@@ -301,7 +316,48 @@ sub do_edit_list : Local {
     # activate/deactivate link next to entries in block list
     my $act = $c->request->params->{block_act};
 
-    admin::Utils::addelact_blocklist($c, $preferences, $list, $add, $del, $act);
+    #admin::Utils::addelact_blocklist($c, $preferences, $list, $add, $del, $act);
+
+    if (defined $add) { # input text field to add new entry to block list
+        my $checkresult;
+        $add =~ s/ //g;
+        return unless $c->model('Provisioning')->call_prov( $c, 'voip', 'check_sip_username_shell_pattern', { pattern => $add }, \$checkresult);
+
+        if ($list eq 'advice_of_charge' || $checkresult) {
+            my $blocklist = $$preferences{$list};
+            $blocklist = [] unless defined $blocklist;
+            $blocklist = [ $blocklist ] unless ref $blocklist;
+            $$preferences{$list} = [ @$blocklist, $add ];
+        }
+        else {
+            $messages{msgadd} = 'Client.Syntax.InvalidSipUsernamePattern';
+            $c->session->{blockaddtxt} = $add;
+        }
+    }
+    elsif (defined $del) { # delete link next to entries in block list
+        my $blocklist = $$preferences{$list};
+        if (defined $blocklist) {
+            $blocklist = [ $blocklist ] unless ref $blocklist;
+            if($c->request->params->{block_stat}) {
+                $$preferences{$list} = [ grep { $_ ne $del } @$blocklist ];
+            } else {
+                $$preferences{$list} = [ grep { $_ ne '#'.$del } @$blocklist ];
+            }
+        }
+    }
+    elsif (defined $act) { # activate/deactivate link next to entries in block list
+        my $blocklist = $$preferences{$list};
+        if (defined $blocklist) {
+            $blocklist = [ $blocklist ] unless ref $blocklist;
+            if($c->request->params->{block_stat}) {
+                $$preferences{$list} = [ grep { $_ ne $act } @$blocklist ];
+                push @{$$preferences{$list}}, '#'.$act;
+            } else {
+                $$preferences{$list} = [ grep { $_ ne '#'.$act } @$blocklist ];
+                push @{$$preferences{$list}}, $act;
+            }
+        }
+    }
 
     unless(eval {keys %{$c->session->{messages}} }) {
         $c->model('Provisioning')->call_prov( $c, 'voip', 'set_domain_preferences',
@@ -316,6 +372,7 @@ sub do_edit_list : Local {
         $c->session->{messages}{numerr} = 'Client.Voip.InputErrorFound';
     }
 
+    $c->session->{messages} = \%messages;
     $c->response->redirect("/domain/edit_list?domain=$domain&list_name=$list");
 }
 
