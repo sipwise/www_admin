@@ -1,9 +1,0 @@
-<!-- BEGIN layout/footer -->
-    <div id="footer" class="span-24 last">
-      <p>
-        NGCP www_admin version [% build_version %] -
-        Copyright 2007-2013 Sipwise GmbH, Austria.<br />
-        <a href="http://sipwise.com/">www.sipwise.com</a>
-      </p>
-    </div>
-<!-- END layout/footer -->
